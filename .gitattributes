@@ -1,0 +1,2 @@
+Assets/Scenes/Faraday.unity filter=lfs diff=lfs merge=lfs -text
+Assets/Real[[:space:]]Materials/Textures/plaster[[:space:]]common[[:space:]]normal.png filter=lfs diff=lfs merge=lfs -text
