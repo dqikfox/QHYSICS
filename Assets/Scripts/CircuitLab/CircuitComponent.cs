@@ -38,7 +38,19 @@ public class CircuitComponent : MonoBehaviour
         Current = 0f;
     }
 
-    protected virtual void Start() { }
+    protected virtual void Start()
+    {
+        EnsureLabReference();
+    }
+
+    protected void EnsureLabReference()
+    {
+        if (Lab == null)
+        {
+            Lab = Object.FindAnyObjectByType<CircuitLab>();
+        }
+    }
+
     protected virtual void Update() { }
 
     public void Place(Point start, Direction dir)
@@ -98,14 +110,20 @@ public class CircuitComponent : MonoBehaviour
     public virtual void SelectEntered()
     {
         IsHeld = true;
+        EnsureLabReference();
 
         // Enable box and sphere colliders so this piece can be placed somewhere else on the board.
-        GetComponent<BoxCollider>().enabled = true;
-        GetComponent<SphereCollider>().enabled = true;
+        var box = GetComponent<BoxCollider>();
+        if (box != null) box.enabled = true;
+        var sphere = GetComponent<SphereCollider>();
+        if (sphere != null) sphere.enabled = true;
 
         if (IsPlaced)
         {
-            Lab.RemoveComponent(this.gameObject, StartingPeg);
+            if (Lab != null)
+            {
+                Lab.RemoveComponent(this.gameObject, StartingPeg);
+            }
 
             IsPlaced = false;
         }
@@ -119,13 +137,19 @@ public class CircuitComponent : MonoBehaviour
         IsHeld = false;
 
         // Make sure gravity is enabled any time we release the object
-        GetComponent<Rigidbody>().isKinematic = false;
-        GetComponent<Rigidbody>().useGravity = true;
+        var rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
+        }
     }
 
     protected IEnumerator PlaySound(AudioSource source, float delay)
     {
+        if (source == null) yield break;
         yield return new WaitForSeconds(delay);
+        if (source == null) yield break;
 
         source.Stop();
         source.Play();
@@ -133,6 +157,7 @@ public class CircuitComponent : MonoBehaviour
 
     protected void RotateLabel(GameObject label, LabelAlignment alignment)
     {
+        if (label == null) return;
         var rotation = label.transform.localEulerAngles;
         var position = label.transform.localPosition;
 
