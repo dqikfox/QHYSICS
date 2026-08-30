@@ -12,7 +12,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Faraday.unity
     guid: 44ece8016ef9edc45b393d83582f5cd1
   m_configObjects:
-    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 067be370b26c88341bb5a5b496448979, type: 2}
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 15c7a55b5cc102149bd86073d5cc68a9, type: 2}
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 7a0e7935bbe6c6d41aa9272196e205b3, type: 2}

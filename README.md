@@ -28,3 +28,25 @@ This project uses the Unity game engine, Unity's XR integration framework, and <
 
 All code outside of the SpiceSharp library was designed, written, and tested by <a href="https://www.linkedin.com/in/dschack/">Darren Schack</a>, a Seattle-based full stack software engineer with a passion for technology and a particular interest in virtual reality.
 
+<h2>Reality Engine VERSION 0.2 - OpenXR foundation (Quest 3S)</h2>
+
+<p>Faraday now uses Unity OpenXR instead of the deprecated Oculus XR Plugin. Gameplay, SpiceSharp, and the Faraday.unity circuit lab were not rewritten. Faraday scripts are Unity XR / XRI based (no OVRInput / OVRManager / UnityEngine.XR.Oculus hits).</p>
+
+<p><b>Play in Editor (Quest 3S via Link)</b></p>
+<ol>
+  <li>Open <code>Assets/Scenes/Faraday.unity</code></li>
+  <li>Edit &gt; Project Settings &gt; XR Plug-in Management: check <b>OpenXR</b> on the <b>Windows</b> tab and the <b>Android</b> tab. Uncheck Oculus if it still appears.</li>
+  <li>Optional: Unity menu <b>Reality Engine &gt; Enable OpenXR for Quest</b> assigns the OpenXR loader and removes Oculus if still assigned.</li>
+  <li>In the Game view, turn <b>Gizmos</b> off.</li>
+  <li>Quest 3S via Link, then Play.</li>
+</ol>
+
+<p><b>Android / Quest device build</b> - Player Settings &gt; Android:</p>
+<ul>
+  <li>Scripting Backend: IL2CPP</li>
+  <li>Target Architectures: ARM64</li>
+  <li>Minimum API Level: 29</li>
+  <li>Texture compression: ASTC</li>
+</ul>
+
+<p>OpenXR Plugin is the Unity 6 Package Manager pin already in this project (<code>com.unity.xr.openxr</code> 1.18.0). Meta's 2026-05-18 note recommended 1.15.1; that version's package does not list Unity 6 (<code>unity: 6000.0</code> starts at 1.18.0 here). <code>com.unity.xr.oculus</code> has been removed.</p>
