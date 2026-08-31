@@ -13,9 +13,9 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Experiments
 {
     /// <summary>
-    /// Reality Engine v0.3 — Electromagnetic Induction Laboratory.
+    /// Reality Engine v0.4 — Electromagnetic Induction Laboratory + Field Lens.
     /// Spawns a grabable bar magnet, copper coil, resistive load, sampled B overlay,
-    /// and a TMP readout beside Faraday's breadboard. Does not touch SpiceSharp.
+    /// Field Lens peels, and a TMP readout beside Faraday's breadboard. Does not touch SpiceSharp.
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(ModelCard))]
@@ -64,6 +64,7 @@ namespace RealityEngine.Experiments
         MagneticFieldViz _fieldViz;
         InductionReadout _readout;
         MagneticDipole _dipole;
+        FieldLens _fieldLens;
         Renderer _loadRenderer;
         Material _loadMaterial;
         bool _built;
@@ -72,6 +73,7 @@ namespace RealityEngine.Experiments
         public InductionCoil Coil => _coil;
         public InductionCircuit Circuit => _circuit;
         public MagneticDipole Dipole => _dipole;
+        public FieldLens FieldLens => _fieldLens;
 
         void Reset()
         {
@@ -104,7 +106,10 @@ namespace RealityEngine.Experiments
             if (buildOnStart && transform.Find("Magnet") == null)
                 BuildLab();
             else
+            {
                 CacheChildren();
+                EnsureFieldLens();
+            }
         }
 
         void OnDestroy()
@@ -131,14 +136,14 @@ namespace RealityEngine.Experiments
                 if (kb.digit1Key.wasPressedThisFrame) SetTimeScale(1f);
                 if (kb.digit2Key.wasPressedThisFrame) SetTimeScale(0.1f);
                 if (kb.digit3Key.wasPressedThisFrame) SetTimeScale(0f);
-                if (kb.fKey.wasPressedThisFrame && _fieldViz != null) _fieldViz.ToggleVisible();
+                if (kb.fKey.wasPressedThisFrame) ToggleMagneticLayer();
             }
 #endif
 #if ENABLE_LEGACY_INPUT_MANAGER
             if (Input.GetKeyDown(KeyCode.Alpha1)) SetTimeScale(1f);
             if (Input.GetKeyDown(KeyCode.Alpha2)) SetTimeScale(0.1f);
             if (Input.GetKeyDown(KeyCode.Alpha3)) SetTimeScale(0f);
-            if (Input.GetKeyDown(KeyCode.F) && _fieldViz != null) _fieldViz.ToggleVisible();
+            if (Input.GetKeyDown(KeyCode.F)) ToggleMagneticLayer();
 #endif
         }
 
@@ -171,6 +176,7 @@ namespace RealityEngine.Experiments
             if (transform.Find("Magnet") != null)
             {
                 CacheChildren();
+                EnsureFieldLens();
                 _built = true;
                 return;
             }
@@ -209,6 +215,7 @@ namespace RealityEngine.Experiments
             if (GetComponent<ModelCard>() == null)
                 gameObject.AddComponent<ModelCard>();
 
+            EnsureFieldLens();
             _built = true;
         }
 
@@ -231,6 +238,7 @@ namespace RealityEngine.Experiments
                 _fieldViz = viz.GetComponent<MagneticFieldViz>();
             if (readout != null)
                 _readout = readout.GetComponent<InductionReadout>();
+            _fieldLens = GetComponent<FieldLens>();
             if (load != null)
             {
                 _loadRenderer = load.GetComponent<Renderer>();
@@ -478,8 +486,8 @@ namespace RealityEngine.Experiments
             tmp.fontSize = 0.22f;
             tmp.alignment = TextAlignmentOptions.TopLeft;
             tmp.color = new Color(0.92f, 0.95f, 0.85f);
-            tmp.rectTransform.sizeDelta = new Vector2(0.62f, 0.40f);
-            tmp.enableWordWrapping = true;
+            tmp.rectTransform.sizeDelta = new Vector2(0.62f, 0.48f);
+            tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.raycastTarget = false;
             TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
             if (font != null)
@@ -493,7 +501,7 @@ namespace RealityEngine.Experiments
             board.name = "Board";
             board.transform.SetParent(go.transform, false);
             board.transform.localPosition = new Vector3(0.22f, -0.12f, 0.01f);
-            board.transform.localScale = new Vector3(0.64f, 0.36f, 0.008f);
+            board.transform.localScale = new Vector3(0.64f, 0.44f, 0.008f);
             KillCollider(board);
             ApplyMat(board, MakeLit(new Color(0.05f, 0.07f, 0.06f)));
 
@@ -507,8 +515,7 @@ namespace RealityEngine.Experiments
             BuildButton(origin + new Vector3(0f, 0f, 0.12f), "Pause", () => SetTimeScale(0f), new Color(0.7f, 0.2f, 0.2f));
             BuildButton(origin + new Vector3(0f, 0f, 0.18f), "Field", () =>
             {
-                if (_fieldViz != null)
-                    _fieldViz.ToggleVisible();
+                ToggleMagneticLayer();
             }, new Color(0.2f, 0.55f, 0.75f));
         }
 
@@ -610,6 +617,128 @@ namespace RealityEngine.Experiments
                 Destroy(c);
             else
                 DestroyImmediate(c);
+        }
+
+        void ToggleMagneticLayer()
+        {
+            if (_fieldLens == null)
+                _fieldLens = GetComponent<FieldLens>();
+            if (_fieldLens != null)
+            {
+                if (_fieldLens.CurrentLayer == (int)FieldLensLayer.Magnetic)
+                    _fieldLens.SetLayer((int)FieldLensLayer.Normal);
+                else
+                    _fieldLens.SetLayer((int)FieldLensLayer.Magnetic);
+                return;
+            }
+            if (_fieldViz != null)
+                _fieldViz.ToggleVisible();
+        }
+
+        public void EnsureFieldLens()
+        {
+            CacheChildren();
+
+            FieldLens lens = GetComponent<FieldLens>();
+            if (lens == null)
+                lens = gameObject.AddComponent<FieldLens>();
+            _fieldLens = lens;
+
+            if (_dipole != null)
+            {
+                FieldLensTarget magTarget = _dipole.GetComponent<FieldLensTarget>();
+                if (magTarget == null)
+                    magTarget = _dipole.gameObject.AddComponent<FieldLensTarget>();
+                magTarget.Configure(lens, FieldLensTargetKind.Magnet, _dipole, _circuit, _fieldViz);
+            }
+
+            if (_coil != null)
+            {
+                EnsureAimCollider(_coil.gameObject, Mathf.Max(0.05f, coilRadius));
+                FieldLensTarget coilTarget = _coil.GetComponent<FieldLensTarget>();
+                if (coilTarget == null)
+                    coilTarget = _coil.gameObject.AddComponent<FieldLensTarget>();
+                coilTarget.Configure(lens, FieldLensTargetKind.Coil, _dipole, _circuit, null);
+            }
+
+            Transform load = transform.Find("Load");
+            if (load != null)
+            {
+                EnsureAimCollider(load.gameObject, 0.04f);
+                FieldLensTarget loadTarget = load.GetComponent<FieldLensTarget>();
+                if (loadTarget == null)
+                    loadTarget = load.gameObject.AddComponent<FieldLensTarget>();
+                loadTarget.Configure(lens, FieldLensTargetKind.Load, _dipole, _circuit, null);
+            }
+
+            if (_readout != null)
+                lens.BindReadout(_readout);
+
+            ModelCard card = GetComponent<ModelCard>();
+            if (card != null)
+                lens.BindModelCard(card);
+
+            MathModelViz math = null;
+            Transform mathT = transform.Find("MathModel");
+            if (mathT != null)
+                math = mathT.GetComponent<MathModelViz>();
+            if (math == null)
+            {
+                var mathGo = new GameObject("MathModel");
+                mathGo.transform.SetParent(transform, true);
+                if (_readout != null)
+                    mathGo.transform.position = _readout.transform.position + new Vector3(0.0f, 0.42f, 0.0f);
+                else
+                    mathGo.transform.position = transform.position + new Vector3(0.4f, 1.1f, 0.6f);
+                math = mathGo.AddComponent<MathModelViz>();
+            }
+            math.Bind(_circuit, _dipole);
+            lens.BindMath(math);
+
+            EnsureLensButtons(lens);
+            lens.SetLayer(lens.CurrentLayer);
+        }
+
+        static void EnsureAimCollider(GameObject go, float worldRadius)
+        {
+            if (go.GetComponent<XRGrabInteractable>() != null)
+                return;
+
+            Transform hit = go.transform.Find("LensHit");
+            GameObject hitGo;
+            if (hit == null)
+            {
+                hitGo = new GameObject("LensHit");
+                hitGo.transform.SetParent(go.transform, false);
+                hitGo.transform.localPosition = Vector3.zero;
+                Vector3 ls = go.transform.lossyScale;
+                hitGo.transform.localScale = new Vector3(
+                    1f / Mathf.Max(ls.x, 1e-4f),
+                    1f / Mathf.Max(ls.y, 1e-4f),
+                    1f / Mathf.Max(ls.z, 1e-4f));
+                var sc = hitGo.AddComponent<SphereCollider>();
+                sc.radius = worldRadius;
+                sc.isTrigger = true;
+            }
+            else
+            {
+                hitGo = hit.gameObject;
+            }
+
+            if (go.GetComponent<XRSimpleInteractable>() == null && hitGo.GetComponent<XRSimpleInteractable>() == null)
+                hitGo.AddComponent<XRSimpleInteractable>();
+        }
+
+        void EnsureLensButtons(FieldLens lens)
+        {
+            if (transform.Find("Button_Lens+") != null)
+                return;
+            Transform time1 = transform.Find("Button_Time1x");
+            Vector3 origin = time1 != null
+                ? time1.position
+                : transform.position + new Vector3(-0.25f, 0.8f, 0.5f);
+            BuildButton(origin + new Vector3(0f, 0f, 0.24f), "Lens +", () => lens.StepNext(), new Color(0.55f, 0.35f, 0.85f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.30f), "Lens -", () => lens.StepPrevious(), new Color(0.35f, 0.22f, 0.55f));
         }
     }
 }

@@ -5,7 +5,7 @@ using RealityEngine.Physics.Electromagnetism;
 namespace RealityEngine.Visualization
 {
     /// <summary>
-    /// World-space TMP panel of Φ, dΦ/dt, EMF, I plus the classical-model disclaimer.
+    /// World-space TMP panel of Φ, dΦ/dt, EMF, I plus the classical-model disclaimer and Field Lens layer.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(40)]
@@ -33,8 +33,9 @@ namespace RealityEngine.Visualization
         InductionCircuit _circuit;
         TextMeshPro _text;
         Camera _camera;
+        FieldLens _lens;
         float _nextRefresh;
-        readonly System.Text.StringBuilder _sb = new System.Text.StringBuilder(512);
+        readonly System.Text.StringBuilder _sb = new System.Text.StringBuilder(768);
 
         public void SetCircuit(InductionCircuit value)
         {
@@ -47,6 +48,11 @@ namespace RealityEngine.Visualization
             SetCircuit(value);
             text = tmp;
             _text = tmp;
+        }
+
+        public void SetFieldLens(FieldLens lens)
+        {
+            _lens = lens;
         }
 
         public TextMeshPro Text => _text != null ? _text : text;
@@ -94,8 +100,15 @@ namespace RealityEngine.Visualization
         void RebuildText()
         {
             _sb.Length = 0;
-            _sb.Append("INDUCTION LAB  v0.3\n");
+            _sb.Append("INDUCTION LAB  v0.4\n");
             _sb.Append("Faraday law  EMF = -N dΦ/dt\n");
+            if (_lens != null)
+            {
+                _sb.Append("Field Lens  ").Append(_lens.CurrentLayerName);
+                _sb.Append("  [").Append(_lens.CurrentHonestyTag).Append("]\n");
+                if (_lens.Focused != null)
+                    _sb.Append("Aim  ").Append(_lens.Focused.KindName).Append('\n');
+            }
             _sb.Append("timeScale ").Append(Time.timeScale.ToString("0.###"));
             if (Time.timeScale <= 0f)
                 _sb.Append("  PAUSED");
@@ -117,6 +130,14 @@ namespace RealityEngine.Visualization
 
             _sb.Append('\n');
             _sb.Append(Disclaimer);
+            if (_lens != null)
+            {
+                _sb.Append("\nField Lens: ").Append(_lens.CurrentLayerName);
+                _sb.Append(" — ").Append(_lens.CurrentHonestyTag);
+                _sb.Append(". Never a literal quantum state.");
+                if (_lens.CurrentLayerEnum == FieldLensLayer.EnergyFlow)
+                    _sb.Append(" Energy flow is an educational approximation, not a full EM energy-flow solver.");
+            }
             _text.text = _sb.ToString();
         }
 
