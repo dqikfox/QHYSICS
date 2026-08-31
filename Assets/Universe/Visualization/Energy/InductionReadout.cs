@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using RealityEngine.Physics.Electromagnetism;
+using RealityEngine.Core;
 
 namespace RealityEngine.Visualization
 {
@@ -34,8 +35,9 @@ namespace RealityEngine.Visualization
         TextMeshPro _text;
         Camera _camera;
         FieldLens _lens;
+        ScaleEngine _scale;
         float _nextRefresh;
-        readonly System.Text.StringBuilder _sb = new System.Text.StringBuilder(768);
+        readonly System.Text.StringBuilder _sb = new System.Text.StringBuilder(1200);
 
         public void SetCircuit(InductionCircuit value)
         {
@@ -53,6 +55,11 @@ namespace RealityEngine.Visualization
         public void SetFieldLens(FieldLens lens)
         {
             _lens = lens;
+        }
+
+        public void SetScaleEngine(ScaleEngine engine)
+        {
+            _scale = engine;
         }
 
         public TextMeshPro Text => _text != null ? _text : text;
@@ -100,8 +107,15 @@ namespace RealityEngine.Visualization
         void RebuildText()
         {
             _sb.Length = 0;
-            _sb.Append("INDUCTION LAB  v0.4\n");
+            _sb.Append("INDUCTION LAB  v0.5\n");
             _sb.Append("Faraday law  EMF = -N dΦ/dt\n");
+            if (_scale != null)
+            {
+                _sb.Append("Scale  ").Append(_scale.CurrentScaleName);
+                _sb.Append("  [").Append(_scale.CurrentHonestyTag).Append("]\n");
+                _sb.Append(_scale.CurrentInForce).Append('\n');
+                _sb.Append(_scale.CurrentParked).Append('\n');
+            }
             if (_lens != null)
             {
                 _sb.Append("Field Lens  ").Append(_lens.CurrentLayerName);
@@ -130,6 +144,12 @@ namespace RealityEngine.Visualization
 
             _sb.Append('\n');
             _sb.Append(Disclaimer);
+            if (_scale != null)
+            {
+                _sb.Append("\nScale Engine: ").Append(_scale.CurrentScaleName);
+                _sb.Append("  [").Append(_scale.CurrentHonestyTag).Append("]");
+                _sb.Append(". Human-scale Faraday sim still running underneath.");
+            }
             if (_lens != null)
             {
                 _sb.Append("\nField Lens: ").Append(_lens.CurrentLayerName);

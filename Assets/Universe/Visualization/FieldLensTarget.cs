@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using RealityEngine.Physics.Electromagnetism;
+using RealityEngine.Core;
 
 namespace RealityEngine.Visualization
 {
@@ -38,6 +39,7 @@ namespace RealityEngine.Visualization
         bool _xriWired;
         bool _configured;
         int _layer;
+        int _scale;
 
         public FieldLensTargetKind Kind => _kind;
         public string KindName => _kind.ToString();
@@ -292,19 +294,27 @@ namespace RealityEngine.Visualization
             }
         }
 
+        public void SetScale(int scale)
+        {
+            _scale = Mathf.Clamp(scale, 0, ScaleEngine.StepCount - 1);
+            ApplyLayer(_layer);
+        }
+
         public void ApplyLayer(int layer)
         {
             _layer = Mathf.Clamp(layer, 0, FieldLens.LayerCount - 1);
             FieldLensLayer L = (FieldLensLayer)_layer;
+            ScaleLevel S = (ScaleLevel)Mathf.Clamp(_scale, 0, ScaleEngine.StepCount - 1);
 
+            // Field Lens Atomic hides solids; Scale Engine never hides the grabable magnet.
             bool showSolid = L != FieldLensLayer.Atomic;
             SetOriginalVisible(showSolid);
-            ApplyMaterialLook(L == FieldLensLayer.Material);
+            ApplyMaterialLook(L == FieldLensLayer.Material || S == ScaleLevel.Material);
 
             if (_lattice != null)
-                _lattice.Visible = L == FieldLensLayer.Atomic;
+                _lattice.Visible = L == FieldLensLayer.Atomic || S == ScaleLevel.Molecular;
             if (_charge != null)
-                _charge.Visible = L == FieldLensLayer.Charge;
+                _charge.Visible = L == FieldLensLayer.Charge || S == ScaleLevel.Atomic;
             if (_electric != null)
                 _electric.Visible = L == FieldLensLayer.Electric;
             if (_poynting != null)
