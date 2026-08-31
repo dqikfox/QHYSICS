@@ -5,7 +5,7 @@ using RealityEngine.Physics.Electromagnetism;
 namespace RealityEngine.Visualization
 {
     /// <summary>
-    /// Cheap VR field-line overlay. Each vertex is B from
+    /// Cheap VR field-line overlay. Reused by v0.4 Field Lens magnetic layer. Each vertex is B from
     /// <see cref="MagneticDipole.CalculateFieldAt"/>, not decorative noise.
     /// Budget: a few dozen lines of short polylines.
     /// </summary>
