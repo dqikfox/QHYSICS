@@ -6,6 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using TMPro;
 using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Visualization;
+using RealityEngine.Core;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -13,7 +14,7 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Experiments
 {
     /// <summary>
-    /// Reality Engine v0.4 — Electromagnetic Induction Laboratory + Field Lens.
+    /// Reality Engine v0.5 — Electromagnetic Induction Laboratory + Field Lens + Scale Engine.
     /// Spawns a grabable bar magnet, copper coil, resistive load, sampled B overlay,
     /// Field Lens peels, and a TMP readout beside Faraday's breadboard. Does not touch SpiceSharp.
     /// </summary>
@@ -65,6 +66,7 @@ namespace RealityEngine.Experiments
         InductionReadout _readout;
         MagneticDipole _dipole;
         FieldLens _fieldLens;
+        ScaleEngine _scaleEngine;
         Renderer _loadRenderer;
         Material _loadMaterial;
         bool _built;
@@ -74,6 +76,7 @@ namespace RealityEngine.Experiments
         public InductionCircuit Circuit => _circuit;
         public MagneticDipole Dipole => _dipole;
         public FieldLens FieldLens => _fieldLens;
+        public ScaleEngine ScaleEngine => _scaleEngine;
 
         void Reset()
         {
@@ -109,6 +112,7 @@ namespace RealityEngine.Experiments
             {
                 CacheChildren();
                 EnsureFieldLens();
+                EnsureScaleEngine();
             }
         }
 
@@ -177,6 +181,7 @@ namespace RealityEngine.Experiments
             {
                 CacheChildren();
                 EnsureFieldLens();
+                EnsureScaleEngine();
                 _built = true;
                 return;
             }
@@ -216,6 +221,7 @@ namespace RealityEngine.Experiments
                 gameObject.AddComponent<ModelCard>();
 
             EnsureFieldLens();
+            EnsureScaleEngine();
             _built = true;
         }
 
@@ -239,6 +245,7 @@ namespace RealityEngine.Experiments
             if (readout != null)
                 _readout = readout.GetComponent<InductionReadout>();
             _fieldLens = GetComponent<FieldLens>();
+            _scaleEngine = GetComponent<ScaleEngine>();
             if (load != null)
             {
                 _loadRenderer = load.GetComponent<Renderer>();
@@ -699,6 +706,45 @@ namespace RealityEngine.Experiments
             lens.SetLayer(lens.CurrentLayer);
         }
 
+        public void EnsureScaleEngine()
+        {
+            CacheChildren();
+            if (_fieldLens == null)
+                EnsureFieldLens();
+
+            ScaleEngine engine = GetComponent<ScaleEngine>();
+            if (engine == null)
+                engine = gameObject.AddComponent<ScaleEngine>();
+            _scaleEngine = engine;
+
+            BindScaleTarget(_dipole != null ? _dipole.gameObject : null, engine);
+            BindScaleTarget(_coil != null ? _coil.gameObject : null, engine);
+            Transform load = transform.Find("Load");
+            if (load != null)
+                BindScaleTarget(load.gameObject, engine);
+
+            if (_readout != null)
+                engine.BindReadout(_readout);
+
+            ModelCard card = GetComponent<ModelCard>();
+            if (card != null)
+                engine.BindModelCard(card);
+
+            EnsureScaleButtons(engine);
+            engine.SetScale(engine.CurrentScale);
+        }
+
+        static void BindScaleTarget(GameObject go, ScaleEngine engine)
+        {
+            if (go == null || engine == null)
+                return;
+            FieldLensTarget lensTarget = go.GetComponent<FieldLensTarget>();
+            ScaleAwareTarget aware = go.GetComponent<ScaleAwareTarget>();
+            if (aware == null)
+                aware = go.AddComponent<ScaleAwareTarget>();
+            aware.Configure(engine, lensTarget);
+        }
+
         static void EnsureAimCollider(GameObject go, float worldRadius)
         {
             if (go.GetComponent<XRGrabInteractable>() != null)
@@ -739,6 +785,18 @@ namespace RealityEngine.Experiments
                 : transform.position + new Vector3(-0.25f, 0.8f, 0.5f);
             BuildButton(origin + new Vector3(0f, 0f, 0.24f), "Lens +", () => lens.StepNext(), new Color(0.55f, 0.35f, 0.85f));
             BuildButton(origin + new Vector3(0f, 0f, 0.30f), "Lens -", () => lens.StepPrevious(), new Color(0.35f, 0.22f, 0.55f));
+        }
+
+        void EnsureScaleButtons(ScaleEngine engine)
+        {
+            if (transform.Find("Button_Scale+") != null)
+                return;
+            Transform lensPlus = transform.Find("Button_Lens+");
+            Vector3 origin = lensPlus != null
+                ? lensPlus.position
+                : transform.position + new Vector3(-0.25f, 0.8f, 0.5f);
+            BuildButton(origin + new Vector3(0f, 0f, 0.06f), "Scale +", () => engine.StepIn(), new Color(0.15f, 0.62f, 0.72f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.12f), "Scale -", () => engine.StepOut(), new Color(0.10f, 0.42f, 0.52f));
         }
     }
 }

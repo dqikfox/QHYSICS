@@ -7,7 +7,7 @@ using RealityEngine.Visualization;
 namespace RealityEngine.EditorTools
 {
     /// <summary>
-    /// Places the Reality Engine v0.4 induction lab (with Field Lens) into the currently open scene.
+    /// Places the Reality Engine v0.5 induction lab (with Field Lens + Scale Engine) into the currently open scene.
     /// Use this while Faraday.unity is open, then save the scene.
     /// </summary>
     public static class RealityEngineInductionLabMenu
@@ -21,11 +21,12 @@ namespace RealityEngine.EditorTools
             if (existing != null)
             {
                 existing.EnsureFieldLens();
+                existing.EnsureScaleEngine();
                 Selection.activeGameObject = existing.gameObject;
                 EditorGUIUtility.PingObject(existing);
                 if (existing.gameObject.scene.IsValid())
                     EditorSceneManager.MarkSceneDirty(existing.gameObject.scene);
-                Debug.Log("Induction Lab already exists. Field Lens v0.4 ensured on: " + existing.gameObject.name, existing);
+                Debug.Log("Induction Lab already exists. Field Lens + Scale Engine v0.5 ensured on: " + existing.gameObject.name, existing);
                 return;
             }
 
@@ -39,7 +40,7 @@ namespace RealityEngine.EditorTools
             if (go.scene.IsValid())
                 EditorSceneManager.MarkSceneDirty(go.scene);
             Debug.Log(
-                "Placed Induction Lab v0.4 (Field Lens) in scene '" + go.scene.name +
+                "Placed Induction Lab v0.5 (Field Lens + Scale Engine) in scene '" + go.scene.name +
                 "'. Save Faraday.unity to keep it. On Play, the bootstrap also builds if Magnet is missing.",
                 go);
         }
