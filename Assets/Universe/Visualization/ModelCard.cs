@@ -3,7 +3,7 @@ using UnityEngine;
 namespace RealityEngine.Visualization
 {
     /// <summary>
-    /// Honest model label for Reality Engine v0.5. Not a Maxwell solver, not a picture of electrons.
+    /// Honest model label for Reality Engine v0.6. Not a Maxwell solver, not a picture of electrons.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class ModelCard : MonoBehaviour
@@ -17,12 +17,15 @@ namespace RealityEngine.Visualization
 
         string _layerLine;
         string _scaleLine;
+        string _experimentLine;
 
         public string Disclaimer => string.IsNullOrEmpty(disclaimer) ? Text : disclaimer;
 
         public string LayerLine => _layerLine;
 
         public string ScaleLine => _scaleLine;
+
+        public string ExperimentLine => _experimentLine;
 
         public void SetLayerLine(string line)
         {
@@ -34,6 +37,11 @@ namespace RealityEngine.Visualization
             _scaleLine = line;
         }
 
+        public void SetExperimentLine(string line)
+        {
+            _experimentLine = line;
+        }
+
         public string Compose()
         {
             string s = Disclaimer;
@@ -41,6 +49,8 @@ namespace RealityEngine.Visualization
                 s += "\n" + _layerLine;
             if (!string.IsNullOrEmpty(_scaleLine))
                 s += "\n" + _scaleLine;
+            if (!string.IsNullOrEmpty(_experimentLine))
+                s += "\n" + _experimentLine;
             return s;
         }
     }

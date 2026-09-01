@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Core;
+using RealityEngine.Experiments;
 
 namespace RealityEngine.Visualization
 {
@@ -36,8 +37,9 @@ namespace RealityEngine.Visualization
         Camera _camera;
         FieldLens _lens;
         ScaleEngine _scale;
+        ExperimentRunner _experiment;
         float _nextRefresh;
-        readonly System.Text.StringBuilder _sb = new System.Text.StringBuilder(1200);
+        readonly System.Text.StringBuilder _sb = new System.Text.StringBuilder(1800);
 
         public void SetCircuit(InductionCircuit value)
         {
@@ -60,6 +62,11 @@ namespace RealityEngine.Visualization
         public void SetScaleEngine(ScaleEngine engine)
         {
             _scale = engine;
+        }
+
+        public void SetExperimentRunner(ExperimentRunner runner)
+        {
+            _experiment = runner;
         }
 
         public TextMeshPro Text => _text != null ? _text : text;
@@ -107,7 +114,7 @@ namespace RealityEngine.Visualization
         void RebuildText()
         {
             _sb.Length = 0;
-            _sb.Append("INDUCTION LAB  v0.5\n");
+            _sb.Append("INDUCTION LAB  v0.6\n");
             _sb.Append("Faraday law  EMF = -N dΦ/dt\n");
             if (_scale != null)
             {
@@ -128,6 +135,16 @@ namespace RealityEngine.Visualization
                 _sb.Append("  PAUSED");
             _sb.Append('\n');
 
+            if (_experiment != null)
+            {
+                _sb.Append("Experiment  ").Append(_experiment.State);
+                _sb.Append("  [").Append(_experiment.HonestyTag).Append("]\n");
+                _sb.Append(_experiment.StatusLine).Append('\n');
+                string cmp = _experiment.CompareLine();
+                if (!string.IsNullOrEmpty(cmp))
+                    _sb.Append(cmp).Append('\n');
+            }
+
             if (_circuit == null)
             {
                 _sb.Append("no circuit\n");
@@ -144,6 +161,12 @@ namespace RealityEngine.Visualization
 
             _sb.Append('\n');
             _sb.Append(Disclaimer);
+            if (_experiment != null)
+            {
+                _sb.Append("\nExperiment: ").Append(_experiment.State);
+                _sb.Append("  [").Append(_experiment.HonestyTag).Append("]. ");
+                _sb.Append(ExperimentRunner.Honesty);
+            }
             if (_scale != null)
             {
                 _sb.Append("\nScale Engine: ").Append(_scale.CurrentScaleName);
