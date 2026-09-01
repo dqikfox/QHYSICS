@@ -10,6 +10,7 @@ using RealityEngine.Core;
 using RealityEngine.AI;
 using RealityEngine.Chemistry;
 using RealityEngine.Biology;
+using RealityEngine.Physics.Thermo;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -17,7 +18,7 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Experiments
 {
     /// <summary>
-    /// Reality Engine v0.9 — Induction lab autostart + AI Scientist + Cu chemistry slice.
+    /// Reality Engine v1.0 — Persistent lab + gradient ledger (coil + cell + toy heat path).
     /// Spawns a grabable bar magnet, copper coil, resistive load, sampled B overlay,
     /// Field Lens peels, and a TMP readout beside Faraday's breadboard. Does not touch SpiceSharp.
     /// </summary>
@@ -74,6 +75,8 @@ namespace RealityEngine.Experiments
         Scientist _scientist;
         MuscleCell _muscleCell;
         BiologyBoard _biologyBoard;
+        HeatCoupler _heatCoupler;
+        ConservationBoard _conservationBoard;
         Renderer _loadRenderer;
         Material _loadMaterial;
         bool _built;
@@ -88,6 +91,8 @@ namespace RealityEngine.Experiments
         public Scientist Scientist => _scientist;
         public MuscleCell MuscleCell => _muscleCell;
         public BiologyBoard BiologyBoard => _biologyBoard;
+        public HeatCoupler HeatCoupler => _heatCoupler;
+        public ConservationBoard ConservationBoard => _conservationBoard;
 
         void Reset()
         {
@@ -172,6 +177,8 @@ namespace RealityEngine.Experiments
                     existing.EnsureChemistry();
                     existing.EnsureBiology();
                     existing.EnsureLabStyle();
+                    existing.EnsureThermo();
+                    existing.EnsureLedger();
                     return existing;
                 }
 
@@ -186,6 +193,8 @@ namespace RealityEngine.Experiments
                 bootstrap.EnsureChemistry();
                 bootstrap.EnsureBiology();
                 bootstrap.EnsureLabStyle();
+                bootstrap.EnsureThermo();
+                bootstrap.EnsureLedger();
                 return bootstrap;
             }
             finally
@@ -213,6 +222,8 @@ namespace RealityEngine.Experiments
                 EnsureChemistry();
                 EnsureBiology();
                 EnsureLabStyle();
+                EnsureThermo();
+                EnsureLedger();
             }
         }
 
@@ -287,6 +298,8 @@ namespace RealityEngine.Experiments
                 EnsureChemistry();
                 EnsureBiology();
                 EnsureLabStyle();
+                EnsureThermo();
+                EnsureLedger();
                 _built = true;
                 return;
             }
@@ -364,6 +377,12 @@ namespace RealityEngine.Experiments
             Transform bioBoard = transform.Find("BiologyBoard");
             if (bioBoard != null)
                 _biologyBoard = bioBoard.GetComponent<BiologyBoard>();
+            Transform heatC = transform.Find("HeatCoupler");
+            if (heatC != null)
+                _heatCoupler = heatC.GetComponent<HeatCoupler>();
+            Transform ledger = transform.Find("ConservationBoard");
+            if (ledger != null)
+                _conservationBoard = ledger.GetComponent<ConservationBoard>();
             if (load != null)
             {
                 _loadRenderer = load.GetComponent<Renderer>();
@@ -1096,12 +1115,14 @@ namespace RealityEngine.Experiments
             Transform board = transform.Find("ScientistBoard");
             if (board == null)
                 return;
-            if (board.Find("Button_Q5") != null)
+            if (board.Find("Button_Q6") != null)
                 return;
             Vector3 origin = board.position + board.right * -0.42f + board.up * -0.28f;
             if (board.Find("Button_Q1") != null)
             {
-                BuildButton(origin + board.right * 0.42f, "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f)).transform.SetParent(board, true);
+                if (board.Find("Button_Q5") == null)
+                    BuildButton(origin + board.right * 0.28f, "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f)).transform.SetParent(board, true);
+                BuildButton(origin + board.right * 0.49f, "Q6", () => scientist.SelectIsEnergyCreated(), new Color(0.62f, 0.38f, 0.18f)).transform.SetParent(board, true);
                 return;
             }
             BuildButton(origin, "Q1", () => scientist.SelectDoubleVelocity(), new Color(0.25f, 0.55f, 0.35f)).transform.SetParent(board, true);
@@ -1109,8 +1130,9 @@ namespace RealityEngine.Experiments
             BuildButton(origin + board.right * 0.14f, "Q3", () => scientist.SelectDoubleR(), new Color(0.50f, 0.40f, 0.20f)).transform.SetParent(board, true);
             BuildButton(origin + board.right * 0.21f, "Q4", () => scientist.SelectWhyCopper(), new Color(0.55f, 0.32f, 0.18f)).transform.SetParent(board, true);
             BuildButton(origin + board.right * 0.28f, "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f)).transform.SetParent(board, true);
-            BuildButton(origin + board.right * 0.35f, "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f)).transform.SetParent(board, true);
-            BuildButton(origin + board.right * 0.42f, "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.35f, "Q6", () => scientist.SelectIsEnergyCreated(), new Color(0.62f, 0.38f, 0.18f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.42f, "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.49f, "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f)).transform.SetParent(board, true);
         }
 
         public void EnsureChemistry()
@@ -1259,6 +1281,14 @@ namespace RealityEngine.Experiments
                         : transform.position + new Vector3(-0.25f, 0.8f, 0.92f);
                     BuildButton(q5pos, "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f));
                 }
+                if (transform.Find("Button_Q6") == null)
+                {
+                    Transform q5 = transform.Find("Button_Q5");
+                    Vector3 q6pos = q5 != null
+                        ? q5.position + new Vector3(0f, 0f, 0.06f)
+                        : transform.position + new Vector3(-0.25f, 0.8f, 0.98f);
+                    BuildButton(q6pos, "Q6", () => scientist.SelectIsEnergyCreated(), new Color(0.62f, 0.38f, 0.18f));
+                }
                 EnsureScientistBoardButtons(scientist);
                 return;
             }
@@ -1271,8 +1301,9 @@ namespace RealityEngine.Experiments
             BuildButton(origin + new Vector3(0f, 0f, 0.18f), "Q3", () => scientist.SelectDoubleR(), new Color(0.50f, 0.40f, 0.20f));
             BuildButton(origin + new Vector3(0f, 0f, 0.24f), "Q4", () => scientist.SelectWhyCopper(), new Color(0.55f, 0.32f, 0.18f));
             BuildButton(origin + new Vector3(0f, 0f, 0.30f), "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f));
-            BuildButton(origin + new Vector3(0f, 0f, 0.36f), "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f));
-            BuildButton(origin + new Vector3(0f, 0f, 0.42f), "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.36f), "Q6", () => scientist.SelectIsEnergyCreated(), new Color(0.62f, 0.38f, 0.18f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.42f), "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.48f), "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f));
             EnsureScientistBoardButtons(scientist);
         }
 
@@ -1381,6 +1412,251 @@ namespace RealityEngine.Experiments
         public void EnsureLabStyle()
         {
             CircuitLabStyleApplier.EnsureApplied();
+        }
+
+
+        public void EnsureThermo()
+        {
+            CacheChildren();
+            if (_scientist == null)
+                EnsureScientist();
+            if (_fieldLens == null)
+                EnsureFieldLens();
+            if (_scaleEngine == null)
+                EnsureScaleEngine();
+
+            HeatReservoir hot = EnsureReservoir("HeatHot", true, ThermoEnergy.DefaultTHot);
+            HeatReservoir cold = EnsureReservoir("HeatCold", false, ThermoEnergy.DefaultTCold);
+            HeatCoupler coupler = EnsureCoupler(hot, cold);
+            PlaceHeatCluster(hot, cold, coupler);
+            LabState.EnsureOn(gameObject);
+            _heatCoupler = coupler;
+        }
+
+        HeatReservoir EnsureReservoir(string name, bool isHot, float kelvin)
+        {
+            Transform existing = transform.Find(name);
+            GameObject go;
+            if (existing != null)
+                go = existing.gameObject;
+            else
+            {
+                go = new GameObject(name);
+                go.transform.SetParent(transform, true);
+            }
+            go.SetActive(true);
+            HeatReservoir res = go.GetComponent<HeatReservoir>();
+            if (res == null)
+                res = go.AddComponent<HeatReservoir>();
+            res.Configure(isHot, kelvin);
+            res.EnsureBuilt();
+            if (_fieldLens != null)
+            {
+                FieldLensTarget lensTarget = go.GetComponent<FieldLensTarget>();
+                if (lensTarget == null)
+                    lensTarget = go.AddComponent<FieldLensTarget>();
+                lensTarget.ConfigureThermo(_fieldLens);
+            }
+            if (_scaleEngine != null)
+                BindScaleTarget(go, _scaleEngine);
+            return res;
+        }
+
+        HeatCoupler EnsureCoupler(HeatReservoir hot, HeatReservoir cold)
+        {
+            Transform existing = transform.Find("HeatCoupler");
+            GameObject go;
+            if (existing != null)
+                go = existing.gameObject;
+            else
+            {
+                go = new GameObject("HeatCoupler");
+                go.transform.SetParent(transform, true);
+            }
+            go.SetActive(true);
+            HeatCoupler coupler = go.GetComponent<HeatCoupler>();
+            if (coupler == null)
+                coupler = go.AddComponent<HeatCoupler>();
+            coupler.Bind(hot, cold);
+            coupler.EnsureBuilt();
+            if (_fieldLens != null)
+            {
+                FieldLensTarget lensTarget = go.GetComponent<FieldLensTarget>();
+                if (lensTarget == null)
+                    lensTarget = go.AddComponent<FieldLensTarget>();
+                lensTarget.ConfigureThermo(_fieldLens);
+            }
+            if (_scaleEngine != null)
+                BindScaleTarget(go, _scaleEngine);
+            return coupler;
+        }
+
+        void PlaceHeatCluster(HeatReservoir hot, HeatReservoir cold, HeatCoupler coupler)
+        {
+            if (hot == null || cold == null || coupler == null)
+                return;
+
+            Transform table = FindNamedContains("circuittable", "circuit table", "workbench", "labbench");
+            Transform breadboard = FindNamedContains("breadboard");
+            Transform surface = table != null ? table : breadboard;
+            Vector3 hotPos;
+            Vector3 coldPos;
+            Vector3 couplerPos;
+            Quaternion couplerRot = Quaternion.Euler(0f, 0f, 90f);
+
+            if (surface != null)
+            {
+                Bounds b = CollectBounds(surface);
+                float y = b.max.y + 0.045f;
+                Vector3 right = Vector3.right;
+                Vector3 fwd = Vector3.forward;
+                Transform eye = FindPlayerEye();
+                if (eye != null)
+                {
+                    fwd = eye.forward;
+                    fwd.y = 0f;
+                    if (fwd.sqrMagnitude < 1e-6f)
+                        fwd = Vector3.forward;
+                    fwd.Normalize();
+                    right = Vector3.Cross(Vector3.up, fwd);
+                    if (right.sqrMagnitude < 1e-6f)
+                        right = Vector3.right;
+                    right.y = 0f;
+                    right.Normalize();
+                }
+                Vector3 along = b.center + right * (b.extents.x * 0.72f);
+                along.y = y;
+                Vector3 span = fwd * 0.14f;
+                hotPos = along - span;
+                coldPos = along + span;
+                couplerPos = along + right * 0.16f;
+                couplerPos.y = y;
+                Vector3 axis = right;
+                couplerRot = Quaternion.FromToRotation(Vector3.up, axis);
+            }
+            else
+            {
+                Transform eye = FindPlayerEye();
+                Vector3 origin = fallbackPosition;
+                Vector3 fwd = Vector3.forward;
+                Vector3 right = Vector3.right;
+                if (eye != null)
+                {
+                    fwd = eye.forward;
+                    fwd.y = 0f;
+                    if (fwd.sqrMagnitude < 1e-6f)
+                        fwd = Vector3.forward;
+                    fwd.Normalize();
+                    right = Vector3.Cross(Vector3.up, fwd);
+                    right.y = 0f;
+                    if (right.sqrMagnitude < 1e-6f)
+                        right = Vector3.right;
+                    right.Normalize();
+                    origin = eye.position + fwd * 1.15f + right * 0.55f;
+                    origin.y = Mathf.Max(0.85f, fallbackPosition.y);
+                }
+                hotPos = origin - fwd * 0.14f;
+                coldPos = origin + fwd * 0.14f;
+                couplerPos = origin + right * 0.16f;
+                couplerRot = Quaternion.FromToRotation(Vector3.up, right);
+            }
+
+            hotPos = NudgeAwayFrom(hotPos, 0.06f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard");
+            coldPos = NudgeAwayFrom(coldPos, 0.06f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard");
+            couplerPos = NudgeAwayFrom(couplerPos, 0.08f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard");
+
+            hot.transform.position = hotPos;
+            cold.transform.position = coldPos;
+            coupler.transform.position = couplerPos;
+            coupler.transform.rotation = couplerRot;
+        }
+
+        Vector3 NudgeAwayFrom(Vector3 pos, float radius, params string[] childNames)
+        {
+            for (int n = 0; n < childNames.Length; n++)
+            {
+                Transform t = transform.Find(childNames[n]);
+                if (t == null)
+                    continue;
+                Bounds b = CollectBounds(t);
+                b.Expand(0.04f);
+                if (!b.Contains(pos) && (b.ClosestPoint(pos) - pos).sqrMagnitude > radius * radius)
+                    continue;
+                pos.x = b.max.x + radius + 0.08f;
+            }
+            return pos;
+        }
+
+        public void EnsureLedger()
+        {
+            CacheChildren();
+            if (_heatCoupler == null)
+                EnsureThermo();
+
+            Transform existing = transform.Find("ConservationBoard");
+            GameObject go;
+            TextMeshPro tmp;
+            if (existing != null)
+            {
+                go = existing.gameObject;
+                go.SetActive(true);
+                tmp = go.GetComponentInChildren<TextMeshPro>();
+            }
+            else
+            {
+                go = new GameObject("ConservationBoard");
+                go.transform.SetParent(transform, true);
+
+                var tmpGo = new GameObject("Text");
+                tmpGo.transform.SetParent(go.transform, false);
+                tmp = tmpGo.AddComponent<TextMeshPro>();
+                tmp.text = "CONSERVATION";
+                tmp.fontSize = 0.16f;
+                tmp.alignment = TextAlignmentOptions.TopLeft;
+                tmp.color = new Color(0.92f, 0.95f, 0.82f);
+                tmp.rectTransform.sizeDelta = new Vector2(1.08f, 0.98f);
+                tmp.textWrappingMode = TextWrappingModes.Normal;
+                tmp.raycastTarget = false;
+                TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+                if (font != null)
+                    tmp.font = font;
+
+                var boardMesh = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                boardMesh.name = "Board";
+                boardMesh.transform.SetParent(go.transform, false);
+                boardMesh.transform.localPosition = new Vector3(0.40f, -0.28f, 0.012f);
+                boardMesh.transform.localScale = new Vector3(1.12f, 0.98f, 0.010f);
+                KillCollider(boardMesh);
+                ApplyMat(boardMesh, MakeLit(new Color(0.05f, 0.07f, 0.06f)));
+            }
+
+            ConservationBoard view = go.GetComponent<ConservationBoard>();
+            if (view == null)
+                view = go.AddComponent<ConservationBoard>();
+            view.Bind(_circuit, _heatCoupler, _fieldLens, _scaleEngine, tmp);
+            PlaceLedger(go.transform);
+            go.SetActive(true);
+            _conservationBoard = view;
+        }
+
+        void PlaceLedger(Transform t)
+        {
+            PlaceInFrontOfPlayer(t, 1.35f, 1.12f);
+            Vector3 p = t.position;
+            p.y = 1.40f;
+            Transform eye = FindPlayerEye();
+            if (eye != null)
+                p.y = Mathf.Clamp(eye.position.y - 0.05f, 1.30f, 1.55f);
+            p = NudgeAwayFrom(p, 0.55f, "ScientistBoard", "ChemistryBoard", "BiologyBoard", "MuscleCell", "ExperimentBoard");
+            Transform breadboard = FindNamedContains("breadboard", "circuittable");
+            if (breadboard != null)
+            {
+                Bounds bb = CollectBounds(breadboard);
+                bb.Expand(0.08f);
+                if (bb.Contains(p) || (bb.ClosestPoint(p) - p).sqrMagnitude < 0.15f * 0.15f)
+                    p.x = bb.max.x + 0.55f;
+            }
+            t.position = p;
         }
 
         static void PlaceGrabInFrontOfPlayer(Transform t, float forwardMeters, float rightMeters, float dropY)

@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Visualization;
+using RealityEngine.Core;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -171,6 +172,7 @@ namespace RealityEngine.Experiments
         {
             ExperimentRunRecord record = BuildRecord();
             _lastSavePath = ExperimentStore.Save(record);
+            LabState.SaveNow();
             _status = "Saved " + (_lastSavePath ?? "(failed)");
             return _lastSavePath;
         }

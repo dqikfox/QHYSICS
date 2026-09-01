@@ -30,7 +30,8 @@ namespace RealityEngine.AI
         DoubleTurnsN = 1,
         DoubleResistanceR = 2,
         WhyCopperConductor = 3,
-        WhereMuscleEnergy = 4
+        WhereMuscleEnergy = 4,
+        IsEnergyCreated = 5
     }
 
     [System.Serializable]
