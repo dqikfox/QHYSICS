@@ -8,6 +8,7 @@ using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Visualization;
 using RealityEngine.Core;
 using RealityEngine.AI;
+using RealityEngine.Chemistry;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -15,7 +16,7 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Experiments
 {
     /// <summary>
-    /// Reality Engine v0.7 — Electromagnetic Induction Laboratory + Field Lens + Scale Engine + AI Scientist.
+    /// Reality Engine v0.8 — Induction lab autostart + AI Scientist + Cu chemistry slice.
     /// Spawns a grabable bar magnet, copper coil, resistive load, sampled B overlay,
     /// Field Lens peels, and a TMP readout beside Faraday's breadboard. Does not touch SpiceSharp.
     /// </summary>
@@ -89,19 +90,99 @@ namespace RealityEngine.Experiments
                 gameObject.AddComponent<ModelCard>();
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void AutoPlaceInFaradayScene()
+        public const string RealityEngineRootName = "RealityEngine";
+
+        static bool _ensureBusy;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void HookPlayModeSceneLoad()
         {
-            Scene scene = SceneManager.GetActiveScene();
-            if (!scene.IsValid() || scene.name != "Faraday")
+            SceneManager.sceneLoaded -= OnAnySceneLoaded;
+            SceneManager.sceneLoaded += OnAnySceneLoaded;
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void AutoPlaceAfterSceneLoad()
+        {
+            TryEnsureLabForScene(SceneManager.GetActiveScene());
+        }
+
+        static void OnAnySceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            TryEnsureLabForScene(scene);
+        }
+
+        public static void TryEnsureLabForScene(Scene scene)
+        {
+            if (!Application.isPlaying)
                 return;
-            if (FindFirstObjectByType<InductionLabBootstrap>() != null)
+            if (!scene.IsValid() || !scene.isLoaded)
                 return;
-            var go = new GameObject(LabRootName);
-            if (go.GetComponent<ModelCard>() == null)
-                go.AddComponent<ModelCard>();
-            var bootstrap = go.AddComponent<InductionLabBootstrap>();
-            bootstrap.BuildLab();
+            if (!IsFaradayOrXrScene(scene))
+                return;
+            EnsureLabInScene(scene);
+        }
+
+        public static bool IsFaradayOrXrScene(Scene scene)
+        {
+            if (!scene.IsValid())
+                return false;
+            string n = scene.name;
+            if (!string.IsNullOrEmpty(n) && n.IndexOf("Faraday", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                return true;
+            GameObject[] roots = scene.GetRootGameObjects();
+            for (int i = 0; i < roots.Length; i++)
+            {
+                if (ContainsXrOrigin(roots[i].transform))
+                    return true;
+            }
+            return false;
+        }
+
+        static bool ContainsXrOrigin(Transform root)
+        {
+            Transform[] ts = root.GetComponentsInChildren<Transform>(true);
+            for (int i = 0; i < ts.Length; i++)
+            {
+                if (ts[i] != null && ts[i].name == "XR Origin")
+                    return true;
+            }
+            return false;
+        }
+
+        public static InductionLabBootstrap EnsureLabInScene(Scene scene)
+        {
+            if (_ensureBusy)
+                return FindFirstObjectByType<InductionLabBootstrap>(FindObjectsInactive.Include);
+            _ensureBusy = true;
+            try
+            {
+                InductionLabBootstrap existing = FindFirstObjectByType<InductionLabBootstrap>(FindObjectsInactive.Include);
+                if (existing != null)
+                {
+                    if (!existing.gameObject.activeSelf)
+                        existing.gameObject.SetActive(true);
+                    existing.BuildLab();
+                    existing.EnsureScientist();
+                    existing.EnsureChemistry();
+                    return existing;
+                }
+
+                var go = new GameObject(RealityEngineRootName);
+                if (scene.IsValid())
+                    SceneManager.MoveGameObjectToScene(go, scene);
+                if (go.GetComponent<ModelCard>() == null)
+                    go.AddComponent<ModelCard>();
+                var bootstrap = go.AddComponent<InductionLabBootstrap>();
+                bootstrap.BuildLab();
+                bootstrap.EnsureScientist();
+                bootstrap.EnsureChemistry();
+                return bootstrap;
+            }
+            finally
+            {
+                _ensureBusy = false;
+            }
         }
 
         void Awake()
@@ -120,6 +201,7 @@ namespace RealityEngine.Experiments
                 EnsureScaleEngine();
                 EnsureExperimentFramework();
                 EnsureScientist();
+                EnsureChemistry();
             }
         }
 
@@ -191,6 +273,7 @@ namespace RealityEngine.Experiments
                 EnsureScaleEngine();
                 EnsureExperimentFramework();
                 EnsureScientist();
+                EnsureChemistry();
                 _built = true;
                 return;
             }
@@ -233,6 +316,7 @@ namespace RealityEngine.Experiments
             EnsureScaleEngine();
             EnsureExperimentFramework();
             EnsureScientist();
+            EnsureChemistry();
             _built = true;
         }
 
@@ -539,7 +623,7 @@ namespace RealityEngine.Experiments
             }, new Color(0.2f, 0.55f, 0.75f));
         }
 
-        void BuildButton(Vector3 pos, string label, System.Action onPress, Color color)
+        GameObject BuildButton(Vector3 pos, string label, System.Action onPress, Color color)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.name = "Button_" + label.Replace(" ", "");
@@ -552,6 +636,7 @@ namespace RealityEngine.Experiments
             simple.selectEntered.AddListener(_ => onPress());
 
             MakeWorldLabel(go.transform, label, new Vector3(0f, 1.6f, 0f), Color.white);
+            return go;
         }
 
         void BuildWireHints(Transform coil, Transform load, Material copper)
@@ -944,22 +1029,16 @@ namespace RealityEngine.Experiments
             {
                 go = new GameObject("ScientistBoard");
                 go.transform.SetParent(transform, true);
-                Transform expBoard = transform.Find("ExperimentBoard");
-                if (expBoard != null)
-                    go.transform.position = expBoard.position + new Vector3(0.72f, 0.0f, 0.0f);
-                else if (_readout != null)
-                    go.transform.position = _readout.transform.position + new Vector3(-0.72f, 0.0f, 0.0f);
-                else
-                    go.transform.position = transform.position + new Vector3(1.8f, 1.0f, 0.6f);
+                PlaceInFrontOfPlayer(go.transform, 1.2f, 0.0f);
 
                 var tmpGo = new GameObject("Text");
                 tmpGo.transform.SetParent(go.transform, false);
                 var tmp = tmpGo.AddComponent<TextMeshPro>();
                 tmp.text = "SCIENTIST";
-                tmp.fontSize = 0.16f;
+                tmp.fontSize = 0.22f;
                 tmp.alignment = TextAlignmentOptions.TopLeft;
                 tmp.color = new Color(0.88f, 0.94f, 0.82f);
-                tmp.rectTransform.sizeDelta = new Vector2(0.64f, 0.58f);
+                tmp.rectTransform.sizeDelta = new Vector2(0.92f, 0.78f);
                 tmp.textWrappingMode = TextWrappingModes.Normal;
                 tmp.raycastTarget = false;
                 TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
@@ -969,13 +1048,14 @@ namespace RealityEngine.Experiments
                 var boardMesh = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 boardMesh.name = "Board";
                 boardMesh.transform.SetParent(go.transform, false);
-                boardMesh.transform.localPosition = new Vector3(0.22f, -0.16f, 0.01f);
-                boardMesh.transform.localScale = new Vector3(0.66f, 0.56f, 0.008f);
+                boardMesh.transform.localPosition = new Vector3(0.34f, -0.22f, 0.012f);
+                boardMesh.transform.localScale = new Vector3(0.96f, 0.78f, 0.010f);
                 KillCollider(boardMesh);
                 ApplyMat(boardMesh, MakeLit(new Color(0.05f, 0.08f, 0.06f)));
 
                 var view = go.AddComponent<ScientistBoard>();
                 view.Bind(scientist, _experiment, tmp);
+                go.SetActive(true);
                 return view;
             }
 
@@ -984,13 +1064,167 @@ namespace RealityEngine.Experiments
                 viewExisting = go.AddComponent<ScientistBoard>();
             TextMeshPro tmpExisting = go.GetComponentInChildren<TextMeshPro>();
             viewExisting.Bind(scientist, _experiment, tmpExisting);
+            go.SetActive(true);
+            PlaceInFrontOfPlayer(go.transform, 1.2f, 0.0f);
             return viewExisting;
         }
 
+
+        void EnsureScientistBoardButtons(Scientist scientist)
+        {
+            Transform board = transform.Find("ScientistBoard");
+            if (board == null || board.Find("Button_Q1") != null)
+                return;
+            Vector3 origin = board.position + board.right * -0.42f + board.up * -0.28f;
+            BuildButton(origin, "Q1", () => scientist.SelectDoubleVelocity(), new Color(0.25f, 0.55f, 0.35f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.07f, "Q2", () => scientist.SelectDoubleN(), new Color(0.25f, 0.50f, 0.55f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.14f, "Q3", () => scientist.SelectDoubleR(), new Color(0.50f, 0.40f, 0.20f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.21f, "Q4", () => scientist.SelectWhyCopper(), new Color(0.55f, 0.32f, 0.18f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.28f, "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.35f, "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f)).transform.SetParent(board, true);
+        }
+
+        public void EnsureChemistry()
+        {
+            CacheChildren();
+            if (_scientist == null)
+                EnsureScientist();
+
+            Transform existing = transform.Find("ChemistryBoard");
+            GameObject go;
+            TextMeshPro tmp;
+            if (existing != null)
+            {
+                go = existing.gameObject;
+                go.SetActive(true);
+                tmp = go.GetComponentInChildren<TextMeshPro>();
+            }
+            else
+            {
+                go = new GameObject("ChemistryBoard");
+                go.transform.SetParent(transform, true);
+                PlaceInFrontOfPlayer(go.transform, 1.2f, 0.55f);
+
+                var tmpGo = new GameObject("Text");
+                tmpGo.transform.SetParent(go.transform, false);
+                tmp = tmpGo.AddComponent<TextMeshPro>();
+                tmp.text = "Cu";
+                tmp.fontSize = 0.20f;
+                tmp.alignment = TextAlignmentOptions.TopLeft;
+                tmp.color = new Color(0.95f, 0.82f, 0.55f);
+                tmp.rectTransform.sizeDelta = new Vector2(0.86f, 0.70f);
+                tmp.textWrappingMode = TextWrappingModes.Normal;
+                tmp.raycastTarget = false;
+                TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+                if (font != null)
+                    tmp.font = font;
+
+                var boardMesh = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                boardMesh.name = "Board";
+                boardMesh.transform.SetParent(go.transform, false);
+                boardMesh.transform.localPosition = new Vector3(0.32f, -0.20f, 0.012f);
+                boardMesh.transform.localScale = new Vector3(0.90f, 0.72f, 0.010f);
+                KillCollider(boardMesh);
+                ApplyMat(boardMesh, MakeLit(new Color(0.12f, 0.07f, 0.04f)));
+            }
+
+            ChemistryBoard view = go.GetComponent<ChemistryBoard>();
+            if (view == null)
+                view = go.AddComponent<ChemistryBoard>();
+            view.Bind(_fieldLens, _scaleEngine, tmp);
+            PlaceInFrontOfPlayer(go.transform, 1.2f, 0.55f);
+
+            EnsureCoilElementCard();
+        }
+
+        void EnsureCoilElementCard()
+        {
+            if (_coil == null)
+                return;
+            Transform existing = _coil.transform.Find("CuCard");
+            GameObject go;
+            if (existing != null)
+                go = existing.gameObject;
+            else
+            {
+                go = new GameObject("CuCard");
+                go.transform.SetParent(_coil.transform, false);
+                go.transform.localPosition = new Vector3(0f, 0.12f, 0f);
+                var tmp = go.AddComponent<TextMeshPro>();
+                tmp.fontSize = 0.14f;
+                tmp.alignment = TextAlignmentOptions.Center;
+                tmp.color = new Color(0.95f, 0.78f, 0.42f);
+                tmp.rectTransform.sizeDelta = new Vector2(0.55f, 0.28f);
+                tmp.textWrappingMode = TextWrappingModes.Normal;
+                tmp.raycastTarget = false;
+                TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+                if (font != null)
+                    tmp.font = font;
+                tmp.text = Element.Cu.Symbol + " Z=" + Element.Cu.Z + "\n" + Element.Cu.ElectronShells
+                    + "\nconductor (conceptual metals)\n" + Element.ConceptualHonesty;
+            }
+            go.SetActive(true);
+        }
+
+        static void PlaceInFrontOfPlayer(Transform t, float forwardMeters, float rightMeters)
+        {
+            if (t == null)
+                return;
+            Transform eye = FindPlayerEye();
+            Vector3 pos;
+            Vector3 fwd;
+            Vector3 right;
+            if (eye != null)
+            {
+                fwd = eye.forward;
+                fwd.y = 0f;
+                if (fwd.sqrMagnitude < 1e-6f)
+                    fwd = Vector3.forward;
+                fwd.Normalize();
+                right = Vector3.Cross(Vector3.up, fwd);
+                if (right.sqrMagnitude < 1e-6f)
+                    right = eye.right;
+                right.y = 0f;
+                right.Normalize();
+                pos = eye.position + fwd * forwardMeters + right * rightMeters;
+                float minY = eye.position.y - 0.15f;
+                if (pos.y < minY)
+                    pos.y = minY;
+            }
+            else
+            {
+                fwd = Vector3.forward;
+                right = Vector3.right;
+                pos = new Vector3(0.40f, 1.35f, 0.55f) + right * rightMeters;
+            }
+            t.position = pos;
+            t.rotation = Quaternion.LookRotation(fwd, Vector3.up);
+        }
+
+        static Transform FindPlayerEye()
+        {
+            Camera cam = Camera.main;
+            if (cam != null)
+                return cam.transform;
+            GameObject xr = GameObject.Find("XR Origin");
+            if (xr != null)
+            {
+                Camera c = xr.GetComponentInChildren<Camera>(true);
+                if (c != null)
+                    return c.transform;
+                return xr.transform;
+            }
+            return null;
+        }
+
         void EnsureScientistButtons(Scientist scientist)
+
         {
             if (transform.Find("Button_Q1") != null)
+            {
+                EnsureScientistBoardButtons(scientist);
                 return;
+            }
             Transform repeat = transform.Find("Button_Repeat");
             Vector3 origin = repeat != null
                 ? repeat.position
@@ -998,8 +1232,10 @@ namespace RealityEngine.Experiments
             BuildButton(origin + new Vector3(0f, 0f, 0.06f), "Q1", () => scientist.SelectDoubleVelocity(), new Color(0.25f, 0.55f, 0.35f));
             BuildButton(origin + new Vector3(0f, 0f, 0.12f), "Q2", () => scientist.SelectDoubleN(), new Color(0.25f, 0.50f, 0.55f));
             BuildButton(origin + new Vector3(0f, 0f, 0.18f), "Q3", () => scientist.SelectDoubleR(), new Color(0.50f, 0.40f, 0.20f));
-            BuildButton(origin + new Vector3(0f, 0f, 0.24f), "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f));
-            BuildButton(origin + new Vector3(0f, 0f, 0.30f), "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.24f), "Q4", () => scientist.SelectWhyCopper(), new Color(0.55f, 0.32f, 0.18f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.30f), "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.36f), "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f));
+            EnsureScientistBoardButtons(scientist);
         }
 
 

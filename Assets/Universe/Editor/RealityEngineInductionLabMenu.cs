@@ -7,7 +7,7 @@ using RealityEngine.Visualization;
 namespace RealityEngine.EditorTools
 {
     /// <summary>
-    /// Places the Reality Engine v0.7 induction lab (Field Lens + Scale Engine + Experiment Framework + AI Scientist) into the currently open scene.
+    /// Places the Reality Engine v0.8 induction lab (Field Lens + Scale Engine + Experiment Framework + AI Scientist) into the currently open scene.
     /// Use this while Faraday.unity is open, then save the scene.
     /// </summary>
     public static class RealityEngineInductionLabMenu
@@ -24,25 +24,28 @@ namespace RealityEngine.EditorTools
                 existing.EnsureScaleEngine();
                 existing.EnsureExperimentFramework();
                 existing.EnsureScientist();
+                existing.EnsureChemistry();
                 Selection.activeGameObject = existing.gameObject;
                 EditorGUIUtility.PingObject(existing);
                 if (existing.gameObject.scene.IsValid())
                     EditorSceneManager.MarkSceneDirty(existing.gameObject.scene);
-                Debug.Log("Induction Lab already exists. Field Lens + Scale Engine + Experiment Framework + AI Scientist v0.7 ensured on: " + existing.gameObject.name, existing);
+                Debug.Log("Induction Lab already exists. Field Lens + Scale Engine + Experiment + AI Scientist + Cu chemistry ensured on: " + existing.gameObject.name, existing);
                 return;
             }
 
-            var go = new GameObject(InductionLabBootstrap.LabRootName);
+            var go = new GameObject(InductionLabBootstrap.RealityEngineRootName);
             Undo.RegisterCreatedObjectUndo(go, "Place Induction Lab");
             if (go.GetComponent<ModelCard>() == null)
                 go.AddComponent<ModelCard>();
             var bootstrap = go.AddComponent<InductionLabBootstrap>();
             bootstrap.BuildLab();
+            bootstrap.EnsureScientist();
+            bootstrap.EnsureChemistry();
             Selection.activeGameObject = go;
             if (go.scene.IsValid())
                 EditorSceneManager.MarkSceneDirty(go.scene);
             Debug.Log(
-                "Placed Induction Lab v0.7 (Field Lens + Scale Engine + Experiment Framework + AI Scientist) in scene '" + go.scene.name +
+                "Placed Induction Lab v0.8 (Field Lens + Scale Engine + Experiment Framework + AI Scientist) in scene '" + go.scene.name +
                 "'. Save Faraday.unity to keep it. On Play, the bootstrap also builds if Magnet is missing.",
                 go);
         }

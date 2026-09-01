@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Core;
+using RealityEngine.Chemistry;
 
 namespace RealityEngine.Visualization
 {
@@ -399,9 +400,18 @@ namespace RealityEngine.Visualization
             if (L == FieldLensLayer.EnergyFlow)
                 extra = "\nEducational approximation — not a full EM energy-flow solver";
             else if (L == FieldLensLayer.Atomic)
+            {
                 extra = "\nNot a literal quantum state";
+                if (_kind == FieldLensTargetKind.Coil)
+                    extra += "\n" + Element.Cu.Symbol + " Z=" + Element.Cu.Z + " shells " + Element.Cu.ElectronShells
+                        + "\n" + Element.Cu.BondingOneLiner;
+            }
             else if (L == FieldLensLayer.Charge)
+            {
                 extra = "\nNot a literal quantum state";
+                if (_kind == FieldLensTargetKind.Coil)
+                    extra += "\nCu coil current is classical I = EMF/R; charge glyphs are conceptual.";
+            }
             else if (L == FieldLensLayer.Magnetic && _kind == FieldLensTargetKind.Coil)
                 extra = "\nB sampled from MagneticDipole.CalculateFieldAt";
             else if (L == FieldLensLayer.Magnetic)

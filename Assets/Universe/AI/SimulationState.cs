@@ -28,7 +28,8 @@ namespace RealityEngine.AI
     {
         DoubleMagnetVelocity = 0,
         DoubleTurnsN = 1,
-        DoubleResistanceR = 2
+        DoubleResistanceR = 2,
+        WhyCopperConductor = 3
     }
 
     [System.Serializable]

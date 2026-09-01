@@ -1,6 +1,7 @@
 using UnityEngine;
 using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Experiments;
+using RealityEngine.Chemistry;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -96,6 +97,11 @@ namespace RealityEngine.AI
             SelectQuestion(ScientistQuestion.DoubleResistanceR);
         }
 
+        public void SelectWhyCopper()
+        {
+            SelectQuestion(ScientistQuestion.WhyCopperConductor);
+        }
+
         public SimulationState CaptureState()
         {
             CacheRefs();
@@ -161,6 +167,9 @@ namespace RealityEngine.AI
                 case ScientistQuestion.DoubleResistanceR:
                     _hypothesis = PredictDoubleR(last);
                     break;
+                case ScientistQuestion.WhyCopperConductor:
+                    _hypothesis = PredictWhyCopper();
+                    break;
                 default:
                     _hypothesis = PredictDoubleVelocity(last);
                     break;
@@ -176,8 +185,11 @@ namespace RealityEngine.AI
             if (!_hypothesisFormed)
                 FormHypothesis();
 
-            ApplyQuestionParameters();
+            if (_question != ScientistQuestion.WhyCopperConductor)
+                ApplyQuestionParameters();
             CaptureState();
+            if (_question == ScientistQuestion.WhyCopperConductor)
+                return;
 
             if (_runner == null)
                 return;
@@ -199,6 +211,8 @@ namespace RealityEngine.AI
                     return "Q2  What if I double N (turns)?";
                 case ScientistQuestion.DoubleResistanceR:
                     return "Q3  What if I double R (total loop resistance)?";
+                case ScientistQuestion.WhyCopperConductor:
+                    return "Q4  Why is copper a conductor?";
                 default:
                     return "Q1  What if I double magnet velocity? (B and coil unchanged)";
             }
@@ -235,6 +249,8 @@ namespace RealityEngine.AI
                     SelectDoubleN();
                 if (kb.digit6Key.wasPressedThisFrame)
                     SelectDoubleR();
+                if (kb.digit7Key.wasPressedThisFrame)
+                    SelectWhyCopper();
                 if (kb.hKey.wasPressedThisFrame)
                     FormHypothesis();
                 if (kb.jKey.wasPressedThisFrame)
@@ -248,6 +264,8 @@ namespace RealityEngine.AI
                 SelectDoubleN();
             if (Input.GetKeyDown(KeyCode.Alpha6))
                 SelectDoubleR();
+            if (Input.GetKeyDown(KeyCode.Alpha7))
+                SelectWhyCopper();
             if (Input.GetKeyDown(KeyCode.H))
                 FormHypothesis();
             if (Input.GetKeyDown(KeyCode.J))
@@ -409,6 +427,19 @@ namespace RealityEngine.AI
                 predictedPeakEmf = predicted,
                 basedOn = basedOn,
                 hasNumericPrediction = true
+            };
+        }
+
+
+        Hypothesis PredictWhyCopper()
+        {
+            string body = Element.CopperConductorAnswer();
+            return new Hypothesis
+            {
+                text = body,
+                predictedPeakEmf = 0f,
+                basedOn = Element.ConceptualHonesty + " " + Element.ClassicalCoilHonesty,
+                hasNumericPrediction = false
             };
         }
 
