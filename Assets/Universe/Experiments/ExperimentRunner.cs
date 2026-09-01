@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Visualization;
@@ -101,6 +101,22 @@ namespace RealityEngine.Experiments
         public void BindModelCard(ModelCard card)
         {
             _modelCard = card;
+            PushHonesty();
+        }
+
+        public void ApplyScientistHypothesis(string question, string hint, float predictedPeakEmf, bool hypothesisSet)
+        {
+            if (definition == null || string.IsNullOrEmpty(definition.id))
+                ApplyCannedDefinition();
+            if (!string.IsNullOrEmpty(question))
+            {
+                definition.question = question;
+                definition.title = question;
+            }
+            if (!string.IsNullOrEmpty(hint))
+                definition.hypothesisHint = hint;
+            definition.hypothesisEmf = predictedPeakEmf;
+            definition.hypothesisSet = hypothesisSet;
             PushHonesty();
         }
 
