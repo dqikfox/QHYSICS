@@ -72,7 +72,7 @@ namespace RealityEngine.AI
         void Rebuild()
         {
             _sb.Length = 0;
-            _sb.Append("SCIENTIST  v0.8\n");
+            _sb.Append("SCIENTIST  v0.9\n");
             _sb.Append(Honesty).Append('\n');
             if (_scientist == null)
             {
@@ -100,7 +100,8 @@ namespace RealityEngine.AI
                 _sb.Append("H  ").Append(h.text).Append('\n');
                 if (h.hasNumericPrediction)
                     _sb.Append("H  peak |EMF| = ").Append(Sci(h.predictedPeakEmf)).Append(" V\n");
-                else if (_scientist.Question != ScientistQuestion.WhyCopperConductor)
+                else if (_scientist.Question != ScientistQuestion.WhyCopperConductor
+                    && _scientist.Question != ScientistQuestion.WhereMuscleEnergy)
                     _sb.Append("H  (no numeric peak — need a baseline run)\n");
                 _sb.Append("basedOn  ").Append(h.basedOn).Append('\n');
             }
@@ -136,7 +137,7 @@ namespace RealityEngine.AI
                     _sb.Append("RUNNER COMPARE  ").Append(cmp.summary).Append('\n');
             }
 
-            _sb.Append("Keys  4 Q1-v  5 Q2-N  6 Q3-R  7 Q4-Cu  H hypothesis  J arm\n");
+            _sb.Append("Keys  4 Q1-v  5 Q2-N  6 Q3-R  7 Q4-Cu  8 Q5-muscle  H hypothesis  J arm\n");
             _sb.Append("Grab the magnet and move it. Do not expect auto-motion.\n");
             _sb.Append(Honesty);
             _text.text = _sb.ToString();

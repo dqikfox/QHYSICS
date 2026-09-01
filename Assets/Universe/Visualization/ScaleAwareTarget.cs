@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using RealityEngine.Core;
+using RealityEngine.Biology;
 
 namespace RealityEngine.Visualization
 {
@@ -93,7 +94,16 @@ namespace RealityEngine.Visualization
                 return;
             string extra = "";
             ScaleLevel L = (ScaleLevel)_scale;
-            if (L == ScaleLevel.Molecular)
+            MuscleCell bio = GetComponent<MuscleCell>();
+            if (bio != null)
+            {
+                extra = "\n" + BioScale.RepresentationOf(L) + "\n" + BioEnergy.Honesty;
+                if (L == ScaleLevel.Molecular)
+                    extra += "\nNot molecular dynamics";
+                else if (L == ScaleLevel.Atomic)
+                    extra += "\nElectronic structure not simulated";
+            }
+            else if (L == ScaleLevel.Molecular)
                 extra = "\nNot molecular dynamics";
             else if (L == ScaleLevel.Atomic)
                 extra = "\nElectronic structure not simulated";

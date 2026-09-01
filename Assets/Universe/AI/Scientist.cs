@@ -2,6 +2,7 @@ using UnityEngine;
 using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Experiments;
 using RealityEngine.Chemistry;
+using RealityEngine.Biology;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -102,6 +103,11 @@ namespace RealityEngine.AI
             SelectQuestion(ScientistQuestion.WhyCopperConductor);
         }
 
+        public void SelectWhereMuscleEnergy()
+        {
+            SelectQuestion(ScientistQuestion.WhereMuscleEnergy);
+        }
+
         public SimulationState CaptureState()
         {
             CacheRefs();
@@ -170,6 +176,9 @@ namespace RealityEngine.AI
                 case ScientistQuestion.WhyCopperConductor:
                     _hypothesis = PredictWhyCopper();
                     break;
+                case ScientistQuestion.WhereMuscleEnergy:
+                    _hypothesis = PredictMuscleEnergy();
+                    break;
                 default:
                     _hypothesis = PredictDoubleVelocity(last);
                     break;
@@ -185,10 +194,10 @@ namespace RealityEngine.AI
             if (!_hypothesisFormed)
                 FormHypothesis();
 
-            if (_question != ScientistQuestion.WhyCopperConductor)
+            if (_question != ScientistQuestion.WhyCopperConductor && _question != ScientistQuestion.WhereMuscleEnergy)
                 ApplyQuestionParameters();
             CaptureState();
-            if (_question == ScientistQuestion.WhyCopperConductor)
+            if (_question == ScientistQuestion.WhyCopperConductor || _question == ScientistQuestion.WhereMuscleEnergy)
                 return;
 
             if (_runner == null)
@@ -213,6 +222,8 @@ namespace RealityEngine.AI
                     return "Q3  What if I double R (total loop resistance)?";
                 case ScientistQuestion.WhyCopperConductor:
                     return "Q4  Why is copper a conductor?";
+                case ScientistQuestion.WhereMuscleEnergy:
+                    return "Q5  Where does muscle energy come from?";
                 default:
                     return "Q1  What if I double magnet velocity? (B and coil unchanged)";
             }
@@ -251,6 +262,8 @@ namespace RealityEngine.AI
                     SelectDoubleR();
                 if (kb.digit7Key.wasPressedThisFrame)
                     SelectWhyCopper();
+                if (kb.digit8Key.wasPressedThisFrame)
+                    SelectWhereMuscleEnergy();
                 if (kb.hKey.wasPressedThisFrame)
                     FormHypothesis();
                 if (kb.jKey.wasPressedThisFrame)
@@ -266,6 +279,8 @@ namespace RealityEngine.AI
                 SelectDoubleR();
             if (Input.GetKeyDown(KeyCode.Alpha7))
                 SelectWhyCopper();
+            if (Input.GetKeyDown(KeyCode.Alpha8))
+                SelectWhereMuscleEnergy();
             if (Input.GetKeyDown(KeyCode.H))
                 FormHypothesis();
             if (Input.GetKeyDown(KeyCode.J))
@@ -439,6 +454,18 @@ namespace RealityEngine.AI
                 text = body,
                 predictedPeakEmf = 0f,
                 basedOn = Element.ConceptualHonesty + " " + Element.ClassicalCoilHonesty,
+                hasNumericPrediction = false
+            };
+        }
+
+        Hypothesis PredictMuscleEnergy()
+        {
+            string body = BioEnergy.MuscleEnergyAnswer();
+            return new Hypothesis
+            {
+                text = body,
+                predictedPeakEmf = 0f,
+                basedOn = BioEnergy.Honesty + " " + BioEnergy.NotSimulation + " " + BioEnergy.Educational,
                 hasNumericPrediction = false
             };
         }

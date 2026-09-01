@@ -55,6 +55,65 @@ namespace RealityEngine.Chemistry
             ConceptualHonesty,
             "Nd appears in NdFeB magnet marketing. Here the magnet is still a classical two-pole MagneticDipole. No rare-earth electronic structure is solved.");
 
+        public static readonly Element C = new Element(
+            6,
+            "C",
+            "Carbon",
+            "2, 4",
+            ConceptualHonesty,
+            "Organic backbone of ATP (schematic). Not a QM electronic-structure solve.");
+
+        public static readonly Element H = new Element(
+            1,
+            "H",
+            "Hydrogen",
+            "1",
+            ConceptualHonesty,
+            "Protons appear in the conceptual proton-motive story; here H is an element card, not a pH simulation.");
+
+        public static readonly Element O = new Element(
+            8,
+            "O",
+            "Oxygen",
+            "2, 6",
+            ConceptualHonesty,
+            "ATP hydrolysis is conceptually ATP + H2O -> ADP + Pi. Not a reaction-rate solver.");
+
+        public static readonly Element N = new Element(
+            7,
+            "N",
+            "Nitrogen",
+            "2, 5",
+            ConceptualHonesty,
+            "Nitrogenous base in ATP (adenine, schematic). Not a tautomer simulation.");
+
+        public static readonly Element P = new Element(
+            15,
+            "P",
+            "Phosphorus",
+            "2, 8, 5",
+            ConceptualHonesty,
+            "Phosphate groups in ATP. 'High-energy phosphate' is classical accounting, not a special kind of energy.");
+
+        public const string AtpFormula = "C10H16N5O13P3";
+
+        public string TinyCard()
+        {
+            return Symbol + " Z=" + Z + "  shells " + ElectronShells;
+        }
+
+        public static string AtpAtomCards()
+        {
+            return "ATP atoms (schematic " + AtpFormula + ")\n"
+                + C.TinyCard() + "\n"
+                + H.TinyCard() + "\n"
+                + O.TinyCard() + "\n"
+                + N.TinyCard() + "\n"
+                + P.TinyCard() + "\n"
+                + ConceptualHonesty + "\n"
+                + "Same lab chemistry as the Cu coil (Cu / C / H / O continuity; ATP also uses N, P).";
+        }
+
         public string PeriodicCard()
         {
             return Symbol + "  Z=" + Z + "  " + Name + "\n"

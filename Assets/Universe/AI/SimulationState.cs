@@ -29,7 +29,8 @@ namespace RealityEngine.AI
         DoubleMagnetVelocity = 0,
         DoubleTurnsN = 1,
         DoubleResistanceR = 2,
-        WhyCopperConductor = 3
+        WhyCopperConductor = 3,
+        WhereMuscleEnergy = 4
     }
 
     [System.Serializable]

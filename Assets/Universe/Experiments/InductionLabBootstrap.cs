@@ -9,6 +9,7 @@ using RealityEngine.Visualization;
 using RealityEngine.Core;
 using RealityEngine.AI;
 using RealityEngine.Chemistry;
+using RealityEngine.Biology;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -16,7 +17,7 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Experiments
 {
     /// <summary>
-    /// Reality Engine v0.8 — Induction lab autostart + AI Scientist + Cu chemistry slice.
+    /// Reality Engine v0.9 — Induction lab autostart + AI Scientist + Cu chemistry slice.
     /// Spawns a grabable bar magnet, copper coil, resistive load, sampled B overlay,
     /// Field Lens peels, and a TMP readout beside Faraday's breadboard. Does not touch SpiceSharp.
     /// </summary>
@@ -71,6 +72,8 @@ namespace RealityEngine.Experiments
         ScaleEngine _scaleEngine;
         ExperimentRunner _experiment;
         Scientist _scientist;
+        MuscleCell _muscleCell;
+        BiologyBoard _biologyBoard;
         Renderer _loadRenderer;
         Material _loadMaterial;
         bool _built;
@@ -83,6 +86,8 @@ namespace RealityEngine.Experiments
         public ScaleEngine ScaleEngine => _scaleEngine;
         public ExperimentRunner Experiment => _experiment;
         public Scientist Scientist => _scientist;
+        public MuscleCell MuscleCell => _muscleCell;
+        public BiologyBoard BiologyBoard => _biologyBoard;
 
         void Reset()
         {
@@ -165,6 +170,8 @@ namespace RealityEngine.Experiments
                     existing.BuildLab();
                     existing.EnsureScientist();
                     existing.EnsureChemistry();
+                    existing.EnsureBiology();
+                    existing.EnsureLabStyle();
                     return existing;
                 }
 
@@ -177,6 +184,8 @@ namespace RealityEngine.Experiments
                 bootstrap.BuildLab();
                 bootstrap.EnsureScientist();
                 bootstrap.EnsureChemistry();
+                bootstrap.EnsureBiology();
+                bootstrap.EnsureLabStyle();
                 return bootstrap;
             }
             finally
@@ -202,6 +211,8 @@ namespace RealityEngine.Experiments
                 EnsureExperimentFramework();
                 EnsureScientist();
                 EnsureChemistry();
+                EnsureBiology();
+                EnsureLabStyle();
             }
         }
 
@@ -274,6 +285,8 @@ namespace RealityEngine.Experiments
                 EnsureExperimentFramework();
                 EnsureScientist();
                 EnsureChemistry();
+                EnsureBiology();
+                EnsureLabStyle();
                 _built = true;
                 return;
             }
@@ -317,6 +330,8 @@ namespace RealityEngine.Experiments
             EnsureExperimentFramework();
             EnsureScientist();
             EnsureChemistry();
+            EnsureBiology();
+            EnsureLabStyle();
             _built = true;
         }
 
@@ -343,6 +358,12 @@ namespace RealityEngine.Experiments
             _scaleEngine = GetComponent<ScaleEngine>();
             _experiment = GetComponent<ExperimentRunner>();
             _scientist = GetComponent<Scientist>();
+            Transform muscle = transform.Find("MuscleCell");
+            if (muscle != null)
+                _muscleCell = muscle.GetComponent<MuscleCell>();
+            Transform bioBoard = transform.Find("BiologyBoard");
+            if (bioBoard != null)
+                _biologyBoard = bioBoard.GetComponent<BiologyBoard>();
             if (load != null)
             {
                 _loadRenderer = load.GetComponent<Renderer>();
@@ -1073,15 +1094,23 @@ namespace RealityEngine.Experiments
         void EnsureScientistBoardButtons(Scientist scientist)
         {
             Transform board = transform.Find("ScientistBoard");
-            if (board == null || board.Find("Button_Q1") != null)
+            if (board == null)
+                return;
+            if (board.Find("Button_Q5") != null)
                 return;
             Vector3 origin = board.position + board.right * -0.42f + board.up * -0.28f;
+            if (board.Find("Button_Q1") != null)
+            {
+                BuildButton(origin + board.right * 0.42f, "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f)).transform.SetParent(board, true);
+                return;
+            }
             BuildButton(origin, "Q1", () => scientist.SelectDoubleVelocity(), new Color(0.25f, 0.55f, 0.35f)).transform.SetParent(board, true);
             BuildButton(origin + board.right * 0.07f, "Q2", () => scientist.SelectDoubleN(), new Color(0.25f, 0.50f, 0.55f)).transform.SetParent(board, true);
             BuildButton(origin + board.right * 0.14f, "Q3", () => scientist.SelectDoubleR(), new Color(0.50f, 0.40f, 0.20f)).transform.SetParent(board, true);
             BuildButton(origin + board.right * 0.21f, "Q4", () => scientist.SelectWhyCopper(), new Color(0.55f, 0.32f, 0.18f)).transform.SetParent(board, true);
-            BuildButton(origin + board.right * 0.28f, "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f)).transform.SetParent(board, true);
-            BuildButton(origin + board.right * 0.35f, "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.28f, "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.35f, "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.42f, "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f)).transform.SetParent(board, true);
         }
 
         public void EnsureChemistry()
@@ -1222,6 +1251,14 @@ namespace RealityEngine.Experiments
         {
             if (transform.Find("Button_Q1") != null)
             {
+                if (transform.Find("Button_Q5") == null)
+                {
+                    Transform q4 = transform.Find("Button_Q4");
+                    Vector3 q5pos = q4 != null
+                        ? q4.position + new Vector3(0f, 0f, 0.42f)
+                        : transform.position + new Vector3(-0.25f, 0.8f, 0.92f);
+                    BuildButton(q5pos, "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f));
+                }
                 EnsureScientistBoardButtons(scientist);
                 return;
             }
@@ -1233,9 +1270,127 @@ namespace RealityEngine.Experiments
             BuildButton(origin + new Vector3(0f, 0f, 0.12f), "Q2", () => scientist.SelectDoubleN(), new Color(0.25f, 0.50f, 0.55f));
             BuildButton(origin + new Vector3(0f, 0f, 0.18f), "Q3", () => scientist.SelectDoubleR(), new Color(0.50f, 0.40f, 0.20f));
             BuildButton(origin + new Vector3(0f, 0f, 0.24f), "Q4", () => scientist.SelectWhyCopper(), new Color(0.55f, 0.32f, 0.18f));
-            BuildButton(origin + new Vector3(0f, 0f, 0.30f), "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f));
-            BuildButton(origin + new Vector3(0f, 0f, 0.36f), "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.30f), "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.36f), "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.42f), "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f));
             EnsureScientistBoardButtons(scientist);
+        }
+
+        public void EnsureBiology()
+        {
+            CacheChildren();
+            if (_scientist == null)
+                EnsureScientist();
+            if (_fieldLens == null)
+                EnsureFieldLens();
+            if (_scaleEngine == null)
+                EnsureScaleEngine();
+
+            MuscleCell cell = EnsureMuscleCell();
+            BiologyBoard board = EnsureBiologyBoard(cell);
+            _muscleCell = cell;
+            _biologyBoard = board;
+        }
+
+        MuscleCell EnsureMuscleCell()
+        {
+            Transform existing = transform.Find("MuscleCell");
+            GameObject go;
+            if (existing != null)
+            {
+                go = existing.gameObject;
+            }
+            else
+            {
+                go = new GameObject("MuscleCell");
+                go.transform.SetParent(transform, true);
+            }
+            go.SetActive(true);
+            PlaceGrabInFrontOfPlayer(go.transform, 1.30f, -0.22f, 0.40f);
+
+            MuscleCell cell = go.GetComponent<MuscleCell>();
+            if (cell == null)
+                cell = go.AddComponent<MuscleCell>();
+            cell.EnsureBuilt();
+
+            if (_fieldLens != null)
+            {
+                FieldLensTarget lensTarget = go.GetComponent<FieldLensTarget>();
+                if (lensTarget == null)
+                    lensTarget = go.AddComponent<FieldLensTarget>();
+                lensTarget.ConfigureCell(_fieldLens);
+            }
+
+            if (_scaleEngine != null)
+                BindScaleTarget(go, _scaleEngine);
+
+            _muscleCell = cell;
+            return cell;
+        }
+
+        BiologyBoard EnsureBiologyBoard(MuscleCell cell)
+        {
+            Transform existing = transform.Find("BiologyBoard");
+            GameObject go;
+            TextMeshPro tmp;
+            if (existing != null)
+            {
+                go = existing.gameObject;
+                go.SetActive(true);
+                tmp = go.GetComponentInChildren<TextMeshPro>();
+            }
+            else
+            {
+                go = new GameObject("BiologyBoard");
+                go.transform.SetParent(transform, true);
+
+                var tmpGo = new GameObject("Text");
+                tmpGo.transform.SetParent(go.transform, false);
+                tmp = tmpGo.AddComponent<TextMeshPro>();
+                tmp.text = "BIOLOGY";
+                tmp.fontSize = 0.18f;
+                tmp.alignment = TextAlignmentOptions.TopLeft;
+                tmp.color = new Color(0.82f, 0.95f, 0.78f);
+                tmp.rectTransform.sizeDelta = new Vector2(0.92f, 0.82f);
+                tmp.textWrappingMode = TextWrappingModes.Normal;
+                tmp.raycastTarget = false;
+                TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+                if (font != null)
+                    tmp.font = font;
+
+                var boardMesh = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                boardMesh.name = "Board";
+                boardMesh.transform.SetParent(go.transform, false);
+                boardMesh.transform.localPosition = new Vector3(0.34f, -0.24f, 0.012f);
+                boardMesh.transform.localScale = new Vector3(0.96f, 0.82f, 0.010f);
+                KillCollider(boardMesh);
+                ApplyMat(boardMesh, MakeLit(new Color(0.05f, 0.10f, 0.06f)));
+            }
+
+            BiologyBoard view = go.GetComponent<BiologyBoard>();
+            if (view == null)
+                view = go.AddComponent<BiologyBoard>();
+            view.Bind(_fieldLens, _scaleEngine, cell, tmp);
+            PlaceInFrontOfPlayer(go.transform, 1.40f, -0.58f);
+            go.SetActive(true);
+            _biologyBoard = view;
+            return view;
+        }
+
+
+        public void EnsureLabStyle()
+        {
+            CircuitLabStyleApplier.EnsureApplied();
+        }
+
+        static void PlaceGrabInFrontOfPlayer(Transform t, float forwardMeters, float rightMeters, float dropY)
+        {
+            PlaceInFrontOfPlayer(t, forwardMeters, rightMeters);
+            Vector3 p = t.position;
+            p.y -= dropY;
+            if (p.y < 0.80f)
+                p.y = 0.80f;
+            t.position = p;
         }
 
 
