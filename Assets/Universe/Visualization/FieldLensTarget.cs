@@ -4,6 +4,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Core;
 using RealityEngine.Chemistry;
+using RealityEngine.Biology;
 
 namespace RealityEngine.Visualization
 {
@@ -11,7 +12,8 @@ namespace RealityEngine.Visualization
     {
         Magnet,
         Coil,
-        Load
+        Load,
+        Cell
     }
 
     /// <summary>
@@ -83,6 +85,11 @@ namespace RealityEngine.Visualization
             ApplyLayer(_lens != null ? _lens.CurrentLayer : 0);
         }
 
+        public void ConfigureCell(FieldLens lens)
+        {
+            Configure(lens, FieldLensTargetKind.Cell, null, null, null);
+        }
+
         void OnDisable()
         {
             if (_lens != null)
@@ -124,11 +131,26 @@ namespace RealityEngine.Visualization
                 return false;
             if (r.GetComponent<TMP_Text>() != null)
                 return false;
+            Transform t = r.transform;
+            while (t != null)
+            {
+                string n = t.name;
+                if (!string.IsNullOrEmpty(n) && n.StartsWith("Bio", System.StringComparison.Ordinal))
+                    return false;
+                t = t.parent;
+            }
             return true;
         }
 
         void BuildChildren()
         {
+            if (_kind == FieldLensTargetKind.Cell)
+            {
+                BuildHonestyLabel();
+                BuildLookMaterials();
+                return;
+            }
+
             _lattice = MakeChild<LatticeViz>("LensLattice");
             if (_kind == FieldLensTargetKind.Magnet)
                 _lattice.BuildMagnet(
@@ -162,11 +184,26 @@ namespace RealityEngine.Visualization
             _poynting.Configure(_kind, _dipole, _circuit);
             _poynting.Visible = false;
 
-            var labelGo = new GameObject("LensHonesty");
-            labelGo.transform.SetParent(transform, false);
-            labelGo.transform.localPosition = HonestyOffset();
-            labelGo.transform.localScale = Vector3.one * 0.02f;
-            _honesty = labelGo.AddComponent<TextMeshPro>();
+            BuildHonestyLabel();
+            BuildLookMaterials();
+        }
+
+        void BuildHonestyLabel()
+        {
+            Transform existing = transform.Find("LensHonesty");
+            GameObject labelGo;
+            if (existing != null)
+                labelGo = existing.gameObject;
+            else
+            {
+                labelGo = new GameObject("LensHonesty");
+                labelGo.transform.SetParent(transform, false);
+                labelGo.transform.localPosition = HonestyOffset();
+                labelGo.transform.localScale = Vector3.one * 0.02f;
+            }
+            _honesty = labelGo.GetComponent<TextMeshPro>();
+            if (_honesty == null)
+                _honesty = labelGo.AddComponent<TextMeshPro>();
             _honesty.fontSize = 5.5f;
             _honesty.alignment = TextAlignmentOptions.Center;
             _honesty.color = new Color(0.92f, 0.95f, 0.85f);
@@ -176,8 +213,6 @@ namespace RealityEngine.Visualization
             TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
             if (font != null)
                 _honesty.font = font;
-
-            BuildLookMaterials();
         }
 
         Vector3 HonestyOffset()
@@ -186,6 +221,8 @@ namespace RealityEngine.Visualization
                 return new Vector3(0f, 0.14f, 0f);
             if (_kind == FieldLensTargetKind.Coil)
                 return new Vector3(0f, 0.08f, 0f);
+            if (_kind == FieldLensTargetKind.Cell)
+                return new Vector3(0f, 0.16f, 0f);
             return new Vector3(0f, 0.08f, 0f);
         }
 
@@ -218,6 +255,15 @@ namespace RealityEngine.Visualization
                     col = new Color(0.8f, 0.48f, 0.18f);
                 else if (_kind == FieldLensTargetKind.Load)
                     col = new Color(0.32f, 0.22f, 0.14f);
+                else if (_kind == FieldLensTargetKind.Cell)
+                {
+                    col = new Color(0.72f, 0.28f, 0.32f);
+                    metallic = 0.08f;
+                    if (r != null && r.gameObject.name == "Mitochondrion")
+                        col = new Color(0.85f, 0.42f, 0.18f);
+                    else if (r != null && r.gameObject.name == "Nucleus")
+                        col = new Color(0.45f, 0.22f, 0.50f);
+                }
                 else if (r != null)
                 {
                     string n = r.gameObject.name;
@@ -306,6 +352,16 @@ namespace RealityEngine.Visualization
             _layer = Mathf.Clamp(layer, 0, FieldLens.LayerCount - 1);
             FieldLensLayer L = (FieldLensLayer)_layer;
             ScaleLevel S = (ScaleLevel)Mathf.Clamp(_scale, 0, ScaleEngine.StepCount - 1);
+
+            if (_kind == FieldLensTargetKind.Cell)
+            {
+                MuscleCell cell = GetComponent<MuscleCell>();
+                if (cell != null)
+                    cell.ApplyView(_layer, _scale);
+                ApplyMaterialLook(L == FieldLensLayer.Material || S == ScaleLevel.Material);
+                UpdateHonesty();
+                return;
+            }
 
             // Field Lens Atomic hides solids; Scale Engine never hides the grabable magnet.
             bool showSolid = L != FieldLensLayer.Atomic;
@@ -416,6 +472,18 @@ namespace RealityEngine.Visualization
                 extra = "\nB sampled from MagneticDipole.CalculateFieldAt";
             else if (L == FieldLensLayer.Magnetic)
                 extra = "\nB sampled from MagneticDipole.CalculateFieldAt";
+            if (_kind == FieldLensTargetKind.Cell)
+            {
+                extra = "\n" + BioEnergy.Honesty;
+                if (L == FieldLensLayer.Mathematical)
+                    extra += "\nATP hydrolysis is conceptual chemical potential, not kinetics.";
+                else if (L == FieldLensLayer.Charge || L == FieldLensLayer.EnergyFlow)
+                    extra += "\n" + BioEnergy.Educational;
+                else if (L == FieldLensLayer.Atomic)
+                    extra += "\nMolecular schematic on the cell (not QM).";
+                else if (L == FieldLensLayer.Electric || L == FieldLensLayer.Magnetic)
+                    extra += "\nNot an EM source. Use the copper coil.";
+            }
 
             _honesty.text = FieldLens.NameOf(_layer) + "\n" + FieldLens.HonestyOf(_layer) + extra;
         }
