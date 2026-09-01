@@ -14,7 +14,7 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Experiments
 {
     /// <summary>
-    /// Reality Engine v0.5 — Electromagnetic Induction Laboratory + Field Lens + Scale Engine.
+    /// Reality Engine v0.6 — Electromagnetic Induction Laboratory + Field Lens + Scale Engine.
     /// Spawns a grabable bar magnet, copper coil, resistive load, sampled B overlay,
     /// Field Lens peels, and a TMP readout beside Faraday's breadboard. Does not touch SpiceSharp.
     /// </summary>
@@ -67,6 +67,7 @@ namespace RealityEngine.Experiments
         MagneticDipole _dipole;
         FieldLens _fieldLens;
         ScaleEngine _scaleEngine;
+        ExperimentRunner _experiment;
         Renderer _loadRenderer;
         Material _loadMaterial;
         bool _built;
@@ -77,6 +78,7 @@ namespace RealityEngine.Experiments
         public MagneticDipole Dipole => _dipole;
         public FieldLens FieldLens => _fieldLens;
         public ScaleEngine ScaleEngine => _scaleEngine;
+        public ExperimentRunner Experiment => _experiment;
 
         void Reset()
         {
@@ -113,6 +115,7 @@ namespace RealityEngine.Experiments
                 CacheChildren();
                 EnsureFieldLens();
                 EnsureScaleEngine();
+                EnsureExperimentFramework();
             }
         }
 
@@ -182,6 +185,7 @@ namespace RealityEngine.Experiments
                 CacheChildren();
                 EnsureFieldLens();
                 EnsureScaleEngine();
+                EnsureExperimentFramework();
                 _built = true;
                 return;
             }
@@ -222,6 +226,7 @@ namespace RealityEngine.Experiments
 
             EnsureFieldLens();
             EnsureScaleEngine();
+            EnsureExperimentFramework();
             _built = true;
         }
 
@@ -246,6 +251,7 @@ namespace RealityEngine.Experiments
                 _readout = readout.GetComponent<InductionReadout>();
             _fieldLens = GetComponent<FieldLens>();
             _scaleEngine = GetComponent<ScaleEngine>();
+            _experiment = GetComponent<ExperimentRunner>();
             if (load != null)
             {
                 _loadRenderer = load.GetComponent<Renderer>();
@@ -798,5 +804,104 @@ namespace RealityEngine.Experiments
             BuildButton(origin + new Vector3(0f, 0f, 0.06f), "Scale +", () => engine.StepIn(), new Color(0.15f, 0.62f, 0.72f));
             BuildButton(origin + new Vector3(0f, 0f, 0.12f), "Scale -", () => engine.StepOut(), new Color(0.10f, 0.42f, 0.52f));
         }
+
+        public void EnsureExperimentFramework()
+        {
+            CacheChildren();
+            if (_scaleEngine == null)
+                EnsureScaleEngine();
+
+            ExperimentRunner runner = GetComponent<ExperimentRunner>();
+            if (runner == null)
+                runner = gameObject.AddComponent<ExperimentRunner>();
+            _experiment = runner;
+            runner.SetLab(_coil, _circuit, _dipole);
+
+            if (_readout != null)
+                runner.BindReadout(_readout);
+
+            ModelCard card = GetComponent<ModelCard>();
+            if (card != null)
+                runner.BindModelCard(card);
+
+            ExperimentBoard board = EnsureExperimentBoard(runner);
+            runner.BindBoard(board);
+
+            if (runner.Definition == null || string.IsNullOrEmpty(runner.Definition.id))
+                runner.ApplyCannedDefinition();
+
+            EnsureExperimentButtons(runner);
+
+            if (runner.State == ExperimentState.Idle)
+                runner.Arm();
+        }
+
+        ExperimentBoard EnsureExperimentBoard(ExperimentRunner runner)
+        {
+            Transform existing = transform.Find("ExperimentBoard");
+            GameObject go;
+            if (existing != null)
+            {
+                go = existing.gameObject;
+            }
+            else
+            {
+                go = new GameObject("ExperimentBoard");
+                go.transform.SetParent(transform, true);
+                if (_readout != null)
+                    go.transform.position = _readout.transform.position + new Vector3(0.72f, 0.0f, 0.0f);
+                else
+                    go.transform.position = transform.position + new Vector3(1.1f, 1.0f, 0.6f);
+
+                var tmpGo = new GameObject("Text");
+                tmpGo.transform.SetParent(go.transform, false);
+                var tmp = tmpGo.AddComponent<TextMeshPro>();
+                tmp.text = "EXPERIMENT";
+                tmp.fontSize = 0.18f;
+                tmp.alignment = TextAlignmentOptions.TopLeft;
+                tmp.color = new Color(0.90f, 0.93f, 0.80f);
+                tmp.rectTransform.sizeDelta = new Vector2(0.62f, 0.52f);
+                tmp.textWrappingMode = TextWrappingModes.Normal;
+                tmp.raycastTarget = false;
+                TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+                if (font != null)
+                    tmp.font = font;
+
+                var boardMesh = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                boardMesh.name = "Board";
+                boardMesh.transform.SetParent(go.transform, false);
+                boardMesh.transform.localPosition = new Vector3(0.22f, -0.14f, 0.01f);
+                boardMesh.transform.localScale = new Vector3(0.64f, 0.50f, 0.008f);
+                KillCollider(boardMesh);
+                ApplyMat(boardMesh, MakeLit(new Color(0.06f, 0.07f, 0.05f)));
+
+                var view = go.AddComponent<ExperimentBoard>();
+                view.Bind(runner, tmp);
+                return view;
+            }
+
+            var viewExisting = go.GetComponent<ExperimentBoard>();
+            if (viewExisting == null)
+                viewExisting = go.AddComponent<ExperimentBoard>();
+            TextMeshPro tmpExisting = go.GetComponentInChildren<TextMeshPro>();
+            viewExisting.Bind(runner, tmpExisting);
+            return viewExisting;
+        }
+
+        void EnsureExperimentButtons(ExperimentRunner runner)
+        {
+            if (transform.Find("Button_Record") != null)
+                return;
+            Transform scaleMinus = transform.Find("Button_Scale-");
+            Vector3 origin = scaleMinus != null
+                ? scaleMinus.position
+                : transform.position + new Vector3(-0.25f, 0.8f, 0.5f);
+            BuildButton(origin + new Vector3(0f, 0f, 0.06f), "Record", () => runner.Record(), new Color(0.20f, 0.70f, 0.35f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.12f), "Stop", () => runner.Stop(), new Color(0.72f, 0.22f, 0.18f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.18f), "Save", () => runner.Save(), new Color(0.25f, 0.45f, 0.75f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.24f), "Load", () => runner.LoadLatest(), new Color(0.20f, 0.35f, 0.60f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.30f), "Repeat", () => runner.Repeat(), new Color(0.55f, 0.45f, 0.15f));
+        }
+
     }
 }
