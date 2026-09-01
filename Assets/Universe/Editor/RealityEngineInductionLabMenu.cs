@@ -7,7 +7,7 @@ using RealityEngine.Visualization;
 namespace RealityEngine.EditorTools
 {
     /// <summary>
-    /// Places the Reality Engine v0.9 induction lab (Field Lens + Scale Engine + Experiment Framework + AI Scientist) into the currently open scene.
+    /// Places the Reality Engine v1.0 induction lab (gradient ledger + toy heat path) into the currently open scene.
     /// Use this while Faraday.unity is open, then save the scene.
     /// </summary>
     public static class RealityEngineInductionLabMenu
@@ -27,6 +27,8 @@ namespace RealityEngine.EditorTools
                 existing.EnsureChemistry();
                 existing.EnsureBiology();
                 existing.EnsureLabStyle();
+                existing.EnsureThermo();
+                existing.EnsureLedger();
                 Selection.activeGameObject = existing.gameObject;
                 EditorGUIUtility.PingObject(existing);
                 if (existing.gameObject.scene.IsValid())
@@ -45,13 +47,51 @@ namespace RealityEngine.EditorTools
             bootstrap.EnsureChemistry();
             bootstrap.EnsureBiology();
             bootstrap.EnsureLabStyle();
+            bootstrap.EnsureThermo();
+            bootstrap.EnsureLedger();
             Selection.activeGameObject = go;
             if (go.scene.IsValid())
                 EditorSceneManager.MarkSceneDirty(go.scene);
             Debug.Log(
-                "Placed Induction Lab v0.9 (Field Lens + Scale Engine + Experiment Framework + AI Scientist) in scene '" + go.scene.name +
+                "Placed Induction Lab v1.0 (gradient ledger + toy heat path) in scene '" + go.scene.name +
                 "'. Save Faraday.unity to keep it. On Play, the bootstrap also builds if Magnet is missing.",
                 go);
+        }
+
+
+        const string Ensure10Path = "Reality Engine/Ensure 1.0 Gradient Lab";
+
+        [MenuItem(Ensure10Path)]
+        public static void EnsureGradientLab()
+        {
+            InductionLabBootstrap existing = Object.FindFirstObjectByType<InductionLabBootstrap>(FindObjectsInactive.Include);
+            if (existing == null)
+            {
+                PlaceInductionLab();
+                existing = Object.FindFirstObjectByType<InductionLabBootstrap>(FindObjectsInactive.Include);
+            }
+            if (existing == null)
+                return;
+            existing.EnsureFieldLens();
+            existing.EnsureScaleEngine();
+            existing.EnsureExperimentFramework();
+            existing.EnsureScientist();
+            existing.EnsureChemistry();
+            existing.EnsureBiology();
+            existing.EnsureLabStyle();
+            existing.EnsureThermo();
+            existing.EnsureLedger();
+            Selection.activeGameObject = existing.gameObject;
+            EditorGUIUtility.PingObject(existing);
+            if (existing.gameObject.scene.IsValid())
+                EditorSceneManager.MarkSceneDirty(existing.gameObject.scene);
+            Debug.Log("Reality Engine 1.0 gradient lab ensured (heat path + conservation ledger) on: " + existing.gameObject.name, existing);
+        }
+
+        [MenuItem(Ensure10Path, true)]
+        public static bool EnsureGradientLabValidate()
+        {
+            return true;
         }
 
         [MenuItem(MenuPath, true)]

@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using RealityEngine.Core;
 using RealityEngine.Biology;
+using RealityEngine.Physics.Thermo;
 
 namespace RealityEngine.Visualization
 {
@@ -95,6 +96,8 @@ namespace RealityEngine.Visualization
             string extra = "";
             ScaleLevel L = (ScaleLevel)_scale;
             MuscleCell bio = GetComponent<MuscleCell>();
+            HeatCoupler heat = GetComponent<HeatCoupler>();
+            HeatReservoir reservoir = GetComponent<HeatReservoir>();
             if (bio != null)
             {
                 extra = "\n" + BioScale.RepresentationOf(L) + "\n" + BioEnergy.Honesty;
@@ -102,6 +105,14 @@ namespace RealityEngine.Visualization
                     extra += "\nNot molecular dynamics";
                 else if (L == ScaleLevel.Atomic)
                     extra += "\nElectronic structure not simulated";
+            }
+            else if (heat != null || reservoir != null)
+            {
+                extra = "\n" + ThermoEnergy.Honesty;
+                if (L == ScaleLevel.Molecular || L == ScaleLevel.Atomic)
+                    extra += "\nnot a molecular sim";
+                else if (L == ScaleLevel.Material)
+                    extra += "\nhot / cold bodies";
             }
             else if (L == ScaleLevel.Molecular)
                 extra = "\nNot molecular dynamics";

@@ -5,6 +5,7 @@ using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Core;
 using RealityEngine.Chemistry;
 using RealityEngine.Biology;
+using RealityEngine.Physics.Thermo;
 
 namespace RealityEngine.Visualization
 {
@@ -13,7 +14,8 @@ namespace RealityEngine.Visualization
         Magnet,
         Coil,
         Load,
-        Cell
+        Cell,
+        Thermo
     }
 
     /// <summary>
@@ -90,6 +92,11 @@ namespace RealityEngine.Visualization
             Configure(lens, FieldLensTargetKind.Cell, null, null, null);
         }
 
+        public void ConfigureThermo(FieldLens lens)
+        {
+            Configure(lens, FieldLensTargetKind.Thermo, null, null, null);
+        }
+
         void OnDisable()
         {
             if (_lens != null)
@@ -135,7 +142,7 @@ namespace RealityEngine.Visualization
             while (t != null)
             {
                 string n = t.name;
-                if (!string.IsNullOrEmpty(n) && n.StartsWith("Bio", System.StringComparison.Ordinal))
+                if (!string.IsNullOrEmpty(n) && (n.StartsWith("Bio", System.StringComparison.Ordinal) || n.StartsWith("HeatEnergy", System.StringComparison.Ordinal) || n.StartsWith("HeatMath", System.StringComparison.Ordinal) || n.StartsWith("HeatParked", System.StringComparison.Ordinal) || n.StartsWith("HeatCaption", System.StringComparison.Ordinal) || n.StartsWith("HeatMaterial", System.StringComparison.Ordinal)))
                     return false;
                 t = t.parent;
             }
@@ -144,7 +151,7 @@ namespace RealityEngine.Visualization
 
         void BuildChildren()
         {
-            if (_kind == FieldLensTargetKind.Cell)
+            if (_kind == FieldLensTargetKind.Cell || _kind == FieldLensTargetKind.Thermo)
             {
                 BuildHonestyLabel();
                 BuildLookMaterials();
@@ -223,6 +230,8 @@ namespace RealityEngine.Visualization
                 return new Vector3(0f, 0.08f, 0f);
             if (_kind == FieldLensTargetKind.Cell)
                 return new Vector3(0f, 0.16f, 0f);
+            if (_kind == FieldLensTargetKind.Thermo)
+                return new Vector3(0f, 0.14f, 0f);
             return new Vector3(0f, 0.08f, 0f);
         }
 
@@ -263,6 +272,27 @@ namespace RealityEngine.Visualization
                         col = new Color(0.85f, 0.42f, 0.18f);
                     else if (r != null && r.gameObject.name == "Nucleus")
                         col = new Color(0.45f, 0.22f, 0.50f);
+                }
+                else if (_kind == FieldLensTargetKind.Thermo)
+                {
+                    metallic = 0.55f;
+                    string gn = gameObject.name;
+                    HeatReservoir hr = GetComponent<HeatReservoir>();
+                    if (gn == "HeatHot" || (hr != null && hr.IsHot))
+                    {
+                        col = new Color(0.52f, 0.16f, 0.08f);
+                        metallic = 0.32f;
+                    }
+                    else if (gn == "HeatCold" || hr != null)
+                    {
+                        col = new Color(0.22f, 0.30f, 0.38f);
+                        metallic = 0.86f;
+                    }
+                    else
+                    {
+                        col = new Color(0.46f, 0.30f, 0.12f);
+                        metallic = 0.92f;
+                    }
                 }
                 else if (r != null)
                 {
@@ -358,6 +388,19 @@ namespace RealityEngine.Visualization
                 MuscleCell cell = GetComponent<MuscleCell>();
                 if (cell != null)
                     cell.ApplyView(_layer, _scale);
+                ApplyMaterialLook(L == FieldLensLayer.Material || S == ScaleLevel.Material);
+                UpdateHonesty();
+                return;
+            }
+
+            if (_kind == FieldLensTargetKind.Thermo)
+            {
+                HeatCoupler coupler = GetComponent<HeatCoupler>();
+                if (coupler != null)
+                    coupler.ApplyView(_layer, _scale);
+                HeatReservoir res = GetComponent<HeatReservoir>();
+                if (res != null)
+                    res.ApplyView(_layer, _scale);
                 ApplyMaterialLook(L == FieldLensLayer.Material || S == ScaleLevel.Material);
                 UpdateHonesty();
                 return;
@@ -472,6 +515,20 @@ namespace RealityEngine.Visualization
                 extra = "\nB sampled from MagneticDipole.CalculateFieldAt";
             else if (L == FieldLensLayer.Magnetic)
                 extra = "\nB sampled from MagneticDipole.CalculateFieldAt";
+            if (_kind == FieldLensTargetKind.Thermo)
+            {
+                extra = "\n" + ThermoEnergy.Honesty;
+                if (L == FieldLensLayer.Mathematical)
+                    extra += "\nQ_in, eta_toy = 1 - Tc/Th (capped), W = eta Q_in, Q_c = Q_in - W";
+                else if (L == FieldLensLayer.Charge || L == FieldLensLayer.EnergyFlow)
+                    extra += "\n" + ThermoEnergy.Educational;
+                else if (L == FieldLensLayer.Atomic)
+                    extra += "\nnot a molecular sim";
+                else if (L == FieldLensLayer.Electric || L == FieldLensLayer.Magnetic)
+                    extra += "\nnot an EM source";
+                else if (L == FieldLensLayer.Material)
+                    extra += "\nhot / cold bodies";
+            }
             if (_kind == FieldLensTargetKind.Cell)
             {
                 extra = "\n" + BioEnergy.Honesty;

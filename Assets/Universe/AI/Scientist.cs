@@ -3,6 +3,7 @@ using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Experiments;
 using RealityEngine.Chemistry;
 using RealityEngine.Biology;
+using RealityEngine.Physics.Thermo;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -108,6 +109,11 @@ namespace RealityEngine.AI
             SelectQuestion(ScientistQuestion.WhereMuscleEnergy);
         }
 
+        public void SelectIsEnergyCreated()
+        {
+            SelectQuestion(ScientistQuestion.IsEnergyCreated);
+        }
+
         public SimulationState CaptureState()
         {
             CacheRefs();
@@ -179,6 +185,9 @@ namespace RealityEngine.AI
                 case ScientistQuestion.WhereMuscleEnergy:
                     _hypothesis = PredictMuscleEnergy();
                     break;
+                case ScientistQuestion.IsEnergyCreated:
+                    _hypothesis = PredictEnergyCreated();
+                    break;
                 default:
                     _hypothesis = PredictDoubleVelocity(last);
                     break;
@@ -194,10 +203,10 @@ namespace RealityEngine.AI
             if (!_hypothesisFormed)
                 FormHypothesis();
 
-            if (_question != ScientistQuestion.WhyCopperConductor && _question != ScientistQuestion.WhereMuscleEnergy)
+            if (_question != ScientistQuestion.WhyCopperConductor && _question != ScientistQuestion.WhereMuscleEnergy && _question != ScientistQuestion.IsEnergyCreated)
                 ApplyQuestionParameters();
             CaptureState();
-            if (_question == ScientistQuestion.WhyCopperConductor || _question == ScientistQuestion.WhereMuscleEnergy)
+            if (_question == ScientistQuestion.WhyCopperConductor || _question == ScientistQuestion.WhereMuscleEnergy || _question == ScientistQuestion.IsEnergyCreated)
                 return;
 
             if (_runner == null)
@@ -224,6 +233,8 @@ namespace RealityEngine.AI
                     return "Q4  Why is copper a conductor?";
                 case ScientistQuestion.WhereMuscleEnergy:
                     return "Q5  Where does muscle energy come from?";
+                case ScientistQuestion.IsEnergyCreated:
+                    return "Q6  Is energy created in this lab?";
                 default:
                     return "Q1  What if I double magnet velocity? (B and coil unchanged)";
             }
@@ -264,6 +275,8 @@ namespace RealityEngine.AI
                     SelectWhyCopper();
                 if (kb.digit8Key.wasPressedThisFrame)
                     SelectWhereMuscleEnergy();
+                if (kb.digit9Key.wasPressedThisFrame)
+                    SelectIsEnergyCreated();
                 if (kb.hKey.wasPressedThisFrame)
                     FormHypothesis();
                 if (kb.jKey.wasPressedThisFrame)
@@ -281,6 +294,8 @@ namespace RealityEngine.AI
                 SelectWhyCopper();
             if (Input.GetKeyDown(KeyCode.Alpha8))
                 SelectWhereMuscleEnergy();
+            if (Input.GetKeyDown(KeyCode.Alpha9))
+                SelectIsEnergyCreated();
             if (Input.GetKeyDown(KeyCode.H))
                 FormHypothesis();
             if (Input.GetKeyDown(KeyCode.J))
@@ -470,6 +485,18 @@ namespace RealityEngine.AI
             };
         }
 
+        Hypothesis PredictEnergyCreated()
+        {
+            HeatCoupler heat = FindFirstObjectByType<HeatCoupler>(FindObjectsInactive.Include);
+            string body = ThermoEnergy.EnergyCreatedAnswer(_circuit, heat);
+            return new Hypothesis
+            {
+                text = body,
+                predictedPeakEmf = 0f,
+                basedOn = ThermoEnergy.Honesty + " " + BioEnergy.Honesty + " " + ThermoEnergy.Educational,
+                hasNumericPrediction = false
+            };
+        }
         float MagnetSpeed()
         {
             if (_magnetBody != null)
