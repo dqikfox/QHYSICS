@@ -7,6 +7,7 @@ using TMPro;
 using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Visualization;
 using RealityEngine.Core;
+using RealityEngine.AI;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -14,7 +15,7 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Experiments
 {
     /// <summary>
-    /// Reality Engine v0.6 — Electromagnetic Induction Laboratory + Field Lens + Scale Engine.
+    /// Reality Engine v0.7 — Electromagnetic Induction Laboratory + Field Lens + Scale Engine + AI Scientist.
     /// Spawns a grabable bar magnet, copper coil, resistive load, sampled B overlay,
     /// Field Lens peels, and a TMP readout beside Faraday's breadboard. Does not touch SpiceSharp.
     /// </summary>
@@ -68,6 +69,7 @@ namespace RealityEngine.Experiments
         FieldLens _fieldLens;
         ScaleEngine _scaleEngine;
         ExperimentRunner _experiment;
+        Scientist _scientist;
         Renderer _loadRenderer;
         Material _loadMaterial;
         bool _built;
@@ -79,6 +81,7 @@ namespace RealityEngine.Experiments
         public FieldLens FieldLens => _fieldLens;
         public ScaleEngine ScaleEngine => _scaleEngine;
         public ExperimentRunner Experiment => _experiment;
+        public Scientist Scientist => _scientist;
 
         void Reset()
         {
@@ -116,6 +119,7 @@ namespace RealityEngine.Experiments
                 EnsureFieldLens();
                 EnsureScaleEngine();
                 EnsureExperimentFramework();
+                EnsureScientist();
             }
         }
 
@@ -186,6 +190,7 @@ namespace RealityEngine.Experiments
                 EnsureFieldLens();
                 EnsureScaleEngine();
                 EnsureExperimentFramework();
+                EnsureScientist();
                 _built = true;
                 return;
             }
@@ -227,6 +232,7 @@ namespace RealityEngine.Experiments
             EnsureFieldLens();
             EnsureScaleEngine();
             EnsureExperimentFramework();
+            EnsureScientist();
             _built = true;
         }
 
@@ -252,6 +258,7 @@ namespace RealityEngine.Experiments
             _fieldLens = GetComponent<FieldLens>();
             _scaleEngine = GetComponent<ScaleEngine>();
             _experiment = GetComponent<ExperimentRunner>();
+            _scientist = GetComponent<Scientist>();
             if (load != null)
             {
                 _loadRenderer = load.GetComponent<Renderer>();
@@ -902,6 +909,99 @@ namespace RealityEngine.Experiments
             BuildButton(origin + new Vector3(0f, 0f, 0.24f), "Load", () => runner.LoadLatest(), new Color(0.20f, 0.35f, 0.60f));
             BuildButton(origin + new Vector3(0f, 0f, 0.30f), "Repeat", () => runner.Repeat(), new Color(0.55f, 0.45f, 0.15f));
         }
+
+
+        public void EnsureScientist()
+        {
+            CacheChildren();
+            if (_experiment == null)
+                EnsureExperimentFramework();
+
+            Scientist scientist = GetComponent<Scientist>();
+            if (scientist == null)
+                scientist = gameObject.AddComponent<Scientist>();
+            _scientist = scientist;
+            scientist.SetLab(_coil, _circuit, _dipole, _experiment);
+
+            if (_readout != null)
+                _readout.SetScientist(scientist);
+
+            ScientistBoard board = EnsureScientistBoard(scientist);
+            scientist.BindBoard(board);
+
+            EnsureScientistButtons(scientist);
+        }
+
+        ScientistBoard EnsureScientistBoard(Scientist scientist)
+        {
+            Transform existing = transform.Find("ScientistBoard");
+            GameObject go;
+            if (existing != null)
+            {
+                go = existing.gameObject;
+            }
+            else
+            {
+                go = new GameObject("ScientistBoard");
+                go.transform.SetParent(transform, true);
+                Transform expBoard = transform.Find("ExperimentBoard");
+                if (expBoard != null)
+                    go.transform.position = expBoard.position + new Vector3(0.72f, 0.0f, 0.0f);
+                else if (_readout != null)
+                    go.transform.position = _readout.transform.position + new Vector3(-0.72f, 0.0f, 0.0f);
+                else
+                    go.transform.position = transform.position + new Vector3(1.8f, 1.0f, 0.6f);
+
+                var tmpGo = new GameObject("Text");
+                tmpGo.transform.SetParent(go.transform, false);
+                var tmp = tmpGo.AddComponent<TextMeshPro>();
+                tmp.text = "SCIENTIST";
+                tmp.fontSize = 0.16f;
+                tmp.alignment = TextAlignmentOptions.TopLeft;
+                tmp.color = new Color(0.88f, 0.94f, 0.82f);
+                tmp.rectTransform.sizeDelta = new Vector2(0.64f, 0.58f);
+                tmp.textWrappingMode = TextWrappingModes.Normal;
+                tmp.raycastTarget = false;
+                TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+                if (font != null)
+                    tmp.font = font;
+
+                var boardMesh = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                boardMesh.name = "Board";
+                boardMesh.transform.SetParent(go.transform, false);
+                boardMesh.transform.localPosition = new Vector3(0.22f, -0.16f, 0.01f);
+                boardMesh.transform.localScale = new Vector3(0.66f, 0.56f, 0.008f);
+                KillCollider(boardMesh);
+                ApplyMat(boardMesh, MakeLit(new Color(0.05f, 0.08f, 0.06f)));
+
+                var view = go.AddComponent<ScientistBoard>();
+                view.Bind(scientist, _experiment, tmp);
+                return view;
+            }
+
+            var viewExisting = go.GetComponent<ScientistBoard>();
+            if (viewExisting == null)
+                viewExisting = go.AddComponent<ScientistBoard>();
+            TextMeshPro tmpExisting = go.GetComponentInChildren<TextMeshPro>();
+            viewExisting.Bind(scientist, _experiment, tmpExisting);
+            return viewExisting;
+        }
+
+        void EnsureScientistButtons(Scientist scientist)
+        {
+            if (transform.Find("Button_Q1") != null)
+                return;
+            Transform repeat = transform.Find("Button_Repeat");
+            Vector3 origin = repeat != null
+                ? repeat.position
+                : transform.position + new Vector3(-0.25f, 0.8f, 0.5f);
+            BuildButton(origin + new Vector3(0f, 0f, 0.06f), "Q1", () => scientist.SelectDoubleVelocity(), new Color(0.25f, 0.55f, 0.35f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.12f), "Q2", () => scientist.SelectDoubleN(), new Color(0.25f, 0.50f, 0.55f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.18f), "Q3", () => scientist.SelectDoubleR(), new Color(0.50f, 0.40f, 0.20f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.24f), "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.30f), "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f));
+        }
+
 
     }
 }

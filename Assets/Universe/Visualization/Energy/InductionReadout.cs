@@ -3,6 +3,7 @@ using TMPro;
 using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Core;
 using RealityEngine.Experiments;
+using RealityEngine.AI;
 
 namespace RealityEngine.Visualization
 {
@@ -38,6 +39,7 @@ namespace RealityEngine.Visualization
         FieldLens _lens;
         ScaleEngine _scale;
         ExperimentRunner _experiment;
+        Scientist _scientist;
         float _nextRefresh;
         readonly System.Text.StringBuilder _sb = new System.Text.StringBuilder(1800);
 
@@ -67,6 +69,11 @@ namespace RealityEngine.Visualization
         public void SetExperimentRunner(ExperimentRunner runner)
         {
             _experiment = runner;
+        }
+
+        public void SetScientist(Scientist scientist)
+        {
+            _scientist = scientist;
         }
 
         public TextMeshPro Text => _text != null ? _text : text;
@@ -114,7 +121,7 @@ namespace RealityEngine.Visualization
         void RebuildText()
         {
             _sb.Length = 0;
-            _sb.Append("INDUCTION LAB  v0.6\n");
+            _sb.Append("INDUCTION LAB  v0.7\n");
             _sb.Append("Faraday law  EMF = -N dΦ/dt\n");
             if (_scale != null)
             {
@@ -135,6 +142,11 @@ namespace RealityEngine.Visualization
                 _sb.Append("  PAUSED");
             _sb.Append('\n');
 
+            if (_scientist != null)
+            {
+                _sb.Append("Scientist  ").Append(_scientist.QuestionPrompt);
+                _sb.Append("  [").Append(_scientist.HonestyTag).Append("]\n");
+            }
             if (_experiment != null)
             {
                 _sb.Append("Experiment  ").Append(_experiment.State);
@@ -161,6 +173,10 @@ namespace RealityEngine.Visualization
 
             _sb.Append('\n');
             _sb.Append(Disclaimer);
+            if (_scientist != null)
+            {
+                _sb.Append("\nScientist: ").Append(Scientist.Honesty);
+            }
             if (_experiment != null)
             {
                 _sb.Append("\nExperiment: ").Append(_experiment.State);
