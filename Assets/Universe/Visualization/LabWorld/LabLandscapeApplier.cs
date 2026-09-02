@@ -8,8 +8,9 @@ namespace RealityEngine.Visualization
 {
     /// <summary>
     /// Reality Engine outdoor lab campus: hide Faraday's broken meadow/terrain,
-    /// spawn a Giza sand/stone plateau, and place Khufu (Great Pyramid) at 1:1
-    /// beyond the circuit table. Play auto-applies. Does not move XR Origin.
+    /// spawn a Giza sand/stone plateau, and place the undamaged 1:1 Giza complex
+    /// (Khufu, Khafre, Menkaure, Sphinx) beyond the circuit table. Play auto-applies.
+    /// Does not move XR Origin. Does not disable MountainScene.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(40)]
@@ -19,7 +20,7 @@ namespace RealityEngine.Visualization
         public const string HostName = "RealityEngine";
         const float LabPlazaSize = 32f;
         const float GapToPyramidM = 40f;
-        const float PlateauPadM = 36f;
+        const float PlateauPadM = GizaComplex.MarginM;
 
         static readonly string[] HideExact =
         {
@@ -78,20 +79,23 @@ namespace RealityEngine.Visualization
             if (!existing.isActiveAndEnabled && existing.gameObject.activeInHierarchy)
                 existing.enabled = true;
 
-            existing.ApplyNow(false);
+            if (Application.isPlaying)
+                existing.ApplyNow(false);
             return existing;
         }
 
         void Awake()
         {
-            ApplyNow(false);
+            if (Application.isPlaying)
+                ApplyNow(false);
         }
 
         void Start()
         {
+            if (!Application.isPlaying)
+                return;
             ApplyNow(false);
-            if (Application.isPlaying)
-                StartCoroutine(ApplyDelayed());
+            StartCoroutine(ApplyDelayed());
         }
 
         void Update()
@@ -132,7 +136,7 @@ namespace RealityEngine.Visualization
             if (_built && transform.Find(RootName) != null)
                 return;
 
-            BuildWorld();
+            BuildWorld(GizaComplex.Spawn.All);
             _built = true;
         }
 
@@ -180,9 +184,9 @@ namespace RealityEngine.Visualization
                     return true;
                 if (n == "circuitlab" || n == "circuittable" || n == "breadboard" || n == "circuitlabhandle")
                     return true;
-                if (n == "realityengine" || n == "induction lab" || n == RootName.ToLowerInvariant() || n == "khufu")
+                if (n == "realityengine" || n == "induction lab" || n == RootName.ToLowerInvariant() || n.Contains("mountainscene"))
                     return true;
-                if (n == "lablandscape" || n.StartsWith("khufu"))
+                if (n == "lablandscape" || GizaComplex.IsMonumentName(n))
                     return true;
                 p = p.parent;
             }
@@ -270,21 +274,42 @@ namespace RealityEngine.Visualization
             RenderSettings.fogDensity = 0.0024f;
         }
 
-        void BuildWorld()
+        public void PlaceMonuments(GizaComplex.Spawn which)
+        {
+            HideBrokenEnvironment();
+            TintLightAndFog();
+            Transform root = transform.Find(RootName);
+            if (root == null)
+            {
+                GameObject found = GameObject.Find(RootName);
+                if (found != null)
+                    root = found.transform;
+            }
+            if (root == null)
+            {
+                BuildWorld(which);
+                _built = true;
+                return;
+            }
+            GizaComplex.Pose pose = ReadPose(root);
+            GizaComplex.Ensure(pose, which);
+            AddTeleports(root.gameObject);
+        }
+
+        void BuildWorld(GizaComplex.Spawn which)
         {
             Transform existing = transform.Find(RootName);
-            if (existing != null)
-                return;
-            GameObject found = GameObject.Find(RootName);
+            GameObject found = existing != null ? existing.gameObject : GameObject.Find(RootName);
             if (found != null)
+            {
+                GizaComplex.Pose poseExisting = ReadPose(found.transform);
+                GizaComplex.Ensure(poseExisting, which);
+                AddTeleports(found);
                 return;
+            }
 
             Bounds table = ResolveTableBounds(out Transform tableXf, out Transform xr);
             Vector3 forward = ResolveForward(tableXf, xr, table);
-            Vector3 right = Vector3.Cross(Vector3.up, forward);
-            if (right.sqrMagnitude < 1e-8f)
-                right = Vector3.right;
-            right.Normalize();
 
             float surfaceY = table.min.y;
             if (xr != null)
@@ -296,13 +321,31 @@ namespace RealityEngine.Visualization
             float tableFwd = ExtentsAlong(table, forward);
             float dist = tableFwd + GapToPyramidM + halfBase;
             Vector3 khufuCenter = new Vector3(table.center.x, surfaceY, table.center.z) + forward * dist;
-
             Vector3 plazaPos = new Vector3(table.center.x, surfaceY, table.center.z);
-            Vector3 mid = (plazaPos + khufuCenter) * 0.5f;
-            float spanZ = Mathf.Abs(khufuCenter.z - plazaPos.z) + KhufuPyramid.BaseMeters + PlateauPadM * 2f;
-            float spanX = KhufuPyramid.BaseMeters + LabPlazaSize + PlateauPadM * 2f;
-            float plateauX = Mathf.Max(spanX, 280f);
-            float plateauZ = Mathf.Max(spanZ, 320f);
+            Quaternion khufuRot = Quaternion.LookRotation(-forward, Vector3.up);
+
+            GizaComplex.LocalExtents(out float xMin, out float xMax, out float zMin, out float zMax);
+            Vector3[] localCorners =
+            {
+                new Vector3(xMin, 0f, zMin),
+                new Vector3(xMin, 0f, zMax),
+                new Vector3(xMax, 0f, zMin),
+                new Vector3(xMax, 0f, zMax)
+            };
+            Vector3 wmin = plazaPos;
+            Vector3 wmax = plazaPos;
+            Encapsulate(ref wmin, ref wmax, plazaPos + new Vector3(LabPlazaSize, 0f, LabPlazaSize) * 0.5f);
+            Encapsulate(ref wmin, ref wmax, plazaPos - new Vector3(LabPlazaSize, 0f, LabPlazaSize) * 0.5f);
+            Encapsulate(ref wmin, ref wmax, khufuCenter);
+            for (int i = 0; i < localCorners.Length; i++)
+                Encapsulate(ref wmin, ref wmax, khufuCenter + khufuRot * localCorners[i]);
+            wmin.x -= PlateauPadM;
+            wmin.z -= PlateauPadM;
+            wmax.x += PlateauPadM;
+            wmax.z += PlateauPadM;
+            Vector3 mid = (wmin + wmax) * 0.5f;
+            float plateauX = Mathf.Max(40f, wmax.x - wmin.x);
+            float plateauZ = Mathf.Max(40f, wmax.z - wmin.z);
 
             var root = new GameObject(RootName);
             root.transform.SetParent(transform, true);
@@ -331,57 +374,131 @@ namespace RealityEngine.Visualization
             }
             Material hillMat = LabWorldMeshes.MakeLit("RELab_HillRock", new Color(0.22f, 0.21f, 0.20f, 1f), 0.12f, 0.16f, false);
 
-            Mesh plateauMesh = LabWorldMeshes.BuildPlateau(plateauX, plateauZ, 36, 4.5f);
+            Mesh plateauMesh = LabWorldMeshes.BuildPlateau(plateauX, plateauZ, 40, 4.5f);
             GameObject plateau = SpawnLocal(root.transform, "GizaPlateau", plateauMesh, sand, Vector3.zero, true);
 
             Mesh plazaMesh = LabWorldMeshes.BuildFlatPad(LabPlazaSize, LabPlazaSize, 8f);
             Vector3 plazaLocal = root.transform.InverseTransformPoint(plazaPos + Vector3.up * 0.03f);
             GameObject plaza = SpawnLocal(root.transform, "LabPlaza", plazaMesh, graph, plazaLocal, true);
 
-            Quaternion khufuRot = Quaternion.LookRotation(-forward, Vector3.up);
-            GameObject khufu = KhufuPyramid.Build(root.transform, khufuCenter, khufuRot, comfortScale);
-            SitOnSurface(khufu.transform, surfaceY);
+            var pose = new GizaComplex.Pose
+            {
+                parent = root.transform,
+                khufuCenter = khufuCenter,
+                rot = khufuRot,
+                surfaceY = surfaceY,
+                comfortScale = comfortScale
+            };
+            StorePose(root.transform, pose);
+            GizaComplex.Ensure(pose, which);
 
-            PlaceHills(root.transform, khufuCenter, halfBase, plateauX, plateauZ, surfaceY, hillMat);
-
-            AddTeleport(plateau);
-            AddTeleport(plaza);
-            Transform pavement = khufu.transform.Find("Khufu_Pavement");
-            if (pavement != null)
-                AddTeleport(pavement.gameObject);
-            Transform casing = khufu.transform.Find("Khufu_Casing");
-            if (casing != null)
-                AddTeleport(casing.gameObject);
-            Transform passages = khufu.transform.Find("Khufu_Passages");
-            if (passages != null)
-                AddTeleport(passages.gameObject);
-            Transform king = khufu.transform.Find("Khufu_KingChamber");
-            if (king != null)
-                AddTeleport(king.gameObject);
-            Transform queen = khufu.transform.Find("Khufu_QueenChamber");
-            if (queen != null)
-                AddTeleport(queen.gameObject);
-            Transform sub = khufu.transform.Find("Khufu_Subterranean");
-            if (sub != null)
-                AddTeleport(sub.gameObject);
+            PlaceHills(root.transform, pose, plateauX, plateauZ, hillMat);
+            AddTeleports(root);
 
             Debug.Log(
                 "LabLandscapeApplier: Giza plateau " + plateauX.ToString("0") + "×" + plateauZ.ToString("0") +
-                " m, Khufu base " + KhufuPyramid.BaseMeters.ToString("0.00") +
-                " m / height " + KhufuPyramid.HeightMeters.ToString("0.00") +
-                " m at " + khufuCenter +
-                ". Hidden meadow/terrain. Teleport to north face (~17 m up) for the entrance.");
+                " m. Khufu 440×280 cubits (230.38×146.61 m) north entrance 17 m. Khafre 215.25×143.5 m, +10 m bedrock, 323 W / 342 S. " +
+                "Menkaure 105.5×65.5 m, 563 W / 743 S, north entrance 4.2 m. Sphinx 73.5×20 m, 347 E / 430 S. " +
+                "Ctrl+R then Play, or Reality Engine / Place Giza Complex. Teleport to each north face.");
         }
 
-        static void PlaceHills(Transform parent, Vector3 khufuCenter, float halfBase, float plateauX, float plateauZ, float surfaceY, Material mat)
+        static void Encapsulate(ref Vector3 min, ref Vector3 max, Vector3 p)
         {
-            float ring = Mathf.Max(plateauX, plateauZ) * 0.42f;
-            int n = 8;
+            min.x = Mathf.Min(min.x, p.x);
+            min.y = Mathf.Min(min.y, p.y);
+            min.z = Mathf.Min(min.z, p.z);
+            max.x = Mathf.Max(max.x, p.x);
+            max.y = Mathf.Max(max.y, p.y);
+            max.z = Mathf.Max(max.z, p.z);
+        }
+
+        static void StorePose(Transform root, GizaComplex.Pose pose)
+        {
+            var marker = root.Find("_GizaPose");
+            if (marker == null)
+            {
+                var go = new GameObject("_GizaPose");
+                go.transform.SetParent(root, false);
+                marker = go.transform;
+            }
+            marker.position = pose.khufuCenter;
+            marker.rotation = pose.rot;
+        }
+
+        GizaComplex.Pose ReadPose(Transform root)
+        {
+            Transform marker = root.Find("_GizaPose");
+            Vector3 khufuCenter;
+            Quaternion rot;
+            if (marker != null)
+            {
+                khufuCenter = marker.position;
+                rot = marker.rotation;
+            }
+            else
+            {
+                Transform khufu = root.Find(KhufuPyramid.RootName);
+                if (khufu == null)
+                {
+                    GameObject named = GizaComplex.FindNamed(KhufuPyramid.RootName);
+                    khufu = named != null ? named.transform : null;
+                }
+                khufuCenter = khufu != null ? khufu.position : root.position;
+                rot = khufu != null ? khufu.rotation : Quaternion.identity;
+            }
+            return new GizaComplex.Pose
+            {
+                parent = root,
+                khufuCenter = khufuCenter,
+                rot = rot,
+                surfaceY = root.position.y,
+                comfortScale = comfortScale
+            };
+        }
+
+        static void AddTeleports(GameObject root)
+        {
+            if (root == null)
+                return;
+            MeshCollider[] cols = root.GetComponentsInChildren<MeshCollider>(true);
+            for (int i = 0; i < cols.Length; i++)
+            {
+                if (cols[i] == null)
+                    continue;
+                string n = cols[i].gameObject.name.ToLowerInvariant();
+                if (n.Contains("honesty") || n.Contains("plate") || n.Contains("airshaft") || n.Contains("emit") || n.Contains("sarcophagus"))
+                    continue;
+                AddTeleport(cols[i].gameObject);
+            }
+            Transform plaza = root.transform.Find("LabPlaza");
+            if (plaza != null)
+                AddTeleport(plaza.gameObject);
+            Transform plateau = root.transform.Find("GizaPlateau");
+            if (plateau != null)
+                AddTeleport(plateau.gameObject);
+        }
+
+        static void PlaceHills(Transform parent, GizaComplex.Pose pose, float plateauX, float plateauZ, Material mat)
+        {
+            if (parent.Find("Hill_0") != null)
+                return;
+            float surfaceY = pose.surfaceY;
+            float ring = Mathf.Max(plateauX, plateauZ) * 0.46f;
+            int n = 10;
+            Vector3 khafre = GizaComplex.WorldFromKhufu(pose, -GizaComplex.KhafreWestM, -GizaComplex.KhafreSouthM, 0f);
+            Vector3 menkaure = GizaComplex.WorldFromKhufu(pose, -GizaComplex.MenkaureWestM, -GizaComplex.MenkaureSouthM, 0f);
+            Vector3 sphinx = GizaComplex.WorldFromKhufu(pose, GizaComplex.SphinxEastM, -GizaComplex.SphinxSouthM, 0f);
             for (int i = 0; i < n; i++)
             {
                 float a = (i / (float)n) * Mathf.PI * 2f + 0.2f;
                 Vector3 p = new Vector3(parent.position.x + Mathf.Cos(a) * ring, surfaceY, parent.position.z + Mathf.Sin(a) * ring);
-                if ((p - khufuCenter).sqrMagnitude < (halfBase + 28f) * (halfBase + 28f))
+                if (TooClose(p, pose.khufuCenter, KhufuPyramid.BaseMeters * 0.5f + 40f))
+                    continue;
+                if (TooClose(p, khafre, KhafrePyramid.BaseMeters * 0.5f + 40f))
+                    continue;
+                if (TooClose(p, menkaure, MenkaurePyramid.BaseMeters * 0.5f + 50f))
+                    continue;
+                if (TooClose(p, sphinx, 60f))
                     continue;
                 var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 go.name = "Hill_" + i;
@@ -447,6 +564,13 @@ namespace RealityEngine.Visualization
                 return;
             if (go.GetComponent<TeleportationArea>() == null)
                 go.AddComponent<TeleportationArea>();
+        }
+
+        static bool TooClose(Vector3 a, Vector3 b, float radius)
+        {
+            a.y = 0f;
+            b.y = 0f;
+            return (a - b).sqrMagnitude < radius * radius;
         }
 
         static void SitOnSurface(Transform t, float surfaceY)
