@@ -33,7 +33,7 @@ namespace RealityEngine.Visualization
         static bool _loggedSkipElectron;
         static bool _loggedSkipGlow;
 
-        readonly HashSet<int> _styled = new HashSet<int>();
+        readonly HashSet<MeshRenderer> _styled = new HashSet<MeshRenderer>();
         float _nextPass;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -147,7 +147,7 @@ namespace RealityEngine.Visualization
         static List<Transform> CollectRoots()
         {
             var roots = new List<Transform>();
-            var seen = new HashSet<int>();
+            var seen = new HashSet<Transform>();
 
             CircuitLab[] labs = Object.FindObjectsByType<CircuitLab>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             for (int i = 0; i < labs.Length; i++)
@@ -183,14 +183,14 @@ namespace RealityEngine.Visualization
             return roots;
         }
 
-        static void AddRoot(List<Transform> roots, HashSet<int> seen, Transform t)
+        static void AddRoot(List<Transform> roots, HashSet<Transform> seen, Transform t)
         {
             if (t == null)
                 return;
             if (IsUnderXrOrigin(t))
                 return;
-            int id = t.GetInstanceID();
-            if (!seen.Add(id))
+
+            if (!seen.Add(t))
                 return;
             roots.Add(t);
         }
@@ -209,34 +209,34 @@ namespace RealityEngine.Visualization
 
         bool StyleOne(MeshRenderer mr, bool force)
         {
-            int id = mr.GetInstanceID();
-            if (!force && _styled.Contains(id))
+
+            if (!force && _styled.Contains(mr))
                 return false;
 
             if (ShouldSkip(mr, out string reason))
             {
                 if (force)
                     LogSkipOnce(mr, reason);
-                _styled.Add(id);
+                _styled.Add(mr);
                 return false;
             }
 
             Kind kind = Classify(mr);
             if (kind == Kind.Skip)
             {
-                _styled.Add(id);
+                _styled.Add(mr);
                 return false;
             }
 
             Material mat = MaterialFor(kind);
             if (mat == null)
             {
-                _styled.Add(id);
+                _styled.Add(mr);
                 return false;
             }
 
             AssignKeepingSlotCount(mr, mat);
-            _styled.Add(id);
+            _styled.Add(mr);
             return true;
         }
 
