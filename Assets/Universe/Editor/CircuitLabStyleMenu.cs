@@ -8,10 +8,31 @@ using RealityEngine.Visualization;
 
 namespace RealityEngine.EditorTools
 {
+    [InitializeOnLoad]
     public static class CircuitLabStyleMenu
     {
         const string MenuPath = "Reality Engine/Apply Circuit Lab Style";
         const string FixPinkPath = "Reality Engine/Fix Pink Lab Materials";
+        const string GraphitePath = "Assets/Universe/Visualization/LabStyle/Materials/RELab_Graphite.mat";
+        const string LabelPath = "Assets/Universe/Visualization/LabStyle/Materials/RELab_Label.mat";
+
+        static bool _autoFixedPink;
+
+        static CircuitLabStyleMenu()
+        {
+            EditorApplication.delayCall += AutoFixPinkOnce;
+        }
+
+        static void AutoFixPinkOnce()
+        {
+            if (_autoFixedPink)
+                return;
+            _autoFixedPink = true;
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
+            RunFixPink(applyLandscape: false, logMenuDetail: false);
+            Debug.Log("Reality Engine: auto-fixed pink lab materials.");
+        }
 
         [MenuItem(MenuPath)]
         public static void ApplyCircuitLabStyle()
@@ -39,6 +60,18 @@ namespace RealityEngine.EditorTools
         [MenuItem(FixPinkPath)]
         public static void FixPinkLabMaterials()
         {
+            RunFixPink(applyLandscape: true, logMenuDetail: true);
+        }
+
+        [MenuItem(FixPinkPath, true)]
+        public static bool FixPinkLabMaterialsValidate()
+        {
+            return true;
+        }
+
+        static void RunFixPink(bool applyLandscape, bool logMenuDetail)
+        {
+            int upgraded = UpgradePinkAssetMaterials();
             int stripped = StripCircuitTableRootRenderers();
             int replaced = ReplacePinkRenderers();
 
@@ -49,24 +82,78 @@ namespace RealityEngine.EditorTools
             if (bootstrap != null)
                 bootstrap.EnsureLabStyle();
 
-            LabLandscapeApplier landscape = LabLandscapeApplier.EnsureApplied();
-            landscape.ApplyNow(true);
+            if (applyLandscape)
+            {
+                LabLandscapeApplier landscape = LabLandscapeApplier.EnsureApplied();
+                landscape.ApplyNow(true);
+            }
 
             replaced += ReplacePinkRenderers();
 
             Scene scene = applier != null && applier.gameObject.scene.IsValid()
                 ? applier.gameObject.scene
-                : (landscape != null ? landscape.gameObject.scene : default);
-            if (scene.IsValid())
+                : default;
+            if (scene.IsValid() && (logMenuDetail || stripped > 0 || replaced > 0 || upgraded > 0))
                 EditorSceneManager.MarkSceneDirty(scene);
 
-            Debug.Log("Fix Pink Lab Materials: stripped " + stripped + " CircuitTable root MeshRenderer(s), replaced " + replaced + " pink/error materials with URP Lit from RELab_Graphite. Scene view should be graphite-copper, not magenta.");
+            if (logMenuDetail)
+                Debug.Log("Fix Pink Lab Materials: stripped " + stripped + " CircuitTable root MeshRenderer(s), upgraded " + upgraded + " asset materials, replaced " + replaced + " pink/error materials with URP Lit from RELab_Graphite. Scene view should be graphite-copper, not magenta.");
         }
 
-        [MenuItem(FixPinkPath, true)]
-        public static bool FixPinkLabMaterialsValidate()
+        static int UpgradePinkAssetMaterials()
         {
-            return true;
+            Shader lit = LabWorldMeshes.LitShader;
+            if (lit == null)
+                return 0;
+
+            int n = 0;
+            string[] folders =
+            {
+                "Assets/Materials",
+                "Assets/Real Materials",
+                "Assets/Universe/Visualization/LabStyle"
+            };
+            string[] guids = AssetDatabase.FindAssets("t:Material", folders);
+            for (int i = 0; i < guids.Length; i++)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+                if (string.IsNullOrEmpty(path))
+                    continue;
+                if (path.IndexOf("Skybox", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    continue;
+                Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (mat == null)
+                    continue;
+                if (!LabWorldMeshes.MaterialLooksPink(mat))
+                    continue;
+                Undo.RecordObject(mat, "Fix Pink Lab Materials");
+                mat.shader = lit;
+                EnsureUrpBaseProps(mat);
+                EditorUtility.SetDirty(mat);
+                n++;
+            }
+            if (n > 0)
+                AssetDatabase.SaveAssets();
+            return n;
+        }
+
+        static void EnsureUrpBaseProps(Material mat)
+        {
+            Color color = Color.white;
+            if (mat.HasProperty("_BaseColor"))
+                color = mat.GetColor("_BaseColor");
+            else if (mat.HasProperty("_Color"))
+                color = mat.GetColor("_Color");
+            if (mat.HasProperty("_BaseColor"))
+                mat.SetColor("_BaseColor", color);
+            if (mat.HasProperty("_Color"))
+                mat.SetColor("_Color", color);
+            if (mat.HasProperty("_BaseMap") && mat.HasProperty("_MainTex"))
+            {
+                Texture main = mat.GetTexture("_MainTex");
+                if (main != null && mat.GetTexture("_BaseMap") == null)
+                    mat.SetTexture("_BaseMap", main);
+            }
         }
 
         static int StripCircuitTableRootRenderers()
@@ -168,15 +255,21 @@ namespace RealityEngine.EditorTools
             return false;
         }
 
+        static Material LoadBakedLit(string path, string makeName, Color color, float metallic, float smoothness)
+        {
+            Material baked = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (baked != null && baked.shader != null && !LabWorldMeshes.ShaderLooksPink(baked.shader))
+                return baked;
+            return LabWorldMeshes.MakeLit(makeName, color, metallic, smoothness, false);
+        }
+
         static bool ReplaceOne(MeshRenderer mr)
         {
             string n = mr.gameObject.name.ToLowerInvariant();
             bool label = n == "board" || n == "plate" || (n.Contains("sign") && !n.Contains("design"));
-            Material mat;
-            if (label)
-                mat = LabWorldMeshes.MakeLit("RELab_Label", new Color(0.86f, 0.88f, 0.84f, 1f), 0.05f, 0.18f, false);
-            else
-                mat = LabWorldMeshes.MakeLit("RELab_Graphite", new Color(0.13f, 0.135f, 0.14f, 1f), 0.78f, 0.36f, false);
+            Material mat = label
+                ? LoadBakedLit(LabelPath, "RELab_Label", new Color(0.86f, 0.88f, 0.84f, 1f), 0.05f, 0.18f)
+                : LoadBakedLit(GraphitePath, "RELab_Graphite", new Color(0.13f, 0.135f, 0.14f, 1f), 0.78f, 0.36f);
             if (mat == null)
             {
                 Debug.LogError("Fix Pink Lab Materials: could not instantiate URP Lit from RELab_Graphite for " + mr.gameObject.name);
