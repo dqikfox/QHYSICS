@@ -583,11 +583,10 @@ namespace RealityEngine.Experiments
             go.transform.localScale = new Vector3(0.03f, 0.035f, 0.03f);
             KillCollider(go);
 
-            _loadMaterial = new Material(LitShader())
-            {
-                name = "InductionLoad",
-                hideFlags = HideFlags.HideAndDontSave
-            };
+            _loadMaterial = LabWorldMeshes.MakeLit("InductionLoad", new Color(0.15f, 0.08f, 0.04f), 0.28f, 0.24f, true);
+            if (_loadMaterial == null)
+                return go;
+            _loadMaterial.hideFlags = HideFlags.HideAndDontSave;
             _loadMaterial.EnableKeyword("_EMISSION");
             _loadMaterial.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
             if (_loadMaterial.HasProperty("_BaseColor"))
@@ -722,34 +721,18 @@ namespace RealityEngine.Experiments
 
         Material MakeLit(Color color)
         {
-            var mat = new Material(LitShader())
-            {
-                hideFlags = HideFlags.HideAndDontSave
-            };
-            if (mat.HasProperty("_BaseColor"))
-                mat.SetColor("_BaseColor", color);
-            if (mat.HasProperty("_Color"))
-                mat.SetColor("_Color", color);
-            mat.color = color;
-            return mat;
+            return LabWorldMeshes.MakeLit("RELab_Induction", color, 0.28f, 0.24f, false);
         }
 
         static Shader LitShader()
         {
-            Shader s = Shader.Find("Universal Render Pipeline/Lit");
-            if (s == null)
-                s = Shader.Find("URP/Lit");
-            if (s == null)
-                s = Shader.Find("Standard");
-            if (s == null)
-                s = Shader.Find("Sprites/Default");
-            return s;
+            return LabWorldMeshes.LitShader;
         }
 
         static void ApplyMat(GameObject go, Material mat)
         {
             var r = go.GetComponent<Renderer>();
-            if (r != null)
+            if (r != null && mat != null)
                 r.sharedMaterial = mat;
         }
 
