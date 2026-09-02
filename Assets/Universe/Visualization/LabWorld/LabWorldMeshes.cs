@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,8 +10,31 @@ namespace RealityEngine.Visualization
     public static class LabWorldMeshes
     {
         const string LitShaderName = "Universal Render Pipeline/Lit";
+        const string GraphiteResource = "RELab_Graphite";
+        const string GraphiteAssetPath = "Assets/Universe/Visualization/LabStyle/Materials/RELab_Graphite.mat";
 
         static Shader _lit;
+        static Material _graphiteTemplate;
+
+        public static Material GraphiteTemplate
+        {
+            get
+            {
+                if (_graphiteTemplate == null)
+                    _graphiteTemplate = LoadGraphiteTemplate();
+                return _graphiteTemplate;
+            }
+        }
+
+        static Material LoadGraphiteTemplate()
+        {
+            Material mat = Resources.Load<Material>(GraphiteResource);
+#if UNITY_EDITOR
+            if (mat == null)
+                mat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(GraphiteAssetPath);
+#endif
+            return mat;
+        }
 
         public static Shader LitShader
         {
@@ -18,26 +42,65 @@ namespace RealityEngine.Visualization
             {
                 if (_lit == null)
                 {
-                    _lit = Shader.Find(LitShaderName);
+                    Material graphite = GraphiteTemplate;
+                    if (graphite != null && graphite.shader != null)
+                        _lit = graphite.shader;
+                    if (_lit == null)
+                        _lit = Shader.Find(LitShaderName);
                     if (_lit == null)
                         _lit = Shader.Find("Universal Render Pipeline/Simple Lit");
                     if (_lit == null)
-                        _lit = Shader.Find("Sprites/Default");
+                        Debug.LogError("LabWorldMeshes: URP Lit missing. Load RELab_Graphite. Not falling back to Sprites/Default (magenta in URP).");
                 }
                 return _lit;
             }
         }
 
+        public static bool ShaderLooksPink(Shader shader)
+        {
+            if (shader == null)
+                return true;
+            string n = shader.name;
+            if (string.IsNullOrEmpty(n))
+                return true;
+            return n.IndexOf("Sprites", StringComparison.OrdinalIgnoreCase) >= 0
+                || n.IndexOf("Standard", StringComparison.OrdinalIgnoreCase) >= 0
+                || n.IndexOf("Hidden/InternalErrorShader", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        public static bool MaterialLooksPink(Material mat)
+        {
+            if (mat == null)
+                return true;
+            string n = mat.name;
+            if (!string.IsNullOrEmpty(n) && n.IndexOf("Default-Material", StringComparison.OrdinalIgnoreCase) >= 0)
+                return true;
+            return ShaderLooksPink(mat.shader);
+        }
+
         public static Material MakeLit(string name, Color color, float metallic, float smoothness, bool emission)
         {
-            Shader sh = LitShader;
-            if (sh == null)
-                return null;
-            var mat = new Material(sh)
+            Material template = GraphiteTemplate;
+            Material mat;
+            if (template != null)
             {
-                name = name,
-                hideFlags = HideFlags.DontSave
-            };
+                mat = new Material(template)
+                {
+                    name = name,
+                    hideFlags = HideFlags.DontSave
+                };
+            }
+            else
+            {
+                Shader sh = LitShader;
+                if (sh == null)
+                    return null;
+                mat = new Material(sh)
+                {
+                    name = name,
+                    hideFlags = HideFlags.DontSave
+                };
+            }
             if (mat.HasProperty("_BaseColor"))
                 mat.SetColor("_BaseColor", color);
             if (mat.HasProperty("_Color"))

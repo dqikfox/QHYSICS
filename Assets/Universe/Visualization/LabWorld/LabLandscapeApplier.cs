@@ -395,6 +395,14 @@ namespace RealityEngine.Visualization
                 MeshRenderer mr = go.GetComponent<MeshRenderer>();
                 if (mr != null)
                 {
+                    if (mat == null)
+                    {
+                        if (Application.isPlaying)
+                            Object.Destroy(mr);
+                        else
+                            Object.DestroyImmediate(mr);
+                        continue;
+                    }
                     mr.sharedMaterial = mat;
                     float dy = surfaceY - mr.bounds.min.y;
                     go.transform.position += Vector3.up * dy;
@@ -410,8 +418,13 @@ namespace RealityEngine.Visualization
             go.transform.localRotation = Quaternion.identity;
             var mf = go.AddComponent<MeshFilter>();
             mf.sharedMesh = mesh;
-            var mr = go.AddComponent<MeshRenderer>();
-            mr.sharedMaterial = mat;
+            if (mat != null)
+            {
+                var mr = go.AddComponent<MeshRenderer>();
+                mr.sharedMaterial = mat;
+            }
+            else
+                Debug.LogError("LabLandscapeApplier: skipped renderer on '" + name + "' (no URP Lit from RELab_Graphite).");
             if (collider)
             {
                 var box = go.AddComponent<BoxCollider>();

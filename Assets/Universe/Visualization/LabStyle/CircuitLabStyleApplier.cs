@@ -108,9 +108,10 @@ namespace RealityEngine.Visualization
         public void ApplyNow(bool force)
         {
             EnsureMaterials();
+            StripCircuitTableRootRenderer();
             if (_lit == null)
             {
-                Debug.LogWarning("CircuitLabStyleApplier: URP Lit shader not found; skipped.");
+                Debug.LogError("CircuitLabStyleApplier: URP Lit shader not found; skipped (no pink Sprites/Default fallback).");
                 return;
             }
 
@@ -539,11 +540,15 @@ namespace RealityEngine.Visualization
         {
             if (_lit == null)
             {
-                _lit = Shader.Find(LitShaderName);
+                Material graphite = LabWorldMeshes.GraphiteTemplate;
+                if (graphite != null && graphite.shader != null)
+                    _lit = graphite.shader;
+                if (_lit == null)
+                    _lit = Shader.Find(LitShaderName);
                 if (_lit == null)
                     _lit = Shader.Find("Universal Render Pipeline/Simple Lit");
                 if (_lit == null)
-                    _lit = Shader.Find("Sprites/Default");
+                    Debug.LogError("CircuitLabStyleApplier: URP Lit missing. Pin RELab_Graphite. Not falling back to Sprites/Default.");
             }
             if (_lit == null)
                 return;
@@ -559,7 +564,7 @@ namespace RealityEngine.Visualization
             if (_filament == null)
             {
                 _filament = MakeLit("RELab_Filament", new Color(0.38f, 0.28f, 0.16f, 1f), 0.82f, 0.42f, true);
-                if (_filament.HasProperty("_EmissionColor"))
+                if (_filament != null && _filament.HasProperty("_EmissionColor"))
                     _filament.SetColor("_EmissionColor", Color.black);
             }
             if (_label == null)
@@ -570,7 +575,7 @@ namespace RealityEngine.Visualization
             {
                 _bench = MakeLit("RELab_Bench", new Color(0.16f, 0.165f, 0.17f, 1f), 0.62f, 0.30f, false);
                 Texture2D grid = EnsureGrid();
-                if (grid != null)
+                if (_bench != null && grid != null)
                 {
                     if (_bench.HasProperty("_BaseMap"))
                         _bench.SetTexture("_BaseMap", grid);
@@ -584,30 +589,25 @@ namespace RealityEngine.Visualization
 
         static Material MakeLit(string name, Color color, float metallic, float smoothness, bool emission)
         {
-            var mat = new Material(_lit)
+            return LabWorldMeshes.MakeLit(name, color, metallic, smoothness, emission);
+        }
+
+        static void StripCircuitTableRootRenderer()
+        {
+            Transform[] all = Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (int i = 0; i < all.Length; i++)
             {
-                name = name,
-                hideFlags = HideFlags.DontSave
-            };
-            if (mat.HasProperty("_BaseColor"))
-                mat.SetColor("_BaseColor", color);
-            if (mat.HasProperty("_Color"))
-                mat.SetColor("_Color", color);
-            mat.color = color;
-            if (mat.HasProperty("_Metallic"))
-                mat.SetFloat("_Metallic", metallic);
-            if (mat.HasProperty("_Smoothness"))
-                mat.SetFloat("_Smoothness", smoothness);
-            if (mat.HasProperty("_Surface"))
-                mat.SetFloat("_Surface", 0f);
-            if (mat.HasProperty("_ZWrite"))
-                mat.SetFloat("_ZWrite", 1f);
-            if (emission)
-            {
-                mat.EnableKeyword("_EMISSION");
-                mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+                Transform t = all[i];
+                if (t == null || t.name != "CircuitTable")
+                    continue;
+                MeshRenderer mr = t.GetComponent<MeshRenderer>();
+                if (mr == null)
+                    continue;
+                if (Application.isPlaying)
+                    Object.Destroy(mr);
+                else
+                    Object.DestroyImmediate(mr);
             }
-            return mat;
         }
 
         static Texture2D EnsureGrid()

@@ -452,10 +452,15 @@ namespace RealityEngine.Visualization
             go.transform.localRotation = Quaternion.identity;
             var mf = go.AddComponent<MeshFilter>();
             mf.sharedMesh = mesh;
-            var mr = go.AddComponent<MeshRenderer>();
-            mr.sharedMaterial = mat;
-            mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            mr.receiveShadows = true;
+            if (mat != null)
+            {
+                var mr = go.AddComponent<MeshRenderer>();
+                mr.sharedMaterial = mat;
+                mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+                mr.receiveShadows = true;
+            }
+            else
+                Debug.LogError("KhufuPyramid: skipped renderer on '" + name + "' (no URP Lit from RELab_Graphite).");
             if (collider && mesh != null && mesh.vertexCount > 0)
             {
                 var mc = go.AddComponent<MeshCollider>();
