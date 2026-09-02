@@ -5,11 +5,12 @@ using UnityEngine;
 namespace RealityEngine.Visualization
 {
     /// <summary>
-    /// Runtime mesh helpers for the Giza plateau / Khufu replica. 1 unit = 1 meter.
+    /// Runtime mesh helpers for the Giza plateau and 1:1 pyramid shells. 1 unit = 1 meter.
     /// </summary>
     public static class LabWorldMeshes
     {
         const string LitShaderName = "Universal Render Pipeline/Lit";
+        const string LitGuid = "933532a4fcc9baf4fa0491de14d08ed7";
         const string GraphiteResource = "RELab_Graphite";
         const string GraphiteAssetPath = "Assets/Universe/Visualization/LabStyle/Materials/RELab_Graphite.mat";
 
@@ -36,22 +37,36 @@ namespace RealityEngine.Visualization
             return mat;
         }
 
+        static Shader LoadLitShader()
+        {
+            Material graphite = GraphiteTemplate;
+            if (graphite != null && graphite.shader != null && !ShaderLooksPink(graphite.shader))
+                return graphite.shader;
+#if UNITY_EDITOR
+            string path = UnityEditor.AssetDatabase.GUIDToAssetPath(LitGuid);
+            if (!string.IsNullOrEmpty(path))
+            {
+                Shader s = UnityEditor.AssetDatabase.LoadAssetAtPath<Shader>(path);
+                if (s != null && !ShaderLooksPink(s))
+                    return s;
+            }
+#endif
+            Shader found = Shader.Find(LitShaderName);
+            if (found != null && !ShaderLooksPink(found))
+                return found;
+            found = Shader.Find("Universal Render Pipeline/Simple Lit");
+            if (found != null && !ShaderLooksPink(found))
+                return found;
+            Debug.LogError("LabWorldMeshes: URP Lit missing. Load RELab_Graphite. Not falling back to Sprites/Default (magenta in URP).");
+            return null;
+        }
+
         public static Shader LitShader
         {
             get
             {
                 if (_lit == null)
-                {
-                    Material graphite = GraphiteTemplate;
-                    if (graphite != null && graphite.shader != null)
-                        _lit = graphite.shader;
-                    if (_lit == null)
-                        _lit = Shader.Find(LitShaderName);
-                    if (_lit == null)
-                        _lit = Shader.Find("Universal Render Pipeline/Simple Lit");
-                    if (_lit == null)
-                        Debug.LogError("LabWorldMeshes: URP Lit missing. Load RELab_Graphite. Not falling back to Sprites/Default (magenta in URP).");
-                }
+                    _lit = LoadLitShader();
                 return _lit;
             }
         }
@@ -134,12 +149,13 @@ namespace RealityEngine.Visualization
                 filterMode = FilterMode.Bilinear,
                 anisoLevel = 2
             };
-            var stone = new Color(0.78f, 0.73f, 0.64f, 1f);
-            var course = new Color(0.62f, 0.57f, 0.50f, 1f);
+            var stone = new Color(0.97f, 0.96f, 0.93f, 1f);
+            var course = new Color(0.90f, 0.87f, 0.80f, 1f);
             var pixels = new Color[w * h];
             for (int y = 0; y < h; y++)
             {
-                bool line = (y % 16) == 0 || (y % 16) == 15;
+                int m = y % 16;
+                bool line = m == 0 || m == 15;
                 Color c = line ? course : stone;
                 for (int x = 0; x < w; x++)
                     pixels[y * w + x] = c;
@@ -458,6 +474,124 @@ namespace RealityEngine.Visualization
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
             return mesh;
+        }
+
+        public void AddSlopedFaceBand(Vector3 bl, Vector3 br, Vector3 apex, Vector3 hint, Color color,
+            int uDiv, int vDiv, float tStart, float tEnd,
+            bool hole, float holeX, float holeY, float holeW, float holeH,
+            float hole2X = 0f, float hole2Y = 0f, float hole2W = 0f, float hole2H = 0f)
+        {
+            uDiv = Mathf.Max(2, uDiv);
+            vDiv = Mathf.Max(2, vDiv);
+            tStart = Mathf.Clamp01(tStart);
+            tEnd = Mathf.Clamp01(tEnd);
+            if (tEnd <= tStart + 1e-5f)
+                return;
+            for (int v = 0; v < vDiv; v++)
+            {
+                float t0 = Mathf.Lerp(tStart, tEnd, v / (float)vDiv);
+                float t1 = Mathf.Lerp(tStart, tEnd, (v + 1) / (float)vDiv);
+                Vector3 a0 = Vector3.Lerp(bl, apex, t0);
+                Vector3 b0 = Vector3.Lerp(br, apex, t0);
+                Vector3 a1 = Vector3.Lerp(bl, apex, t1);
+                Vector3 b1 = Vector3.Lerp(br, apex, t1);
+                for (int u = 0; u < uDiv; u++)
+                {
+                    float s0 = u / (float)uDiv;
+                    float s1 = (u + 1) / (float)uDiv;
+                    Vector3 p00 = Vector3.Lerp(a0, b0, s0);
+                    Vector3 p10 = Vector3.Lerp(a0, b0, s1);
+                    Vector3 p11 = Vector3.Lerp(a1, b1, s1);
+                    Vector3 p01 = Vector3.Lerp(a1, b1, s0);
+                    if (hole)
+                    {
+                        float minX = Mathf.Min(Mathf.Min(p00.x, p10.x), Mathf.Min(p11.x, p01.x));
+                        float maxX = Mathf.Max(Mathf.Max(p00.x, p10.x), Mathf.Max(p11.x, p01.x));
+                        float minY = Mathf.Min(Mathf.Min(p00.y, p10.y), Mathf.Min(p11.y, p01.y));
+                        float maxY = Mathf.Max(Mathf.Max(p00.y, p10.y), Mathf.Max(p11.y, p01.y));
+                        bool h1 = maxX > holeX - holeW * 0.5f && minX < holeX + holeW * 0.5f &&
+                                  maxY > holeY - holeH * 0.5f && minY < holeY + holeH * 0.5f;
+                        bool h2 = hole2W > 0.01f &&
+                                  maxX > hole2X - hole2W * 0.5f && minX < hole2X + hole2W * 0.5f &&
+                                  maxY > hole2Y - hole2H * 0.5f && minY < hole2Y + hole2H * 0.5f;
+                        if (h1 || h2)
+                            continue;
+                    }
+                    Vector2 uv00 = new Vector2(s0, t0 * 12f);
+                    Vector2 uv10 = new Vector2(s1, t0 * 12f);
+                    Vector2 uv11 = new Vector2(s1, t1 * 12f);
+                    Vector2 uv01 = new Vector2(s0, t1 * 12f);
+                    AddQuad(p00, p10, p11, p01, hint, uv00, uv10, uv11, uv01, color);
+                }
+            }
+        }
+
+        public void AddPyramidCasing(float half, float height, Color color,
+            float tStart, float tEnd, int uDiv, int vDiv,
+            bool northHole, float holeX, float holeY, float holeW, float holeH,
+            float hole2X = 0f, float hole2Y = 0f, float hole2W = 0f, float hole2H = 0f)
+        {
+            Vector3 apex = new Vector3(0f, height, 0f);
+            Vector3 nBl = new Vector3(-half, 0f, half);
+            Vector3 nBr = new Vector3(half, 0f, half);
+            Vector3 eBl = new Vector3(half, 0f, half);
+            Vector3 eBr = new Vector3(half, 0f, -half);
+            Vector3 sBl = new Vector3(half, 0f, -half);
+            Vector3 sBr = new Vector3(-half, 0f, -half);
+            Vector3 wBl = new Vector3(-half, 0f, -half);
+            Vector3 wBr = new Vector3(-half, 0f, half);
+            int holeU = northHole ? Mathf.Max(32, uDiv) : uDiv;
+            int holeV = northHole ? Mathf.Max(48, vDiv) : vDiv;
+            AddSlopedFaceBand(nBl, nBr, apex, Vector3.forward, color, holeU, holeV, tStart, tEnd, northHole, holeX, holeY, holeW, holeH, hole2X, hole2Y, hole2W, hole2H);
+            AddSlopedFaceBand(eBl, eBr, apex, Vector3.right, color, uDiv, vDiv, tStart, tEnd, false, 0f, 0f, 0f, 0f);
+            AddSlopedFaceBand(sBl, sBr, apex, Vector3.back, color, uDiv, vDiv, tStart, tEnd, false, 0f, 0f, 0f, 0f);
+            AddSlopedFaceBand(wBl, wBr, apex, Vector3.left, color, uDiv, vDiv, tStart, tEnd, false, 0f, 0f, 0f, 0f);
+        }
+
+        public void AddGableRoof(Vector3 floorCenter, float widthX, float depthZ, float wallH, float peakH, Color color)
+        {
+            float hx = widthX * 0.5f;
+            float hz = depthZ * 0.5f;
+            Vector3 nL = floorCenter + new Vector3(-hx, wallH, hz);
+            Vector3 nR = floorCenter + new Vector3(hx, wallH, hz);
+            Vector3 sL = floorCenter + new Vector3(-hx, wallH, -hz);
+            Vector3 sR = floorCenter + new Vector3(hx, wallH, -hz);
+            Vector3 ridgeN = floorCenter + new Vector3(0f, peakH, hz);
+            Vector3 ridgeS = floorCenter + new Vector3(0f, peakH, -hz);
+            AddQuad(nL, sL, ridgeS, ridgeN, Vector3.right, color);
+            AddQuad(nR, ridgeN, ridgeS, sR, Vector3.left, color);
+            AddTri(nL, nR, ridgeN, Vector3.back, Vector2.zero, Vector2.right, Vector2.one, color);
+            AddTri(sR, sL, ridgeS, Vector3.forward, Vector2.zero, Vector2.right, Vector2.one, color);
+        }
+
+        public void AddBarrelVault(Vector3 floorCenter, float widthX, float depthZ, float wallH, float peakH, Color color, int segs)
+        {
+            segs = Mathf.Max(4, segs);
+            float hx = widthX * 0.5f;
+            float hz = depthZ * 0.5f;
+            float rise = Mathf.Max(0.2f, peakH - wallH);
+            for (int i = 0; i < segs; i++)
+            {
+                float a0 = Mathf.PI * (i / (float)segs);
+                float a1 = Mathf.PI * ((i + 1) / (float)segs);
+                float x0 = -hx + widthX * (i / (float)segs);
+                float x1 = -hx + widthX * ((i + 1) / (float)segs);
+                float y0 = wallH + Mathf.Sin(a0) * rise;
+                float y1 = wallH + Mathf.Sin(a1) * rise;
+                Vector3 n0 = floorCenter + new Vector3(x0, y0, hz);
+                Vector3 n1 = floorCenter + new Vector3(x1, y1, hz);
+                Vector3 s1 = floorCenter + new Vector3(x1, y1, -hz);
+                Vector3 s0 = floorCenter + new Vector3(x0, y0, -hz);
+                AddQuad(n0, s0, s1, n1, Vector3.down, color);
+            }
+            Vector3 nL = floorCenter + new Vector3(-hx, wallH, hz);
+            Vector3 nR = floorCenter + new Vector3(hx, wallH, hz);
+            Vector3 peakN = floorCenter + new Vector3(0f, peakH, hz);
+            Vector3 sL = floorCenter + new Vector3(-hx, wallH, -hz);
+            Vector3 sR = floorCenter + new Vector3(hx, wallH, -hz);
+            Vector3 peakS = floorCenter + new Vector3(0f, peakH, -hz);
+            AddTri(nL, nR, peakN, Vector3.back, Vector2.zero, Vector2.right, Vector2.one, color);
+            AddTri(sR, sL, peakS, Vector3.forward, Vector2.zero, Vector2.right, Vector2.one, color);
         }
     }
 }
