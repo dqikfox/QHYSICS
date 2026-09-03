@@ -4,7 +4,7 @@ namespace RealityEngine.Visualization
 {
     /// <summary>
     /// Rest of the undamaged Giza necropolis: Khufu queens G1a-c, mortuary temples,
-    /// causeways, boat pits, Khafre valley temple, Sphinx temple, temenos walls.
+    /// causeways, boat pits, Khafre/Menkaure valley temples, Sphinx temple, temenos walls.
     /// Reconstructed original massing from published plans (Lehner/Petrie). Not photogrammetry.
     /// Architectural local space: +X east, +Z north, 1 unit = 1 m.
     /// </summary>
@@ -25,6 +25,7 @@ namespace RealityEngine.Visualization
         public const string SphinxEnclosureName = "SphinxEnclosure";
         public const string MenkaureMortuaryName = "MenkaureMortuary";
         public const string MenkaureCausewayName = "MenkaureCauseway";
+        public const string MenkaureValleyName = "MenkaureValleyTemple";
         public const string MenkaureEnclosureName = "MenkaureEnclosure";
 
         public struct Layout
@@ -41,7 +42,8 @@ namespace RealityEngine.Visualization
             public float valleyEW, valleyNS, valleyEast, valleyNorth;
             public float sphinxTempleEW, sphinxTempleNS, sphinxTempleEast, sphinxTempleNorth;
             public float menkaureTempleEW, menkaureTempleNS, menkaureTempleEast, menkaureTempleNorth;
-            public float menCauseStartEast, menCauseEndEast;
+            public float menCauseStartEast, menCauseEndEast, menCauseEndNorth;
+            public float menValleyEW, menValleyNS, menValleyEast, menValleyNorth;
         }
 
         public static Layout Compute()
@@ -67,6 +69,8 @@ namespace RealityEngine.Visualization
             L.sphinxTempleNS = 28f;
             L.menkaureTempleEW = 36f;
             L.menkaureTempleNS = 42f;
+            L.menValleyEW = 44f;
+            L.menValleyNS = 47f;
 
             float kh = KhufuPyramid.BaseMeters * 0.5f;
             float khPav = KhufuPyramid.PavementWidthM;
@@ -102,7 +106,11 @@ namespace RealityEngine.Visualization
             L.menkaureTempleEast = -GizaComplex.MenkaureWestM + mn + 4f + 2f + L.menkaureTempleEW * 0.5f;
             L.menkaureTempleNorth = -GizaComplex.MenkaureSouthM;
             L.menCauseStartEast = L.menkaureTempleEast + L.menkaureTempleEW * 0.5f;
-            L.menCauseEndEast = L.menCauseStartEast + 180f;
+            // Valley terminus east/north filled in EnsureMenkaure from live plateau lip.
+            L.menCauseEndEast = L.menCauseStartEast + 40f;
+            L.menCauseEndNorth = L.menkaureTempleNorth;
+            L.menValleyEast = L.menCauseEndEast + 22f;
+            L.menValleyNorth = L.menkaureTempleNorth;
             return L;
         }
 
@@ -123,7 +131,9 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.valleyEast, L.valleyNorth, L.valleyEW * 0.5f + 4f, L.valleyNS * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.sphinxTempleEast, L.sphinxTempleNorth, L.sphinxTempleEW * 0.5f + 4f, L.sphinxTempleNS * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.menkaureTempleEast, L.menkaureTempleNorth, L.menkaureTempleEW * 0.5f + 2f, L.menkaureTempleNS * 0.5f + 2f);
-            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.menCauseEndEast, L.menkaureTempleNorth, 10f);
+            // Cliff-lip pad east of Menkaure mortuary — do not pull the plateau under the valley descent.
+            float menLipEast = L.menkaureTempleEast + L.menkaureTempleEW * 0.5f + 10f;
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, menLipEast, L.menkaureTempleNorth, 12f);
         }
 
         static void Enc(ref float xMin, ref float xMax, ref float zMin, ref float zMax, float east, float north, float r)
@@ -209,12 +219,34 @@ namespace RealityEngine.Visualization
         public static void EnsureMenkaure(GizaComplex.Pose pose)
         {
             Layout L = Compute();
+            float floodY = pose.surfaceY - GizaComplex.CliffHeightM + GizaNile.SitAboveDesertM;
             const string honesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Menkaure mortuary temple. Immediately east of Menkaure. Open limestone court, complete walls (reconstructed; historically unfinished granite conversion).\n" +
-                "Short schematic causeway east. Queens G3a-c already sit south of Menkaure — not duplicated.";
+                "Causeway descends east down the escarpment to the Menkaure valley temple. Queens G3a-c already sit south of Menkaure — not duplicated.";
+            const string valleyHonesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Menkaure valley temple. Floodplain-level mudbrick / limestone massing east of the cliff (Lehner plan scale ~44 x 47 m).\n" +
+                "Reconstructed complete shell; historically unfinished in stone then finished in mudbrick (Shepseskaf). Walkable court + antechambers. Not photogrammetry.";
+
             Ensure(MenkaureMortuaryName, pose, p => BuildMortuary(p, MenkaureMortuaryName, L.menkaureTempleEast, L.menkaureTempleNorth, 0f, L.menkaureTempleEW, L.menkaureTempleNS, false, honesty), pose.surfaceY, true);
-            Ensure(MenkaureCausewayName, pose, p => BuildCauseway(p, MenkaureCausewayName, L.menCauseStartEast, L.menkaureTempleNorth, L.menCauseEndEast, L.menkaureTempleNorth, pose.surfaceY, pose.surfaceY, 8f), pose.surfaceY, false);
+
+            GizaComplex.LocalExtents(out _, out float plateauEast, out _, out _);
+            float cliffEast = plateauEast + GizaComplex.MarginM;
+            L.menValleyEast = cliffEast + GizaNile.GapFromCliffM + 36f + L.menValleyEW * 0.5f;
+            L.menValleyNorth = L.menkaureTempleNorth;
+            L.menCauseEndEast = L.menValleyEast - L.menValleyEW * 0.5f;
+            L.menCauseEndNorth = L.menValleyNorth;
+
+            GameObject oldCause = GizaComplex.FindNamed(MenkaureCausewayName);
+            if (oldCause != null && !MenkaureCausewayIsDescent(oldCause, floodY))
+                DestroyNamed(oldCause);
+            GameObject oldValley = GizaComplex.FindNamed(MenkaureValleyName);
+            if (oldValley != null && oldValley.transform.Find(MenkaureValleyName + "_Halls") == null)
+                DestroyNamed(oldValley);
+
+            Ensure(MenkaureCausewayName, pose, p => BuildCauseway(p, MenkaureCausewayName, L.menCauseStartEast, L.menkaureTempleNorth, L.menCauseEndEast, L.menCauseEndNorth, pose.surfaceY, floodY, 8f), pose.surfaceY, false);
+            Ensure(MenkaureValleyName, pose, p => BuildMenkaureValleyTemple(p, L, valleyHonesty), floodY, true);
             Vector3 men = GizaComplex.WorldFromKhufu(pose, -GizaComplex.MenkaureWestM, -GizaComplex.MenkaureSouthM, 0f);
             Ensure(MenkaureEnclosureName, pose, p => BuildEnclosure(p, MenkaureEnclosureName, men, 0f, MenkaurePyramid.BaseMeters * 0.5f + 4f, L.menkaureTempleNS + 4f, false), pose.surfaceY, true);
         }
@@ -238,6 +270,16 @@ namespace RealityEngine.Visualization
             if (term == null)
                 return false;
             // Flat legacy deck sits near plateau; descent terminal sits near floodplain.
+            return term.position.y < floodY + 8f;
+        }
+
+        static bool MenkaureCausewayIsDescent(GameObject go, float floodY)
+        {
+            if (go == null)
+                return false;
+            Transform term = go.transform.Find(MenkaureCausewayName + "_Terminal");
+            if (term == null)
+                return false;
             return term.position.y < floodY + 8f;
         }
 
@@ -529,15 +571,18 @@ namespace RealityEngine.Visualization
             SlopedRail(walls, hw - wallT * 0.5f, deckH, deckH + dy, 0f, len, wallT, wallH);
             GizaBuild.SpawnMesh(root.transform, name + "_Walls", walls.Build(name + "_Walls"), tura, true);
 
-            if (name == KhufuCausewayName)
+            if (name == KhufuCausewayName || name == MenkaureCausewayName)
             {
                 var pad = new LabMeshBuilder(8, 12);
                 pad.AddBox(new Vector3(0f, deckH * 0.5f + dy, len + 4f), new Vector3(width + 4f, deckH, 8f), Color.white);
                 GizaBuild.SpawnMesh(root.transform, name + "_Terminal", pad.Build(name + "_Terminal"), pav, true);
-                const string causeHonesty =
-                    GizaComplex.HonestyPrefix + "\n" +
-                    "Khufu causeway. Descends from the mortuary east door down the east escarpment to the floodplain / harbor foot (schematic valley terminus pad).\n" +
-                    "Walkable deck + rails. Width ~10 m. Not photogrammetry.";
+                string causeHonesty = name == KhufuCausewayName
+                    ? GizaComplex.HonestyPrefix + "\n" +
+                      "Khufu causeway. Descends from the mortuary east door down the east escarpment to the floodplain / harbor foot (schematic valley terminus pad).\n" +
+                      "Walkable deck + rails. Width ~10 m. Not photogrammetry."
+                    : GizaComplex.HonestyPrefix + "\n" +
+                      "Menkaure causeway. Descends from the mortuary east door down the east escarpment to the Menkaure valley temple on the floodplain.\n" +
+                      "Walkable deck + rails. Width ~8 m. Not photogrammetry.";
                 GizaBuild.HonestyPlate(root.transform, name + "_Honesty", causeHonesty, width + 8f);
                 Transform plate = root.transform.Find(name + "_Honesty");
                 if (plate != null)
@@ -545,6 +590,69 @@ namespace RealityEngine.Visualization
                     plate.localPosition = new Vector3(0f, deckH + dy + 1.55f, len * 0.35f);
                     plate.localRotation = Quaternion.Euler(0f, 180f, 0f);
                 }
+            }
+            return root;
+        }
+
+        static GameObject BuildMenkaureValleyTemple(GizaComplex.Pose pose, Layout L, string honesty)
+        {
+            Vector3 c = GizaComplex.WorldFromKhufu(pose, L.menValleyEast, L.menValleyNorth, 0f);
+            GameObject root = GizaBuild.Root(MenkaureValleyName, pose.parent, c, pose.rot);
+            Material mud = GizaBuild.Mudbrick();
+            Material lime = GizaBuild.InteriorLime();
+            Material pav = GizaBuild.Pavement();
+            Material tura = GizaBuild.TuraCasing();
+            float ew = L.menValleyEW;
+            float ns = L.menValleyNS;
+            float hx = ew * 0.5f;
+            float hz = ns * 0.5f;
+            const float wallH = 7.2f;
+            const float wallT = 1.35f;
+            const float floorT = 0.35f;
+            float y = wallH * 0.5f;
+
+            var floor = new LabMeshBuilder(8, 12);
+            floor.AddBox(new Vector3(0f, floorT * 0.5f, 0f), new Vector3(ew, floorT, ns), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MenkaureValleyName + "_Floor", floor.Build(MenkaureValleyName + "_Floor"), pav, true);
+
+            var walls = new LabMeshBuilder(48, 72);
+            walls.AddBox(new Vector3(0f, y, hz - wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
+            walls.AddBox(new Vector3(0f, y, -hz + wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
+            walls.AddBox(new Vector3(hx - wallT * 0.5f, y, 0f), new Vector3(wallT, wallH, ns), Color.white);
+            WallDoorX(walls, -hx + wallT * 0.5f, ns, wallH, wallT, 6.0f);
+            GizaBuild.SpawnMesh(root.transform, MenkaureValleyName + "_Walls", walls.Build(MenkaureValleyName + "_Walls"), mud, true);
+
+            var halls = new LabMeshBuilder(160, 240);
+            Color stone = Color.white;
+            float hallH = 6.2f;
+            float hy = floorT + hallH * 0.5f;
+            // Open court band + west antechambers toward causeway door.
+            halls.AddRoom(new Vector3(6.0f, hy, 0f), new Vector3(24.0f, hallH, 28.0f), stone, false, false, true, true);
+            halls.AddRoom(new Vector3(-12.5f, hy, 0f), new Vector3(14.0f, hallH, 12.0f), stone, false, false, true, true);
+            halls.AddRoom(new Vector3(-12.5f, hy, 12.5f), new Vector3(10.0f, hallH * 0.9f, 8.0f), stone, false, false, false, true);
+            halls.AddRoom(new Vector3(-12.5f, hy, -12.5f), new Vector3(10.0f, hallH * 0.9f, 8.0f), stone, false, false, false, true);
+            GizaBuild.SpawnMesh(root.transform, MenkaureValleyName + "_Halls", halls.Build(MenkaureValleyName + "_Halls"), lime, true);
+
+            var pillars = new LabMeshBuilder(96, 144);
+            float ps = 1.0f;
+            float ph = 5.6f;
+            for (int row = 0; row < 2; row++)
+            {
+                float x = 2.0f + row * 8.0f;
+                for (int i = 0; i < 6; i++)
+                {
+                    float z = Mathf.Lerp(-11.5f, 11.5f, i / 5f);
+                    pillars.AddBox(new Vector3(x, floorT + ph * 0.5f, z), new Vector3(ps, ph, ps), Color.white);
+                }
+            }
+            GizaBuild.SpawnMesh(root.transform, MenkaureValleyName + "_Pillars", pillars.Build(MenkaureValleyName + "_Pillars"), tura, true);
+
+            GizaBuild.HonestyPlate(root.transform, MenkaureValleyName + "_Honesty", honesty, ns);
+            Transform plate = root.transform.Find(MenkaureValleyName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(hx + 4f, 1.55f, 0f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
             }
             return root;
         }
