@@ -653,6 +653,7 @@ namespace RealityEngine.Visualization
             SitFound("KhafreValleyTemple", court);
             SitFound("KhafreEnclosure", terrace);
             SitFound("SphinxTemple", court);
+            SitFound("SphinxValleyLink", court);
             SitFound("SphinxEnclosure", court);
             SitFound("MenkaureMortuary", top);
             SitFound("MenkaureEnclosure", top);
