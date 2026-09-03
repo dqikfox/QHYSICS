@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace RealityEngine.Visualization
 {
@@ -13,12 +13,14 @@ namespace RealityEngine.Visualization
         public const float HeightM = 20.22f;
         public const float WidthM = 19.3f;
         public const string RootName = "Sphinx";
+        public const string DreamSteleName = "Sphinx_DreamStele";
 
         public const string Honesty =
             GizaComplex.HonestyPrefix + "\n" +
             "Great Sphinx. Schematic Lehner/ARCE massing (boxes + quads), not a scan, not photogrammetry.\n" +
             "~73.5 m long, ~20.2 m high, ~19.3 m wide. Limestone bedrock core. Faces east. Associated with Khafre.\n" +
             "Body, haunches, chest, nemes head, forepaws with toe pads, hind paws, tail curl. No portrait face.\n" +
+            "Granite Dream Stele (Thutmose IV) between the forepaws — schematic slab, not the Cairo Museum original.\n" +
             "Offset from Khufu centre (approx. WGS84, lat 30°): 347 m east, 430 m south. No interior.";
 
         // Local axes: +X face/east, -X haunches/west, +Y up, ±Z north/south.
@@ -120,6 +122,7 @@ namespace RealityEngine.Visualization
             b.AddBox(new Vector3(tailBaseX - 5.5f, 12.2f, 7.5f), new Vector3(2.4f, 2.4f, 5.5f), c);
 
             GizaBuild.SpawnMesh(root.transform, "Sphinx_Body", b.Build("Sphinx_Body"), lime, true);
+            BuildDreamStele(root.transform, pawEast, pawLen);
             GizaBuild.HonestyPlate(root.transform, "Sphinx_Honesty", Honesty, WidthM);
             Transform plate = root.transform.Find("Sphinx_Honesty");
             if (plate != null)
@@ -128,6 +131,42 @@ namespace RealityEngine.Visualization
                 plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
             }
             return root;
+        }
+
+        /// <summary>
+        /// Thutmose IV Dream Stele between the forepaws (schematic granite, faces east).
+        /// ~3.6 m tall reconstructed standing slab — not the museum original.
+        /// </summary>
+        static void BuildDreamStele(Transform parent, float pawEast, float pawLen)
+        {
+            Material gran = GizaBuild.Granite();
+            var s = new LabMeshBuilder(24, 36);
+            Color c = Color.white;
+            // Sit mid-gap between paws, a few metres west of the toe tips.
+            float steleX = pawEast + pawLen * 0.12f;
+            const float steleH = 3.6f;
+            const float steleW = 2.15f;
+            const float steleT = 0.42f;
+            const float baseH = 0.55f;
+            // Pedestal
+            s.AddBox(new Vector3(steleX, 0.7f + baseH * 0.5f, 0f), new Vector3(steleT + 0.55f, baseH, steleW + 0.7f), c);
+            // Main slab (thin E-W, wide N-S, tall) — face plane toward temple / east
+            s.AddBox(new Vector3(steleX, 0.7f + baseH + steleH * 0.5f, 0f), new Vector3(steleT, steleH, steleW), c);
+            // Cornice / cavetto stub
+            s.AddBox(new Vector3(steleX, 0.7f + baseH + steleH + 0.22f, 0f), new Vector3(steleT + 0.18f, 0.35f, steleW + 0.35f), c);
+            GizaBuild.SpawnMesh(parent, DreamSteleName, s.Build(DreamSteleName), gran, true);
+
+            const string steleHonesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Dream Stele of Thutmose IV. Granite slab between the Sphinx forepaws (schematic reconstruction).\n" +
+                "~3.6 m tall. Faces east toward the Sphinx temple. Not the Cairo Museum original. Not photogrammetry.";
+            GizaBuild.HonestyPlate(parent, DreamSteleName + "_Honesty", steleHonesty, steleW + 4f);
+            Transform plate = parent.Find(DreamSteleName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(steleX + 2.4f, 1.55f, 0f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
         }
     }
 }
