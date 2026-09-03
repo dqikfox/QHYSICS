@@ -231,11 +231,12 @@ namespace RealityEngine.Visualization
             const string honesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Sphinx temple. Immediately east of the Sphinx face. Twin of Khafre valley temple: dual N/S east portals, west door toward the Sphinx enclosure, south door into the Sphinx-Khafre link court.\n" +
-                "Open central court, granite colonnade, ten colossal niches (5 N / 5 S), west sanctuaries. Lehner / ARCE plan massing (walkable). Not photogrammetry.";
+                "Open central court with granite paving, granite colonnade with architraves/lintels, ten colossal niches (5 N / 5 S), west sanctuaries. Lehner / ARCE plan massing (walkable). Not photogrammetry.";
             GameObject oldTemple = GizaComplex.FindNamed(SphinxTempleName);
             if (oldTemple != null && (oldTemple.transform.Find(SphinxTempleName + "_Niches") == null
                 || oldTemple.transform.Find(SphinxTempleName + "_Portals") == null
-                || oldTemple.transform.Find(SphinxTempleName + "_LinkDoor") == null))
+                || oldTemple.transform.Find(SphinxTempleName + "_LinkDoor") == null
+                || oldTemple.transform.Find(SphinxTempleName + "_Architraves") == null))
                 DestroyNamed(oldTemple);
             Ensure(SphinxTempleName, pose, p => BuildSphinxTemple(p, L, honesty), GizaComplex.CourtY(pose), true);
 
@@ -596,21 +597,50 @@ namespace RealityEngine.Visualization
             }
             GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Niches", niches.Build(SphinxTempleName + "_Niches"), gran, true);
 
-            // Granite colonnade framing the open court (2 rows × 6).
+            // Outer pavement floor kept; granite court paving for the open central court (Lehner/ARCE).
+            float courtEW = 18.5f;
+            float courtNS = ns - wallT * 2f - 7.0f;
+            float courtX = 3.0f;
+            var graniteCourt = new LabMeshBuilder(8, 12);
+            graniteCourt.AddBox(new Vector3(courtX, floorT * 0.5f + 0.04f, 0f), new Vector3(courtEW, floorT + 0.08f, courtNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_GraniteCourt", graniteCourt.Build(SphinxTempleName + "_GraniteCourt"), gran, true);
+
+            // Granite colonnade framing the open court (2 rows x 6).
             var pillars = new LabMeshBuilder(128, 192);
             float ps = 1.05f;
             float ph = 5.6f;
             float py = floorT + ph * 0.5f;
+            float rowX0 = -4.5f;
+            float rowX1 = 10.5f;
+            float z0 = -hz + wallT + 3.2f;
+            float z1 = hz - wallT - 3.2f;
             for (int row = 0; row < 2; row++)
             {
-                float px = Mathf.Lerp(-4.5f, 10.5f, row / 1f);
+                float px = Mathf.Lerp(rowX0, rowX1, row / 1f);
                 for (int i = 0; i < 6; i++)
                 {
-                    float pz = Mathf.Lerp(-hz + wallT + 3.2f, hz - wallT - 3.2f, i / 5f);
+                    float pz = Mathf.Lerp(z0, z1, i / 5f);
                     pillars.AddBox(new Vector3(px, py, pz), new Vector3(ps, ph, ps), Color.white);
                 }
             }
             GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Pillars", pillars.Build(SphinxTempleName + "_Pillars"), gran, true);
+
+            // Colonnade architraves / lintels atop the pillar rows (Ensure rebuild marker).
+            const float beamH = 0.55f;
+            const float beamW = 1.25f;
+            float beamY = floorT + ph + beamH * 0.5f;
+            float spanZ = (z1 - z0) + ps + 0.4f;
+            var arch = new LabMeshBuilder(96, 144);
+            arch.AddBox(new Vector3(rowX0, beamY, 0f), new Vector3(beamW, beamH, spanZ), Color.white);
+            arch.AddBox(new Vector3(rowX1, beamY, 0f), new Vector3(beamW, beamH, spanZ), Color.white);
+            for (int i = 0; i < 6; i++)
+            {
+                float pz = Mathf.Lerp(z0, z1, i / 5f);
+                float midX = (rowX0 + rowX1) * 0.5f;
+                float crossLen = (rowX1 - rowX0) + ps * 0.35f;
+                arch.AddBox(new Vector3(midX, beamY, pz), new Vector3(crossLen, beamH * 0.85f, beamW * 0.72f), Color.white);
+            }
+            GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Architraves", arch.Build(SphinxTempleName + "_Architraves"), gran, true);
 
             // East-facade portal vestibules (N/S) — twin temple pattern with Khafre valley.
             const float portalH = 4.6f;
