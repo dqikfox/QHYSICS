@@ -191,7 +191,11 @@ namespace RealityEngine.Visualization
             Layout L = Compute();
             const string honesty =
                 GizaComplex.HonestyPrefix + "\n" +
-                "Sphinx temple. Immediately east of the Sphinx (in front of the face). Courtyard + inner sanctum (box massing). Walkable. Associated with Khafre's valley complex.";
+                "Sphinx temple. Immediately east of the Sphinx face. Open central court, granite colonnade, ten colossal niches (5 N / 5 S), west sanctuaries toward the Sphinx.\n" +
+                "Lehner / ARCE plan massing (walkable). Associated with Khafre's valley complex. Not photogrammetry.";
+            GameObject oldTemple = GizaComplex.FindNamed(SphinxTempleName);
+            if (oldTemple != null && oldTemple.transform.Find(SphinxTempleName + "_Niches") == null)
+                DestroyNamed(oldTemple);
             Ensure(SphinxTempleName, pose, p => BuildSphinxTemple(p, L, honesty), GizaComplex.CourtY(pose), true);
         }
 
@@ -394,33 +398,75 @@ namespace RealityEngine.Visualization
             Material tura = GizaBuild.TuraCasing();
             Material pav = GizaBuild.Pavement();
             Material lime = GizaBuild.InteriorLime();
+            Material gran = GizaBuild.Granite();
             float ew = L.sphinxTempleEW;
             float ns = L.sphinxTempleNS;
             float hx = ew * 0.5f;
             float hz = ns * 0.5f;
-            const float wallH = 6.0f;
-            const float wallT = 1.2f;
+            const float wallH = 6.4f;
+            const float wallT = 1.35f;
             const float floorT = 0.35f;
             float y = wallH * 0.5f;
 
+            // Open court floor (sky open — no roof).
             var floor = new LabMeshBuilder(8, 12);
             floor.AddBox(new Vector3(0f, floorT * 0.5f, 0f), new Vector3(ew, floorT, ns), Color.white);
             GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Floor", floor.Build(SphinxTempleName + "_Floor"), pav, true);
 
-            var walls = new LabMeshBuilder(48, 72);
+            // Perimeter walls with east door toward valley / harbor.
+            var walls = new LabMeshBuilder(64, 96);
             walls.AddBox(new Vector3(0f, y, hz - wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
             walls.AddBox(new Vector3(0f, y, -hz + wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
             walls.AddBox(new Vector3(-hx + wallT * 0.5f, y, 0f), new Vector3(wallT, wallH, ns), Color.white);
-            WallDoorX(walls, hx - wallT * 0.5f, ns, wallH, wallT, 7f);
+            WallDoorX(walls, hx - wallT * 0.5f, ns, wallH, wallT, 7.5f);
             GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Walls", walls.Build(SphinxTempleName + "_Walls"), tura, true);
 
-            float sEW = 10f;
-            float sNS = 12f;
-            float sH = 5.2f;
-            Vector3 sC = new Vector3(-hx + wallT + sEW * 0.5f + 0.3f, floorT + sH * 0.5f, 0f);
-            var sanctum = new LabMeshBuilder(48, 72);
-            sanctum.AddRoom(sC, new Vector3(sEW, sH, sNS), Color.white, false, false, false, true);
+            // West sanctuaries facing the Sphinx (three chambers).
+            float sEW = 9.5f;
+            float sNS = 7.2f;
+            float sH = 5.4f;
+            float sX = -hx + wallT + sEW * 0.5f + 0.25f;
+            float hy = floorT + sH * 0.5f;
+            var sanctum = new LabMeshBuilder(96, 144);
+            sanctum.AddRoom(new Vector3(sX, hy, 0f), new Vector3(sEW, sH, sNS), Color.white, false, false, false, true);
+            sanctum.AddRoom(new Vector3(sX, hy, 8.2f), new Vector3(sEW * 0.85f, sH * 0.92f, 5.4f), Color.white, false, false, false, true);
+            sanctum.AddRoom(new Vector3(sX, hy, -8.2f), new Vector3(sEW * 0.85f, sH * 0.92f, 5.4f), Color.white, false, false, false, true);
             GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Sanctum", sanctum.Build(SphinxTempleName + "_Sanctum"), lime, true);
+
+            // Ten colossal niches (5 north / 5 south) — Lehner Sphinx temple statue bays.
+            var niches = new LabMeshBuilder(160, 240);
+            float nicheD = 2.4f;
+            float nicheW = 3.6f;
+            float nicheH = 5.8f;
+            float nicheY = floorT + nicheH * 0.5f;
+            float nicheZ = hz - wallT - nicheD * 0.5f - 0.15f;
+            for (int i = 0; i < 5; i++)
+            {
+                float u = i / 4f;
+                float nx = Mathf.Lerp(-hx + wallT + nicheW * 0.5f + 1.2f, hx - wallT - nicheW * 0.5f - 2.5f, u);
+                niches.AddRoom(new Vector3(nx, nicheY, nicheZ), new Vector3(nicheW, nicheH, nicheD), Color.white, true, false, false, false);
+                niches.AddRoom(new Vector3(nx, nicheY, -nicheZ), new Vector3(nicheW, nicheH, nicheD), Color.white, false, true, false, false);
+                // Pedestal stub for missing colossus (honest empty niche).
+                niches.AddBox(new Vector3(nx, floorT + 0.55f, nicheZ), new Vector3(nicheW * 0.72f, 1.1f, nicheD * 0.55f), Color.white);
+                niches.AddBox(new Vector3(nx, floorT + 0.55f, -nicheZ), new Vector3(nicheW * 0.72f, 1.1f, nicheD * 0.55f), Color.white);
+            }
+            GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Niches", niches.Build(SphinxTempleName + "_Niches"), gran, true);
+
+            // Granite colonnade framing the open court (2 rows × 6).
+            var pillars = new LabMeshBuilder(128, 192);
+            float ps = 1.05f;
+            float ph = 5.6f;
+            float py = floorT + ph * 0.5f;
+            for (int row = 0; row < 2; row++)
+            {
+                float px = Mathf.Lerp(-4.5f, 10.5f, row / 1f);
+                for (int i = 0; i < 6; i++)
+                {
+                    float pz = Mathf.Lerp(-hz + wallT + 3.2f, hz - wallT - 3.2f, i / 5f);
+                    pillars.AddBox(new Vector3(px, py, pz), new Vector3(ps, ph, ps), Color.white);
+                }
+            }
+            GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Pillars", pillars.Build(SphinxTempleName + "_Pillars"), gran, true);
 
             GizaBuild.HonestyPlate(root.transform, SphinxTempleName + "_Honesty", honesty, ns);
             Transform plate = root.transform.Find(SphinxTempleName + "_Honesty");
