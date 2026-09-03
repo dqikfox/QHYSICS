@@ -656,6 +656,8 @@ namespace RealityEngine.Visualization
             SitFound("SphinxEnclosure", court);
             SitFound("MenkaureMortuary", top);
             SitFound("MenkaureEnclosure", top);
+            float flood = pose.surfaceY - CliffHeightM + GizaNile.SitAboveDesertM;
+            SitFound("MenkaureValleyTemple", flood);
         }
 
         static void SitFound(string name, float sitY)
