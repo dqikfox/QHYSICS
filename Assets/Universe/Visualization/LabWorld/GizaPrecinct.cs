@@ -228,10 +228,11 @@ namespace RealityEngine.Visualization
             Layout L = Compute();
             const string honesty =
                 GizaComplex.HonestyPrefix + "\n" +
-                "Sphinx temple. Immediately east of the Sphinx face. Open central court, granite colonnade, ten colossal niches (5 N / 5 S), west sanctuaries toward the Sphinx.\n" +
-                "Lehner / ARCE plan massing (walkable). Associated with Khafre's valley complex. Not photogrammetry.";
+                "Sphinx temple. Immediately east of the Sphinx face. Twin of Khafre valley temple: dual N/S east portals, west door toward the Sphinx enclosure.\n" +
+                "Open central court, granite colonnade, ten colossal niches (5 N / 5 S), west sanctuaries. Lehner / ARCE plan massing (walkable). Not photogrammetry.";
             GameObject oldTemple = GizaComplex.FindNamed(SphinxTempleName);
-            if (oldTemple != null && oldTemple.transform.Find(SphinxTempleName + "_Niches") == null)
+            if (oldTemple != null && (oldTemple.transform.Find(SphinxTempleName + "_Niches") == null
+                || oldTemple.transform.Find(SphinxTempleName + "_Portals") == null))
                 DestroyNamed(oldTemple);
             Ensure(SphinxTempleName, pose, p => BuildSphinxTemple(p, L, honesty), GizaComplex.CourtY(pose), true);
 
@@ -523,12 +524,29 @@ namespace RealityEngine.Visualization
             floor.AddBox(new Vector3(0f, floorT * 0.5f, 0f), new Vector3(ew, floorT, ns), Color.white);
             GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Floor", floor.Build(SphinxTempleName + "_Floor"), pav, true);
 
-            // Perimeter walls with east door toward valley / harbor.
-            var walls = new LabMeshBuilder(64, 96);
+            // Perimeter: dual east portals (twin to Khafre valley), west door toward Sphinx.
+            const float portalDoorW = 3.2f;
+            const float portalZ = 7.0f;
+            var walls = new LabMeshBuilder(96, 144);
             walls.AddBox(new Vector3(0f, y, hz - wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
             walls.AddBox(new Vector3(0f, y, -hz + wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
-            walls.AddBox(new Vector3(-hx + wallT * 0.5f, y, 0f), new Vector3(wallT, wallH, ns), Color.white);
-            WallDoorX(walls, hx - wallT * 0.5f, ns, wallH, wallT, 7.5f);
+            // West wall with center door toward Sphinx enclosure / forepaws.
+            WallDoorX(walls, -hx + wallT * 0.5f, ns, wallH, wallT, 5.5f);
+            // Dual east facade doors (N/S of centerline).
+            float wallX = hx - wallT * 0.5f;
+            float halfDoor = portalDoorW * 0.5f;
+            float northTop = portalZ + halfDoor;
+            float northRemain = hz - northTop;
+            if (northRemain > 0.3f)
+                walls.AddBox(new Vector3(wallX, y, northTop + northRemain * 0.5f), new Vector3(wallT, wallH, northRemain), Color.white);
+            float southBot = -portalZ - halfDoor;
+            float southRemain = southBot - (-hz);
+            if (southRemain > 0.3f)
+                walls.AddBox(new Vector3(wallX, y, southBot - southRemain * 0.5f), new Vector3(wallT, wallH, southRemain), Color.white);
+            float centerLen = (portalZ - halfDoor) - (-portalZ + halfDoor);
+            walls.AddBox(new Vector3(wallX, y, 0f), new Vector3(wallT, wallH, centerLen), Color.white);
+            walls.AddBox(new Vector3(wallX, wallH - 0.4f, portalZ), new Vector3(wallT, 0.8f, portalDoorW + 0.5f), Color.white);
+            walls.AddBox(new Vector3(wallX, wallH - 0.4f, -portalZ), new Vector3(wallT, 0.8f, portalDoorW + 0.5f), Color.white);
             GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Walls", walls.Build(SphinxTempleName + "_Walls"), tura, true);
 
             // West sanctuaries facing the Sphinx (three chambers).
@@ -577,6 +595,23 @@ namespace RealityEngine.Visualization
                 }
             }
             GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Pillars", pillars.Build(SphinxTempleName + "_Pillars"), gran, true);
+
+            // East-facade portal vestibules (N/S) — twin temple pattern with Khafre valley.
+            const float portalH = 4.6f;
+            const float portalDepth = 2.8f;
+            const float anteDepth = 2.8f;
+            const float anteW = 3.8f;
+            const float anteH = 4.4f;
+            var portals = new LabMeshBuilder(96, 144);
+            float portalHy = floorT + portalH * 0.5f;
+            float anteHy = floorT + anteH * 0.5f;
+            float vestibX = hx + portalDepth * 0.5f;
+            float anteX = hx - wallT - anteDepth * 0.5f - 0.1f;
+            portals.AddRoom(new Vector3(vestibX, portalHy, portalZ), new Vector3(portalDepth, portalH, portalDoorW), Color.white, false, false, true, true);
+            portals.AddRoom(new Vector3(vestibX, portalHy, -portalZ), new Vector3(portalDepth, portalH, portalDoorW), Color.white, false, false, true, true);
+            portals.AddRoom(new Vector3(anteX, anteHy, portalZ), new Vector3(anteDepth, anteH, anteW), Color.white, false, false, true, true);
+            portals.AddRoom(new Vector3(anteX, anteHy, -portalZ), new Vector3(anteDepth, anteH, anteW), Color.white, false, false, true, true);
+            GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Portals", portals.Build(SphinxTempleName + "_Portals"), gran, true);
 
             GizaBuild.HonestyPlate(root.transform, SphinxTempleName + "_Honesty", honesty, ns);
             Transform plate = root.transform.Find(SphinxTempleName + "_Honesty");
