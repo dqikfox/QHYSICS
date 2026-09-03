@@ -403,7 +403,8 @@ namespace RealityEngine.Visualization
                 GizaComplex.SphinxCourtDropM.ToString("0") + " m below the table. " +
                 "Oasis sand skirts Khufu " + KhufuDuneRadiusM.ToString("0") +
                 " m, Khafre " + KhafreDuneRadiusM.ToString("0") + " m, Menkaure " + MenkaureDuneRadiusM.ToString("0") +
-                " m. From the lab: sand around Khufu's base you could eat, Tura courses still on the pyramid. Ctrl+R then Play, or Reality Engine / Place Giza Complex.");
+                " m. East of the cliff: Nile floodplain silt, schematic harbor basin, and valley settlement (true Nile ~8 km further east, not modeled)." +
+                " From the lab: sand around Khufu's base you could eat, Tura courses still on the pyramid. Ctrl+R then Play, or Reality Engine / Place Giza Complex.");
         }
 
         const int PlateauDiv = 80;
@@ -457,6 +458,7 @@ namespace RealityEngine.Visualization
 
             PlaceDuneSkirts(root, pose, sand, plazaPos);
             PlaceSandWashes(root, pose, sand, plazaPos);
+            GizaNile.Ensure(root, pose, plazaPos, xMin, xMax, zMin, zMax);
 
             float terrX = -GizaComplex.KhafreWestM - cx;
             float terrZ = -GizaComplex.KhafreSouthM - cz;
@@ -635,7 +637,8 @@ namespace RealityEngine.Visualization
                 if (cols[i] == null)
                     continue;
                 string n = cols[i].gameObject.name.ToLowerInvariant();
-                if (n.Contains("honesty") || n.Contains("plate") || n.Contains("airshaft") || n.Contains("emit") || n.Contains("sarcophagus") || n.Contains("hull") || n.Contains("cliff"))
+                if (n.Contains("honesty") || n.Contains("plate") || n.Contains("airshaft") || n.Contains("emit") || n.Contains("sarcophagus") || n.Contains("hull") || n.Contains("cliff")
+                    || n.Contains("water") || n.Contains("house"))
                     continue;
                 AddTeleport(cols[i].gameObject);
             }
@@ -659,6 +662,46 @@ namespace RealityEngine.Visualization
                 string n = ch.name.ToLowerInvariant();
                 if (n.StartsWith("gizadune") || n.StartsWith("gizasandwash"))
                     AddTeleport(ch.gameObject);
+            }
+            Transform floodplain = root.transform.Find("GizaNileFloodplain");
+            if (floodplain != null)
+            {
+                AddTeleport(floodplain.gameObject);
+                for (int i = 0; i < floodplain.childCount; i++)
+                {
+                    Transform fch = floodplain.GetChild(i);
+                    if (fch == null)
+                        continue;
+                    string fn = fch.name.ToLowerInvariant();
+                    if (fn.Contains("field") || fn.Contains("silt"))
+                        AddTeleport(fch.gameObject);
+                }
+            }
+            Transform harbor = root.transform.Find("GizaNileHarbor");
+            if (harbor != null)
+            {
+                for (int i = 0; i < harbor.childCount; i++)
+                {
+                    Transform hch = harbor.GetChild(i);
+                    if (hch == null)
+                        continue;
+                    string hn = hch.name.ToLowerInvariant();
+                    if (hn.Contains("rim") && !hn.Contains("water"))
+                        AddTeleport(hch.gameObject);
+                }
+            }
+            Transform village = root.transform.Find("GizaValleySettlement");
+            if (village != null)
+            {
+                for (int i = 0; i < village.childCount; i++)
+                {
+                    Transform vch = village.GetChild(i);
+                    if (vch == null)
+                        continue;
+                    string vn = vch.name.ToLowerInvariant();
+                    if (vn.Contains("yard") || vn.Contains("court"))
+                        AddTeleport(vch.gameObject);
+                }
             }
         }
 
