@@ -145,6 +145,8 @@ namespace RealityEngine.Visualization
                 || lower == "g3a" || lower == "g3b" || lower == "g3c"
                 || lower.Contains("mortuary") || lower.Contains("causeway") || lower.Contains("boatpit")
                 || lower.Contains("enclosure") || lower.Contains("valleytemple")
+                || lower.Contains("nile") || lower.Contains("floodplain") || lower.Contains("harbor")
+                || lower.Contains("village") || lower.Contains("settlement")
                 || lower.StartsWith("lablandscape");
         }
     }
@@ -167,6 +169,10 @@ namespace RealityEngine.Visualization
         static Material _sand;
         static Material _cliff;
         static Material _sphinx;
+        static Material _silt;
+        static Material _nileWater;
+        static Material _mudbrick;
+        static Material _field;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetCaches()
@@ -183,6 +189,10 @@ namespace RealityEngine.Visualization
             _sand = null;
             _cliff = null;
             _sphinx = null;
+            _silt = null;
+            _nileWater = null;
+            _mudbrick = null;
+            _field = null;
         }
 
         static Material CachedLit(ref Material slot, string name, Color color, float metallic, float smoothness, Texture2D map, Vector2 scale)
@@ -292,6 +302,34 @@ namespace RealityEngine.Visualization
 
             return CachedLit(ref _sand, "RELab_GizaSand", new Color(0.78f, 0.66f, 0.44f, 1f), 0.02f, 0.10f,
                 LabWorldMeshes.MakeDesertSandTexture(), Vector2.one);
+        }
+
+        public static Material NileSilt()
+        {
+            return CachedLit(ref _silt, "RELab_NileSilt", new Color(0.28f, 0.32f, 0.18f, 1f), 0.02f, 0.12f,
+                LabWorldMeshes.MakeNileSiltTexture(), Vector2.one);
+        }
+
+        public static Material NileField()
+        {
+            return CachedLit(ref _field, "RELab_NileField", new Color(0.22f, 0.40f, 0.16f, 1f), 0.02f, 0.14f,
+                LabWorldMeshes.MakeNileSiltTexture(), new Vector2(2f, 2f));
+        }
+
+        public static Material NileWater()
+        {
+            if (_nileWater != null)
+                return _nileWater;
+            _nileWater = LabWorldMeshes.MakeLit("RELab_NileWater", new Color(0.08f, 0.16f, 0.18f, 1f), 0.04f, 0.62f, false);
+            return _nileWater;
+        }
+
+        public static Material Mudbrick()
+        {
+            if (_mudbrick != null)
+                return _mudbrick;
+            _mudbrick = LabWorldMeshes.MakeLit("RELab_Mudbrick", new Color(0.55f, 0.38f, 0.26f, 1f), 0.02f, 0.10f, false);
+            return _mudbrick;
         }
 
         public static Material CliffRock()
@@ -536,6 +574,11 @@ namespace RealityEngine.Visualization
                 if (l.Contains("labplaza") || l.Contains("honesty") || l.Contains("emit") || l.Contains("hull"))
                     continue;
                 if (l.Contains("plate") && !l.Contains("plateau") && !l.Contains("gizaplateau"))
+                    continue;
+                if (l.Contains("floodplain") || l.Contains("nile") || l.Contains("harbor")
+                    || l.Contains("village") || l.Contains("silt") || l.Contains("settlement")
+                    || l.Contains("field") || l.Contains("mudbrick") || l.Contains("yard")
+                    || l.Contains("house"))
                     continue;
                 if (l.Contains("pyramidion") || mn.Contains("Pyramidion"))
                     mr.sharedMaterial = gold;

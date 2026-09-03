@@ -147,6 +147,7 @@ namespace RealityEngine.Visualization
         static Texture2D _granTex;
         static Texture2D _sandTex;
         static Texture2D _cliffTex;
+        static Texture2D _siltTex;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetMeshCaches()
@@ -158,6 +159,7 @@ namespace RealityEngine.Visualization
             _granTex = null;
             _sandTex = null;
             _cliffTex = null;
+            _siltTex = null;
         }
 
         public static void ApplyAlbedo(Material mat, Texture2D tex, Vector2 scale)
@@ -257,6 +259,33 @@ namespace RealityEngine.Visualization
             }
             _sandTex = FinishTex("RELab_DesertSand", size, pixels);
             return _sandTex;
+        }
+
+        public static Texture2D MakeNileSiltTexture()
+        {
+            if (_siltTex != null)
+                return _siltTex;
+            const int size = ProcTexSize;
+            var pixels = new Color[size * size];
+            var silt = new Color(0.28f, 0.32f, 0.18f, 1f);
+            var wet = new Color(0.18f, 0.22f, 0.12f, 1f);
+            var clod = new Color(0.34f, 0.30f, 0.16f, 1f);
+            var pale = new Color(0.38f, 0.40f, 0.24f, 1f);
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float ripple = Mathf.PerlinNoise(x * 0.045f, y * 0.014f);
+                    float grain = Hash01(x, y, 41);
+                    Color c = Color.Lerp(silt, wet, ripple * 0.55f);
+                    c = Color.Lerp(c, pale, grain * 0.14f);
+                    if (grain > 0.92f)
+                        c = clod;
+                    pixels[y * size + x] = c;
+                }
+            }
+            _siltTex = FinishTex("RELab_NileSilt", size, pixels);
+            return _siltTex;
         }
 
         public static Texture2D MakeCliffTexture()
@@ -705,6 +734,50 @@ namespace RealityEngine.Visualization
                 }
             }
             return b.Build("RELab_GizaSandWash");
+        }
+
+        public static Mesh BuildFloodplain(float sizeX, float sizeZ, int div, float furrowM)
+        {
+            int nx = Mathf.Max(8, div);
+            int nz = Mathf.Max(8, div);
+            float hx = sizeX * 0.5f;
+            float hz = sizeZ * 0.5f;
+            furrowM = Mathf.Max(0f, furrowM);
+            var b = new LabMeshBuilder(nx * nz * 2, (nx - 1) * (nz - 1) * 6);
+            float uv = 1f / 8f;
+            for (int z = 0; z < nz - 1; z++)
+            {
+                float tz0 = z / (float)(nz - 1);
+                float tz1 = (z + 1) / (float)(nz - 1);
+                float z0 = Mathf.Lerp(-hz, hz, tz0);
+                float z1 = Mathf.Lerp(-hz, hz, tz1);
+                for (int x = 0; x < nx - 1; x++)
+                {
+                    float tx0 = x / (float)(nx - 1);
+                    float tx1 = (x + 1) / (float)(nx - 1);
+                    float x0 = Mathf.Lerp(-hx, hx, tx0);
+                    float x1 = Mathf.Lerp(-hx, hx, tx1);
+                    float y00 = FloodplainY(x0, z0, furrowM);
+                    float y10 = FloodplainY(x1, z0, furrowM);
+                    float y11 = FloodplainY(x1, z1, furrowM);
+                    float y01 = FloodplainY(x0, z1, furrowM);
+                    Vector3 a = new Vector3(x0, y00, z0);
+                    Vector3 br = new Vector3(x1, y10, z0);
+                    Vector3 c = new Vector3(x1, y11, z1);
+                    Vector3 d = new Vector3(x0, y01, z1);
+                    b.AddQuad(a, br, c, d, Vector3.up,
+                        new Vector2(x0 * uv, z0 * uv), new Vector2(x1 * uv, z0 * uv),
+                        new Vector2(x1 * uv, z1 * uv), new Vector2(x0 * uv, z1 * uv), Color.white);
+                }
+            }
+            return b.Build("RELab_GizaFloodplain");
+        }
+
+        static float FloodplainY(float x, float z, float furrowM)
+        {
+            float furrow = Mathf.Sin(x * 0.42f) * furrowM;
+            float n = (Mathf.PerlinNoise(x * 0.018f + 1.3f, z * 0.011f + 4.7f) - 0.5f) * furrowM;
+            return furrow * 0.55f + n * 0.45f;
         }
 
         static float SandWashY(float tx, float tz, float height)
