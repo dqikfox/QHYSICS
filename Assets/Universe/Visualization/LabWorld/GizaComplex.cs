@@ -4,7 +4,7 @@ using TMPro;
 namespace RealityEngine.Visualization
 {
     /// <summary>
-    /// Giza necropolis at 1:1. Offsets from Khufu centre are approx. WGS84 at lat 30°.
+    /// Giza necropolis at 1:1. Offsets from Khufu centre are approx. WGS84 at lat 30Â°.
     /// Architectural local space: origin at Khufu base centre, +Y up, +Z north, +X east.
     /// </summary>
     public static class GizaComplex
@@ -99,6 +99,16 @@ namespace RealityEngine.Visualization
             }
             if ((which & Spawn.Sphinx) != 0)
             {
+                // Force rebuild when Dream Stele is missing (pre-stele body massing).
+                GameObject oldSphinx = FindNamed(GizaSphinx.RootName);
+                if (oldSphinx != null && oldSphinx.transform.Find(GizaSphinx.DreamSteleName) == null)
+                {
+                    oldSphinx.name = oldSphinx.name + "_Obsolete";
+                    if (Application.isPlaying)
+                        Object.Destroy(oldSphinx);
+                    else
+                        Object.DestroyImmediate(oldSphinx);
+                }
                 Vector3 c = WorldFromKhufu(pose, SphinxEastM, -SphinxSouthM, 0f);
                 EnsureNamed(GizaSphinx.RootName, pose, (p) => GizaSphinx.Build(p.parent, c, p.rot), CourtY(pose));
                 GizaPrecinct.EnsureSphinx(pose);
@@ -153,7 +163,7 @@ namespace RealityEngine.Visualization
 
     /// <summary>
     /// Shared undamaged true-pyramid casing, pyramidion, pavement, honesty plate.
-    /// 4-face shells only — no filled core (walkable interiors do not clip solid rock).
+    /// 4-face shells only â€” no filled core (walkable interiors do not clip solid rock).
     /// </summary>
     public static class GizaBuild
     {
