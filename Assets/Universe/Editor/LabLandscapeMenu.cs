@@ -68,7 +68,7 @@ namespace RealityEngine.EditorTools
         [MenuItem(ComplexPath)]
         public static void PlaceGizaComplex()
         {
-            Place(GizaComplex.Spawn.All, "full Giza complex (Khufu, Khafre, Menkaure, Sphinx). Dedupe if already spawned.");
+            Place(GizaComplex.Spawn.All, "full Giza complex (Khufu + G1a-c queens, mortuary temples, causeways, boat pits, Khafre valley/Sphinx temples, Menkaure precinct). Dedupe by child names if already spawned.");
         }
 
         [MenuItem(ComplexPath, true)]

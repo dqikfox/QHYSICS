@@ -61,26 +61,33 @@ namespace RealityEngine.Visualization
             xMax = Mathf.Max(kh, SphinxEastM + GizaSphinx.LengthM * 0.5f);
             zMin = -MenkaureSouthM - mn - 8f - 28f - q;
             zMax = kh;
+            GizaPrecinct.ExpandExtents(ref xMin, ref xMax, ref zMin, ref zMax);
         }
 
         public static void Ensure(Pose pose, Spawn which)
         {
             if ((which & Spawn.Khufu) != 0)
+            {
                 EnsureNamed(KhufuPyramid.RootName, pose, (p) => KhufuPyramid.Build(p.parent, p.khufuCenter, p.rot, p.comfortScale), pose.surfaceY);
+                GizaPrecinct.EnsureKhufu(pose);
+            }
             if ((which & Spawn.Khafre) != 0)
             {
                 Vector3 c = WorldFromKhufu(pose, -KhafreWestM, -KhafreSouthM, 0f);
                 EnsureNamed(KhafrePyramid.RootName, pose, (p) => KhafrePyramid.Build(p.parent, c, p.rot, p.comfortScale), pose.surfaceY);
+                GizaPrecinct.EnsureKhafre(pose);
             }
             if ((which & Spawn.Menkaure) != 0)
             {
                 Vector3 c = WorldFromKhufu(pose, -MenkaureWestM, -MenkaureSouthM, 0f);
                 EnsureNamed(MenkaurePyramid.RootName, pose, (p) => MenkaurePyramid.Build(p.parent, c, p.rot, p.comfortScale), pose.surfaceY);
+                GizaPrecinct.EnsureMenkaure(pose);
             }
             if ((which & Spawn.Sphinx) != 0)
             {
                 Vector3 c = WorldFromKhufu(pose, SphinxEastM, -SphinxSouthM, 0f);
                 EnsureNamed(GizaSphinx.RootName, pose, (p) => GizaSphinx.Build(p.parent, c, p.rot), pose.surfaceY);
+                GizaPrecinct.EnsureSphinx(pose);
             }
         }
 
@@ -119,7 +126,11 @@ namespace RealityEngine.Visualization
                 || lower == "menkaure" || lower.StartsWith("menkaure")
                 || lower == "sphinx" || lower.StartsWith("sphinx")
                 || lower == "gizacomplex" || lower.StartsWith("giza")
+                || lower == "g1a" || lower == "g1b" || lower == "g1c"
+                || lower.StartsWith("g1a") || lower.StartsWith("g1b") || lower.StartsWith("g1c")
                 || lower == "g3a" || lower == "g3b" || lower == "g3c"
+                || lower.Contains("mortuary") || lower.Contains("causeway") || lower.Contains("boatpit")
+                || lower.Contains("enclosure") || lower.Contains("valleytemple")
                 || lower.StartsWith("lablandscape");
         }
     }
@@ -379,6 +390,12 @@ namespace RealityEngine.Visualization
                 r = RendererNamedContains(t, "_Casing");
             if (r == null)
                 r = RendererNamedContains(t, "_Body");
+            if (r == null)
+                r = RendererNamedContains(t, "_Floor");
+            if (r == null)
+                r = RendererNamedContains(t, "_Deck");
+            if (r == null)
+                r = RendererNamedContains(t, "_Rim");
             if (r == null)
             {
                 Vector3 p = t.position;
