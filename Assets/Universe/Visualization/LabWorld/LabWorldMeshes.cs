@@ -137,33 +137,215 @@ namespace RealityEngine.Visualization
             return mat;
         }
 
+        public const float StoneTileM = 4.8f;
+        public const float SandTileM = 2f;
+        public const float CliffTileM = 8f;
+        public const int ProcTexSize = 512;
+
+        static Texture2D _turaTex;
+        static Texture2D _limeTex;
+        static Texture2D _granTex;
+        static Texture2D _sandTex;
+        static Texture2D _cliffTex;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetMeshCaches()
+        {
+            _lit = null;
+            _graphiteTemplate = null;
+            _turaTex = null;
+            _limeTex = null;
+            _granTex = null;
+            _sandTex = null;
+            _cliffTex = null;
+        }
+
+        public static void ApplyAlbedo(Material mat, Texture2D tex, Vector2 scale)
+        {
+            if (mat == null || tex == null)
+                return;
+            if (mat.HasProperty("_BaseMap"))
+            {
+                mat.SetTexture("_BaseMap", tex);
+                mat.SetTextureScale("_BaseMap", scale);
+            }
+            if (mat.HasProperty("_MainTex"))
+            {
+                mat.SetTexture("_MainTex", tex);
+                mat.SetTextureScale("_MainTex", scale);
+            }
+        }
+
+        public static Texture2D MakeTuraBlockTexture()
+        {
+            if (_turaTex != null)
+                return _turaTex;
+            _turaTex = BuildCourseBlocks(
+                "RELab_TuraBlocks", 8, 8, 5,
+                new Color(0.92f, 0.87f, 0.75f, 1f),
+                new Color(0.84f, 0.78f, 0.64f, 1f),
+                new Color(0.58f, 0.52f, 0.44f, 1f),
+                new Color(0.78f, 0.72f, 0.60f, 1f),
+                0.10f);
+            return _turaTex;
+        }
+
+        public static Texture2D MakeLimestoneTexture()
+        {
+            if (_limeTex != null)
+                return _limeTex;
+            _limeTex = BuildCourseBlocks(
+                "RELab_MokattamLime", 6, 5, 6,
+                new Color(0.72f, 0.64f, 0.52f, 1f),
+                new Color(0.58f, 0.52f, 0.42f, 1f),
+                new Color(0.40f, 0.36f, 0.30f, 1f),
+                new Color(0.50f, 0.44f, 0.36f, 1f),
+                0.16f);
+            return _limeTex;
+        }
+
+        public static Texture2D MakeGraniteTexture()
+        {
+            if (_granTex != null)
+                return _granTex;
+            const int size = ProcTexSize;
+            var pixels = new Color[size * size];
+            var red = new Color(0.56f, 0.28f, 0.24f, 1f);
+            var dark = new Color(0.22f, 0.18f, 0.18f, 1f);
+            var grey = new Color(0.42f, 0.38f, 0.36f, 1f);
+            var pink = new Color(0.62f, 0.42f, 0.38f, 1f);
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float n = Hash01(x, y, 11);
+                    float g = Hash01(x / 2, y / 2, 23);
+                    Color c = n < 0.18f ? dark : n < 0.55f ? grey : n < 0.82f ? red : pink;
+                    float speckle = Hash01(x * 3, y * 3, 7);
+                    c = Color.Lerp(c, dark, speckle * 0.22f + g * 0.08f);
+                    pixels[y * size + x] = c;
+                }
+            }
+            _granTex = FinishTex("RELab_AswanSpeckles", size, pixels);
+            return _granTex;
+        }
+
+        public static Texture2D MakeDesertSandTexture()
+        {
+            if (_sandTex != null)
+                return _sandTex;
+            const int size = ProcTexSize;
+            var pixels = new Color[size * size];
+            var sand = new Color(0.76f, 0.64f, 0.42f, 1f);
+            var dune = new Color(0.68f, 0.56f, 0.36f, 1f);
+            var pebble = new Color(0.52f, 0.44f, 0.32f, 1f);
+            var pale = new Color(0.84f, 0.74f, 0.54f, 1f);
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float ripple = Mathf.PerlinNoise(x * 0.035f, y * 0.018f);
+                    float grain = Hash01(x, y, 31);
+                    Color c = Color.Lerp(sand, dune, ripple);
+                    c = Color.Lerp(c, pale, grain * 0.18f);
+                    if (grain > 0.93f)
+                        c = pebble;
+                    else if (grain > 0.88f)
+                        c = Color.Lerp(c, pebble, 0.55f);
+                    pixels[y * size + x] = c;
+                }
+            }
+            _sandTex = FinishTex("RELab_DesertSand", size, pixels);
+            return _sandTex;
+        }
+
+        public static Texture2D MakeCliffTexture()
+        {
+            if (_cliffTex != null)
+                return _cliffTex;
+            _cliffTex = BuildCourseBlocks(
+                "RELab_CliffLime", 5, 4, 7,
+                new Color(0.48f, 0.42f, 0.34f, 1f),
+                new Color(0.36f, 0.32f, 0.26f, 1f),
+                new Color(0.24f, 0.22f, 0.18f, 1f),
+                new Color(0.32f, 0.28f, 0.22f, 1f),
+                0.20f);
+            return _cliffTex;
+        }
+
         public static Texture2D MakeCourseTexture()
         {
-            const int w = 64;
-            const int h = 256;
-            var tex = new Texture2D(w, h, TextureFormat.RGBA32, false, true)
+            return MakeTuraBlockTexture();
+        }
+
+        static Texture2D BuildCourseBlocks(string name, int courses, int blocks, int mortarPx,
+            Color ivory, Color cream, Color mortar, Color vein, float variation)
+        {
+            const int size = ProcTexSize;
+            var pixels = new Color[size * size];
+            int courseH = Mathf.Max(8, size / Mathf.Max(1, courses));
+            int blockW = Mathf.Max(8, size / Mathf.Max(1, blocks));
+            mortarPx = Mathf.Clamp(mortarPx, 2, courseH / 3);
+            for (int y = 0; y < size; y++)
             {
-                name = "RELab_KhufuCourses",
+                int course = y / courseH;
+                int ly = y % courseH;
+                bool jointH = ly < mortarPx || ly >= courseH - 1;
+                int xOff = (course & 1) * (blockW / 2);
+                for (int x = 0; x < size; x++)
+                {
+                    int sx = (x + xOff) % size;
+                    if (sx < 0)
+                        sx += size;
+                    int bx = sx / blockW;
+                    int lx = sx % blockW;
+                    bool jointV = lx < mortarPx;
+                    Color c;
+                    if (jointH || jointV)
+                    {
+                        float mj = Hash01(bx, course, 41) * 0.08f;
+                        c = mortar * (0.96f + mj);
+                    }
+                    else
+                    {
+                        float h = Hash01(bx, course, 17);
+                        c = Color.Lerp(ivory, cream, h);
+                        float v = Mathf.PerlinNoise((x + course * 13) * 0.018f, (y + bx * 9) * 0.028f);
+                        c = Color.Lerp(c, vein, v * 0.14f);
+                        float n = Hash01(x, y, 3);
+                        float mul = 1f - variation * 0.5f + n * variation;
+                        c = new Color(c.r * mul, c.g * mul, c.b * mul, 1f);
+                    }
+                    pixels[y * size + x] = c;
+                }
+            }
+            return FinishTex(name, size, pixels);
+        }
+
+        static Texture2D FinishTex(string name, int size, Color[] pixels)
+        {
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, true, false)
+            {
+                name = name,
                 hideFlags = HideFlags.DontSave,
                 wrapMode = TextureWrapMode.Repeat,
                 filterMode = FilterMode.Bilinear,
-                anisoLevel = 2
+                anisoLevel = 4
             };
-            var stone = new Color(0.97f, 0.96f, 0.93f, 1f);
-            var course = new Color(0.90f, 0.87f, 0.80f, 1f);
-            var pixels = new Color[w * h];
-            for (int y = 0; y < h; y++)
-            {
-                int m = y % 16;
-                bool line = m == 0 || m == 15;
-                Color c = line ? course : stone;
-                for (int x = 0; x < w; x++)
-                    pixels[y * w + x] = c;
-            }
             tex.SetPixels(pixels);
-            tex.Apply(false, true);
+            tex.Apply(true, true);
             return tex;
         }
+
+        static float Hash01(int x, int y, int salt)
+        {
+            int n = x * 374761393 + y * 668265263 + salt * 1274126177;
+            n = (n ^ (n >> 13)) * 1274126177;
+            n ^= n >> 16;
+            return (n & 0x7fffffff) * (1f / 2147483647f);
+        }
+
+
 
         public static Texture2D MakePlazaTexture()
         {
@@ -218,6 +400,248 @@ namespace RealityEngine.Visualization
             tex.Apply(false, true);
             return tex;
         }
+
+        public struct PlateauCut
+        {
+            public float xMin, xMax, zMin, zMax, dropM;
+        }
+
+        public static Mesh BuildPlateauTop(float sizeX, float sizeZ, int div, PlateauCut court, float noiseM)
+        {
+            int nx = Mathf.Max(8, div);
+            int nz = Mathf.Max(8, div);
+            float hx = sizeX * 0.5f;
+            float hz = sizeZ * 0.5f;
+            var b = new LabMeshBuilder(nx * nz * 2, (nx - 1) * (nz - 1) * 6);
+            float uv = 1f / SandTileM;
+            for (int z = 0; z < nz - 1; z++)
+            {
+                float tz0 = z / (float)(nz - 1);
+                float tz1 = (z + 1) / (float)(nz - 1);
+                float z0 = Mathf.Lerp(-hz, hz, tz0);
+                float z1 = Mathf.Lerp(-hz, hz, tz1);
+                for (int x = 0; x < nx - 1; x++)
+                {
+                    float tx0 = x / (float)(nx - 1);
+                    float tx1 = (x + 1) / (float)(nx - 1);
+                    float x0 = Mathf.Lerp(-hx, hx, tx0);
+                    float x1 = Mathf.Lerp(-hx, hx, tx1);
+                    float y00 = PlateauTopY(x0, z0, hx, hz, court, noiseM);
+                    float y10 = PlateauTopY(x1, z0, hx, hz, court, noiseM);
+                    float y11 = PlateauTopY(x1, z1, hx, hz, court, noiseM);
+                    float y01 = PlateauTopY(x0, z1, hx, hz, court, noiseM);
+                    Vector3 a = new Vector3(x0, y00, z0);
+                    Vector3 br = new Vector3(x1, y10, z0);
+                    Vector3 c = new Vector3(x1, y11, z1);
+                    Vector3 d = new Vector3(x0, y01, z1);
+                    Vector2 u00 = new Vector2(x0 * uv, z0 * uv);
+                    Vector2 u10 = new Vector2(x1 * uv, z0 * uv);
+                    Vector2 u11 = new Vector2(x1 * uv, z1 * uv);
+                    Vector2 u01 = new Vector2(x0 * uv, z1 * uv);
+                    b.AddQuad(a, br, c, d, Vector3.up, u00, u10, u11, u01, Color.white);
+                }
+            }
+            return b.Build("RELab_GizaPlateauTop");
+        }
+
+        public static Mesh BuildPlateauCliffs(float sizeX, float sizeZ, int div, PlateauCut court, float cliffH,
+            float eastBevel, float southBevel, float westBevel, float northBevel, float noiseM)
+        {
+            int n = Mathf.Max(8, div);
+            float hx = sizeX * 0.5f;
+            float hz = sizeZ * 0.5f;
+            float yBot = -Mathf.Max(4f, cliffH);
+            var b = new LabMeshBuilder(n * 20, n * 30);
+            float uv = 1f / CliffTileM;
+            AddCliffEast(b, n, hx, hz, yBot, eastBevel, court, noiseM, uv);
+            AddCliffWest(b, n, hx, hz, yBot, westBevel, court, noiseM, uv);
+            AddCliffSouth(b, n, hx, hz, yBot, southBevel, court, noiseM, uv);
+            AddCliffNorth(b, n, hx, hz, yBot, northBevel, court, noiseM, uv);
+            AddCliffCorner(b, new Vector3(hx, PlateauTopY(hx, -hz, hx, hz, court, noiseM), -hz),
+                new Vector3(hx + eastBevel, yBot, -hz), new Vector3(hx, yBot, -hz - southBevel),
+                new Vector3(hx + eastBevel, yBot, -hz - southBevel), new Vector3(1f, 0f, -1f), uv);
+            AddCliffCorner(b, new Vector3(-hx, PlateauTopY(-hx, -hz, hx, hz, court, noiseM), -hz),
+                new Vector3(-hx - westBevel, yBot, -hz), new Vector3(-hx, yBot, -hz - southBevel),
+                new Vector3(-hx - westBevel, yBot, -hz - southBevel), new Vector3(-1f, 0f, -1f), uv);
+            AddCliffCorner(b, new Vector3(hx, PlateauTopY(hx, hz, hx, hz, court, noiseM), hz),
+                new Vector3(hx + eastBevel, yBot, hz), new Vector3(hx, yBot, hz + northBevel),
+                new Vector3(hx + eastBevel, yBot, hz + northBevel), new Vector3(1f, 0f, 1f), uv);
+            AddCliffCorner(b, new Vector3(-hx, PlateauTopY(-hx, hz, hx, hz, court, noiseM), hz),
+                new Vector3(-hx - westBevel, yBot, hz), new Vector3(-hx, yBot, hz + northBevel),
+                new Vector3(-hx - westBevel, yBot, hz + northBevel), new Vector3(-1f, 0f, 1f), uv);
+            return b.Build("RELab_GizaPlateauCliffs");
+        }
+
+        static void AddCliffEast(LabMeshBuilder b, int n, float hx, float hz, float yBot, float bevel,
+            PlateauCut court, float noiseM, float uv)
+        {
+            for (int i = 0; i < n - 1; i++)
+            {
+                float z0 = Mathf.Lerp(-hz, hz, i / (float)(n - 1));
+                float z1 = Mathf.Lerp(-hz, hz, (i + 1) / (float)(n - 1));
+                float y0 = PlateauTopY(hx, z0, hx, hz, court, noiseM);
+                float y1 = PlateauTopY(hx, z1, hx, hz, court, noiseM);
+                Vector3 t0 = new Vector3(hx, y0, z0);
+                Vector3 t1 = new Vector3(hx, y1, z1);
+                Vector3 o0 = new Vector3(hx + bevel, yBot, z0);
+                Vector3 o1 = new Vector3(hx + bevel, yBot, z1);
+                float u0 = z0 * uv;
+                float u1 = z1 * uv;
+                b.AddQuad(t0, t1, o1, o0, Vector3.right,
+                    new Vector2(u0, y0 * uv), new Vector2(u1, y1 * uv),
+                    new Vector2(u1, yBot * uv), new Vector2(u0, yBot * uv), Color.white);
+            }
+        }
+
+        static void AddCliffWest(LabMeshBuilder b, int n, float hx, float hz, float yBot, float bevel,
+            PlateauCut court, float noiseM, float uv)
+        {
+            for (int i = 0; i < n - 1; i++)
+            {
+                float z0 = Mathf.Lerp(-hz, hz, i / (float)(n - 1));
+                float z1 = Mathf.Lerp(-hz, hz, (i + 1) / (float)(n - 1));
+                float y0 = PlateauTopY(-hx, z0, hx, hz, court, noiseM);
+                float y1 = PlateauTopY(-hx, z1, hx, hz, court, noiseM);
+                Vector3 t0 = new Vector3(-hx, y0, z0);
+                Vector3 t1 = new Vector3(-hx, y1, z1);
+                Vector3 o0 = new Vector3(-hx - bevel, yBot, z0);
+                Vector3 o1 = new Vector3(-hx - bevel, yBot, z1);
+                float u0 = z0 * uv;
+                float u1 = z1 * uv;
+                b.AddQuad(t0, o0, o1, t1, Vector3.left,
+                    new Vector2(u0, y0 * uv), new Vector2(u0, yBot * uv),
+                    new Vector2(u1, yBot * uv), new Vector2(u1, y1 * uv), Color.white);
+            }
+        }
+
+        static void AddCliffSouth(LabMeshBuilder b, int n, float hx, float hz, float yBot, float bevel,
+            PlateauCut court, float noiseM, float uv)
+        {
+            for (int i = 0; i < n - 1; i++)
+            {
+                float x0 = Mathf.Lerp(-hx, hx, i / (float)(n - 1));
+                float x1 = Mathf.Lerp(-hx, hx, (i + 1) / (float)(n - 1));
+                float y0 = PlateauTopY(x0, -hz, hx, hz, court, noiseM);
+                float y1 = PlateauTopY(x1, -hz, hx, hz, court, noiseM);
+                Vector3 t0 = new Vector3(x0, y0, -hz);
+                Vector3 t1 = new Vector3(x1, y1, -hz);
+                Vector3 o0 = new Vector3(x0, yBot, -hz - bevel);
+                Vector3 o1 = new Vector3(x1, yBot, -hz - bevel);
+                float u0 = x0 * uv;
+                float u1 = x1 * uv;
+                b.AddQuad(t0, o0, o1, t1, Vector3.back,
+                    new Vector2(u0, y0 * uv), new Vector2(u0, yBot * uv),
+                    new Vector2(u1, yBot * uv), new Vector2(u1, y1 * uv), Color.white);
+            }
+        }
+
+        static void AddCliffNorth(LabMeshBuilder b, int n, float hx, float hz, float yBot, float bevel,
+            PlateauCut court, float noiseM, float uv)
+        {
+            for (int i = 0; i < n - 1; i++)
+            {
+                float x0 = Mathf.Lerp(-hx, hx, i / (float)(n - 1));
+                float x1 = Mathf.Lerp(-hx, hx, (i + 1) / (float)(n - 1));
+                float y0 = PlateauTopY(x0, hz, hx, hz, court, noiseM);
+                float y1 = PlateauTopY(x1, hz, hx, hz, court, noiseM);
+                Vector3 t0 = new Vector3(x0, y0, hz);
+                Vector3 t1 = new Vector3(x1, y1, hz);
+                Vector3 o0 = new Vector3(x0, yBot, hz + bevel);
+                Vector3 o1 = new Vector3(x1, yBot, hz + bevel);
+                float u0 = x0 * uv;
+                float u1 = x1 * uv;
+                b.AddQuad(t0, t1, o1, o0, Vector3.forward,
+                    new Vector2(u0, y0 * uv), new Vector2(u1, y1 * uv),
+                    new Vector2(u1, yBot * uv), new Vector2(u0, yBot * uv), Color.white);
+            }
+        }
+
+        static void AddCliffCorner(LabMeshBuilder b, Vector3 top, Vector3 aBot, Vector3 bBot, Vector3 cBot, Vector3 hint, float uv)
+        {
+            b.AddQuad(top, aBot, cBot, bBot, hint,
+                new Vector2(0f, top.y * uv), new Vector2(1f, aBot.y * uv),
+                new Vector2(1f, cBot.y * uv), new Vector2(0f, bBot.y * uv), Color.white);
+        }
+
+        public static Mesh BuildDesertFloor(float size, int div, float rollM)
+        {
+            int n = Mathf.Max(4, div);
+            float h = size * 0.5f;
+            var b = new LabMeshBuilder(n * n, (n - 1) * (n - 1) * 6);
+            float uv = 1f / SandTileM;
+            rollM = Mathf.Max(0f, rollM);
+            for (int z = 0; z < n - 1; z++)
+            {
+                float tz0 = z / (float)(n - 1);
+                float tz1 = (z + 1) / (float)(n - 1);
+                float z0 = Mathf.Lerp(-h, h, tz0);
+                float z1 = Mathf.Lerp(-h, h, tz1);
+                for (int x = 0; x < n - 1; x++)
+                {
+                    float tx0 = x / (float)(n - 1);
+                    float tx1 = (x + 1) / (float)(n - 1);
+                    float x0 = Mathf.Lerp(-h, h, tx0);
+                    float x1 = Mathf.Lerp(-h, h, tx1);
+                    float y00 = (Mathf.PerlinNoise(tx0 * 4.2f, tz0 * 3.7f) - 0.5f) * 2f * rollM;
+                    float y10 = (Mathf.PerlinNoise(tx1 * 4.2f, tz0 * 3.7f) - 0.5f) * 2f * rollM;
+                    float y11 = (Mathf.PerlinNoise(tx1 * 4.2f, tz1 * 3.7f) - 0.5f) * 2f * rollM;
+                    float y01 = (Mathf.PerlinNoise(tx0 * 4.2f, tz1 * 3.7f) - 0.5f) * 2f * rollM;
+                    Vector3 a = new Vector3(x0, y00, z0);
+                    Vector3 br = new Vector3(x1, y10, z0);
+                    Vector3 c = new Vector3(x1, y11, z1);
+                    Vector3 d = new Vector3(x0, y01, z1);
+                    b.AddQuad(a, br, c, d, Vector3.up,
+                        new Vector2(x0 * uv, z0 * uv), new Vector2(x1 * uv, z0 * uv),
+                        new Vector2(x1 * uv, z1 * uv), new Vector2(x0 * uv, z1 * uv), Color.white);
+                }
+            }
+            return b.Build("RELab_GizaDesert");
+        }
+
+        public static Mesh BuildRaisedPad(float sizeX, float sizeZ, float height)
+        {
+            height = Mathf.Max(0.2f, height);
+            float hx = sizeX * 0.5f;
+            float hz = sizeZ * 0.5f;
+            float tile = StoneTileM;
+            var b = new LabMeshBuilder(24, 36);
+            Color c = Color.white;
+            Vector3 t00 = new Vector3(-hx, height, -hz);
+            Vector3 t10 = new Vector3(hx, height, -hz);
+            Vector3 t11 = new Vector3(hx, height, hz);
+            Vector3 t01 = new Vector3(-hx, height, hz);
+            Vector3 b00 = new Vector3(-hx, 0f, -hz);
+            Vector3 b10 = new Vector3(hx, 0f, -hz);
+            Vector3 b11 = new Vector3(hx, 0f, hz);
+            Vector3 b01 = new Vector3(-hx, 0f, hz);
+            Vector2 u00 = new Vector2(0f, 0f);
+            Vector2 u10 = new Vector2(sizeX / tile, 0f);
+            Vector2 u11 = new Vector2(sizeX / tile, sizeZ / tile);
+            Vector2 u01 = new Vector2(0f, sizeZ / tile);
+            b.AddQuad(t00, t10, t11, t01, Vector3.up, u00, u10, u11, u01, c);
+            float hv = height / tile;
+            b.AddQuad(t00, b00, b10, t10, Vector3.back,
+                new Vector2(0f, hv), new Vector2(0f, 0f), new Vector2(sizeX / tile, 0f), new Vector2(sizeX / tile, hv), c);
+            b.AddQuad(t01, t11, b11, b01, Vector3.forward,
+                new Vector2(0f, hv), new Vector2(sizeX / tile, hv), new Vector2(sizeX / tile, 0f), new Vector2(0f, 0f), c);
+            b.AddQuad(t00, t01, b01, b00, Vector3.left,
+                new Vector2(0f, hv), new Vector2(sizeZ / tile, hv), new Vector2(sizeZ / tile, 0f), new Vector2(0f, 0f), c);
+            b.AddQuad(t10, b10, b11, t11, Vector3.right,
+                new Vector2(0f, hv), new Vector2(0f, 0f), new Vector2(sizeZ / tile, 0f), new Vector2(sizeZ / tile, hv), c);
+            return b.Build("RELab_GizaTerrace");
+        }
+
+        public static float PlateauTopY(float x, float z, float hx, float hz, PlateauCut court, float noiseM)
+        {
+            if (x >= court.xMin && x <= court.xMax && z >= court.zMin && z <= court.zMax)
+                return -court.dropM;
+            float tx = (x + hx) / Mathf.Max(0.01f, 2f * hx);
+            float tz = (z + hz) / Mathf.Max(0.01f, 2f * hz);
+            float edge = EdgeAmount(tx, tz);
+            float n = (Mathf.PerlinNoise(tx * 9.1f + 2.2f, tz * 8.3f + 1.7f) - 0.5f) * 2f;
+            return n * noiseM * edge * edge;
+        }
+
 
         public static Mesh BuildPlateau(float sizeX, float sizeZ, int div, float edgeLift)
         {
@@ -361,12 +785,22 @@ namespace RealityEngine.Visualization
             Vector3 p101 = center + new Vector3(h.x, -h.y, h.z);
             Vector3 p111 = center + new Vector3(h.x, h.y, h.z);
             Vector3 p011 = center + new Vector3(-h.x, h.y, h.z);
-            AddQuad(p000, p100, p110, p010, Vector3.back, color);
-            AddQuad(p001, p011, p111, p101, Vector3.forward, color);
-            AddQuad(p000, p010, p011, p001, Vector3.left, color);
-            AddQuad(p100, p101, p111, p110, Vector3.right, color);
-            AddQuad(p010, p110, p111, p011, Vector3.up, color);
-            AddQuad(p000, p001, p101, p100, Vector3.down, color);
+            float tile = LabWorldMeshes.StoneTileM;
+            float ux = size.x / tile;
+            float uy = size.y / tile;
+            float uz = size.z / tile;
+            AddQuad(p000, p100, p110, p010, Vector3.back,
+                new Vector2(0f, 0f), new Vector2(ux, 0f), new Vector2(ux, uy), new Vector2(0f, uy), color);
+            AddQuad(p001, p011, p111, p101, Vector3.forward,
+                new Vector2(0f, 0f), new Vector2(0f, uy), new Vector2(uz, uy), new Vector2(uz, 0f), color);
+            AddQuad(p000, p010, p011, p001, Vector3.left,
+                new Vector2(0f, 0f), new Vector2(0f, uy), new Vector2(uz, uy), new Vector2(uz, 0f), color);
+            AddQuad(p100, p101, p111, p110, Vector3.right,
+                new Vector2(0f, 0f), new Vector2(uz, 0f), new Vector2(uz, uy), new Vector2(0f, uy), color);
+            AddQuad(p010, p110, p111, p011, Vector3.up,
+                new Vector2(0f, 0f), new Vector2(ux, 0f), new Vector2(ux, uz), new Vector2(0f, uz), color);
+            AddQuad(p000, p001, p101, p100, Vector3.down,
+                new Vector2(0f, 0f), new Vector2(0f, uz), new Vector2(ux, uz), new Vector2(ux, 0f), color);
         }
 
         public void AddOpenBox(Vector3 center, Vector3 size, Color color)
@@ -487,6 +921,11 @@ namespace RealityEngine.Visualization
             tEnd = Mathf.Clamp01(tEnd);
             if (tEnd <= tStart + 1e-5f)
                 return;
+            float faceW = Vector3.Distance(bl, br);
+            float faceH = Mathf.Abs(apex.y - (bl.y + br.y) * 0.5f);
+            float tile = LabWorldMeshes.StoneTileM;
+            float uScale = faceW / tile;
+            float vScale = faceH / tile;
             for (int v = 0; v < vDiv; v++)
             {
                 float t0 = Mathf.Lerp(tStart, tEnd, v / (float)vDiv);
@@ -517,10 +956,10 @@ namespace RealityEngine.Visualization
                         if (h1 || h2)
                             continue;
                     }
-                    Vector2 uv00 = new Vector2(s0, t0 * 12f);
-                    Vector2 uv10 = new Vector2(s1, t0 * 12f);
-                    Vector2 uv11 = new Vector2(s1, t1 * 12f);
-                    Vector2 uv01 = new Vector2(s0, t1 * 12f);
+                    Vector2 uv00 = new Vector2(s0 * uScale, t0 * vScale);
+                    Vector2 uv10 = new Vector2(s1 * uScale, t0 * vScale);
+                    Vector2 uv11 = new Vector2(s1 * uScale, t1 * vScale);
+                    Vector2 uv01 = new Vector2(s0 * uScale, t1 * vScale);
                     AddQuad(p00, p10, p11, p01, hint, uv00, uv10, uv11, uv01, color);
                 }
             }

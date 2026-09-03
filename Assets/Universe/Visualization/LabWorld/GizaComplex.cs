@@ -11,6 +11,9 @@ namespace RealityEngine.Visualization
     {
         public const float Cubit = 0.5236f;
         public const float MarginM = 80f;
+        public const float CliffHeightM = 32f;
+        public const float SphinxCourtDropM = 12f;
+        public const float DesertSizeM = 2600f;
         public const float KhafreWestM = 323f;
         public const float KhafreSouthM = 342f;
         public const float KhafreBedrockM = 10f;
@@ -39,6 +42,17 @@ namespace RealityEngine.Visualization
             public Quaternion rot;
             public float surfaceY;
             public bool comfortScale;
+        }
+
+
+        public static float CourtY(Pose pose)
+        {
+            return pose.surfaceY - SphinxCourtDropM;
+        }
+
+        public static float TerraceY(Pose pose)
+        {
+            return pose.surfaceY + KhafreBedrockM;
         }
 
         public static Vector3 LocalOffset(float eastM, float northM, float upM)
@@ -86,7 +100,7 @@ namespace RealityEngine.Visualization
             if ((which & Spawn.Sphinx) != 0)
             {
                 Vector3 c = WorldFromKhufu(pose, SphinxEastM, -SphinxSouthM, 0f);
-                EnsureNamed(GizaSphinx.RootName, pose, (p) => GizaSphinx.Build(p.parent, c, p.rot), pose.surfaceY);
+                EnsureNamed(GizaSphinx.RootName, pose, (p) => GizaSphinx.Build(p.parent, c, p.rot), CourtY(pose));
                 GizaPrecinct.EnsureSphinx(pose);
             }
         }
@@ -141,64 +155,126 @@ namespace RealityEngine.Visualization
     /// </summary>
     public static class GizaBuild
     {
+        static Material _tura;
+        static Material _lime;
+        static Material _gran;
+        static Material _aswan;
+        static Material _electrum;
+        static Material _pav;
+        static Material _rock;
+        static Material _emit;
+        static Material _plate;
+        static Material _sand;
+        static Material _cliff;
+        static Material _sphinx;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetCaches()
+        {
+            _tura = null;
+            _lime = null;
+            _gran = null;
+            _aswan = null;
+            _electrum = null;
+            _pav = null;
+            _rock = null;
+            _emit = null;
+            _plate = null;
+            _sand = null;
+            _cliff = null;
+            _sphinx = null;
+        }
+
+        static Material CachedLit(ref Material slot, string name, Color color, float metallic, float smoothness, Texture2D map, Vector2 scale)
+        {
+            if (slot != null)
+                return slot;
+            slot = LabWorldMeshes.MakeLit(name, color, metallic, smoothness, false);
+            LabWorldMeshes.ApplyAlbedo(slot, map, scale);
+            return slot;
+        }
+
         public static Material TuraCasing()
         {
-            Material mat = LabWorldMeshes.MakeLit("RELab_TuraCasing", new Color(0.86f, 0.81f, 0.70f, 1f), 0.03f, 0.82f, false);
-            Texture2D courses = LabWorldMeshes.MakeCourseTexture();
-            if (mat != null && courses != null)
-            {
-                if (mat.HasProperty("_BaseMap"))
-                    mat.SetTexture("_BaseMap", courses);
-                if (mat.HasProperty("_MainTex"))
-                    mat.SetTexture("_MainTex", courses);
-                mat.SetTextureScale("_BaseMap", new Vector2(1f, 10f));
-                mat.SetTextureScale("_MainTex", new Vector2(1f, 10f));
-            }
-            return mat;
+            return CachedLit(ref _tura, "RELab_TuraCasing", new Color(0.86f, 0.81f, 0.70f, 1f), 0.02f, 0.18f,
+                LabWorldMeshes.MakeTuraBlockTexture(), Vector2.one);
         }
 
         public static Material InteriorLime()
         {
-            return LabWorldMeshes.MakeLit("RELab_GizaCore", new Color(0.58f, 0.53f, 0.46f, 1f), 0.04f, 0.14f, false);
+            return CachedLit(ref _lime, "RELab_GizaCore", new Color(0.62f, 0.56f, 0.48f, 1f), 0.02f, 0.12f,
+                LabWorldMeshes.MakeLimestoneTexture(), Vector2.one);
         }
 
         public static Material Granite()
         {
-            return LabWorldMeshes.MakeLit("RELab_GizaGranite", new Color(0.30f, 0.22f, 0.22f, 1f), 0.22f, 0.32f, false);
+            return CachedLit(ref _gran, "RELab_GizaGranite", new Color(0.38f, 0.28f, 0.26f, 1f), 0.06f, 0.20f,
+                LabWorldMeshes.MakeGraniteTexture(), Vector2.one);
         }
 
         public static Material Aswan()
         {
-            return LabWorldMeshes.MakeLit("RELab_AswanGranite", new Color(0.46f, 0.24f, 0.20f, 1f), 0.28f, 0.38f, false);
+            return CachedLit(ref _aswan, "RELab_AswanGranite", new Color(0.50f, 0.28f, 0.24f, 1f), 0.08f, 0.22f,
+                LabWorldMeshes.MakeGraniteTexture(), Vector2.one);
         }
 
         public static Material Electrum()
         {
-            return LabWorldMeshes.MakeLit("RELab_Pyramidion", new Color(0.78f, 0.66f, 0.32f, 1f), 0.82f, 0.62f, false);
+            if (_electrum != null)
+                return _electrum;
+            _electrum = LabWorldMeshes.MakeLit("RELab_Pyramidion", new Color(0.78f, 0.66f, 0.32f, 1f), 0.82f, 0.62f, false);
+            return _electrum;
         }
 
         public static Material Pavement()
         {
-            return LabWorldMeshes.MakeLit("RELab_GizaPavement", new Color(0.72f, 0.68f, 0.58f, 1f), 0.06f, 0.22f, false);
+            return CachedLit(ref _pav, "RELab_GizaPavement", new Color(0.74f, 0.68f, 0.56f, 1f), 0.03f, 0.14f,
+                LabWorldMeshes.MakeLimestoneTexture(), Vector2.one);
         }
 
         public static Material Bedrock()
         {
-            return LabWorldMeshes.MakeLit("RELab_GizaBedrock", new Color(0.42f, 0.38f, 0.32f, 1f), 0.05f, 0.12f, false);
+            return CachedLit(ref _rock, "RELab_GizaBedrock", new Color(0.50f, 0.44f, 0.36f, 1f), 0.02f, 0.10f,
+                LabWorldMeshes.MakeLimestoneTexture(), Vector2.one);
+        }
+
+        public static Material DesertSand()
+        {
+            return CachedLit(ref _sand, "RELab_GizaSand", new Color(0.78f, 0.66f, 0.44f, 1f), 0.02f, 0.10f,
+                LabWorldMeshes.MakeDesertSandTexture(), Vector2.one);
+        }
+
+        public static Material CliffRock()
+        {
+            return CachedLit(ref _cliff, "RELab_HillRock", new Color(0.42f, 0.38f, 0.32f, 1f), 0.03f, 0.12f,
+                LabWorldMeshes.MakeCliffTexture(), Vector2.one);
+        }
+
+        public static Material SphinxLime()
+        {
+            return CachedLit(ref _sphinx, "RELab_SphinxLimestone", new Color(0.78f, 0.72f, 0.58f, 1f), 0.03f, 0.14f,
+                LabWorldMeshes.MakeLimestoneTexture(), Vector2.one);
         }
 
         public static Material Emit()
         {
-            Material emit = LabWorldMeshes.MakeLit("RELab_GizaEmit", new Color(0.22f, 0.20f, 0.16f, 1f), 0.0f, 0.08f, true);
-            if (emit != null && emit.HasProperty("_EmissionColor"))
-                emit.SetColor("_EmissionColor", new Color(0.16f, 0.14f, 0.10f, 1f));
-            return emit;
+            if (_emit != null)
+                return _emit;
+            _emit = LabWorldMeshes.MakeLit("RELab_GizaEmit", new Color(0.22f, 0.20f, 0.16f, 1f), 0.0f, 0.08f, true);
+            if (_emit != null && _emit.HasProperty("_EmissionColor"))
+                _emit.SetColor("_EmissionColor", new Color(0.16f, 0.14f, 0.10f, 1f));
+            return _emit;
         }
 
         public static Material Plate()
         {
-            return LabWorldMeshes.MakeLit("RELab_GizaPlate", new Color(0.10f, 0.11f, 0.12f, 1f), 0.2f, 0.18f, false);
+            if (_plate != null)
+                return _plate;
+            _plate = LabWorldMeshes.MakeLit("RELab_GizaPlate", new Color(0.10f, 0.11f, 0.12f, 1f), 0.2f, 0.18f, false);
+            return _plate;
         }
+
+
 
         public static void Casing(Transform parent, string name, float baseM, float heightM, Material mat,
             bool northDoor, float doorX, float doorY, float doorW, float doorH, float capH,
@@ -250,11 +326,18 @@ namespace RealityEngine.Visualization
             Vector3[] inn = Ring(inner, y1);
             Vector3[] outt = Ring(outer, y1);
             Vector3[] outB = Ring(outer, y0);
+            float tile = LabWorldMeshes.StoneTileM;
+            float uLen = (inner + outer) * 0.5f * 2f;
+            float vLen = widthM;
             for (int i = 0; i < 4; i++)
             {
                 int j = (i + 1) % 4;
-                b.AddQuad(inn[i], outt[i], outt[j], inn[j], Vector3.up, c);
-                b.AddQuad(outt[i], outB[i], outB[j], outt[j], (outt[i] + outt[j]).normalized, c);
+                Vector2 u00 = new Vector2(0f, 0f);
+                Vector2 u10 = new Vector2(vLen / tile, 0f);
+                Vector2 u11 = new Vector2(vLen / tile, uLen / tile);
+                Vector2 u01 = new Vector2(0f, uLen / tile);
+                b.AddQuad(inn[i], outt[i], outt[j], inn[j], Vector3.up, u00, u10, u11, u01, c);
+                b.AddQuad(outt[i], outB[i], outB[j], outt[j], (outt[i] + outt[j]).normalized, u00, u10, u11, u01, c);
             }
             SpawnMesh(parent, name, b.Build(name), mat, true);
         }
@@ -376,6 +459,100 @@ namespace RealityEngine.Visualization
             }
             return go;
         }
+
+        public static void ReapplyMaterials(Transform root)
+        {
+            if (root == null)
+                return;
+            Material tura = TuraCasing();
+            Material lime = InteriorLime();
+            Material gran = Granite();
+            Material aswan = Aswan();
+            Material pav = Pavement();
+            Material rock = Bedrock();
+            Material gold = Electrum();
+            Material sphinx = SphinxLime();
+            Material sand = DesertSand();
+            Material cliff = CliffRock();
+            MeshRenderer[] mrs = root.GetComponentsInChildren<MeshRenderer>(true);
+            for (int i = 0; i < mrs.Length; i++)
+            {
+                MeshRenderer mr = mrs[i];
+                if (mr == null)
+                    continue;
+                string obj = mr.gameObject.name;
+                string l = string.IsNullOrEmpty(obj) ? "" : obj.ToLowerInvariant();
+                string mn = mr.sharedMaterial != null ? mr.sharedMaterial.name : "";
+                if (l.Contains("labplaza") || l.Contains("honesty") || l.Contains("emit") || l.Contains("hull"))
+                    continue;
+                if (l.Contains("plate") && !l.Contains("plateau") && !l.Contains("gizaplateau"))
+                    continue;
+                if (l.Contains("pyramidion") || mn.Contains("Pyramidion"))
+                    mr.sharedMaterial = gold;
+                else if (l.Contains("gizadesert") || mn.Contains("GizaSand") || mn.Contains("DesertSand"))
+                    mr.sharedMaterial = sand;
+                else if (l.Contains("cliff") || mn.Contains("HillRock") || mn.Contains("Cliff"))
+                    mr.sharedMaterial = cliff;
+                else if (l == "gizaplateau" || l.Contains("gizaplateautop"))
+                    mr.sharedMaterial = sand;
+                else if (l.Contains("casinggranite") || l.Contains("aswan") || mn.Contains("Aswan"))
+                    mr.sharedMaterial = aswan;
+                else if (l.Contains("casing") || mn.Contains("TuraCasing"))
+                    mr.sharedMaterial = tura;
+                else if (l.Contains("sphinx") || mn.Contains("SphinxLimestone"))
+                    mr.sharedMaterial = sphinx;
+                else if (l.Contains("sarcophagus") || l.Contains("kingchamber") || l.Contains("pillar")
+                    || (l.Contains("antechamber") && l.Contains("khufu"))
+                    || mn.Contains("GizaGranite"))
+                    mr.sharedMaterial = gran;
+                else if (l.Contains("valley") && l.Contains("wall"))
+                    mr.sharedMaterial = gran;
+                else if (l.Contains("boat") && l.Contains("pavement"))
+                    mr.sharedMaterial = tura;
+                else if (l.Contains("_walls") || l.Contains("enclosure"))
+                    mr.sharedMaterial = tura;
+                else if (l.Contains("bedrock") || l.Contains("terrace") || mn.Contains("GizaBedrock"))
+                    mr.sharedMaterial = rock;
+                else if (l.Contains("pavement") || l.Contains("_floor") || l.Contains("_deck")
+                    || l.Contains("ledge") || l.Contains("terminal") || mn.Contains("GizaPavement"))
+                    mr.sharedMaterial = pav;
+                else if (mn.Contains("GizaCore") || l.Contains("passage") || l.Contains("chamber")
+                    || l.Contains("burial") || l.Contains("sanctum") || l.Contains("subterranean")
+                    || l.Contains("reliev") || l.Contains("airshaft") || l.Contains("hall"))
+                    mr.sharedMaterial = lime;
+            }
+        }
+
+        public static void SitExisting(GizaComplex.Pose pose)
+        {
+            float top = pose.surfaceY;
+            float court = GizaComplex.CourtY(pose);
+            float terrace = GizaComplex.TerraceY(pose);
+            SitFound(KhufuPyramid.RootName, top);
+            SitFound(KhafrePyramid.RootName, top);
+            SitFound(MenkaurePyramid.RootName, top);
+            SitFound(GizaSphinx.RootName, court);
+            SitFound("G1a", top);
+            SitFound("G1b", top);
+            SitFound("G1c", top);
+            SitFound("KhufuMortuary", top);
+            SitFound("KhufuBoatPits", top);
+            SitFound("KhufuEnclosure", top);
+            SitFound("KhafreMortuary", terrace);
+            SitFound("KhafreValleyTemple", court);
+            SitFound("KhafreEnclosure", terrace);
+            SitFound("SphinxTemple", court);
+            SitFound("MenkaureMortuary", top);
+            SitFound("MenkaureEnclosure", top);
+        }
+
+        static void SitFound(string name, float sitY)
+        {
+            GameObject go = GizaComplex.FindNamed(name);
+            if (go != null)
+                SitOn(go.transform, sitY);
+        }
+
 
         public static void SitOn(Transform t, float surfaceY)
         {

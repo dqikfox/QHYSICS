@@ -11,6 +11,9 @@ namespace RealityEngine.Visualization
     /// spawn a Giza sand/stone plateau, and place the undamaged 1:1 Giza complex
     /// (Khufu, queens G1a-c, temples, causeways, boat pits, Khafre, Menkaure, Sphinx) beyond the circuit table. Play auto-applies.
     /// Does not move XR Origin. Does not disable MountainScene.
+    /// Test: Ctrl+R, Play Faraday.unity. From the lab: Khufu north face in front,
+    /// limestone COURSES visible, plateau underfoot extending under all three pyramids,
+    /// cliff/desert visible looking east past the queens, not a black void, not magenta.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(40)]
@@ -119,20 +122,6 @@ namespace RealityEngine.Visualization
         {
             HideBrokenEnvironment();
             TintLightAndFog();
-            if (force)
-            {
-                Transform old = transform.Find(RootName);
-                if (old == null)
-                {
-                    GameObject named = GameObject.Find(RootName);
-                    if (named != null)
-                        old = named.transform;
-                }
-                if (old != null)
-                    SafeDestroy(old.gameObject);
-                _built = false;
-            }
-
             Transform rootXf = transform.Find(RootName);
             if (rootXf == null)
             {
@@ -140,11 +129,24 @@ namespace RealityEngine.Visualization
                 if (named != null)
                     rootXf = named.transform;
             }
+            if (!force && rootXf != null && rootXf.Find("GizaDesert") == null)
+                force = true;
+
+            if (force)
+            {
+                if (rootXf != null)
+                    SafeDestroy(rootXf.gameObject);
+                _built = false;
+                rootXf = null;
+            }
+
             if (rootXf != null)
             {
                 GizaComplex.Pose pose = ReadPose(rootXf);
                 GizaComplex.Ensure(pose, GizaComplex.Spawn.All);
                 FitPlateau(rootXf, pose);
+                GizaBuild.ReapplyMaterials(rootXf);
+                GizaBuild.SitExisting(pose);
                 AddTeleports(rootXf.gameObject);
                 _built = true;
                 return;
@@ -275,17 +277,17 @@ namespace RealityEngine.Visualization
                 string n = SafeLower(l.gameObject.name);
                 if (n.Contains("directional"))
                 {
-                    l.color = new Color(0.70f, 0.76f, 0.86f, 1f);
-                    if (l.intensity > 1.25f)
-                        l.intensity = 1.2f;
+                    l.color = new Color(1.00f, 0.91f, 0.72f, 1f);
+                    l.intensity = 1.15f;
                     break;
                 }
             }
 
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Exponential;
-            RenderSettings.fogColor = new Color(0.12f, 0.13f, 0.16f, 1f);
-            RenderSettings.fogDensity = 0.0024f;
+            RenderSettings.fogColor = new Color(0.78f, 0.72f, 0.58f, 1f);
+            RenderSettings.fogDensity = 0.00032f;
+            RenderSettings.ambientLight = new Color(0.62f, 0.56f, 0.44f, 1f);
         }
 
         public void PlaceMonuments(GizaComplex.Spawn which)
@@ -308,6 +310,8 @@ namespace RealityEngine.Visualization
             GizaComplex.Pose pose = ReadPose(root);
             GizaComplex.Ensure(pose, which);
             FitPlateau(root, pose);
+            GizaBuild.ReapplyMaterials(root);
+            GizaBuild.SitExisting(pose);
             AddTeleports(root.gameObject);
         }
 
@@ -320,6 +324,8 @@ namespace RealityEngine.Visualization
                 GizaComplex.Pose poseExisting = ReadPose(found.transform);
                 GizaComplex.Ensure(poseExisting, which);
                 FitPlateau(found.transform, poseExisting);
+                GizaBuild.ReapplyMaterials(found.transform);
+                GizaBuild.SitExisting(poseExisting);
                 AddTeleports(found);
                 return;
             }
@@ -368,34 +374,13 @@ namespace RealityEngine.Visualization
             root.transform.position = new Vector3(mid.x, surfaceY, mid.z);
             root.transform.rotation = Quaternion.identity;
 
-            Material sand = LabWorldMeshes.MakeLit("RELab_GizaSand", new Color(0.46f, 0.41f, 0.34f, 1f), 0.04f, 0.14f, false);
-            Texture2D sandTex = LabWorldMeshes.MakePlazaTexture();
-            if (sand != null && sandTex != null)
-            {
-                if (sand.HasProperty("_BaseMap"))
-                    sand.SetTexture("_BaseMap", sandTex);
-                if (sand.HasProperty("_MainTex"))
-                    sand.SetTexture("_MainTex", sandTex);
-            }
             Material graph = LabWorldMeshes.MakeLit("RELab_LabPlaza", new Color(0.16f, 0.165f, 0.17f, 1f), 0.62f, 0.30f, false);
             Texture2D gtex = LabWorldMeshes.MakeGraphiteTexture();
-            if (graph != null && gtex != null)
-            {
-                if (graph.HasProperty("_BaseMap"))
-                    graph.SetTexture("_BaseMap", gtex);
-                if (graph.HasProperty("_MainTex"))
-                    graph.SetTexture("_MainTex", gtex);
-                graph.SetTextureScale("_BaseMap", new Vector2(8f, 8f));
-                graph.SetTextureScale("_MainTex", new Vector2(8f, 8f));
-            }
-            Material hillMat = LabWorldMeshes.MakeLit("RELab_HillRock", new Color(0.22f, 0.21f, 0.20f, 1f), 0.12f, 0.16f, false);
-
-            Mesh plateauMesh = LabWorldMeshes.BuildPlateau(plateauX, plateauZ, 40, 4.5f);
-            GameObject plateau = SpawnLocal(root.transform, "GizaPlateau", plateauMesh, sand, Vector3.zero, true);
+            LabWorldMeshes.ApplyAlbedo(graph, gtex, new Vector2(8f, 8f));
 
             Mesh plazaMesh = LabWorldMeshes.BuildFlatPad(LabPlazaSize, LabPlazaSize, 8f);
             Vector3 plazaLocal = root.transform.InverseTransformPoint(plazaPos + Vector3.up * 0.03f);
-            GameObject plaza = SpawnLocal(root.transform, "LabPlaza", plazaMesh, graph, plazaLocal, true);
+            SpawnLocal(root.transform, "LabPlaza", plazaMesh, graph, plazaLocal, true);
 
             var pose = new GizaComplex.Pose
             {
@@ -406,64 +391,181 @@ namespace RealityEngine.Visualization
                 comfortScale = comfortScale
             };
             StorePose(root.transform, pose);
+            FitPlateau(root.transform, pose);
             GizaComplex.Ensure(pose, which);
-
-            PlaceHills(root.transform, pose, plateauX, plateauZ, hillMat);
+            GizaBuild.ReapplyMaterials(root.transform);
+            GizaBuild.SitExisting(pose);
             AddTeleports(root);
 
             Debug.Log(
-                "LabLandscapeApplier: Giza plateau " + plateauX.ToString("0") + "x" + plateauZ.ToString("0") +
-                " m. Khufu 230.38x146.61 m. Queens G1a-c east (~49.5/49/46.2 x ~30 m). Mortuary 52x40 m east of Khufu, causeway 500x10 m further east (not through the lab). " +
-                "Five boat pits ~50x7 m on Khufu south. Khafre mortuary east + causeway down to valley temple beside Sphinx; Sphinx temple east of the face. Menkaure mortuary east, short causeway. G3a-c kept. " +
-                "From the lab: Khufu north face is in front. East is to your left (look past the NE corner / teleport east). Ctrl+R then Play, or Reality Engine / Place Giza Complex.");
+                "LabLandscapeApplier: Giza limestone plateau ~" + plateauX.ToString("0") + "x" + plateauZ.ToString("0") +
+                " m, cliff " + GizaComplex.CliffHeightM.ToString("0") + " m, desert " + GizaComplex.DesertSizeM.ToString("0") +
+                " m. Khufu 230.38x146.61 m Tura courses. Khafre on +10 m terrace. Sphinx court " +
+                GizaComplex.SphinxCourtDropM.ToString("0") + " m below the table. " +
+                "From the lab: Khufu north face in front, plateau underfoot, cliff/desert east past the queens. Ctrl+R then Play, or Reality Engine / Place Giza Complex.");
         }
+
+        const int PlateauDiv = 80;
+        const float TopNoiseM = 1.2f;
+        const float EastSouthBevelM = 8f;
+        const float WestNorthBevelM = 52f;
 
         void FitPlateau(Transform root, GizaComplex.Pose pose)
         {
             if (root == null)
                 return;
-            Transform plateau = root.Find("GizaPlateau");
-            if (plateau == null)
-                return;
             Transform plaza = root.Find("LabPlaza");
             Vector3 plazaPos = plaza != null ? plaza.position : pose.khufuCenter;
-            GizaComplex.LocalExtents(out float xMin, out float xMax, out float zMin, out float zMax);
-            Vector3[] localCorners =
+            ComputeOrientedBounds(pose, plazaPos, out float xMin, out float xMax, out float zMin, out float zMax);
+            float cx = (xMin + xMax) * 0.5f;
+            float cz = (zMin + zMax) * 0.5f;
+            float plateauX = Mathf.Max(40f, xMax - xMin);
+            float plateauZ = Mathf.Max(40f, zMax - zMin);
+            float hx = plateauX * 0.5f;
+            float hz = plateauZ * 0.5f;
+
+            GizaPrecinct.Layout L = GizaPrecinct.Compute();
+            var court = new LabWorldMeshes.PlateauCut();
+            court.xMin = (GizaComplex.SphinxEastM - GizaSphinx.LengthM * 0.5f - 24f) - cx;
+            court.xMax = hx;
+            court.zMin = (Mathf.Min(-GizaComplex.SphinxSouthM - 20f, L.valleyNorth - L.valleyNS * 0.5f - 20f)) - cz;
+            court.zMax = (Mathf.Max(-GizaComplex.SphinxSouthM + 20f, L.sphinxTempleNorth + L.sphinxTempleNS * 0.5f + 16f)) - cz;
+            court.dropM = GizaComplex.SphinxCourtDropM;
+            court.xMin = Mathf.Clamp(court.xMin, -hx + 12f, hx - 40f);
+            court.zMin = Mathf.Clamp(court.zMin, -hz + 12f, hz - 12f);
+            court.zMax = Mathf.Clamp(court.zMax, court.zMin + 20f, hz - 12f);
+
+            Vector3 plateauPos = pose.khufuCenter + pose.rot * new Vector3(cx, 0f, cz);
+            plateauPos.y = pose.surfaceY;
+
+            Material sand = GizaBuild.DesertSand();
+            Material cliff = GizaBuild.CliffRock();
+            Material rock = GizaBuild.Bedrock();
+
+            Mesh topMesh = LabWorldMeshes.BuildPlateauTop(plateauX, plateauZ, PlateauDiv, court, TopNoiseM);
+            ApplyLandMesh(root, "GizaPlateau", topMesh, sand, plateauPos, pose.rot, true, false, true);
+
+            Mesh cliffMesh = LabWorldMeshes.BuildPlateauCliffs(
+                plateauX, plateauZ, PlateauDiv, court, GizaComplex.CliffHeightM,
+                EastSouthBevelM, EastSouthBevelM, WestNorthBevelM, WestNorthBevelM, TopNoiseM);
+            ApplyLandMesh(root, "GizaPlateauCliffs", cliffMesh, cliff, plateauPos, pose.rot, true, false, false);
+
+            Mesh desertMesh = LabWorldMeshes.BuildDesertFloor(GizaComplex.DesertSizeM, 16, 1.2f);
+            Vector3 desertPos = new Vector3(plateauPos.x, pose.surfaceY - GizaComplex.CliffHeightM - 0.12f, plateauPos.z);
+            ApplyLandMesh(root, "GizaDesert", desertMesh, sand, desertPos, Quaternion.identity, true, true, true);
+
+            float terrX = -GizaComplex.KhafreWestM - cx;
+            float terrZ = -GizaComplex.KhafreSouthM - cz;
+            float terrSize = KhafrePyramid.BaseMeters + 28f;
+            Mesh terrMesh = LabWorldMeshes.BuildRaisedPad(terrSize, terrSize, GizaComplex.KhafreBedrockM * 0.99f);
+            Vector3 terrPos = plateauPos + pose.rot * new Vector3(terrX, 0f, terrZ);
+            terrPos.y = pose.surfaceY;
+            ApplyLandMesh(root, "GizaKhafreTerrace", terrMesh, rock, terrPos, pose.rot, true, false, true);
+
+            if (plaza != null)
             {
-                new Vector3(xMin, 0f, zMin),
-                new Vector3(xMin, 0f, zMax),
-                new Vector3(xMax, 0f, zMin),
-                new Vector3(xMax, 0f, zMax)
-            };
-            Vector3 wmin = plazaPos;
-            Vector3 wmax = plazaPos;
-            Encapsulate(ref wmin, ref wmax, plazaPos + new Vector3(LabPlazaSize, 0f, LabPlazaSize) * 0.5f);
-            Encapsulate(ref wmin, ref wmax, plazaPos - new Vector3(LabPlazaSize, 0f, LabPlazaSize) * 0.5f);
-            Encapsulate(ref wmin, ref wmax, pose.khufuCenter);
-            for (int i = 0; i < localCorners.Length; i++)
-                Encapsulate(ref wmin, ref wmax, pose.khufuCenter + pose.rot * localCorners[i]);
-            wmin.x -= PlateauPadM;
-            wmin.z -= PlateauPadM;
-            wmax.x += PlateauPadM;
-            wmax.z += PlateauPadM;
-            Vector3 mid = (wmin + wmax) * 0.5f;
-            float plateauX = Mathf.Max(40f, wmax.x - wmin.x);
-            float plateauZ = Mathf.Max(40f, wmax.z - wmin.z);
-            Mesh mesh = LabWorldMeshes.BuildPlateau(plateauX, plateauZ, 40, 4.5f);
-            MeshFilter mf = plateau.GetComponent<MeshFilter>();
-            if (mf != null)
-                mf.sharedMesh = mesh;
-            BoxCollider box = plateau.GetComponent<BoxCollider>();
-            if (box != null && mesh != null)
-            {
-                box.center = mesh.bounds.center;
-                box.size = mesh.bounds.size;
+                Vector3 p = plaza.position;
+                p.y = pose.surfaceY + 0.03f;
+                plaza.position = p;
             }
-            MeshCollider mc = plateau.GetComponent<MeshCollider>();
-            if (mc != null)
-                mc.sharedMesh = mesh;
-            plateau.position = new Vector3(mid.x, root.position.y, mid.z);
         }
+
+        static void ComputeOrientedBounds(GizaComplex.Pose pose, Vector3 plazaWorld,
+            out float xMin, out float xMax, out float zMin, out float zMax)
+        {
+            GizaComplex.LocalExtents(out xMin, out xMax, out zMin, out zMax);
+            float hs = LabPlazaSize * 0.5f;
+            EncLocal(pose, plazaWorld + new Vector3(hs, 0f, hs), ref xMin, ref xMax, ref zMin, ref zMax);
+            EncLocal(pose, plazaWorld + new Vector3(-hs, 0f, hs), ref xMin, ref xMax, ref zMin, ref zMax);
+            EncLocal(pose, plazaWorld + new Vector3(hs, 0f, -hs), ref xMin, ref xMax, ref zMin, ref zMax);
+            EncLocal(pose, plazaWorld + new Vector3(-hs, 0f, -hs), ref xMin, ref xMax, ref zMin, ref zMax);
+            xMin -= PlateauPadM;
+            xMax += PlateauPadM;
+            zMin -= PlateauPadM;
+            zMax += PlateauPadM;
+        }
+
+        static void EncLocal(GizaComplex.Pose pose, Vector3 world, ref float xMin, ref float xMax, ref float zMin, ref float zMax)
+        {
+            Vector3 local = Quaternion.Inverse(pose.rot) * (world - pose.khufuCenter);
+            xMin = Mathf.Min(xMin, local.x);
+            xMax = Mathf.Max(xMax, local.x);
+            zMin = Mathf.Min(zMin, local.z);
+            zMax = Mathf.Max(zMax, local.z);
+        }
+
+        static Transform ApplyLandMesh(Transform parent, string name, Mesh mesh, Material mat,
+            Vector3 worldPos, Quaternion worldRot, bool meshCol, bool boxCol, bool teleport)
+        {
+            Transform t = parent.Find(name);
+            GameObject go;
+            if (t == null)
+            {
+                go = new GameObject(name);
+                go.transform.SetParent(parent, true);
+                t = go.transform;
+            }
+            else
+                go = t.gameObject;
+            t.SetPositionAndRotation(worldPos, worldRot);
+
+            MeshFilter mf = go.GetComponent<MeshFilter>();
+            if (mf == null)
+                mf = go.AddComponent<MeshFilter>();
+            mf.sharedMesh = mesh;
+
+            if (mat != null)
+            {
+                MeshRenderer mr = go.GetComponent<MeshRenderer>();
+                if (mr == null)
+                    mr = go.AddComponent<MeshRenderer>();
+                mr.sharedMaterial = mat;
+                mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+                mr.receiveShadows = true;
+            }
+            else
+                Debug.LogError("LabLandscapeApplier: skipped renderer on '" + name + "' (no URP Lit from RELab_Graphite).");
+
+            BoxCollider box = go.GetComponent<BoxCollider>();
+            if (boxCol)
+            {
+                if (box == null)
+                    box = go.AddComponent<BoxCollider>();
+                if (mesh != null)
+                {
+                    box.center = mesh.bounds.center;
+                    box.size = mesh.bounds.size;
+                }
+            }
+            else if (box != null)
+            {
+                if (Application.isPlaying)
+                    Object.Destroy(box);
+                else
+                    Object.DestroyImmediate(box);
+            }
+
+            MeshCollider mc = go.GetComponent<MeshCollider>();
+            if (meshCol)
+            {
+                if (mc == null)
+                    mc = go.AddComponent<MeshCollider>();
+                mc.sharedMesh = mesh;
+                mc.convex = false;
+            }
+            else if (mc != null)
+            {
+                if (Application.isPlaying)
+                    Object.Destroy(mc);
+                else
+                    Object.DestroyImmediate(mc);
+            }
+
+            if (teleport)
+                AddTeleport(go);
+            return t;
+        }
+
 
         static void Encapsulate(ref Vector3 min, ref Vector3 max, Vector3 p)
         {
@@ -529,7 +631,7 @@ namespace RealityEngine.Visualization
                 if (cols[i] == null)
                     continue;
                 string n = cols[i].gameObject.name.ToLowerInvariant();
-                if (n.Contains("honesty") || n.Contains("plate") || n.Contains("airshaft") || n.Contains("emit") || n.Contains("sarcophagus") || n.Contains("hull"))
+                if (n.Contains("honesty") || n.Contains("plate") || n.Contains("airshaft") || n.Contains("emit") || n.Contains("sarcophagus") || n.Contains("hull") || n.Contains("cliff"))
                     continue;
                 AddTeleport(cols[i].gameObject);
             }
@@ -539,6 +641,12 @@ namespace RealityEngine.Visualization
             Transform plateau = root.transform.Find("GizaPlateau");
             if (plateau != null)
                 AddTeleport(plateau.gameObject);
+            Transform desert = root.transform.Find("GizaDesert");
+            if (desert != null)
+                AddTeleport(desert.gameObject);
+            Transform terrace = root.transform.Find("GizaKhafreTerrace");
+            if (terrace != null)
+                AddTeleport(terrace.gameObject);
         }
 
         static void PlaceHills(Transform parent, GizaComplex.Pose pose, float plateauX, float plateauZ, Material mat)

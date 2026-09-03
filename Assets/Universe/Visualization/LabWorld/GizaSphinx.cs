@@ -23,7 +23,7 @@ namespace RealityEngine.Visualization
         public static GameObject Build(Transform parent, Vector3 worldBaseCenter, Quaternion worldRot)
         {
             GameObject root = GizaBuild.Root(RootName, parent, worldBaseCenter, worldRot);
-            Material lime = LabWorldMeshes.MakeLit("RELab_SphinxLimestone", new Color(0.78f, 0.72f, 0.58f, 1f), 0.04f, 0.28f, false);
+            Material lime = GizaBuild.SphinxLime();
             var b = new LabMeshBuilder(96, 160);
             Color c = Color.white;
             float hx = LengthM * 0.5f;
