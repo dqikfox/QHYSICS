@@ -727,6 +727,22 @@ namespace RealityEngine.Visualization
             SpawnQueenDune(root, pose, sand, plazaPos, "GizaDune_G1a", L.g1aEast, L.g1aNorth, L.g1aBase);
             SpawnQueenDune(root, pose, sand, plazaPos, "GizaDune_G1b", L.g1bEast, L.g1bNorth, L.g1bBase);
             SpawnQueenDune(root, pose, sand, plazaPos, "GizaDune_G1c", L.g1cEast, L.g1cNorth, L.g1cBase);
+            // Menkaure queens G3a-c (south of Menkaure; same local layout as MenkaurePyramid.BuildQueens).
+            float g3South = -MenkaurePyramid.BaseMeters * 0.5f - 8f - MenkaurePyramid.QueenBaseM * 0.5f;
+            float[] g3Xs = { 32f, 0f, -32f };
+            string[] g3Dunes = { "GizaDune_G3a", "GizaDune_G3b", "GizaDune_G3c" };
+            for (int i = 0; i < 3; i++)
+            {
+                float east = -GizaComplex.MenkaureWestM + g3Xs[i];
+                float north = -GizaComplex.MenkaureSouthM + g3South;
+                SpawnQueenDune(root, pose, sand, plazaPos, g3Dunes[i], east, north, MenkaurePyramid.QueenBaseM);
+            }
+
+            // Thin Oasis skirt around the Sphinx court / enclosure approach.
+            Vector3 sphinx = GizaComplex.WorldFromKhufu(pose, GizaComplex.SphinxEastM, -GizaComplex.SphinxSouthM, 0f);
+            SpawnDune(root, "GizaDune_Sphinx", sphinx, pose.rot, GizaComplex.CourtY(pose), sand,
+                GizaSphinx.LengthM * 0.32f, 16f, 1.6f, 24,
+                GizaSphinx.LengthM * 0.42f, 12f, 0.55f, plazaPos);
         }
 
         void SpawnQueenDune(Transform root, GizaComplex.Pose pose, Material sand, Vector3 plazaPos,
@@ -759,6 +775,12 @@ namespace RealityEngine.Visualization
             PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_KhafreSouth", -GizaComplex.KhafreWestM, -GizaComplex.KhafreSouthM - hf - 14f, 30f, 22f);
             PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_MenkaureWest", -GizaComplex.MenkaureWestM - mn - 12f, -GizaComplex.MenkaureSouthM, 24f, 20f);
             PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_MenkaureSouth", -GizaComplex.MenkaureWestM, -GizaComplex.MenkaureSouthM - mn - 12f, 22f, 18f);
+            PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_SphinxEast",
+                GizaComplex.SphinxEastM + GizaSphinx.LengthM * 0.5f + 10f, -GizaComplex.SphinxSouthM, 28f, 20f);
+            PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_SphinxSouth",
+                GizaComplex.SphinxEastM, -GizaComplex.SphinxSouthM - GizaSphinx.WidthM * 0.5f - 12f, 26f, 18f);
+            PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_G3South",
+                -GizaComplex.MenkaureWestM, -GizaComplex.MenkaureSouthM - mn - 8f - MenkaurePyramid.QueenBaseM - 10f, 48f, 20f);
         }
 
         void PlaceWash(Transform root, GizaComplex.Pose pose, Material sand, Vector3 plazaPos,
