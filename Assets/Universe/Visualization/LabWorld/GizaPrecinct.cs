@@ -4,7 +4,7 @@ namespace RealityEngine.Visualization
 {
     /// <summary>
     /// Rest of the undamaged Giza necropolis: Khufu queens G1a-c, mortuary temples,
-    /// causeways, boat pits, Khufu/Khafre/Menkaure valley temples, Sphinx temple, temenos walls.
+    /// causeways, boat pits, Khufu/Khafre/Menkaure valley temples, Sphinx temple, Sphinx-Khafre link court, temenos walls.
     /// Reconstructed original massing from published plans (Lehner/Petrie). Not photogrammetry.
     /// Architectural local space: +X east, +Z north, 1 unit = 1 m.
     /// </summary>
@@ -24,6 +24,7 @@ namespace RealityEngine.Visualization
         public const string KhafreEnclosureName = "KhafreEnclosure";
         public const string SphinxTempleName = "SphinxTemple";
         public const string SphinxEnclosureName = "SphinxEnclosure";
+        public const string SphinxValleyLinkName = "SphinxValleyLink";
         public const string MenkaureMortuaryName = "MenkaureMortuary";
         public const string MenkaureCausewayName = "MenkaureCauseway";
         public const string MenkaureValleyName = "MenkaureValleyTemple";
@@ -206,11 +207,12 @@ namespace RealityEngine.Visualization
             const string valleyHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Khafre valley temple. Granite and limestone, T-shaped pillared halls (walkable block rooms). Dual north/south east entrances (vestibule portals) — Lehner / well-preserved Khafre valley temple.\n" +
-                "Not photogrammetry. Causeway descends from the Khafre mortuary temple.";
+                "North door opens onto the Sphinx-Khafre link court. Not photogrammetry. Causeway descends from the Khafre mortuary temple.";
 
             // Force rebuild when dual-portal marker or causeway Terminal is missing.
             GameObject oldValley = GizaComplex.FindNamed(KhafreValleyName);
-            if (oldValley != null && oldValley.transform.Find(KhafreValleyName + "_Portals") == null)
+            if (oldValley != null && (oldValley.transform.Find(KhafreValleyName + "_Portals") == null
+                || oldValley.transform.Find(KhafreValleyName + "_LinkDoor") == null))
                 DestroyNamed(oldValley);
             GameObject oldCause = GizaComplex.FindNamed(KhafreCausewayName);
             if (oldCause != null && oldCause.transform.Find(KhafreCausewayName + "_Terminal") == null)
@@ -228,13 +230,20 @@ namespace RealityEngine.Visualization
             Layout L = Compute();
             const string honesty =
                 GizaComplex.HonestyPrefix + "\n" +
-                "Sphinx temple. Immediately east of the Sphinx face. Twin of Khafre valley temple: dual N/S east portals, west door toward the Sphinx enclosure.\n" +
+                "Sphinx temple. Immediately east of the Sphinx face. Twin of Khafre valley temple: dual N/S east portals, west door toward the Sphinx enclosure, south door into the Sphinx-Khafre link court.\n" +
                 "Open central court, granite colonnade, ten colossal niches (5 N / 5 S), west sanctuaries. Lehner / ARCE plan massing (walkable). Not photogrammetry.";
             GameObject oldTemple = GizaComplex.FindNamed(SphinxTempleName);
             if (oldTemple != null && (oldTemple.transform.Find(SphinxTempleName + "_Niches") == null
-                || oldTemple.transform.Find(SphinxTempleName + "_Portals") == null))
+                || oldTemple.transform.Find(SphinxTempleName + "_Portals") == null
+                || oldTemple.transform.Find(SphinxTempleName + "_LinkDoor") == null))
                 DestroyNamed(oldTemple);
             Ensure(SphinxTempleName, pose, p => BuildSphinxTemple(p, L, honesty), GizaComplex.CourtY(pose), true);
+
+            const string linkHonesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Sphinx-Khafre valley link court. Walkable paved terrace in the ~8 m gap between the Sphinx temple south wall and the Khafre valley temple north wall.\n" +
+                "Lehner twin-temple terrace (schematic). Facing doors connect the courts. Not photogrammetry.";
+            Ensure(SphinxValleyLinkName, pose, p => BuildSphinxValleyLink(p, L, linkHonesty), GizaComplex.CourtY(pose), true);
 
             // Rock-cut Sphinx enclosure (quarry ditch). Force rebuild when marker missing.
             GameObject oldEnc = GizaComplex.FindNamed(SphinxEnclosureName);
@@ -430,7 +439,8 @@ namespace RealityEngine.Visualization
             const float portalDoorW = 3.5f;
             const float portalZ = 10.5f;
             var walls = new LabMeshBuilder(80, 120);
-            walls.AddBox(new Vector3(0f, y, hz - wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
+            // North wall door toward Sphinx temple / link court.
+            WallDoorZ(walls, hz - wallT * 0.5f, ew, wallH, wallT, 4.8f);
             walls.AddBox(new Vector3(0f, y, -hz + wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
             walls.AddBox(new Vector3(-hx + wallT * 0.5f, y, 0f), new Vector3(wallT, wallH, ns), Color.white);
             float wallX = hx - wallT * 0.5f;
@@ -492,6 +502,11 @@ namespace RealityEngine.Visualization
             portals.AddRoom(new Vector3(anteX, anteHy, -portalZ), new Vector3(anteDepth, anteH, anteW), Color.white, false, false, true, true);
             GizaBuild.SpawnMesh(root.transform, KhafreValleyName + "_Portals", portals.Build(KhafreValleyName + "_Portals"), gran, true);
 
+            // Marker: north link door toward Sphinx temple (Ensure rebuilds when missing).
+            var linkMark = new LabMeshBuilder(8, 12);
+            linkMark.AddBox(new Vector3(0f, 0.15f, hz - wallT), new Vector3(0.4f, 0.3f, 0.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhafreValleyName + "_LinkDoor", linkMark.Build(KhafreValleyName + "_LinkDoor"), gran, false);
+
             GizaBuild.HonestyPlate(root.transform, KhafreValleyName + "_Honesty", honesty, ns);
             Transform plate = root.transform.Find(KhafreValleyName + "_Honesty");
             if (plate != null)
@@ -529,7 +544,8 @@ namespace RealityEngine.Visualization
             const float portalZ = 7.0f;
             var walls = new LabMeshBuilder(96, 144);
             walls.AddBox(new Vector3(0f, y, hz - wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
-            walls.AddBox(new Vector3(0f, y, -hz + wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
+            // South wall door toward Khafre valley / link court.
+            WallDoorZ(walls, -hz + wallT * 0.5f, ew, wallH, wallT, 4.5f);
             // West wall with center door toward Sphinx enclosure / forepaws.
             WallDoorX(walls, -hx + wallT * 0.5f, ns, wallH, wallT, 5.5f);
             // Dual east facade doors (N/S of centerline).
@@ -612,6 +628,11 @@ namespace RealityEngine.Visualization
             portals.AddRoom(new Vector3(anteX, anteHy, portalZ), new Vector3(anteDepth, anteH, anteW), Color.white, false, false, true, true);
             portals.AddRoom(new Vector3(anteX, anteHy, -portalZ), new Vector3(anteDepth, anteH, anteW), Color.white, false, false, true, true);
             GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_Portals", portals.Build(SphinxTempleName + "_Portals"), gran, true);
+
+            // Marker: south link door toward Khafre valley (Ensure rebuilds when missing).
+            var linkMark = new LabMeshBuilder(8, 12);
+            linkMark.AddBox(new Vector3(0f, 0.15f, -hz + wallT), new Vector3(0.4f, 0.3f, 0.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SphinxTempleName + "_LinkDoor", linkMark.Build(SphinxTempleName + "_LinkDoor"), gran, false);
 
             GizaBuild.HonestyPlate(root.transform, SphinxTempleName + "_Honesty", honesty, ns);
             Transform plate = root.transform.Find(SphinxTempleName + "_Honesty");
@@ -876,6 +897,61 @@ namespace RealityEngine.Visualization
             {
                 plate.localPosition = new Vector3(lx, 1.55f, L.boatNorth - L.boatWid * 0.5f - 6f);
                 plate.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+            return root;
+        }
+
+
+        /// <summary>
+        /// Walkable paved terrace in the gap between Sphinx temple (south) and Khafre valley temple (north).
+        /// Facing doors on both temples open onto this court. Schematic Lehner twin-temple terrace.
+        /// </summary>
+        static GameObject BuildSphinxValleyLink(GizaComplex.Pose pose, Layout L, string honesty)
+        {
+            float southFace = L.sphinxTempleNorth - L.sphinxTempleNS * 0.5f;
+            float northFace = L.valleyNorth + L.valleyNS * 0.5f;
+            float gap = southFace - northFace;
+            float midNorth = (southFace + northFace) * 0.5f;
+            float ew = Mathf.Min(L.sphinxTempleEW, L.valleyEW) - 2f;
+            Vector3 c = GizaComplex.WorldFromKhufu(pose, L.sphinxTempleEast, midNorth, 0f);
+            GameObject root = GizaBuild.Root(SphinxValleyLinkName, pose.parent, c, pose.rot);
+            Material pav = GizaBuild.Pavement();
+            Material lime = GizaBuild.InteriorLime();
+            Material gran = GizaBuild.Granite();
+
+            const float floorT = 0.32f;
+            float deckNS = Mathf.Max(6.5f, gap - 0.4f);
+            float deckEW = Mathf.Max(18f, ew);
+
+            var floor = new LabMeshBuilder(8, 12);
+            floor.AddBox(new Vector3(0f, floorT * 0.5f, 0f), new Vector3(deckEW, floorT, deckNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SphinxValleyLinkName + "_Floor", floor.Build(SphinxValleyLinkName + "_Floor"), pav, true);
+
+            // Low side walls (east open toward harbor / dual portals, west toward Sphinx enclosure approach).
+            const float wallH = 2.4f;
+            const float wallT = 0.85f;
+            float hx = deckEW * 0.5f;
+            float hz = deckNS * 0.5f;
+            float y = wallH * 0.5f;
+            var walls = new LabMeshBuilder(32, 48);
+            walls.AddBox(new Vector3(-hx + wallT * 0.5f, y, 0f), new Vector3(wallT, wallH, deckNS), Color.white);
+            // East stubs only — leave center open toward the twin east portal courts.
+            walls.AddBox(new Vector3(hx - wallT * 0.5f, y, hz * 0.55f), new Vector3(wallT, wallH, deckNS * 0.35f), Color.white);
+            walls.AddBox(new Vector3(hx - wallT * 0.5f, y, -hz * 0.55f), new Vector3(wallT, wallH, deckNS * 0.35f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SphinxValleyLinkName + "_Walls", walls.Build(SphinxValleyLinkName + "_Walls"), lime, true);
+
+            // Granite threshold pads at the facing doors.
+            var pads = new LabMeshBuilder(16, 24);
+            pads.AddBox(new Vector3(0f, floorT + 0.08f, hz - 0.35f), new Vector3(5.2f, 0.16f, 0.7f), Color.white);
+            pads.AddBox(new Vector3(0f, floorT + 0.08f, -hz + 0.35f), new Vector3(5.2f, 0.16f, 0.7f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SphinxValleyLinkName + "_Thresholds", pads.Build(SphinxValleyLinkName + "_Thresholds"), gran, true);
+
+            GizaBuild.HonestyPlate(root.transform, SphinxValleyLinkName + "_Honesty", honesty, deckNS);
+            Transform plate = root.transform.Find(SphinxValleyLinkName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(hx + 3.5f, 1.55f, 0f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
             }
             return root;
         }
