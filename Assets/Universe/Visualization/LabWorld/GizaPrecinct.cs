@@ -22,6 +22,7 @@ namespace RealityEngine.Visualization
         public const string KhafreValleyName = "KhafreValleyTemple";
         public const string KhafreEnclosureName = "KhafreEnclosure";
         public const string SphinxTempleName = "SphinxTemple";
+        public const string SphinxEnclosureName = "SphinxEnclosure";
         public const string MenkaureMortuaryName = "MenkaureMortuary";
         public const string MenkaureCausewayName = "MenkaureCauseway";
         public const string MenkaureEnclosureName = "MenkaureEnclosure";
@@ -197,6 +198,12 @@ namespace RealityEngine.Visualization
             if (oldTemple != null && oldTemple.transform.Find(SphinxTempleName + "_Niches") == null)
                 DestroyNamed(oldTemple);
             Ensure(SphinxTempleName, pose, p => BuildSphinxTemple(p, L, honesty), GizaComplex.CourtY(pose), true);
+
+            // Rock-cut Sphinx enclosure (quarry ditch). Force rebuild when marker missing.
+            GameObject oldEnc = GizaComplex.FindNamed(SphinxEnclosureName);
+            if (oldEnc != null && oldEnc.transform.Find(SphinxEnclosureName + "_Ditch") == null)
+                DestroyNamed(oldEnc);
+            Ensure(SphinxEnclosureName, pose, p => BuildSphinxEnclosure(p), GizaComplex.CourtY(pose), true);
         }
 
         public static void EnsureMenkaure(GizaComplex.Pose pose)
@@ -589,6 +596,82 @@ namespace RealityEngine.Visualization
             {
                 plate.localPosition = new Vector3(lx, 1.55f, L.boatNorth - L.boatWid * 0.5f - 6f);
                 plate.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+            return root;
+        }
+
+        /// <summary>
+        /// Limestone quarry enclosure around the Sphinx court. Walls rise from court floor
+        /// toward the plateau lip (~SphinxCourtDropM). East open toward the Sphinx temple.
+        /// Schematic Lehner ditch — not a scan.
+        /// </summary>
+        static GameObject BuildSphinxEnclosure(GizaComplex.Pose pose)
+        {
+            Vector3 c = GizaComplex.WorldFromKhufu(pose, GizaComplex.SphinxEastM, -GizaComplex.SphinxSouthM, 0f);
+            GameObject root = GizaBuild.Root(SphinxEnclosureName, pose.parent, c, pose.rot);
+            Material rock = GizaBuild.Bedrock();
+            Material lime = GizaBuild.SphinxLime();
+            Material pav = GizaBuild.Pavement();
+
+            // Inner clear around Sphinx body; outer face meets the plateau cut.
+            float halfE = GizaSphinx.LengthM * 0.5f + 14f; // ~50.75 m east/west from centre
+            float halfN = GizaSphinx.WidthM * 0.5f + 18f;  // ~27.65 m north/south
+            float wallH = GizaComplex.SphinxCourtDropM - 0.35f; // meet plateau lip
+            float wallT = 2.6f;
+            float ledgeH = 0.55f;
+            float y = wallH * 0.5f;
+            float hx = halfE;
+            float hz = halfN;
+
+            // Walkable court pavement strip inside the ditch (outside the Sphinx plinth).
+            var floor = new LabMeshBuilder(16, 24);
+            float floorT = 0.28f;
+            float rimIn = 4.5f;
+            floor.AddBox(new Vector3(0f, floorT * 0.5f, hz - rimIn * 0.5f), new Vector3(halfE * 2f - 2f, floorT, rimIn), Color.white);
+            floor.AddBox(new Vector3(0f, floorT * 0.5f, -(hz - rimIn * 0.5f)), new Vector3(halfE * 2f - 2f, floorT, rimIn), Color.white);
+            floor.AddBox(new Vector3(-(hx - rimIn * 0.5f), floorT * 0.5f, 0f), new Vector3(rimIn, floorT, halfN * 2f - rimIn * 2f), Color.white);
+            floor.AddBox(new Vector3(hx - rimIn * 0.5f - 1.5f, floorT * 0.5f, 0f), new Vector3(rimIn - 1f, floorT, halfN * 2f - rimIn * 2f - 8f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SphinxEnclosureName + "_Floor", floor.Build(SphinxEnclosureName + "_Floor"), pav, true);
+
+            // Quarry walls: N, S, W solid; east open toward Sphinx temple with door gap.
+            var ditch = new LabMeshBuilder(96, 144);
+            Color stone = Color.white;
+            ditch.AddBox(new Vector3(0f, y, hz + wallT * 0.5f), new Vector3(halfE * 2f + wallT * 2f, wallH, wallT), stone);
+            ditch.AddBox(new Vector3(0f, y, -(hz + wallT * 0.5f)), new Vector3(halfE * 2f + wallT * 2f, wallH, wallT), stone);
+            ditch.AddBox(new Vector3(-(hx + wallT * 0.5f), y, 0f), new Vector3(wallT, wallH, halfN * 2f + wallT * 2f), stone);
+            WallDoorX(ditch, hx + wallT * 0.5f, halfN * 2f + wallT * 2f, wallH, wallT, 18f);
+            // Inner ledge / working berm at mid-height (schematic quarry shelf).
+            float shelfY = 3.2f;
+            ditch.AddBox(new Vector3(0f, shelfY, hz - 0.9f), new Vector3(halfE * 2f - 2f, ledgeH, 1.6f), stone);
+            ditch.AddBox(new Vector3(0f, shelfY, -(hz - 0.9f)), new Vector3(halfE * 2f - 2f, ledgeH, 1.6f), stone);
+            ditch.AddBox(new Vector3(-(hx - 0.9f), shelfY, 0f), new Vector3(1.6f, ledgeH, halfN * 2f - 4f), stone);
+            // Plateau lip coping on top of walls.
+            float copeY = wallH + 0.2f;
+            ditch.AddBox(new Vector3(0f, copeY, hz + wallT * 0.5f), new Vector3(halfE * 2f + wallT * 2f + 0.8f, 0.4f, wallT + 0.6f), stone);
+            ditch.AddBox(new Vector3(0f, copeY, -(hz + wallT * 0.5f)), new Vector3(halfE * 2f + wallT * 2f + 0.8f, 0.4f, wallT + 0.6f), stone);
+            ditch.AddBox(new Vector3(-(hx + wallT * 0.5f), copeY, 0f), new Vector3(wallT + 0.6f, 0.4f, halfN * 2f + wallT * 2f + 0.8f), stone);
+            GizaBuild.SpawnMesh(root.transform, SphinxEnclosureName + "_Ditch", ditch.Build(SphinxEnclosureName + "_Ditch"), rock, true);
+
+            // Soft inner face lining so the ditch reads as cut bedrock.
+            var lining = new LabMeshBuilder(48, 72);
+            float linT = 0.45f;
+            float linH = wallH - 0.8f;
+            float ly = linH * 0.5f;
+            lining.AddBox(new Vector3(0f, ly, hz - linT * 0.5f - 0.05f), new Vector3(halfE * 2f - 1f, linH, linT), stone);
+            lining.AddBox(new Vector3(0f, ly, -(hz - linT * 0.5f - 0.05f)), new Vector3(halfE * 2f - 1f, linH, linT), stone);
+            lining.AddBox(new Vector3(-(hx - linT * 0.5f - 0.05f), ly, 0f), new Vector3(linT, linH, halfN * 2f - 1f), stone);
+            GizaBuild.SpawnMesh(root.transform, SphinxEnclosureName + "_Lining", lining.Build(SphinxEnclosureName + "_Lining"), lime, true);
+
+            string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Sphinx enclosure. Rock-cut quarry ditch around the Sphinx court (~12 m below plateau). Limestone walls N/S/W; east open toward the Sphinx temple.\n" +
+                "Schematic Lehner ditch massing (walkable floor bands + mid-height shelf). Not photogrammetry. Not the sand-filled modern ruin.";
+            GizaBuild.HonestyPlate(root.transform, SphinxEnclosureName + "_Honesty", honesty, halfN);
+            Transform plate = root.transform.Find(SphinxEnclosureName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(hx + 6f, 1.55f, hz * 0.35f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
             }
             return root;
         }
