@@ -11,9 +11,8 @@ namespace RealityEngine.Visualization
     /// spawn a Giza sand/stone plateau, and place the undamaged 1:1 Giza complex
     /// (Khufu, queens G1a-c, temples, causeways, boat pits, Khafre, Menkaure, Sphinx) beyond the circuit table. Play auto-applies.
     /// Does not move XR Origin. Does not disable MountainScene.
-    /// Test: Ctrl+R, Play Faraday.unity. From the lab: Khufu north face in front,
-    /// limestone COURSES visible, plateau underfoot extending under all three pyramids,
-    /// cliff/desert visible looking east past the queens, not a black void, not magenta.
+    /// Test: Ctrl+R, Play Faraday.unity. From the lab: sand around Khufu's base you could eat,
+    /// desert beyond the east cliff, Tura courses still on the pyramid, not magenta, not a plastic plane.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(40)]
@@ -402,7 +401,9 @@ namespace RealityEngine.Visualization
                 " m, cliff " + GizaComplex.CliffHeightM.ToString("0") + " m, desert " + GizaComplex.DesertSizeM.ToString("0") +
                 " m. Khufu 230.38x146.61 m Tura courses. Khafre on +10 m terrace. Sphinx court " +
                 GizaComplex.SphinxCourtDropM.ToString("0") + " m below the table. " +
-                "From the lab: Khufu north face in front, plateau underfoot, cliff/desert east past the queens. Ctrl+R then Play, or Reality Engine / Place Giza Complex.");
+                "Oasis sand skirts Khufu " + KhufuDuneRadiusM.ToString("0") +
+                " m, Khafre " + KhafreDuneRadiusM.ToString("0") + " m, Menkaure " + MenkaureDuneRadiusM.ToString("0") +
+                " m. From the lab: sand around Khufu's base you could eat, Tura courses still on the pyramid. Ctrl+R then Play, or Reality Engine / Place Giza Complex.");
         }
 
         const int PlateauDiv = 80;
@@ -443,7 +444,7 @@ namespace RealityEngine.Visualization
             Material rock = GizaBuild.Bedrock();
 
             Mesh topMesh = LabWorldMeshes.BuildPlateauTop(plateauX, plateauZ, PlateauDiv, court, TopNoiseM);
-            ApplyLandMesh(root, "GizaPlateau", topMesh, sand, plateauPos, pose.rot, true, false, true);
+            ApplyLandMesh(root, "GizaPlateau", topMesh, rock, plateauPos, pose.rot, true, false, true);
 
             Mesh cliffMesh = LabWorldMeshes.BuildPlateauCliffs(
                 plateauX, plateauZ, PlateauDiv, court, GizaComplex.CliffHeightM,
@@ -453,6 +454,9 @@ namespace RealityEngine.Visualization
             Mesh desertMesh = LabWorldMeshes.BuildDesertFloor(GizaComplex.DesertSizeM, 16, 1.2f);
             Vector3 desertPos = new Vector3(plateauPos.x, pose.surfaceY - GizaComplex.CliffHeightM - 0.12f, plateauPos.z);
             ApplyLandMesh(root, "GizaDesert", desertMesh, sand, desertPos, Quaternion.identity, true, true, true);
+
+            PlaceDuneSkirts(root, pose, sand, plazaPos);
+            PlaceSandWashes(root, pose, sand, plazaPos);
 
             float terrX = -GizaComplex.KhafreWestM - cx;
             float terrZ = -GizaComplex.KhafreSouthM - cz;
@@ -647,6 +651,82 @@ namespace RealityEngine.Visualization
             Transform terrace = root.transform.Find("GizaKhafreTerrace");
             if (terrace != null)
                 AddTeleport(terrace.gameObject);
+            for (int i = 0; i < root.transform.childCount; i++)
+            {
+                Transform ch = root.transform.GetChild(i);
+                if (ch == null)
+                    continue;
+                string n = ch.name.ToLowerInvariant();
+                if (n.StartsWith("gizadune") || n.StartsWith("gizasandwash"))
+                    AddTeleport(ch.gameObject);
+            }
+        }
+
+        public const float KhufuDuneRadiusM = 32f;
+        public const float KhafreDuneRadiusM = 28f;
+        public const float MenkaureDuneRadiusM = 20f;
+        public const float QueenDuneRadiusM = 14f;
+
+        void PlaceDuneSkirts(Transform root, GizaComplex.Pose pose, Material sand, Vector3 plazaPos)
+        {
+            SpawnDune(root, "GizaDune_Khufu", pose.khufuCenter, pose.rot, pose.surfaceY, sand,
+                KhufuPyramid.BaseMeters * 0.5f, KhufuDuneRadiusM, 3.5f, 40,
+                KhufuPyramid.EntranceEastOffsetM, 16f, 0.38f, plazaPos);
+            Vector3 khafre = GizaComplex.WorldFromKhufu(pose, -GizaComplex.KhafreWestM, -GizaComplex.KhafreSouthM, 0f);
+            SpawnDune(root, "GizaDune_Khafre", khafre, pose.rot, GizaComplex.TerraceY(pose), sand,
+                KhafrePyramid.BaseMeters * 0.5f, KhafreDuneRadiusM, 3.1f, 36,
+                KhafrePyramid.EntranceEastOffsetM, 16f, 0.40f, plazaPos);
+            Vector3 menkaure = GizaComplex.WorldFromKhufu(pose, -GizaComplex.MenkaureWestM, -GizaComplex.MenkaureSouthM, 0f);
+            SpawnDune(root, "GizaDune_Menkaure", menkaure, pose.rot, pose.surfaceY, sand,
+                MenkaurePyramid.BaseMeters * 0.5f, MenkaureDuneRadiusM, 2.4f, 28,
+                0f, 12f, 0.42f, plazaPos);
+            GizaPrecinct.Layout L = GizaPrecinct.Compute();
+            SpawnQueenDune(root, pose, sand, plazaPos, "GizaDune_G1a", L.g1aEast, L.g1aNorth, L.g1aBase);
+            SpawnQueenDune(root, pose, sand, plazaPos, "GizaDune_G1b", L.g1bEast, L.g1bNorth, L.g1bBase);
+            SpawnQueenDune(root, pose, sand, plazaPos, "GizaDune_G1c", L.g1cEast, L.g1cNorth, L.g1cBase);
+        }
+
+        void SpawnQueenDune(Transform root, GizaComplex.Pose pose, Material sand, Vector3 plazaPos,
+            string name, float east, float north, float baseM)
+        {
+            Vector3 c = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            SpawnDune(root, name, c, pose.rot, pose.surfaceY, sand,
+                baseM * 0.5f, QueenDuneRadiusM, 1.5f, 20, 0f, 0f, 1f, plazaPos);
+        }
+
+        void SpawnDune(Transform root, string name, Vector3 center, Quaternion rot, float y,
+            Material sand, float innerHalf, float radius, float height, int div,
+            float doorX, float doorGap, float northScale, Vector3 plazaPos)
+        {
+            if (TooClose(center, plazaPos, LabPlazaSize * 0.5f + innerHalf + 6f))
+                return;
+            Mesh mesh = LabWorldMeshes.BuildDuneSkirt(innerHalf, radius, height, div, doorX, doorGap, northScale);
+            Vector3 pos = new Vector3(center.x, y, center.z);
+            ApplyLandMesh(root, name, mesh, sand, pos, rot, true, false, true);
+        }
+
+        void PlaceSandWashes(Transform root, GizaComplex.Pose pose, Material sand, Vector3 plazaPos)
+        {
+            float kh = KhufuPyramid.BaseMeters * 0.5f;
+            float hf = KhafrePyramid.BaseMeters * 0.5f;
+            float mn = MenkaurePyramid.BaseMeters * 0.5f;
+            PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_KhufuWest", -kh - 18f, 0f, 36f, 28f);
+            PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_KhufuSouth", 8f, -kh - 16f, 34f, 26f);
+            PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_KhafreWest", -GizaComplex.KhafreWestM - hf - 16f, -GizaComplex.KhafreSouthM, 32f, 24f);
+            PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_KhafreSouth", -GizaComplex.KhafreWestM, -GizaComplex.KhafreSouthM - hf - 14f, 30f, 22f);
+            PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_MenkaureWest", -GizaComplex.MenkaureWestM - mn - 12f, -GizaComplex.MenkaureSouthM, 24f, 20f);
+            PlaceWash(root, pose, sand, plazaPos, "GizaSandWash_MenkaureSouth", -GizaComplex.MenkaureWestM, -GizaComplex.MenkaureSouthM - mn - 12f, 22f, 18f);
+        }
+
+        void PlaceWash(Transform root, GizaComplex.Pose pose, Material sand, Vector3 plazaPos,
+            string name, float east, float north, float sizeX, float sizeZ)
+        {
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            if (TooClose(world, plazaPos, LabPlazaSize * 0.5f + 18f))
+                return;
+            Mesh mesh = LabWorldMeshes.BuildSandWash(sizeX, sizeZ, 10, 0.11f);
+            Vector3 pos = new Vector3(world.x, pose.surfaceY + 0.04f, world.z);
+            ApplyLandMesh(root, name, mesh, sand, pos, pose.rot, true, false, true);
         }
 
         static void PlaceHills(Transform parent, GizaComplex.Pose pose, float plateauX, float plateauZ, Material mat)

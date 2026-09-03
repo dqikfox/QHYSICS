@@ -20,7 +20,7 @@ namespace RealityEngine.EditorTools
             applier.ApplyNow(true);
             Mark(applier);
             Selection.activeGameObject = applier != null ? applier.gameObject : null;
-            Debug.Log("Applied Reality Engine Giza plateau (meadow/terrain hidden, MountainScene left on). Play Faraday.unity or use Place Giza Complex. Khufu north face ~17 m; Khafre 11.54 m + ground; Menkaure 4.2 m.");
+            Debug.Log("Applied Reality Engine Giza plateau with Oasis sand skirts (meadow/terrain hidden, MountainScene left on). Ctrl+R, Play Faraday.unity. Sand around Khufu base; Tura courses still on the pyramid.");
         }
 
         [MenuItem(LandscapePath, true)]

@@ -1,0 +1,4 @@
+Oasis sand from Unity URP 3D Sample (Oasis scene).
+Binaries: https://github.com/raegar/URP3DSampleScenes (real PNG maps, not LFS pointers).
+Shader Graph / .meta GUIDs: https://github.com/freadamAbebe/URP3DSampleScenes (Unity-Technologies URP 3D Sample public-beta).
+Only sand materials, textures, and shader graphs were copied. No tents, water, cameras, volume stacks, or TrailEffect.
