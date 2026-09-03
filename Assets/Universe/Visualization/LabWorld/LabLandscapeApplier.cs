@@ -9,7 +9,7 @@ namespace RealityEngine.Visualization
     /// <summary>
     /// Reality Engine outdoor lab campus: hide Faraday's broken meadow/terrain,
     /// spawn a Giza sand/stone plateau, and place the undamaged 1:1 Giza complex
-    /// (Khufu, Khafre, Menkaure, Sphinx) beyond the circuit table. Play auto-applies.
+    /// (Khufu, queens G1a-c, temples, causeways, boat pits, Khafre, Menkaure, Sphinx) beyond the circuit table. Play auto-applies.
     /// Does not move XR Origin. Does not disable MountainScene.
     /// </summary>
     [DisallowMultipleComponent]
@@ -133,8 +133,22 @@ namespace RealityEngine.Visualization
                 _built = false;
             }
 
-            if (_built && transform.Find(RootName) != null)
+            Transform rootXf = transform.Find(RootName);
+            if (rootXf == null)
+            {
+                GameObject named = GameObject.Find(RootName);
+                if (named != null)
+                    rootXf = named.transform;
+            }
+            if (rootXf != null)
+            {
+                GizaComplex.Pose pose = ReadPose(rootXf);
+                GizaComplex.Ensure(pose, GizaComplex.Spawn.All);
+                FitPlateau(rootXf, pose);
+                AddTeleports(rootXf.gameObject);
+                _built = true;
                 return;
+            }
 
             BuildWorld(GizaComplex.Spawn.All);
             _built = true;
@@ -293,6 +307,7 @@ namespace RealityEngine.Visualization
             }
             GizaComplex.Pose pose = ReadPose(root);
             GizaComplex.Ensure(pose, which);
+            FitPlateau(root, pose);
             AddTeleports(root.gameObject);
         }
 
@@ -304,6 +319,7 @@ namespace RealityEngine.Visualization
             {
                 GizaComplex.Pose poseExisting = ReadPose(found.transform);
                 GizaComplex.Ensure(poseExisting, which);
+                FitPlateau(found.transform, poseExisting);
                 AddTeleports(found);
                 return;
             }
@@ -396,10 +412,57 @@ namespace RealityEngine.Visualization
             AddTeleports(root);
 
             Debug.Log(
-                "LabLandscapeApplier: Giza plateau " + plateauX.ToString("0") + "×" + plateauZ.ToString("0") +
-                " m. Khufu 440×280 cubits (230.38×146.61 m) north entrance 17 m. Khafre 215.25×143.5 m, +10 m bedrock, 323 W / 342 S. " +
-                "Menkaure 105.5×65.5 m, 563 W / 743 S, north entrance 4.2 m. Sphinx 73.5×20 m, 347 E / 430 S. " +
-                "Ctrl+R then Play, or Reality Engine / Place Giza Complex. Teleport to each north face.");
+                "LabLandscapeApplier: Giza plateau " + plateauX.ToString("0") + "x" + plateauZ.ToString("0") +
+                " m. Khufu 230.38x146.61 m. Queens G1a-c east (~49.5/49/46.2 x ~30 m). Mortuary 52x40 m east of Khufu, causeway 500x10 m further east (not through the lab). " +
+                "Five boat pits ~50x7 m on Khufu south. Khafre mortuary east + causeway down to valley temple beside Sphinx; Sphinx temple east of the face. Menkaure mortuary east, short causeway. G3a-c kept. " +
+                "From the lab: Khufu north face is in front. East is to your left (look past the NE corner / teleport east). Ctrl+R then Play, or Reality Engine / Place Giza Complex.");
+        }
+
+        void FitPlateau(Transform root, GizaComplex.Pose pose)
+        {
+            if (root == null)
+                return;
+            Transform plateau = root.Find("GizaPlateau");
+            if (plateau == null)
+                return;
+            Transform plaza = root.Find("LabPlaza");
+            Vector3 plazaPos = plaza != null ? plaza.position : pose.khufuCenter;
+            GizaComplex.LocalExtents(out float xMin, out float xMax, out float zMin, out float zMax);
+            Vector3[] localCorners =
+            {
+                new Vector3(xMin, 0f, zMin),
+                new Vector3(xMin, 0f, zMax),
+                new Vector3(xMax, 0f, zMin),
+                new Vector3(xMax, 0f, zMax)
+            };
+            Vector3 wmin = plazaPos;
+            Vector3 wmax = plazaPos;
+            Encapsulate(ref wmin, ref wmax, plazaPos + new Vector3(LabPlazaSize, 0f, LabPlazaSize) * 0.5f);
+            Encapsulate(ref wmin, ref wmax, plazaPos - new Vector3(LabPlazaSize, 0f, LabPlazaSize) * 0.5f);
+            Encapsulate(ref wmin, ref wmax, pose.khufuCenter);
+            for (int i = 0; i < localCorners.Length; i++)
+                Encapsulate(ref wmin, ref wmax, pose.khufuCenter + pose.rot * localCorners[i]);
+            wmin.x -= PlateauPadM;
+            wmin.z -= PlateauPadM;
+            wmax.x += PlateauPadM;
+            wmax.z += PlateauPadM;
+            Vector3 mid = (wmin + wmax) * 0.5f;
+            float plateauX = Mathf.Max(40f, wmax.x - wmin.x);
+            float plateauZ = Mathf.Max(40f, wmax.z - wmin.z);
+            Mesh mesh = LabWorldMeshes.BuildPlateau(plateauX, plateauZ, 40, 4.5f);
+            MeshFilter mf = plateau.GetComponent<MeshFilter>();
+            if (mf != null)
+                mf.sharedMesh = mesh;
+            BoxCollider box = plateau.GetComponent<BoxCollider>();
+            if (box != null && mesh != null)
+            {
+                box.center = mesh.bounds.center;
+                box.size = mesh.bounds.size;
+            }
+            MeshCollider mc = plateau.GetComponent<MeshCollider>();
+            if (mc != null)
+                mc.sharedMesh = mesh;
+            plateau.position = new Vector3(mid.x, root.position.y, mid.z);
         }
 
         static void Encapsulate(ref Vector3 min, ref Vector3 max, Vector3 p)
@@ -466,7 +529,7 @@ namespace RealityEngine.Visualization
                 if (cols[i] == null)
                     continue;
                 string n = cols[i].gameObject.name.ToLowerInvariant();
-                if (n.Contains("honesty") || n.Contains("plate") || n.Contains("airshaft") || n.Contains("emit") || n.Contains("sarcophagus"))
+                if (n.Contains("honesty") || n.Contains("plate") || n.Contains("airshaft") || n.Contains("emit") || n.Contains("sarcophagus") || n.Contains("hull"))
                     continue;
                 AddTeleport(cols[i].gameObject);
             }
@@ -488,6 +551,7 @@ namespace RealityEngine.Visualization
             Vector3 khafre = GizaComplex.WorldFromKhufu(pose, -GizaComplex.KhafreWestM, -GizaComplex.KhafreSouthM, 0f);
             Vector3 menkaure = GizaComplex.WorldFromKhufu(pose, -GizaComplex.MenkaureWestM, -GizaComplex.MenkaureSouthM, 0f);
             Vector3 sphinx = GizaComplex.WorldFromKhufu(pose, GizaComplex.SphinxEastM, -GizaComplex.SphinxSouthM, 0f);
+            GizaPrecinct.Layout L = GizaPrecinct.Compute();
             for (int i = 0; i < n; i++)
             {
                 float a = (i / (float)n) * Mathf.PI * 2f + 0.2f;
@@ -499,6 +563,16 @@ namespace RealityEngine.Visualization
                 if (TooClose(p, menkaure, MenkaurePyramid.BaseMeters * 0.5f + 50f))
                     continue;
                 if (TooClose(p, sphinx, 60f))
+                    continue;
+                if (TooClose(p, GizaComplex.WorldFromKhufu(pose, L.g1aEast, L.g1aNorth, 0f), 50f))
+                    continue;
+                if (TooClose(p, GizaComplex.WorldFromKhufu(pose, L.g1bEast, L.g1bNorth, 0f), 50f))
+                    continue;
+                if (TooClose(p, GizaComplex.WorldFromKhufu(pose, L.g1cEast, L.g1cNorth, 0f), 50f))
+                    continue;
+                if (TooClose(p, GizaComplex.WorldFromKhufu(pose, L.valleyEast, L.valleyNorth, 0f), 55f))
+                    continue;
+                if (TooClose(p, GizaComplex.WorldFromKhufu(pose, L.sphinxTempleEast, L.sphinxTempleNorth, 0f), 50f))
                     continue;
                 var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 go.name = "Hill_" + i;
