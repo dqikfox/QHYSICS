@@ -598,6 +598,123 @@ namespace RealityEngine.Visualization
             return b.Build("RELab_GizaDesert");
         }
 
+        public static Mesh BuildDuneSkirt(float innerHalf, float outerPad, float height, int div,
+            float doorX, float doorGapW, float northScale)
+        {
+            innerHalf = Mathf.Max(4f, innerHalf);
+            outerPad = Mathf.Max(8f, outerPad);
+            height = Mathf.Max(0.25f, height);
+            int n = Mathf.Max(16, div);
+            float outer = innerHalf + outerPad;
+            var b = new LabMeshBuilder(n * n * 2, (n - 1) * (n - 1) * 6);
+            float uv = 1f / SandTileM;
+            for (int z = 0; z < n - 1; z++)
+            {
+                float tz0 = z / (float)(n - 1);
+                float tz1 = (z + 1) / (float)(n - 1);
+                float z0 = Mathf.Lerp(-outer, outer, tz0);
+                float z1 = Mathf.Lerp(-outer, outer, tz1);
+                for (int x = 0; x < n - 1; x++)
+                {
+                    float tx0 = x / (float)(n - 1);
+                    float tx1 = (x + 1) / (float)(n - 1);
+                    float x0 = Mathf.Lerp(-outer, outer, tx0);
+                    float x1 = Mathf.Lerp(-outer, outer, tx1);
+                    float y00 = DuneSkirtY(x0, z0, innerHalf, outerPad, height, doorX, doorGapW, northScale);
+                    float y10 = DuneSkirtY(x1, z0, innerHalf, outerPad, height, doorX, doorGapW, northScale);
+                    float y11 = DuneSkirtY(x1, z1, innerHalf, outerPad, height, doorX, doorGapW, northScale);
+                    float y01 = DuneSkirtY(x0, z1, innerHalf, outerPad, height, doorX, doorGapW, northScale);
+                    if (y00 + y10 + y11 + y01 < 0.05f)
+                        continue;
+                    Vector3 a = new Vector3(x0, y00, z0);
+                    Vector3 br = new Vector3(x1, y10, z0);
+                    Vector3 c = new Vector3(x1, y11, z1);
+                    Vector3 d = new Vector3(x0, y01, z1);
+                    b.AddQuad(a, br, c, d, Vector3.up,
+                        new Vector2(x0 * uv, z0 * uv), new Vector2(x1 * uv, z0 * uv),
+                        new Vector2(x1 * uv, z1 * uv), new Vector2(x0 * uv, z1 * uv), Color.white);
+                }
+            }
+            return b.Build("RELab_GizaDune");
+        }
+
+        static float DuneSkirtY(float x, float z, float inner, float pad, float height,
+            float doorX, float doorGapW, float northScale)
+        {
+            float dx = Mathf.Abs(x) - inner;
+            float dz = Mathf.Abs(z) - inner;
+            float outside = Mathf.Max(dx, dz);
+            float y;
+            if (outside < 0f)
+            {
+                float edge = Mathf.Min(-dx, -dz);
+                if (edge > 1.15f)
+                    return 0f;
+                float tIn = 1f - edge / 1.15f;
+                y = height * tIn * tIn;
+            }
+            else
+            {
+                float t = Mathf.Clamp01(outside / pad);
+                if (t >= 0.995f)
+                    return 0f;
+                float n = Mathf.PerlinNoise(x * 0.037f + 3.1f, z * 0.033f + 1.7f);
+                y = height * (1f - t) * (1f - t) * (0.70f + 0.30f * n);
+            }
+            if (z > inner * 0.22f)
+            {
+                y *= Mathf.Clamp(northScale, 0.12f, 1f);
+                if (doorGapW > 0.5f && Mathf.Abs(x - doorX) < doorGapW * 0.5f)
+                    y *= 0.07f;
+            }
+            return y;
+        }
+
+        public static Mesh BuildSandWash(float sizeX, float sizeZ, int div, float height)
+        {
+            int nx = Mathf.Max(6, div);
+            int nz = Mathf.Max(6, div);
+            float hx = sizeX * 0.5f;
+            float hz = sizeZ * 0.5f;
+            height = Mathf.Max(0.03f, height);
+            var b = new LabMeshBuilder(nx * nz * 2, (nx - 1) * (nz - 1) * 6);
+            float uv = 1f / SandTileM;
+            for (int z = 0; z < nz - 1; z++)
+            {
+                float tz0 = z / (float)(nz - 1);
+                float tz1 = (z + 1) / (float)(nz - 1);
+                float z0 = Mathf.Lerp(-hz, hz, tz0);
+                float z1 = Mathf.Lerp(-hz, hz, tz1);
+                for (int x = 0; x < nx - 1; x++)
+                {
+                    float tx0 = x / (float)(nx - 1);
+                    float tx1 = (x + 1) / (float)(nx - 1);
+                    float x0 = Mathf.Lerp(-hx, hx, tx0);
+                    float x1 = Mathf.Lerp(-hx, hx, tx1);
+                    float y00 = SandWashY(tx0, tz0, height);
+                    float y10 = SandWashY(tx1, tz0, height);
+                    float y11 = SandWashY(tx1, tz1, height);
+                    float y01 = SandWashY(tx0, tz1, height);
+                    Vector3 a = new Vector3(x0, y00, z0);
+                    Vector3 br = new Vector3(x1, y10, z0);
+                    Vector3 c = new Vector3(x1, y11, z1);
+                    Vector3 d = new Vector3(x0, y01, z1);
+                    b.AddQuad(a, br, c, d, Vector3.up,
+                        new Vector2(x0 * uv, z0 * uv), new Vector2(x1 * uv, z0 * uv),
+                        new Vector2(x1 * uv, z1 * uv), new Vector2(x0 * uv, z1 * uv), Color.white);
+                }
+            }
+            return b.Build("RELab_GizaSandWash");
+        }
+
+        static float SandWashY(float tx, float tz, float height)
+        {
+            float edge = Mathf.Max(Mathf.Abs(tx - 0.5f), Mathf.Abs(tz - 0.5f)) * 2f;
+            float fall = 1f - Mathf.SmoothStep(0.55f, 1f, edge);
+            float n = Mathf.PerlinNoise(tx * 5.4f + 2.2f, tz * 4.8f + 0.7f);
+            return height * fall * (0.45f + 0.55f * n);
+        }
+
         public static Mesh BuildRaisedPad(float sizeX, float sizeZ, float height)
         {
             height = Mathf.Max(0.2f, height);

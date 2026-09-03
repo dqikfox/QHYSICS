@@ -238,8 +238,58 @@ namespace RealityEngine.Visualization
                 LabWorldMeshes.MakeLimestoneTexture(), Vector2.one);
         }
 
+        const string OasisSandResource = "RELab_OasisSand";
+        const string OasisSandPath = "Assets/Universe/Visualization/LabWorld/OasisSand/Resources/RELab_OasisSand.mat";
+        const string OasisGravelResource = "RELab_OasisGravel";
+        const string OasisGravelPath = "Assets/Universe/Visualization/LabWorld/OasisSand/Resources/RELab_OasisGravel.mat";
+
+        static Material LoadOasisAsset(string resource, string path)
+        {
+            Material mat = Resources.Load<Material>(resource);
+#if UNITY_EDITOR
+            if (mat == null)
+                mat = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(path);
+#endif
+            return mat;
+        }
+
         public static Material DesertSand()
         {
+            if (_sand != null)
+                return _sand;
+
+            Material oasis = LoadOasisAsset(OasisSandResource, OasisSandPath);
+            if (oasis != null && !LabWorldMeshes.MaterialLooksPink(oasis))
+            {
+                _sand = new Material(oasis)
+                {
+                    name = "RELab_OasisSand",
+                    hideFlags = HideFlags.DontSave
+                };
+                if (_sand.HasProperty("_Glitter_On"))
+                    _sand.SetFloat("_Glitter_On", 1f);
+                if (_sand.HasProperty("_Glitter_Strength"))
+                    _sand.SetFloat("_Glitter_Strength", 0.22f);
+                if (_sand.HasProperty("_Glitter_Strength_in_Shadow"))
+                    _sand.SetFloat("_Glitter_Strength_in_Shadow", 0.35f);
+                return _sand;
+            }
+
+            Material gravel = LoadOasisAsset(OasisGravelResource, OasisGravelPath);
+            if (gravel != null && !LabWorldMeshes.MaterialLooksPink(gravel))
+            {
+                _sand = new Material(gravel)
+                {
+                    name = "RELab_OasisSand",
+                    hideFlags = HideFlags.DontSave
+                };
+                Texture2D albedo = null;
+                if (_sand.HasProperty("_BaseMap"))
+                    albedo = _sand.GetTexture("_BaseMap") as Texture2D;
+                LabWorldMeshes.ApplyAlbedo(_sand, albedo, new Vector2(0.12f, 0.12f));
+                return _sand;
+            }
+
             return CachedLit(ref _sand, "RELab_GizaSand", new Color(0.78f, 0.66f, 0.44f, 1f), 0.02f, 0.10f,
                 LabWorldMeshes.MakeDesertSandTexture(), Vector2.one);
         }
@@ -489,12 +539,14 @@ namespace RealityEngine.Visualization
                     continue;
                 if (l.Contains("pyramidion") || mn.Contains("Pyramidion"))
                     mr.sharedMaterial = gold;
-                else if (l.Contains("gizadesert") || mn.Contains("GizaSand") || mn.Contains("DesertSand"))
+                else if (l.Contains("gizadesert") || l.Contains("gizadune") || l.Contains("sandwash")
+                    || mn.Contains("GizaSand") || mn.Contains("DesertSand") || mn.Contains("OasisSand")
+                    || mn.Contains("OasisTerrain"))
                     mr.sharedMaterial = sand;
                 else if (l.Contains("cliff") || mn.Contains("HillRock") || mn.Contains("Cliff"))
                     mr.sharedMaterial = cliff;
                 else if (l == "gizaplateau" || l.Contains("gizaplateautop"))
-                    mr.sharedMaterial = sand;
+                    mr.sharedMaterial = rock;
                 else if (l.Contains("casinggranite") || l.Contains("aswan") || mn.Contains("Aswan"))
                     mr.sharedMaterial = aswan;
                 else if (l.Contains("casing") || mn.Contains("TuraCasing"))
