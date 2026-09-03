@@ -604,6 +604,12 @@ namespace RealityEngine.Visualization
                     mr.sharedMaterial = aswan;
                 else if (l.Contains("casing") || mn.Contains("TuraCasing"))
                     mr.sharedMaterial = tura;
+                else if (l.Contains("sphinxenclosure") && l.Contains("_ditch"))
+                    mr.sharedMaterial = rock;
+                else if (l.Contains("sphinxenclosure") && l.Contains("_floor"))
+                    mr.sharedMaterial = pav;
+                else if (l.Contains("sphinxenclosure") && l.Contains("_lining"))
+                    mr.sharedMaterial = sphinx;
                 else if (l.Contains("sphinx") || mn.Contains("SphinxLimestone"))
                     mr.sharedMaterial = sphinx;
                 else if (l.Contains("sarcophagus") || l.Contains("kingchamber") || l.Contains("pillar")
@@ -647,6 +653,7 @@ namespace RealityEngine.Visualization
             SitFound("KhafreValleyTemple", court);
             SitFound("KhafreEnclosure", terrace);
             SitFound("SphinxTemple", court);
+            SitFound("SphinxEnclosure", court);
             SitFound("MenkaureMortuary", top);
             SitFound("MenkaureEnclosure", top);
         }
