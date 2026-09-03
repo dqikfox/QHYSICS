@@ -205,8 +205,17 @@ namespace RealityEngine.Visualization
                 "Khafre mortuary temple. Immediately east of Khafre. Open limestone court, granite pillars, complete walls. Walkable.";
             const string valleyHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
-                "Khafre valley temple. Granite and limestone, T-shaped pillared halls (walkable block rooms). Undamaged reconstruction of the well-preserved temple beside the Sphinx.\n" +
+                "Khafre valley temple. Granite and limestone, T-shaped pillared halls (walkable block rooms). Dual north/south east entrances (vestibule portals) — Lehner / well-preserved Khafre valley temple.\n" +
                 "Not photogrammetry. Causeway descends from the Khafre mortuary temple.";
+
+            // Force rebuild when dual-portal marker or causeway Terminal is missing.
+            GameObject oldValley = GizaComplex.FindNamed(KhafreValleyName);
+            if (oldValley != null && oldValley.transform.Find(KhafreValleyName + "_Portals") == null)
+                DestroyNamed(oldValley);
+            GameObject oldCause = GizaComplex.FindNamed(KhafreCausewayName);
+            if (oldCause != null && oldCause.transform.Find(KhafreCausewayName + "_Terminal") == null)
+                DestroyNamed(oldCause);
+
             Ensure(KhafreMortuaryName, pose, p => BuildMortuary(p, KhafreMortuaryName, L.khafreTempleEast, L.khafreTempleNorth, GizaComplex.KhafreBedrockM, L.khafreTempleEW, L.khafreTempleNS, true, mortHonesty), terrace, true);
             Ensure(KhafreValleyName, pose, p => BuildValleyTemple(p, L, valleyHonesty), GizaComplex.CourtY(pose), true);
             Ensure(KhafreCausewayName, pose, p => BuildCauseway(p, KhafreCausewayName, L.khafreCauseStartEast, L.khafreCauseStartNorth, L.khafreCauseEndEast, L.khafreCauseEndNorth, terrace, GizaComplex.CourtY(pose), 10f), pose.surfaceY, false);
@@ -416,11 +425,27 @@ namespace RealityEngine.Visualization
             floor.AddBox(new Vector3(0f, floorT * 0.5f, 0f), new Vector3(ew, floorT, ns), Color.white);
             GizaBuild.SpawnMesh(root.transform, KhafreValleyName + "_Floor", floor.Build(KhafreValleyName + "_Floor"), pav, true);
 
-            var walls = new LabMeshBuilder(48, 72);
+            // Dual east facade doors (N/S of centerline) — iconic Khafre valley temple portals.
+            const float portalDoorW = 3.5f;
+            const float portalZ = 10.5f;
+            var walls = new LabMeshBuilder(80, 120);
             walls.AddBox(new Vector3(0f, y, hz - wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
             walls.AddBox(new Vector3(0f, y, -hz + wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
             walls.AddBox(new Vector3(-hx + wallT * 0.5f, y, 0f), new Vector3(wallT, wallH, ns), Color.white);
-            WallDoorX(walls, hx - wallT * 0.5f, ns, wallH, wallT, 6.5f);
+            float wallX = hx - wallT * 0.5f;
+            float halfDoor = portalDoorW * 0.5f;
+            float northTop = portalZ + halfDoor;
+            float northRemain = hz - northTop;
+            if (northRemain > 0.3f)
+                walls.AddBox(new Vector3(wallX, y, northTop + northRemain * 0.5f), new Vector3(wallT, wallH, northRemain), Color.white);
+            float southBot = -portalZ - halfDoor;
+            float southRemain = southBot - (-hz);
+            if (southRemain > 0.3f)
+                walls.AddBox(new Vector3(wallX, y, southBot - southRemain * 0.5f), new Vector3(wallT, wallH, southRemain), Color.white);
+            float centerLen = (portalZ - halfDoor) - (-portalZ + halfDoor);
+            walls.AddBox(new Vector3(wallX, y, 0f), new Vector3(wallT, wallH, centerLen), Color.white);
+            walls.AddBox(new Vector3(wallX, wallH - 0.4f, portalZ), new Vector3(wallT, 0.8f, portalDoorW + 0.5f), Color.white);
+            walls.AddBox(new Vector3(wallX, wallH - 0.4f, -portalZ), new Vector3(wallT, 0.8f, portalDoorW + 0.5f), Color.white);
             GizaBuild.SpawnMesh(root.transform, KhafreValleyName + "_Walls", walls.Build(KhafreValleyName + "_Walls"), gran, true);
 
             var halls = new LabMeshBuilder(160, 240);
@@ -446,6 +471,25 @@ namespace RealityEngine.Visualization
                 }
             }
             GizaBuild.SpawnMesh(root.transform, KhafreValleyName + "_Pillars", pillars.Build(KhafreValleyName + "_Pillars"), gran, true);
+
+            // East-facade portal vestibules (N/S) protruding slightly outside the east wall.
+            const float portalH = 5.0f;
+            const float portalDepth = 3.0f;
+            const float anteDepth = 3.2f;
+            const float anteW = 4.2f;
+            const float anteH = 4.8f;
+            var portals = new LabMeshBuilder(96, 144);
+            float portalHy = floorT + portalH * 0.5f;
+            float anteHy = floorT + anteH * 0.5f;
+            float vestibX = hx + portalDepth * 0.5f;
+            float anteX = hx - wallT - anteDepth * 0.5f - 0.1f;
+            // Vestibule corridors: open east (court) and west (into temple through door gaps).
+            portals.AddRoom(new Vector3(vestibX, portalHy, portalZ), new Vector3(portalDepth, portalH, portalDoorW), Color.white, false, false, true, true);
+            portals.AddRoom(new Vector3(vestibX, portalHy, -portalZ), new Vector3(portalDepth, portalH, portalDoorW), Color.white, false, false, true, true);
+            // Shallow antechamber stubs just inside each portal.
+            portals.AddRoom(new Vector3(anteX, anteHy, portalZ), new Vector3(anteDepth, anteH, anteW), Color.white, false, false, true, true);
+            portals.AddRoom(new Vector3(anteX, anteHy, -portalZ), new Vector3(anteDepth, anteH, anteW), Color.white, false, false, true, true);
+            GizaBuild.SpawnMesh(root.transform, KhafreValleyName + "_Portals", portals.Build(KhafreValleyName + "_Portals"), gran, true);
 
             GizaBuild.HonestyPlate(root.transform, KhafreValleyName + "_Honesty", honesty, ns);
             Transform plate = root.transform.Find(KhafreValleyName + "_Honesty");
@@ -588,18 +632,30 @@ namespace RealityEngine.Visualization
             SlopedRail(walls, hw - wallT * 0.5f, deckH, deckH + dy, 0f, len, wallT, wallH);
             GizaBuild.SpawnMesh(root.transform, name + "_Walls", walls.Build(name + "_Walls"), tura, true);
 
-            if (name == KhufuCausewayName || name == MenkaureCausewayName)
+            if (name == KhufuCausewayName || name == MenkaureCausewayName || name == KhafreCausewayName)
             {
                 var pad = new LabMeshBuilder(8, 12);
                 pad.AddBox(new Vector3(0f, deckH * 0.5f + dy, len + 4f), new Vector3(width + 4f, deckH, 8f), Color.white);
                 GizaBuild.SpawnMesh(root.transform, name + "_Terminal", pad.Build(name + "_Terminal"), pav, true);
-                string causeHonesty = name == KhufuCausewayName
-                    ? GizaComplex.HonestyPrefix + "\n" +
-                      "Khufu causeway. Descends from the mortuary east door down the east escarpment to the Khufu valley temple on the floodplain.\n" +
-                      "Walkable deck + rails. Width ~10 m. Not photogrammetry."
-                    : GizaComplex.HonestyPrefix + "\n" +
-                      "Menkaure causeway. Descends from the mortuary east door down the east escarpment to the Menkaure valley temple on the floodplain.\n" +
-                      "Walkable deck + rails. Width ~8 m. Not photogrammetry.";
+                string causeHonesty;
+                if (name == KhufuCausewayName)
+                {
+                    causeHonesty = GizaComplex.HonestyPrefix + "\n" +
+                        "Khufu causeway. Descends from the mortuary east door down the east escarpment to the Khufu valley temple on the floodplain.\n" +
+                        "Walkable deck + rails. Width ~10 m. Not photogrammetry.";
+                }
+                else if (name == MenkaureCausewayName)
+                {
+                    causeHonesty = GizaComplex.HonestyPrefix + "\n" +
+                        "Menkaure causeway. Descends from the mortuary east door down the east escarpment to the Menkaure valley temple on the floodplain.\n" +
+                        "Walkable deck + rails. Width ~8 m. Not photogrammetry.";
+                }
+                else
+                {
+                    causeHonesty = GizaComplex.HonestyPrefix + "\n" +
+                        "Khafre causeway. Descends from the Khafre mortuary east door down to the Khafre valley temple / Sphinx court terrace.\n" +
+                        "Walkable deck + rails. Width ~10 m. Not photogrammetry.";
+                }
                 GizaBuild.HonestyPlate(root.transform, name + "_Honesty", causeHonesty, width + 8f);
                 Transform plate = root.transform.Find(name + "_Honesty");
                 if (plate != null)
