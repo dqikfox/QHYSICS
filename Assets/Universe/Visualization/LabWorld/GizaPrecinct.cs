@@ -112,7 +112,11 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1bEast, L.g1bNorth, L.g1bBase * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1cEast, L.g1cNorth, L.g1cBase * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.khufuTempleEast, 0f, L.khufuTempleEW * 0.5f + 2f, L.khufuTempleNS * 0.5f + 2f);
-            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.khufuCauseEndEast, 0f, 12f);
+            // Cliff-lip pad east of mortuary/queens — do not pull the plateau under the full valley causeway run.
+            float khufuLipEast = Mathf.Max(
+                L.khufuTempleEast + L.khufuTempleEW * 0.5f + 10f,
+                L.g1aEast + L.g1aBase * 0.5f + 10f);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, khufuLipEast, 0f, 12f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, 0f, L.boatNorth, L.boatLen * 2.5f + 20f, L.boatWid * 0.5f + 6f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.khafreTempleEast, L.khafreTempleNorth, L.khafreTempleEW * 0.5f + 2f, L.khafreTempleNS * 0.5f + 2f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.valleyEast, L.valleyNorth, L.valleyEW * 0.5f + 4f, L.valleyNS * 0.5f + 4f);
@@ -145,12 +149,21 @@ namespace RealityEngine.Visualization
             const string templeHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Khufu mortuary temple. Immediately east of Khufu, between the pyramid and the queens. ~52 x 40 m limestone court + pillared massing.\n" +
-                "Open court (walkable), complete walls (not today's stubs). Causeway runs east from the east door toward the valley.";
+                "Open court (walkable), complete walls (not today's stubs). Causeway descends east from the east door down the escarpment to the floodplain / harbor foot.";
             Ensure(G1aName, pose, p => BuildQueen(p, G1aName, L.g1aEast, L.g1aNorth, L.g1aBase, L.g1aHeight, queensHonesty), pose.surfaceY, true);
             Ensure(G1bName, pose, p => BuildQueen(p, G1bName, L.g1bEast, L.g1bNorth, L.g1bBase, L.g1bHeight, null), pose.surfaceY, true);
             Ensure(G1cName, pose, p => BuildQueen(p, G1cName, L.g1cEast, L.g1cNorth, L.g1cBase, L.g1cHeight, null), pose.surfaceY, true);
             Ensure(KhufuMortuaryName, pose, p => BuildMortuary(p, KhufuMortuaryName, L.khufuTempleEast, 0f, 0f, L.khufuTempleEW, L.khufuTempleNS, false, templeHonesty), pose.surfaceY, true);
-            Ensure(KhufuCausewayName, pose, p => BuildCauseway(p, KhufuCausewayName, L.khufuCauseStartEast, 0f, L.khufuCauseEndEast, 0f, pose.surfaceY, pose.surfaceY, L.khufuCauseWid), pose.surfaceY, false);
+
+            // Descend to Nile floodplain / harbor west rim. Plateau extents no longer follow the full run.
+            float floodY = pose.surfaceY - GizaComplex.CliffHeightM + GizaNile.SitAboveDesertM;
+            GameObject oldCause = GizaComplex.FindNamed(KhufuCausewayName);
+            if (oldCause != null && !KhufuCausewayIsDescent(oldCause, floodY))
+                DestroyNamed(oldCause);
+            GizaComplex.LocalExtents(out _, out float plateauEast, out _, out _);
+            float cliffEast = plateauEast + GizaComplex.MarginM;
+            float causeEndEast = cliffEast + GizaNile.GapFromCliffM + GizaNile.HarborEastOfCliffM;
+            Ensure(KhufuCausewayName, pose, p => BuildCauseway(p, KhufuCausewayName, L.khufuCauseStartEast, 0f, causeEndEast, 0f, pose.surfaceY, floodY, L.khufuCauseWid), pose.surfaceY, false);
             Ensure(KhufuBoatPitsName, pose, p => BuildBoatPits(p, L), pose.surfaceY, true);
             Ensure(KhufuEnclosureName, pose, p => BuildEnclosure(p, KhufuEnclosureName, pose.khufuCenter, 0f, KhufuPyramid.BaseMeters * 0.5f + KhufuPyramid.PavementWidthM, L.khufuTempleNS + 4f, true), pose.surfaceY, true);
         }
@@ -204,6 +217,29 @@ namespace RealityEngine.Visualization
             if (sit && go != null)
                 GizaBuild.SitOn(go.transform, sitY);
             return go;
+        }
+
+        static bool KhufuCausewayIsDescent(GameObject go, float floodY)
+        {
+            if (go == null)
+                return false;
+            Transform term = go.transform.Find(KhufuCausewayName + "_Terminal");
+            if (term == null)
+                return false;
+            // Flat legacy deck sits near plateau; descent terminal sits near floodplain.
+            return term.position.y < floodY + 8f;
+        }
+
+        static void DestroyNamed(GameObject go)
+        {
+            if (go == null)
+                return;
+            // Rename so FindNamed cannot early-out on a deferred Destroy.
+            go.name = go.name + "_Obsolete";
+            if (Application.isPlaying)
+                Object.Destroy(go);
+            else
+                Object.DestroyImmediate(go);
         }
 
         static GameObject BuildQueen(GizaComplex.Pose pose, string name, float east, float north, float baseM, float heightM, string honesty)
@@ -445,6 +481,17 @@ namespace RealityEngine.Visualization
                 var pad = new LabMeshBuilder(8, 12);
                 pad.AddBox(new Vector3(0f, deckH * 0.5f + dy, len + 4f), new Vector3(width + 4f, deckH, 8f), Color.white);
                 GizaBuild.SpawnMesh(root.transform, name + "_Terminal", pad.Build(name + "_Terminal"), pav, true);
+                const string causeHonesty =
+                    GizaComplex.HonestyPrefix + "\n" +
+                    "Khufu causeway. Descends from the mortuary east door down the east escarpment to the floodplain / harbor foot (schematic valley terminus pad).\n" +
+                    "Walkable deck + rails. Width ~10 m. Not photogrammetry.";
+                GizaBuild.HonestyPlate(root.transform, name + "_Honesty", causeHonesty, width + 8f);
+                Transform plate = root.transform.Find(name + "_Honesty");
+                if (plate != null)
+                {
+                    plate.localPosition = new Vector3(0f, deckH + dy + 1.55f, len * 0.35f);
+                    plate.localRotation = Quaternion.Euler(0f, 180f, 0f);
+                }
             }
             return root;
         }
