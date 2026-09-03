@@ -95,7 +95,16 @@ namespace RealityEngine.Chemistry
             ConceptualHonesty,
             "Phosphate groups in ATP. 'High-energy phosphate' is classical accounting, not a special kind of energy.");
 
+        public static readonly Element Ca = new Element(
+            20,
+            "Ca",
+            "Calcium",
+            "2, 8, 8, 2",
+            ConceptualHonesty,
+            "Ca in calcite (CaCO3). Ionic Ca2+ with carbonate — conceptual crystal, not XRD, not a band-structure solve.");
+
         public const string AtpFormula = "C10H16N5O13P3";
+        public const string CalciteFormula = "CaCO3";
 
         public string TinyCard()
         {
@@ -112,6 +121,16 @@ namespace RealityEngine.Chemistry
                 + P.TinyCard() + "\n"
                 + ConceptualHonesty + "\n"
                 + "Same lab chemistry as the Cu coil (Cu / C / H / O continuity; ATP also uses N, P).";
+        }
+
+        public static string CalciteAtomCards()
+        {
+            return "calcite (schematic " + CalciteFormula + ")\n"
+                + Ca.TinyCard() + "\n"
+                + C.TinyCard() + "\n"
+                + O.TinyCard() + "\n"
+                + "Conceptual / Classical crystal, not XRD.\n"
+                + ConceptualHonesty;
         }
 
         public string PeriodicCard()

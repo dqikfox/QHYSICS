@@ -31,7 +31,8 @@ namespace RealityEngine.AI
         DoubleResistanceR = 2,
         WhyCopperConductor = 3,
         WhereMuscleEnergy = 4,
-        IsEnergyCreated = 5
+        IsEnergyCreated = 5,
+        WhyKhufuSlope = 6
     }
 
     [System.Serializable]

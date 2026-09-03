@@ -212,6 +212,17 @@ namespace RealityEngine.Visualization
 
             Vector3 origin = _camera.transform.position;
             Vector3 fwd = _camera.transform.forward;
+            RaycastHit hit;
+            if (Physics.Raycast(origin, fwd, out hit, 400f, ~0, QueryTriggerInteraction.Ignore))
+            {
+                FieldLensTarget rayTarget = hit.collider.GetComponentInParent<FieldLensTarget>();
+                if (rayTarget != null)
+                {
+                    _focused = rayTarget;
+                    return;
+                }
+            }
+
             FieldLensTarget best = null;
             float bestDot = 0.82f;
             for (int i = 0; i < _targets.Count; i++)

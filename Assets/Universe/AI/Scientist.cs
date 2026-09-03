@@ -4,6 +4,8 @@ using RealityEngine.Experiments;
 using RealityEngine.Chemistry;
 using RealityEngine.Biology;
 using RealityEngine.Physics.Thermo;
+using RealityEngine.Survey;
+using RealityEngine.Visualization;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -114,6 +116,11 @@ namespace RealityEngine.AI
             SelectQuestion(ScientistQuestion.IsEnergyCreated);
         }
 
+        public void SelectWhyKhufuSlope()
+        {
+            SelectQuestion(ScientistQuestion.WhyKhufuSlope);
+        }
+
         public SimulationState CaptureState()
         {
             CacheRefs();
@@ -188,6 +195,9 @@ namespace RealityEngine.AI
                 case ScientistQuestion.IsEnergyCreated:
                     _hypothesis = PredictEnergyCreated();
                     break;
+                case ScientistQuestion.WhyKhufuSlope:
+                    _hypothesis = PredictKhufuSlope();
+                    break;
                 default:
                     _hypothesis = PredictDoubleVelocity(last);
                     break;
@@ -203,10 +213,10 @@ namespace RealityEngine.AI
             if (!_hypothesisFormed)
                 FormHypothesis();
 
-            if (_question != ScientistQuestion.WhyCopperConductor && _question != ScientistQuestion.WhereMuscleEnergy && _question != ScientistQuestion.IsEnergyCreated)
+            if (_question != ScientistQuestion.WhyCopperConductor && _question != ScientistQuestion.WhereMuscleEnergy && _question != ScientistQuestion.IsEnergyCreated && _question != ScientistQuestion.WhyKhufuSlope)
                 ApplyQuestionParameters();
             CaptureState();
-            if (_question == ScientistQuestion.WhyCopperConductor || _question == ScientistQuestion.WhereMuscleEnergy || _question == ScientistQuestion.IsEnergyCreated)
+            if (_question == ScientistQuestion.WhyCopperConductor || _question == ScientistQuestion.WhereMuscleEnergy || _question == ScientistQuestion.IsEnergyCreated || _question == ScientistQuestion.WhyKhufuSlope)
                 return;
 
             if (_runner == null)
@@ -235,6 +245,8 @@ namespace RealityEngine.AI
                     return "Q5  Where does muscle energy come from?";
                 case ScientistQuestion.IsEnergyCreated:
                     return "Q6  Is energy created in this lab?";
+                case ScientistQuestion.WhyKhufuSlope:
+                    return "Q7  Why is the slope 51 deg 50'?";
                 default:
                     return "Q1  What if I double magnet velocity? (B and coil unchanged)";
             }
@@ -277,6 +289,8 @@ namespace RealityEngine.AI
                     SelectWhereMuscleEnergy();
                 if (kb.digit9Key.wasPressedThisFrame)
                     SelectIsEnergyCreated();
+                if (kb.digit0Key.wasPressedThisFrame)
+                    SelectWhyKhufuSlope();
                 if (kb.hKey.wasPressedThisFrame)
                     FormHypothesis();
                 if (kb.jKey.wasPressedThisFrame)
@@ -296,6 +310,8 @@ namespace RealityEngine.AI
                 SelectWhereMuscleEnergy();
             if (Input.GetKeyDown(KeyCode.Alpha9))
                 SelectIsEnergyCreated();
+            if (Input.GetKeyDown(KeyCode.Alpha0))
+                SelectWhyKhufuSlope();
             if (Input.GetKeyDown(KeyCode.H))
                 FormHypothesis();
             if (Input.GetKeyDown(KeyCode.J))
@@ -494,6 +510,18 @@ namespace RealityEngine.AI
                 text = body,
                 predictedPeakEmf = 0f,
                 basedOn = ThermoEnergy.Honesty + " " + BioEnergy.Honesty + " " + ThermoEnergy.Educational,
+                hasNumericPrediction = false
+            };
+        }
+
+        Hypothesis PredictKhufuSlope()
+        {
+            string body = KhufuSurvey.SlopeAnswer();
+            return new Hypothesis
+            {
+                text = body,
+                predictedPeakEmf = 0f,
+                basedOn = GizaComplex.HonestyPrefix + " Published seked 5.5 palms; live cubit rod if held.",
                 hasNumericPrediction = false
             };
         }
