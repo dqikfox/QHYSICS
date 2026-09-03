@@ -407,6 +407,8 @@ namespace RealityEngine.XR
 
             EnsureTeleportAreaOn("LabPlaza");
             EnsureTeleportAreaOn("GizaPlateau");
+            EnsureTeleportAreaOn("GizaDesert");
+            EnsureTeleportAreaOn("GizaKhafreTerrace");
             AddTeleportOnNamedContains("causeway");
             AddTeleportOnNamedContains("temple");
 

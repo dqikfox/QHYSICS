@@ -80,7 +80,10 @@ namespace RealityEngine.EditorTools
         static void Place(GizaComplex.Spawn which, string detail)
         {
             LabLandscapeApplier applier = LabLandscapeApplier.EnsureApplied();
-            applier.PlaceMonuments(which);
+            if (which == GizaComplex.Spawn.All)
+                applier.ApplyNow(true);
+            else
+                applier.PlaceMonuments(which);
             Mark(applier);
             Selection.activeGameObject = applier != null ? applier.gameObject : null;
             Debug.Log("Reality Engine: placed " + detail);

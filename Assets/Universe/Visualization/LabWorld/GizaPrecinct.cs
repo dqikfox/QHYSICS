@@ -167,8 +167,8 @@ namespace RealityEngine.Visualization
                 "Khafre valley temple. Granite and limestone, T-shaped pillared halls (walkable block rooms). Undamaged reconstruction of the well-preserved temple beside the Sphinx.\n" +
                 "Not photogrammetry. Causeway descends from the Khafre mortuary temple.";
             Ensure(KhafreMortuaryName, pose, p => BuildMortuary(p, KhafreMortuaryName, L.khafreTempleEast, L.khafreTempleNorth, GizaComplex.KhafreBedrockM, L.khafreTempleEW, L.khafreTempleNS, true, mortHonesty), terrace, true);
-            Ensure(KhafreValleyName, pose, p => BuildValleyTemple(p, L, valleyHonesty), pose.surfaceY, true);
-            Ensure(KhafreCausewayName, pose, p => BuildCauseway(p, KhafreCausewayName, L.khafreCauseStartEast, L.khafreCauseStartNorth, L.khafreCauseEndEast, L.khafreCauseEndNorth, terrace, pose.surfaceY, 10f), pose.surfaceY, false);
+            Ensure(KhafreValleyName, pose, p => BuildValleyTemple(p, L, valleyHonesty), GizaComplex.CourtY(pose), true);
+            Ensure(KhafreCausewayName, pose, p => BuildCauseway(p, KhafreCausewayName, L.khafreCauseStartEast, L.khafreCauseStartNorth, L.khafreCauseEndEast, L.khafreCauseEndNorth, terrace, GizaComplex.CourtY(pose), 10f), pose.surfaceY, false);
             Vector3 khafre = GizaComplex.WorldFromKhufu(pose, -GizaComplex.KhafreWestM, -GizaComplex.KhafreSouthM, GizaComplex.KhafreBedrockM);
             Ensure(KhafreEnclosureName, pose, p => BuildEnclosure(p, KhafreEnclosureName, khafre, GizaComplex.KhafreBedrockM, KhafrePyramid.BaseMeters * 0.5f + 5f, L.khafreTempleNS + 4f, false), terrace, true);
         }
@@ -179,7 +179,7 @@ namespace RealityEngine.Visualization
             const string honesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Sphinx temple. Immediately east of the Sphinx (in front of the face). Courtyard + inner sanctum (box massing). Walkable. Associated with Khafre's valley complex.";
-            Ensure(SphinxTempleName, pose, p => BuildSphinxTemple(p, L, honesty), pose.surfaceY, true);
+            Ensure(SphinxTempleName, pose, p => BuildSphinxTemple(p, L, honesty), GizaComplex.CourtY(pose), true);
         }
 
         public static void EnsureMenkaure(GizaComplex.Pose pose)
