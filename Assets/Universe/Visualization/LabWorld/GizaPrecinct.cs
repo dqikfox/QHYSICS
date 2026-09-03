@@ -185,7 +185,8 @@ namespace RealityEngine.Visualization
             float causeEndEast = L.khufuValleyEast - L.khufuValleyEW * 0.5f;
 
             GameObject oldCause = GizaComplex.FindNamed(KhufuCausewayName);
-            if (oldCause != null && (GizaComplex.FindNamed(KhufuValleyName) == null || !KhufuCausewayIsDescent(oldCause, floodY)))
+            if (oldCause != null && (GizaComplex.FindNamed(KhufuValleyName) == null || !KhufuCausewayIsDescent(oldCause, floodY)
+                || oldCause.transform.Find(KhufuCausewayName + "_Roof") == null))
                 DestroyNamed(oldCause);
             GameObject oldValley = GizaComplex.FindNamed(KhufuValleyName);
             if (oldValley != null && oldValley.transform.Find(KhufuValleyName + "_Halls") == null)
@@ -215,7 +216,8 @@ namespace RealityEngine.Visualization
                 || oldValley.transform.Find(KhafreValleyName + "_LinkDoor") == null))
                 DestroyNamed(oldValley);
             GameObject oldCause = GizaComplex.FindNamed(KhafreCausewayName);
-            if (oldCause != null && oldCause.transform.Find(KhafreCausewayName + "_Terminal") == null)
+            if (oldCause != null && (oldCause.transform.Find(KhafreCausewayName + "_Terminal") == null
+                || oldCause.transform.Find(KhafreCausewayName + "_Roof") == null))
                 DestroyNamed(oldCause);
 
             Ensure(KhafreMortuaryName, pose, p => BuildMortuary(p, KhafreMortuaryName, L.khafreTempleEast, L.khafreTempleNorth, GizaComplex.KhafreBedrockM, L.khafreTempleEW, L.khafreTempleNS, true, mortHonesty), terrace, true);
@@ -276,7 +278,8 @@ namespace RealityEngine.Visualization
             L.menCauseEndNorth = L.menValleyNorth;
 
             GameObject oldCause = GizaComplex.FindNamed(MenkaureCausewayName);
-            if (oldCause != null && !MenkaureCausewayIsDescent(oldCause, floodY))
+            if (oldCause != null && (!MenkaureCausewayIsDescent(oldCause, floodY)
+                || oldCause.transform.Find(MenkaureCausewayName + "_Roof") == null))
                 DestroyNamed(oldCause);
             GameObject oldValley = GizaComplex.FindNamed(MenkaureValleyName);
             if (oldValley != null && oldValley.transform.Find(MenkaureValleyName + "_Halls") == null)
@@ -691,8 +694,10 @@ namespace RealityEngine.Visualization
             Material tura = GizaBuild.TuraCasing();
             Material pav = GizaBuild.Pavement();
             const float deckH = 1.55f;
-            const float wallH = 1.45f;
+            // Covered processional corridor (Lehner): side walls + stone roof, VR headroom ~3.2 m.
+            const float wallH = 3.2f;
             const float wallT = 0.5f;
+            const float roofT = 0.5f;
             float dy = y1 - y0;
             float hw = width * 0.5f;
 
@@ -718,6 +723,26 @@ namespace RealityEngine.Visualization
             SlopedRail(walls, hw - wallT * 0.5f, deckH, deckH + dy, 0f, len, wallT, wallH);
             GizaBuild.SpawnMesh(root.transform, name + "_Walls", walls.Build(name + "_Walls"), tura, true);
 
+            // Stone roof / ceiling (Ensure rebuild marker: _Roof).
+            float ry0 = deckH + wallH;
+            float ry1 = deckH + dy + wallH;
+            var roof = new LabMeshBuilder(16, 24);
+            Vector3 rt00 = new Vector3(-hw, ry0 + roofT, 0f);
+            Vector3 rt10 = new Vector3(hw, ry0 + roofT, 0f);
+            Vector3 rt11 = new Vector3(hw, ry1 + roofT, len);
+            Vector3 rt01 = new Vector3(-hw, ry1 + roofT, len);
+            Vector3 rb00 = new Vector3(-hw, ry0, 0f);
+            Vector3 rb10 = new Vector3(hw, ry0, 0f);
+            Vector3 rb11 = new Vector3(hw, ry1, len);
+            Vector3 rb01 = new Vector3(-hw, ry1, len);
+            roof.AddQuad(rt00, rt10, rt11, rt01, Vector3.up, Color.white);
+            roof.AddQuad(rb00, rb01, rb11, rb10, Vector3.down, Color.white);
+            roof.AddQuad(rt00, rt01, rb01, rb00, Vector3.left, Color.white);
+            roof.AddQuad(rt10, rb10, rb11, rt11, Vector3.right, Color.white);
+            roof.AddQuad(rt00, rb00, rb10, rt10, Vector3.back, Color.white);
+            roof.AddQuad(rt01, rt11, rb11, rb01, Vector3.forward, Color.white);
+            GizaBuild.SpawnMesh(root.transform, name + "_Roof", roof.Build(name + "_Roof"), tura, true);
+
             if (name == KhufuCausewayName || name == MenkaureCausewayName || name == KhafreCausewayName)
             {
                 var pad = new LabMeshBuilder(8, 12);
@@ -728,25 +753,25 @@ namespace RealityEngine.Visualization
                 {
                     causeHonesty = GizaComplex.HonestyPrefix + "\n" +
                         "Khufu causeway. Descends from the mortuary east door down the east escarpment to the Khufu valley temple on the floodplain.\n" +
-                        "Walkable deck + rails. Width ~10 m. Not photogrammetry.";
+                        "Covered walkable corridor (deck + side walls + stone roof). Width ~10 m. Not photogrammetry.";
                 }
                 else if (name == MenkaureCausewayName)
                 {
                     causeHonesty = GizaComplex.HonestyPrefix + "\n" +
                         "Menkaure causeway. Descends from the mortuary east door down the east escarpment to the Menkaure valley temple on the floodplain.\n" +
-                        "Walkable deck + rails. Width ~8 m. Not photogrammetry.";
+                        "Covered walkable corridor (deck + side walls + stone roof). Width ~8 m. Not photogrammetry.";
                 }
                 else
                 {
                     causeHonesty = GizaComplex.HonestyPrefix + "\n" +
                         "Khafre causeway. Descends from the Khafre mortuary east door down to the Khafre valley temple / Sphinx court terrace.\n" +
-                        "Walkable deck + rails. Width ~10 m. Not photogrammetry.";
+                        "Covered walkable corridor (deck + side walls + stone roof). Width ~10 m. Not photogrammetry.";
                 }
                 GizaBuild.HonestyPlate(root.transform, name + "_Honesty", causeHonesty, width + 8f);
                 Transform plate = root.transform.Find(name + "_Honesty");
                 if (plate != null)
                 {
-                    plate.localPosition = new Vector3(0f, deckH + dy + 1.55f, len * 0.35f);
+                    plate.localPosition = new Vector3(0f, ry1 + roofT + 1.55f, len * 0.35f);
                     plate.localRotation = Quaternion.Euler(0f, 180f, 0f);
                 }
             }
