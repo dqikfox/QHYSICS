@@ -28,6 +28,17 @@ namespace RealityEngine.Experiments
     {
         public const string LabRootName = "Induction Lab";
 
+        const float BoardWidthMeters = 0.70f;
+        const float BoardHeightMeters = 1.25f;
+        const float BoardGapMeters = 0.15f;
+        const float BoardFontSize = 0.046f;
+        const int BoardSlotCount = 5;
+        const int SlotScientist = 0;
+        const int SlotChemistry = 1;
+        const int SlotBiology = 2;
+        const int SlotConservation = 3;
+        const int SlotExperiment = 4;
+
         [SerializeField]
         [Tooltip("World position of the coil center if no table/breadboard is found. 1 unit = 1 meter.")]
         Vector3 fallbackPosition = new Vector3(0.40f, 0.75f, 0.55f);
@@ -440,12 +451,191 @@ namespace RealityEngine.Experiments
         static Bounds CollectBounds(Transform root)
         {
             Renderer[] rs = root.GetComponentsInChildren<Renderer>();
-            if (rs.Length == 0)
+            Collider[] cs = root.GetComponentsInChildren<Collider>();
+            bool any = false;
+            Bounds b = new Bounds(root.position, Vector3.one * 0.1f);
+            for (int i = 0; i < rs.Length; i++)
+            {
+                if (!any)
+                {
+                    b = rs[i].bounds;
+                    any = true;
+                }
+                else
+                    b.Encapsulate(rs[i].bounds);
+            }
+            for (int i = 0; i < cs.Length; i++)
+            {
+                if (!any)
+                {
+                    b = cs[i].bounds;
+                    any = true;
+                }
+                else
+                    b.Encapsulate(cs[i].bounds);
+            }
+            if (!any)
                 return new Bounds(root.position, Vector3.one * 0.1f);
-            Bounds b = rs[0].bounds;
-            for (int i = 1; i < rs.Length; i++)
-                b.Encapsulate(rs[i].bounds);
             return b;
+        }
+
+        bool TryGetLabSurface(out Bounds bounds)
+        {
+            Transform table = FindNamedContains("circuittable", "circuit table");
+            if (table == null)
+                table = FindNamedContains("workbench", "labbench");
+            Transform breadboard = FindNamedContains("breadboard");
+            if (table != null)
+            {
+                bounds = CollectBounds(table);
+                if (breadboard != null)
+                    bounds.Encapsulate(CollectBounds(breadboard));
+                return true;
+            }
+            if (breadboard != null)
+            {
+                bounds = CollectBounds(breadboard);
+                return true;
+            }
+            bounds = new Bounds(fallbackPosition, Vector3.one * 0.4f);
+            return false;
+        }
+
+        void GetPlayerAxes(out Vector3 fwd, out Vector3 right)
+        {
+            Transform eye = FindPlayerEye();
+            if (eye != null)
+            {
+                fwd = eye.forward;
+                fwd.y = 0f;
+                if (fwd.sqrMagnitude < 1e-6f)
+                    fwd = Vector3.forward;
+                fwd.Normalize();
+                right = Vector3.Cross(Vector3.up, fwd);
+                if (right.sqrMagnitude < 1e-6f)
+                    right = Vector3.right;
+                right.y = 0f;
+                right.Normalize();
+                return;
+            }
+            fwd = Vector3.forward;
+            right = Vector3.right;
+        }
+
+        void ApplyBoardFace(GameObject go, TextMeshPro tmp)
+        {
+            if (go != null)
+                go.transform.localScale = Vector3.one;
+
+            const float w = BoardWidthMeters;
+            const float h = BoardHeightMeters;
+            if (tmp != null)
+            {
+                tmp.fontSize = BoardFontSize;
+                tmp.rectTransform.sizeDelta = new Vector2(w - 0.06f, h - 0.08f);
+                tmp.textWrappingMode = TextWrappingModes.Normal;
+                tmp.raycastTarget = false;
+                tmp.transform.localScale = Vector3.one;
+                tmp.transform.localPosition = new Vector3(-(w - 0.06f) * 0.5f, (h - 0.08f) * 0.5f, -0.008f);
+            }
+
+            if (go == null)
+                return;
+            Transform board = go.transform.Find("Board");
+            if (board != null)
+            {
+                board.localScale = new Vector3(w, h, 0.010f);
+                board.localPosition = new Vector3(0f, 0f, 0.012f);
+            }
+        }
+
+        void PlaceBoardAlongTableEdge(Transform t, int slot)
+        {
+            if (t == null)
+                return;
+            slot = Mathf.Clamp(slot, 0, BoardSlotCount - 1);
+            t.localScale = Vector3.one;
+
+            Vector3 fwd;
+            Vector3 right;
+            GetPlayerAxes(out fwd, out right);
+            Transform eye = FindPlayerEye();
+
+            float pitch = BoardWidthMeters + BoardGapMeters;
+            float total = BoardSlotCount * BoardWidthMeters + (BoardSlotCount - 1) * BoardGapMeters;
+            float alongOffset = -0.5f * total + 0.5f * BoardWidthMeters + slot * pitch;
+
+            Vector3 origin;
+            Vector3 faceDir;
+            Bounds surface;
+            if (TryGetLabSurface(out surface))
+            {
+                Vector3 towardPlayer;
+                if (eye != null)
+                {
+                    towardPlayer = eye.position - surface.center;
+                    towardPlayer.y = 0f;
+                    if (towardPlayer.sqrMagnitude < 1e-6f)
+                        towardPlayer = -fwd;
+                    towardPlayer.Normalize();
+                }
+                else
+                    towardPlayer = -fwd;
+
+                Vector3 away = -towardPlayer;
+                Vector3 along = Vector3.Cross(towardPlayer, Vector3.up);
+                if (along.sqrMagnitude < 1e-6f)
+                    along = right;
+                along.Normalize();
+
+                float towardExtent = Mathf.Abs(away.x) * surface.extents.x + Mathf.Abs(away.z) * surface.extents.z;
+                Vector3 edge = surface.center + away * (towardExtent + 0.04f);
+                origin = edge + along * alongOffset;
+                origin.y = surface.max.y + BoardHeightMeters * 0.5f;
+                faceDir = towardPlayer;
+            }
+            else
+            {
+                origin = fallbackPosition + right * alongOffset;
+                origin.y = Mathf.Max(fallbackPosition.y, 0.90f) + BoardHeightMeters * 0.5f;
+                faceDir = -fwd;
+                if (eye != null)
+                {
+                    Vector3 toEye = eye.position - origin;
+                    toEye.y = 0f;
+                    if (toEye.sqrMagnitude > 1e-6f)
+                        faceDir = toEye.normalized;
+                }
+            }
+
+            faceDir.y = 0f;
+            if (faceDir.sqrMagnitude < 1e-6f)
+                faceDir = Vector3.forward;
+            t.position = origin;
+            t.rotation = Quaternion.LookRotation(-faceDir.normalized, Vector3.up);
+        }
+
+        void PlaceOnTableGrab(Transform t, float alongRight, float alongFwd)
+        {
+            if (t == null)
+                return;
+            Vector3 fwd;
+            Vector3 right;
+            GetPlayerAxes(out fwd, out right);
+            Bounds surface;
+            Vector3 p;
+            if (TryGetLabSurface(out surface))
+            {
+                p = surface.center + right * alongRight + fwd * alongFwd;
+                p.y = surface.max.y + 0.04f;
+            }
+            else
+            {
+                p = fallbackPosition + right * alongRight + fwd * alongFwd;
+                if (p.y < 0.80f)
+                    p.y = 0.80f;
+            }
+            t.position = p;
         }
 
         GameObject BuildStand(Vector3 coilPos, Material wood)
@@ -963,10 +1153,6 @@ namespace RealityEngine.Experiments
             {
                 go = new GameObject("ExperimentBoard");
                 go.transform.SetParent(transform, true);
-                if (_readout != null)
-                    go.transform.position = _readout.transform.position + new Vector3(0.72f, 0.0f, 0.0f);
-                else
-                    go.transform.position = transform.position + new Vector3(1.1f, 1.0f, 0.6f);
 
                 var tmpGo = new GameObject("Text");
                 tmpGo.transform.SetParent(go.transform, false);
@@ -991,6 +1177,8 @@ namespace RealityEngine.Experiments
                 ApplyMat(boardMesh, MakeLit(new Color(0.06f, 0.07f, 0.05f)));
 
                 var view = go.AddComponent<ExperimentBoard>();
+                ApplyBoardFace(go, tmp);
+                PlaceBoardAlongTableEdge(go.transform, SlotExperiment);
                 view.Bind(runner, tmp);
                 return view;
             }
@@ -999,6 +1187,8 @@ namespace RealityEngine.Experiments
             if (viewExisting == null)
                 viewExisting = go.AddComponent<ExperimentBoard>();
             TextMeshPro tmpExisting = go.GetComponentInChildren<TextMeshPro>();
+            ApplyBoardFace(go, tmpExisting);
+            PlaceBoardAlongTableEdge(go.transform, SlotExperiment);
             viewExisting.Bind(runner, tmpExisting);
             return viewExisting;
         }
@@ -1052,7 +1242,6 @@ namespace RealityEngine.Experiments
             {
                 go = new GameObject("ScientistBoard");
                 go.transform.SetParent(transform, true);
-                PlaceInFrontOfPlayer(go.transform, 1.2f, 0.0f);
 
                 var tmpGo = new GameObject("Text");
                 tmpGo.transform.SetParent(go.transform, false);
@@ -1077,6 +1266,8 @@ namespace RealityEngine.Experiments
                 ApplyMat(boardMesh, MakeLit(new Color(0.05f, 0.08f, 0.06f)));
 
                 var view = go.AddComponent<ScientistBoard>();
+                ApplyBoardFace(go, tmp);
+                PlaceBoardAlongTableEdge(go.transform, SlotScientist);
                 view.Bind(scientist, _experiment, tmp);
                 go.SetActive(true);
                 return view;
@@ -1086,9 +1277,10 @@ namespace RealityEngine.Experiments
             if (viewExisting == null)
                 viewExisting = go.AddComponent<ScientistBoard>();
             TextMeshPro tmpExisting = go.GetComponentInChildren<TextMeshPro>();
+            ApplyBoardFace(go, tmpExisting);
+            PlaceBoardAlongTableEdge(go.transform, SlotScientist);
             viewExisting.Bind(scientist, _experiment, tmpExisting);
             go.SetActive(true);
-            PlaceInFrontOfPlayer(go.transform, 1.2f, 0.0f);
             return viewExisting;
         }
 
@@ -1137,7 +1329,6 @@ namespace RealityEngine.Experiments
             {
                 go = new GameObject("ChemistryBoard");
                 go.transform.SetParent(transform, true);
-                PlaceInFrontOfPlayer(go.transform, 1.2f, 0.55f);
 
                 var tmpGo = new GameObject("Text");
                 tmpGo.transform.SetParent(go.transform, false);
@@ -1165,8 +1356,9 @@ namespace RealityEngine.Experiments
             ChemistryBoard view = go.GetComponent<ChemistryBoard>();
             if (view == null)
                 view = go.AddComponent<ChemistryBoard>();
+            ApplyBoardFace(go, tmp);
+            PlaceBoardAlongTableEdge(go.transform, SlotChemistry);
             view.Bind(_fieldLens, _scaleEngine, tmp);
-            PlaceInFrontOfPlayer(go.transform, 1.2f, 0.55f);
 
             EnsureCoilElementCard();
         }
@@ -1200,54 +1392,19 @@ namespace RealityEngine.Experiments
             go.SetActive(true);
         }
 
-        static void PlaceInFrontOfPlayer(Transform t, float forwardMeters, float rightMeters)
-        {
-            if (t == null)
-                return;
-            Transform eye = FindPlayerEye();
-            Vector3 pos;
-            Vector3 fwd;
-            Vector3 right;
-            if (eye != null)
-            {
-                fwd = eye.forward;
-                fwd.y = 0f;
-                if (fwd.sqrMagnitude < 1e-6f)
-                    fwd = Vector3.forward;
-                fwd.Normalize();
-                right = Vector3.Cross(Vector3.up, fwd);
-                if (right.sqrMagnitude < 1e-6f)
-                    right = eye.right;
-                right.y = 0f;
-                right.Normalize();
-                pos = eye.position + fwd * forwardMeters + right * rightMeters;
-                float minY = eye.position.y - 0.15f;
-                if (pos.y < minY)
-                    pos.y = minY;
-            }
-            else
-            {
-                fwd = Vector3.forward;
-                right = Vector3.right;
-                pos = new Vector3(0.40f, 1.35f, 0.55f) + right * rightMeters;
-            }
-            t.position = pos;
-            t.rotation = Quaternion.LookRotation(fwd, Vector3.up);
-        }
-
         static Transform FindPlayerEye()
         {
-            Camera cam = Camera.main;
-            if (cam != null)
-                return cam.transform;
             GameObject xr = GameObject.Find("XR Origin");
             if (xr != null)
             {
-                Camera c = xr.GetComponentInChildren<Camera>(true);
-                if (c != null)
-                    return c.transform;
+                Camera xrCam = xr.GetComponentInChildren<Camera>(true);
+                if (xrCam != null)
+                    return xrCam.transform;
                 return xr.transform;
             }
+            Camera cam = Camera.main;
+            if (cam != null)
+                return cam.transform;
             return null;
         }
 
@@ -1320,7 +1477,7 @@ namespace RealityEngine.Experiments
                 go.transform.SetParent(transform, true);
             }
             go.SetActive(true);
-            PlaceGrabInFrontOfPlayer(go.transform, 1.30f, -0.22f, 0.40f);
+            PlaceOnTableGrab(go.transform, -0.22f, 0.18f);
 
             MuscleCell cell = go.GetComponent<MuscleCell>();
             if (cell == null)
@@ -1384,8 +1541,9 @@ namespace RealityEngine.Experiments
             BiologyBoard view = go.GetComponent<BiologyBoard>();
             if (view == null)
                 view = go.AddComponent<BiologyBoard>();
+            ApplyBoardFace(go, tmp);
+            PlaceBoardAlongTableEdge(go.transform, SlotBiology);
             view.Bind(_fieldLens, _scaleEngine, cell, tmp);
-            PlaceInFrontOfPlayer(go.transform, 1.40f, -0.58f);
             go.SetActive(true);
             _biologyBoard = view;
             return view;
@@ -1616,40 +1774,11 @@ namespace RealityEngine.Experiments
             ConservationBoard view = go.GetComponent<ConservationBoard>();
             if (view == null)
                 view = go.AddComponent<ConservationBoard>();
+            ApplyBoardFace(go, tmp);
+            PlaceBoardAlongTableEdge(go.transform, SlotConservation);
             view.Bind(_circuit, _heatCoupler, _fieldLens, _scaleEngine, tmp);
-            PlaceLedger(go.transform);
             go.SetActive(true);
             _conservationBoard = view;
-        }
-
-        void PlaceLedger(Transform t)
-        {
-            PlaceInFrontOfPlayer(t, 1.35f, 1.12f);
-            Vector3 p = t.position;
-            p.y = 1.40f;
-            Transform eye = FindPlayerEye();
-            if (eye != null)
-                p.y = Mathf.Clamp(eye.position.y - 0.05f, 1.30f, 1.55f);
-            p = NudgeAwayFrom(p, 0.55f, "ScientistBoard", "ChemistryBoard", "BiologyBoard", "MuscleCell", "ExperimentBoard");
-            Transform breadboard = FindNamedContains("breadboard", "circuittable");
-            if (breadboard != null)
-            {
-                Bounds bb = CollectBounds(breadboard);
-                bb.Expand(0.08f);
-                if (bb.Contains(p) || (bb.ClosestPoint(p) - p).sqrMagnitude < 0.15f * 0.15f)
-                    p.x = bb.max.x + 0.55f;
-            }
-            t.position = p;
-        }
-
-        static void PlaceGrabInFrontOfPlayer(Transform t, float forwardMeters, float rightMeters, float dropY)
-        {
-            PlaceInFrontOfPlayer(t, forwardMeters, rightMeters);
-            Vector3 p = t.position;
-            p.y -= dropY;
-            if (p.y < 0.80f)
-                p.y = 0.80f;
-            t.position = p;
         }
 
 
