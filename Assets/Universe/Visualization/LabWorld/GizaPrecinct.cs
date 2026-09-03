@@ -176,7 +176,7 @@ namespace RealityEngine.Visualization
             const string valleyHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Khufu valley temple. Floodplain-level limestone massing at the causeway foot (Lehner plan scale ~52 x 45 m).\n" +
-                "Reconstructed schematic: original largely lost under Nazlet el-Samman. Walkable court + antechambers. Not photogrammetry.";
+                "Reconstructed schematic: original largely lost under Nazlet el-Samman. Dual east portals toward the harbor, walkable court + antechambers. Not photogrammetry.";
 
             GizaComplex.LocalExtents(out _, out float plateauEast, out _, out _);
             float cliffEast = plateauEast + GizaComplex.MarginM;
@@ -189,7 +189,8 @@ namespace RealityEngine.Visualization
                 || oldCause.transform.Find(KhufuCausewayName + "_Roof") == null))
                 DestroyNamed(oldCause);
             GameObject oldValley = GizaComplex.FindNamed(KhufuValleyName);
-            if (oldValley != null && oldValley.transform.Find(KhufuValleyName + "_Halls") == null)
+            if (oldValley != null && (oldValley.transform.Find(KhufuValleyName + "_Halls") == null
+                || oldValley.transform.Find(KhufuValleyName + "_Portals") == null))
                 DestroyNamed(oldValley);
 
             Ensure(KhufuCausewayName, pose, p => BuildCauseway(p, KhufuCausewayName, L.khufuCauseStartEast, 0f, causeEndEast, 0f, pose.surfaceY, floodY, L.khufuCauseWid), pose.surfaceY, false);
@@ -863,11 +864,27 @@ namespace RealityEngine.Visualization
             floor.AddBox(new Vector3(0f, floorT * 0.5f, 0f), new Vector3(ew, floorT, ns), Color.white);
             GizaBuild.SpawnMesh(root.transform, KhufuValleyName + "_Floor", floor.Build(KhufuValleyName + "_Floor"), pav, true);
 
-            var walls = new LabMeshBuilder(48, 72);
+            // Dual east facade doors (N/S) toward harbor — twin pattern with Khafre valley.
+            const float portalDoorW = 3.4f;
+            const float portalZ = 9.5f;
+            var walls = new LabMeshBuilder(80, 120);
             walls.AddBox(new Vector3(0f, y, hz - wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
             walls.AddBox(new Vector3(0f, y, -hz + wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
-            walls.AddBox(new Vector3(hx - wallT * 0.5f, y, 0f), new Vector3(wallT, wallH, ns), Color.white);
             WallDoorX(walls, -hx + wallT * 0.5f, ns, wallH, wallT, 6.5f);
+            float wallX = hx - wallT * 0.5f;
+            float halfDoor = portalDoorW * 0.5f;
+            float northTop = portalZ + halfDoor;
+            float northRemain = hz - northTop;
+            if (northRemain > 0.3f)
+                walls.AddBox(new Vector3(wallX, y, northTop + northRemain * 0.5f), new Vector3(wallT, wallH, northRemain), Color.white);
+            float southBot = -portalZ - halfDoor;
+            float southRemain = southBot - (-hz);
+            if (southRemain > 0.3f)
+                walls.AddBox(new Vector3(wallX, y, southBot - southRemain * 0.5f), new Vector3(wallT, wallH, southRemain), Color.white);
+            float centerLen = (portalZ - halfDoor) - (-portalZ + halfDoor);
+            walls.AddBox(new Vector3(wallX, y, 0f), new Vector3(wallT, wallH, centerLen), Color.white);
+            walls.AddBox(new Vector3(wallX, wallH - 0.4f, portalZ), new Vector3(wallT, 0.8f, portalDoorW + 0.5f), Color.white);
+            walls.AddBox(new Vector3(wallX, wallH - 0.4f, -portalZ), new Vector3(wallT, 0.8f, portalDoorW + 0.5f), Color.white);
             GizaBuild.SpawnMesh(root.transform, KhufuValleyName + "_Walls", walls.Build(KhufuValleyName + "_Walls"), tura, true);
 
             var halls = new LabMeshBuilder(160, 240);
@@ -894,6 +911,23 @@ namespace RealityEngine.Visualization
                 }
             }
             GizaBuild.SpawnMesh(root.transform, KhufuValleyName + "_Pillars", pillars.Build(KhufuValleyName + "_Pillars"), gran, true);
+
+            // East-facade portal vestibules (N/S) toward harbor.
+            const float portalH = 4.8f;
+            const float portalDepth = 3.0f;
+            const float anteDepth = 3.0f;
+            const float anteW = 4.0f;
+            const float anteH = 4.6f;
+            var portals = new LabMeshBuilder(96, 144);
+            float portalHy = floorT + portalH * 0.5f;
+            float anteHy = floorT + anteH * 0.5f;
+            float vestibX = hx + portalDepth * 0.5f;
+            float anteX = hx - wallT - anteDepth * 0.5f - 0.1f;
+            portals.AddRoom(new Vector3(vestibX, portalHy, portalZ), new Vector3(portalDepth, portalH, portalDoorW), Color.white, false, false, true, true);
+            portals.AddRoom(new Vector3(vestibX, portalHy, -portalZ), new Vector3(portalDepth, portalH, portalDoorW), Color.white, false, false, true, true);
+            portals.AddRoom(new Vector3(anteX, anteHy, portalZ), new Vector3(anteDepth, anteH, anteW), Color.white, false, false, true, true);
+            portals.AddRoom(new Vector3(anteX, anteHy, -portalZ), new Vector3(anteDepth, anteH, anteW), Color.white, false, false, true, true);
+            GizaBuild.SpawnMesh(root.transform, KhufuValleyName + "_Portals", portals.Build(KhufuValleyName + "_Portals"), gran, true);
 
             GizaBuild.HonestyPlate(root.transform, KhufuValleyName + "_Honesty", honesty, ns);
             Transform plate = root.transform.Find(KhufuValleyName + "_Honesty");
