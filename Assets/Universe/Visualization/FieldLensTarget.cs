@@ -6,6 +6,7 @@ using RealityEngine.Core;
 using RealityEngine.Chemistry;
 using RealityEngine.Biology;
 using RealityEngine.Physics.Thermo;
+using RealityEngine.Survey;
 
 namespace RealityEngine.Visualization
 {
@@ -15,7 +16,8 @@ namespace RealityEngine.Visualization
         Coil,
         Load,
         Cell,
-        Thermo
+        Thermo,
+        Pyramid
     }
 
     /// <summary>
@@ -97,6 +99,11 @@ namespace RealityEngine.Visualization
             Configure(lens, FieldLensTargetKind.Thermo, null, null, null);
         }
 
+        public void ConfigurePyramid(FieldLens lens)
+        {
+            Configure(lens, FieldLensTargetKind.Pyramid, null, null, null);
+        }
+
         void OnDisable()
         {
             if (_lens != null)
@@ -142,7 +149,7 @@ namespace RealityEngine.Visualization
             while (t != null)
             {
                 string n = t.name;
-                if (!string.IsNullOrEmpty(n) && (n.StartsWith("Bio", System.StringComparison.Ordinal) || n.StartsWith("HeatEnergy", System.StringComparison.Ordinal) || n.StartsWith("HeatMath", System.StringComparison.Ordinal) || n.StartsWith("HeatParked", System.StringComparison.Ordinal) || n.StartsWith("HeatCaption", System.StringComparison.Ordinal) || n.StartsWith("HeatMaterial", System.StringComparison.Ordinal)))
+                if (!string.IsNullOrEmpty(n) && (n.StartsWith("Bio", System.StringComparison.Ordinal) || n.StartsWith("KhufuLens", System.StringComparison.Ordinal) || n.StartsWith("HeatEnergy", System.StringComparison.Ordinal) || n.StartsWith("HeatMath", System.StringComparison.Ordinal) || n.StartsWith("HeatParked", System.StringComparison.Ordinal) || n.StartsWith("HeatCaption", System.StringComparison.Ordinal) || n.StartsWith("HeatMaterial", System.StringComparison.Ordinal)))
                     return false;
                 t = t.parent;
             }
@@ -151,9 +158,10 @@ namespace RealityEngine.Visualization
 
         void BuildChildren()
         {
-            if (_kind == FieldLensTargetKind.Cell || _kind == FieldLensTargetKind.Thermo)
+            if (_kind == FieldLensTargetKind.Cell || _kind == FieldLensTargetKind.Thermo || _kind == FieldLensTargetKind.Pyramid)
             {
-                BuildHonestyLabel();
+                if (_kind != FieldLensTargetKind.Pyramid)
+                    BuildHonestyLabel();
                 BuildLookMaterials();
                 return;
             }
@@ -232,6 +240,8 @@ namespace RealityEngine.Visualization
                 return new Vector3(0f, 0.16f, 0f);
             if (_kind == FieldLensTargetKind.Thermo)
                 return new Vector3(0f, 0.14f, 0f);
+            if (_kind == FieldLensTargetKind.Pyramid)
+                return new Vector3(0f, 2.2f, 0f);
             return new Vector3(0f, 0.08f, 0f);
         }
 
@@ -294,6 +304,20 @@ namespace RealityEngine.Visualization
                         metallic = 0.92f;
                     }
                 }
+                else if (_kind == FieldLensTargetKind.Pyramid)
+                {
+                    metallic = 0.06f;
+                    col = new Color(0.74f, 0.68f, 0.56f);
+                    if (r != null)
+                    {
+                        string gn = r.gameObject.name;
+                        if (gn.IndexOf("King", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            col = new Color(0.38f, 0.28f, 0.26f);
+                            metallic = 0.28f;
+                        }
+                    }
+                }
                 else if (r != null)
                 {
                     string n = r.gameObject.name;
@@ -305,24 +329,10 @@ namespace RealityEngine.Visualization
                         col = new Color(0.28f, 0.3f, 0.33f);
                 }
 
-                Shader s = Shader.Find("Universal Render Pipeline/Lit");
-                if (s == null)
-                    s = Shader.Find("Standard");
-                if (s == null)
-                    s = Shader.Find("Sprites/Default");
-                var mat = new Material(s)
-                {
-                    hideFlags = HideFlags.HideAndDontSave,
-                    color = col
-                };
-                if (mat.HasProperty("_BaseColor"))
-                    mat.SetColor("_BaseColor", col);
-                if (mat.HasProperty("_Color"))
-                    mat.SetColor("_Color", col);
-                if (mat.HasProperty("_Metallic"))
-                    mat.SetFloat("_Metallic", metallic);
-                if (mat.HasProperty("_Smoothness"))
-                    mat.SetFloat("_Smoothness", 0.72f);
+                Material mat = LabWorldMeshes.MakeLit("RELab_LensLook", col, metallic, 0.72f, false);
+                if (mat == null)
+                    continue;
+                mat.hideFlags = HideFlags.HideAndDontSave;
                 _look[i] = mat;
             }
         }
@@ -382,6 +392,17 @@ namespace RealityEngine.Visualization
             _layer = Mathf.Clamp(layer, 0, FieldLens.LayerCount - 1);
             FieldLensLayer L = (FieldLensLayer)_layer;
             ScaleLevel S = (ScaleLevel)Mathf.Clamp(_scale, 0, ScaleEngine.StepCount - 1);
+
+            if (_kind == FieldLensTargetKind.Pyramid)
+            {
+                KhufuSurvey survey = GetComponent<KhufuSurvey>();
+                if (survey == null)
+                    survey = GetComponentInParent<KhufuSurvey>();
+                if (survey != null)
+                    survey.ApplyView(_layer, _scale);
+                ApplyMaterialLook(L == FieldLensLayer.Material || S == ScaleLevel.Material);
+                return;
+            }
 
             if (_kind == FieldLensTargetKind.Cell)
             {
@@ -540,6 +561,18 @@ namespace RealityEngine.Visualization
                     extra += "\nMolecular schematic on the cell (not QM).";
                 else if (L == FieldLensLayer.Electric || L == FieldLensLayer.Magnetic)
                     extra += "\nNot an EM source. Use the copper coil.";
+            }
+            if (_kind == FieldLensTargetKind.Pyramid)
+            {
+                extra = "\n" + GizaComplex.HonestyPrefix;
+                if (L == FieldLensLayer.Mathematical)
+                    extra += "\nseked 5.5 palms = 51 deg 50' 40\". 440 x 280 cubits. rise 14 / run 11.";
+                else if (L == FieldLensLayer.Electric || L == FieldLensLayer.Magnetic || L == FieldLensLayer.Charge || L == FieldLensLayer.EnergyFlow)
+                    extra += "\nnot an EM source";
+                else if (L == FieldLensLayer.Atomic)
+                    extra += "\nCaCO3 calcite schematic. Conceptual / Classical crystal, not XRD.";
+                else if (L == FieldLensLayer.Material)
+                    extra += "\nCourse banding / block outlines. Not 2 million blocks.";
             }
 
             _honesty.text = FieldLens.NameOf(_layer) + "\n" + FieldLens.HonestyOf(_layer) + extra;

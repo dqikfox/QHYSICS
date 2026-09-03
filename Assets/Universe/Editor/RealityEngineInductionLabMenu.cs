@@ -26,6 +26,7 @@ namespace RealityEngine.EditorTools
                 existing.EnsureScientist();
                 existing.EnsureChemistry();
                 existing.EnsureBiology();
+                existing.EnsureSurvey();
                 existing.EnsureLabStyle();
                 existing.EnsureThermo();
                 existing.EnsureLedger();
@@ -33,7 +34,7 @@ namespace RealityEngine.EditorTools
                 EditorGUIUtility.PingObject(existing);
                 if (existing.gameObject.scene.IsValid())
                     EditorSceneManager.MarkSceneDirty(existing.gameObject.scene);
-                Debug.Log("Induction Lab already exists. Field Lens + Scale Engine + Experiment + AI Scientist + Cu chemistry + biology ensured on: " + existing.gameObject.name, existing);
+                Debug.Log("Induction Lab already exists. Field Lens + Scale Engine + Experiment + AI Scientist + Cu chemistry + biology + Khufu survey ensured on: " + existing.gameObject.name, existing);
                 return;
             }
 
@@ -46,6 +47,7 @@ namespace RealityEngine.EditorTools
             bootstrap.EnsureScientist();
             bootstrap.EnsureChemistry();
             bootstrap.EnsureBiology();
+            bootstrap.EnsureSurvey();
             bootstrap.EnsureLabStyle();
             bootstrap.EnsureThermo();
             bootstrap.EnsureLedger();
@@ -58,6 +60,33 @@ namespace RealityEngine.EditorTools
                 go);
         }
 
+
+        const string SurveyPath = "Reality Engine/Place Khufu Survey";
+
+        [MenuItem(SurveyPath)]
+        public static void PlaceKhufuSurvey()
+        {
+            InductionLabBootstrap existing = Object.FindFirstObjectByType<InductionLabBootstrap>(FindObjectsInactive.Include);
+            if (existing == null)
+            {
+                PlaceInductionLab();
+                existing = Object.FindFirstObjectByType<InductionLabBootstrap>(FindObjectsInactive.Include);
+            }
+            if (existing == null)
+                return;
+            existing.EnsureSurvey();
+            Selection.activeGameObject = existing.gameObject;
+            EditorGUIUtility.PingObject(existing);
+            if (existing.gameObject.scene.IsValid())
+                EditorSceneManager.MarkSceneDirty(existing.gameObject.scene);
+            Debug.Log("Khufu cubit survey ensured (rod on table, survey board on table edge, Field Lens on casing, Scientist Q7). Dedupe if already placed.", existing);
+        }
+
+        [MenuItem(SurveyPath, true)]
+        public static bool PlaceKhufuSurveyValidate()
+        {
+            return true;
+        }
 
         const string Ensure10Path = "Reality Engine/Ensure 1.0 Gradient Lab";
 
@@ -78,6 +107,7 @@ namespace RealityEngine.EditorTools
             existing.EnsureScientist();
             existing.EnsureChemistry();
             existing.EnsureBiology();
+            existing.EnsureSurvey();
             existing.EnsureLabStyle();
             existing.EnsureThermo();
             existing.EnsureLedger();
@@ -85,7 +115,7 @@ namespace RealityEngine.EditorTools
             EditorGUIUtility.PingObject(existing);
             if (existing.gameObject.scene.IsValid())
                 EditorSceneManager.MarkSceneDirty(existing.gameObject.scene);
-            Debug.Log("Reality Engine 1.0 gradient lab ensured (heat path + conservation ledger) on: " + existing.gameObject.name, existing);
+            Debug.Log("Reality Engine 1.0 gradient lab ensured (heat path + conservation ledger + Khufu survey) on: " + existing.gameObject.name, existing);
         }
 
         [MenuItem(Ensure10Path, true)]

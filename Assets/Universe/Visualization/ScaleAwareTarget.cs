@@ -3,6 +3,7 @@ using TMPro;
 using RealityEngine.Core;
 using RealityEngine.Biology;
 using RealityEngine.Physics.Thermo;
+using RealityEngine.Survey;
 
 namespace RealityEngine.Visualization
 {
@@ -113,6 +114,16 @@ namespace RealityEngine.Visualization
                     extra += "\nnot a molecular sim";
                 else if (L == ScaleLevel.Material)
                     extra += "\nhot / cold bodies";
+            }
+            else if (GetComponent<KhufuSurvey>() != null || GetComponentInParent<KhufuSurvey>() != null)
+            {
+                extra = "\n" + GizaComplex.HonestyPrefix;
+                if (L == ScaleLevel.Molecular)
+                    extra += "\nCalcite lattice schematic. Conceptual / Classical crystal, not XRD.";
+                else if (L == ScaleLevel.Atomic)
+                    extra += "\nCa, C, O cards. Not QM.";
+                else if (L == ScaleLevel.Material)
+                    extra += "\nCourse banding / block outlines near look-hit.";
             }
             else if (L == ScaleLevel.Molecular)
                 extra = "\nNot molecular dynamics";

@@ -11,6 +11,7 @@ using RealityEngine.AI;
 using RealityEngine.Chemistry;
 using RealityEngine.Biology;
 using RealityEngine.Physics.Thermo;
+using RealityEngine.Survey;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -32,12 +33,13 @@ namespace RealityEngine.Experiments
         const float BoardHeightMeters = 1.25f;
         const float BoardGapMeters = 0.15f;
         const float BoardFontSize = 0.046f;
-        const int BoardSlotCount = 5;
+        const int BoardSlotCount = 6;
         const int SlotScientist = 0;
         const int SlotChemistry = 1;
         const int SlotBiology = 2;
         const int SlotConservation = 3;
         const int SlotExperiment = 4;
+        const int SlotSurvey = 5;
 
         [SerializeField]
         [Tooltip("World position of the coil center if no table/breadboard is found. 1 unit = 1 meter.")]
@@ -88,6 +90,8 @@ namespace RealityEngine.Experiments
         BiologyBoard _biologyBoard;
         HeatCoupler _heatCoupler;
         ConservationBoard _conservationBoard;
+        SurveyBoard _surveyBoard;
+        CubitRod _cubitRod;
         Renderer _loadRenderer;
         Material _loadMaterial;
         bool _built;
@@ -104,6 +108,8 @@ namespace RealityEngine.Experiments
         public BiologyBoard BiologyBoard => _biologyBoard;
         public HeatCoupler HeatCoupler => _heatCoupler;
         public ConservationBoard ConservationBoard => _conservationBoard;
+        public SurveyBoard SurveyBoard => _surveyBoard;
+        public CubitRod CubitRod => _cubitRod;
 
         void Reset()
         {
@@ -187,6 +193,7 @@ namespace RealityEngine.Experiments
                     existing.EnsureScientist();
                     existing.EnsureChemistry();
                     existing.EnsureBiology();
+                    existing.EnsureSurvey();
                     existing.EnsureLabStyle();
                     existing.EnsureThermo();
                     existing.EnsureLedger();
@@ -203,6 +210,7 @@ namespace RealityEngine.Experiments
                 bootstrap.EnsureScientist();
                 bootstrap.EnsureChemistry();
                 bootstrap.EnsureBiology();
+                bootstrap.EnsureSurvey();
                 bootstrap.EnsureLabStyle();
                 bootstrap.EnsureThermo();
                 bootstrap.EnsureLedger();
@@ -232,6 +240,7 @@ namespace RealityEngine.Experiments
                 EnsureScientist();
                 EnsureChemistry();
                 EnsureBiology();
+                EnsureSurvey();
                 EnsureLabStyle();
                 EnsureThermo();
                 EnsureLedger();
@@ -308,6 +317,7 @@ namespace RealityEngine.Experiments
                 EnsureScientist();
                 EnsureChemistry();
                 EnsureBiology();
+                EnsureSurvey();
                 EnsureLabStyle();
                 EnsureThermo();
                 EnsureLedger();
@@ -355,6 +365,7 @@ namespace RealityEngine.Experiments
             EnsureScientist();
             EnsureChemistry();
             EnsureBiology();
+            EnsureSurvey();
             EnsureLabStyle();
             _built = true;
         }
@@ -394,6 +405,12 @@ namespace RealityEngine.Experiments
             Transform ledger = transform.Find("ConservationBoard");
             if (ledger != null)
                 _conservationBoard = ledger.GetComponent<ConservationBoard>();
+            Transform surveyBoard = transform.Find("SurveyBoard");
+            if (surveyBoard != null)
+                _surveyBoard = surveyBoard.GetComponent<SurveyBoard>();
+            Transform cubit = transform.Find("CubitRod");
+            if (cubit != null)
+                _cubitRod = cubit.GetComponent<CubitRod>();
             if (load != null)
             {
                 _loadRenderer = load.GetComponent<Renderer>();
@@ -524,11 +541,14 @@ namespace RealityEngine.Experiments
 
         void ApplyBoardFace(GameObject go, TextMeshPro tmp)
         {
+            ApplyBoardFace(go, tmp, BoardWidthMeters, BoardHeightMeters);
+        }
+
+        void ApplyBoardFace(GameObject go, TextMeshPro tmp, float w, float h)
+        {
             if (go != null)
                 go.transform.localScale = Vector3.one;
 
-            const float w = BoardWidthMeters;
-            const float h = BoardHeightMeters;
             if (tmp != null)
             {
                 tmp.fontSize = BoardFontSize;
@@ -550,6 +570,11 @@ namespace RealityEngine.Experiments
         }
 
         void PlaceBoardAlongTableEdge(Transform t, int slot)
+        {
+            PlaceBoardAlongTableEdge(t, slot, BoardHeightMeters);
+        }
+
+        void PlaceBoardAlongTableEdge(Transform t, int slot, float heightMeters)
         {
             if (t == null)
                 return;
@@ -591,13 +616,13 @@ namespace RealityEngine.Experiments
                 float towardExtent = Mathf.Abs(away.x) * surface.extents.x + Mathf.Abs(away.z) * surface.extents.z;
                 Vector3 edge = surface.center + away * (towardExtent + 0.04f);
                 origin = edge + along * alongOffset;
-                origin.y = surface.max.y + BoardHeightMeters * 0.5f;
+                origin.y = surface.max.y + heightMeters * 0.5f;
                 faceDir = towardPlayer;
             }
             else
             {
                 origin = fallbackPosition + right * alongOffset;
-                origin.y = Mathf.Max(fallbackPosition.y, 0.90f) + BoardHeightMeters * 0.5f;
+                origin.y = Mathf.Max(fallbackPosition.y, 0.90f) + heightMeters * 0.5f;
                 faceDir = -fwd;
                 if (eye != null)
                 {
@@ -1290,14 +1315,16 @@ namespace RealityEngine.Experiments
             Transform board = transform.Find("ScientistBoard");
             if (board == null)
                 return;
-            if (board.Find("Button_Q6") != null)
+            if (board.Find("Button_Q7") != null)
                 return;
             Vector3 origin = board.position + board.right * -0.42f + board.up * -0.28f;
             if (board.Find("Button_Q1") != null)
             {
                 if (board.Find("Button_Q5") == null)
                     BuildButton(origin + board.right * 0.28f, "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f)).transform.SetParent(board, true);
-                BuildButton(origin + board.right * 0.49f, "Q6", () => scientist.SelectIsEnergyCreated(), new Color(0.62f, 0.38f, 0.18f)).transform.SetParent(board, true);
+                if (board.Find("Button_Q6") == null)
+                    BuildButton(origin + board.right * 0.35f, "Q6", () => scientist.SelectIsEnergyCreated(), new Color(0.62f, 0.38f, 0.18f)).transform.SetParent(board, true);
+                BuildButton(origin + board.right * 0.42f, "Q7", () => scientist.SelectWhyKhufuSlope(), new Color(0.55f, 0.42f, 0.18f)).transform.SetParent(board, true);
                 return;
             }
             BuildButton(origin, "Q1", () => scientist.SelectDoubleVelocity(), new Color(0.25f, 0.55f, 0.35f)).transform.SetParent(board, true);
@@ -1306,8 +1333,9 @@ namespace RealityEngine.Experiments
             BuildButton(origin + board.right * 0.21f, "Q4", () => scientist.SelectWhyCopper(), new Color(0.55f, 0.32f, 0.18f)).transform.SetParent(board, true);
             BuildButton(origin + board.right * 0.28f, "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f)).transform.SetParent(board, true);
             BuildButton(origin + board.right * 0.35f, "Q6", () => scientist.SelectIsEnergyCreated(), new Color(0.62f, 0.38f, 0.18f)).transform.SetParent(board, true);
-            BuildButton(origin + board.right * 0.42f, "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f)).transform.SetParent(board, true);
-            BuildButton(origin + board.right * 0.49f, "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.42f, "Q7", () => scientist.SelectWhyKhufuSlope(), new Color(0.55f, 0.42f, 0.18f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.49f, "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f)).transform.SetParent(board, true);
+            BuildButton(origin + board.right * 0.56f, "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f)).transform.SetParent(board, true);
         }
 
         public void EnsureChemistry()
@@ -1429,6 +1457,14 @@ namespace RealityEngine.Experiments
                         : transform.position + new Vector3(-0.25f, 0.8f, 0.98f);
                     BuildButton(q6pos, "Q6", () => scientist.SelectIsEnergyCreated(), new Color(0.62f, 0.38f, 0.18f));
                 }
+                if (transform.Find("Button_Q7") == null)
+                {
+                    Transform q6 = transform.Find("Button_Q6");
+                    Vector3 q7pos = q6 != null
+                        ? q6.position + new Vector3(0f, 0f, 0.06f)
+                        : transform.position + new Vector3(-0.25f, 0.8f, 1.04f);
+                    BuildButton(q7pos, "Q7", () => scientist.SelectWhyKhufuSlope(), new Color(0.55f, 0.42f, 0.18f));
+                }
                 EnsureScientistBoardButtons(scientist);
                 return;
             }
@@ -1442,8 +1478,9 @@ namespace RealityEngine.Experiments
             BuildButton(origin + new Vector3(0f, 0f, 0.24f), "Q4", () => scientist.SelectWhyCopper(), new Color(0.55f, 0.32f, 0.18f));
             BuildButton(origin + new Vector3(0f, 0f, 0.30f), "Q5", () => scientist.SelectWhereMuscleEnergy(), new Color(0.45f, 0.55f, 0.22f));
             BuildButton(origin + new Vector3(0f, 0f, 0.36f), "Q6", () => scientist.SelectIsEnergyCreated(), new Color(0.62f, 0.38f, 0.18f));
-            BuildButton(origin + new Vector3(0f, 0f, 0.42f), "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f));
-            BuildButton(origin + new Vector3(0f, 0f, 0.48f), "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.42f), "Q7", () => scientist.SelectWhyKhufuSlope(), new Color(0.55f, 0.42f, 0.18f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.48f), "Form hypothesis", () => scientist.FormHypothesis(), new Color(0.45f, 0.35f, 0.70f));
+            BuildButton(origin + new Vector3(0f, 0f, 0.54f), "Arm experiment", () => scientist.ArmExperiment(), new Color(0.70f, 0.35f, 0.20f));
             EnsureScientistBoardButtons(scientist);
         }
 
@@ -1549,6 +1586,158 @@ namespace RealityEngine.Experiments
             return view;
         }
 
+
+        public void EnsureSurvey()
+        {
+            CacheChildren();
+            if (_scientist == null)
+                EnsureScientist();
+            if (_fieldLens == null)
+                EnsureFieldLens();
+            if (_scaleEngine == null)
+                EnsureScaleEngine();
+
+            GameObject khufu = GizaComplex.FindNamed(KhufuPyramid.RootName);
+            if (khufu == null)
+            {
+                LabLandscapeApplier.EnsureApplied();
+                khufu = GizaComplex.FindNamed(KhufuPyramid.RootName);
+            }
+            if (khufu != null)
+            {
+                KhufuSurvey survey = khufu.GetComponent<KhufuSurvey>();
+                if (survey == null)
+                    survey = khufu.AddComponent<KhufuSurvey>();
+                survey.EnsureBuilt();
+                BindPyramidTarget(FindChildNamed(khufu.transform, "Khufu_Casing"));
+                BindPyramidTarget(FindChildNamed(khufu.transform, "Khufu_KingChamber"));
+            }
+
+            CubitRod rod = EnsureCubitRod();
+            SurveyBoard board = EnsureSurveyBoard();
+            _cubitRod = rod;
+            _surveyBoard = board;
+        }
+
+        static Transform FindChildNamed(Transform root, string name)
+        {
+            if (root == null)
+                return null;
+            Transform t = root.Find(name);
+            if (t != null)
+                return t;
+            Transform[] all = root.GetComponentsInChildren<Transform>(true);
+            for (int i = 0; i < all.Length; i++)
+            {
+                if (all[i] != null && all[i].name == name)
+                    return all[i];
+            }
+            return null;
+        }
+
+        void BindPyramidTarget(Transform t)
+        {
+            if (t == null)
+                return;
+            GameObject go = t.gameObject;
+            if (_fieldLens != null)
+            {
+                FieldLensTarget lensTarget = go.GetComponent<FieldLensTarget>();
+                if (lensTarget == null)
+                    lensTarget = go.AddComponent<FieldLensTarget>();
+                lensTarget.ConfigurePyramid(_fieldLens);
+            }
+            if (_scaleEngine != null)
+                BindScaleTarget(go, _scaleEngine);
+        }
+
+        CubitRod EnsureCubitRod()
+        {
+            Transform existing = transform.Find(CubitRod.RootName);
+            GameObject go;
+            if (existing != null)
+                go = existing.gameObject;
+            else
+            {
+                GameObject named = GameObject.Find(CubitRod.RootName);
+                if (named != null)
+                {
+                    named.transform.SetParent(transform, true);
+                    go = named;
+                }
+                else
+                {
+                    go = new GameObject(CubitRod.RootName);
+                    go.transform.SetParent(transform, true);
+                }
+            }
+            go.SetActive(true);
+            PlaceOnTableGrab(go.transform, 0.26f, -0.12f);
+            Bounds surface;
+            if (TryGetLabSurface(out surface))
+            {
+                Vector3 p = go.transform.position;
+                p.y = surface.max.y + CubitRod.LengthMeters * 0.5f + 0.01f;
+                go.transform.position = p;
+            }
+
+            CubitRod rod = go.GetComponent<CubitRod>();
+            if (rod == null)
+                rod = go.AddComponent<CubitRod>();
+            rod.EnsureBuilt();
+            _cubitRod = rod;
+            return rod;
+        }
+
+        SurveyBoard EnsureSurveyBoard()
+        {
+            Transform existing = transform.Find(SurveyBoard.RootName);
+            GameObject go;
+            TextMeshPro tmp;
+            if (existing != null)
+            {
+                go = existing.gameObject;
+                go.SetActive(true);
+                tmp = go.GetComponentInChildren<TextMeshPro>();
+            }
+            else
+            {
+                go = new GameObject(SurveyBoard.RootName);
+                go.transform.SetParent(transform, true);
+
+                var tmpGo = new GameObject("Text");
+                tmpGo.transform.SetParent(go.transform, false);
+                tmp = tmpGo.AddComponent<TextMeshPro>();
+                tmp.text = "KHUFU SURVEY";
+                tmp.fontSize = BoardFontSize;
+                tmp.alignment = TextAlignmentOptions.TopLeft;
+                tmp.color = new Color(0.92f, 0.88f, 0.70f);
+                tmp.rectTransform.sizeDelta = new Vector2(0.64f, 0.42f);
+                tmp.textWrappingMode = TextWrappingModes.Normal;
+                tmp.raycastTarget = false;
+                TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+                if (font != null)
+                    tmp.font = font;
+
+                var boardMesh = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                boardMesh.name = "Board";
+                boardMesh.transform.SetParent(go.transform, false);
+                boardMesh.transform.localPosition = new Vector3(0f, 0f, 0.012f);
+                boardMesh.transform.localScale = new Vector3(SurveyBoard.WidthMeters, SurveyBoard.HeightMeters, 0.010f);
+                KillCollider(boardMesh);
+                ApplyMat(boardMesh, MakeLit(new Color(0.08f, 0.07f, 0.05f)));
+            }
+
+            SurveyBoard view = go.GetComponent<SurveyBoard>();
+            if (view == null)
+                view = go.AddComponent<SurveyBoard>();
+            ApplyBoardFace(go, tmp, SurveyBoard.WidthMeters, SurveyBoard.HeightMeters);
+            PlaceBoardAlongTableEdge(go.transform, SlotSurvey, SurveyBoard.HeightMeters);
+            view.Bind(tmp);
+            go.SetActive(true);
+            _surveyBoard = view;
+            return view;
+        }
 
         public void EnsureLabStyle()
         {
@@ -1702,9 +1891,9 @@ namespace RealityEngine.Experiments
                 couplerRot = Quaternion.FromToRotation(Vector3.up, right);
             }
 
-            hotPos = NudgeAwayFrom(hotPos, 0.06f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard");
-            coldPos = NudgeAwayFrom(coldPos, 0.06f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard");
-            couplerPos = NudgeAwayFrom(couplerPos, 0.08f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard");
+            hotPos = NudgeAwayFrom(hotPos, 0.06f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard", "CubitRod", "SurveyBoard");
+            coldPos = NudgeAwayFrom(coldPos, 0.06f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard", "CubitRod", "SurveyBoard");
+            couplerPos = NudgeAwayFrom(couplerPos, 0.08f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard", "CubitRod", "SurveyBoard");
 
             hot.transform.position = hotPos;
             cold.transform.position = coldPos;
