@@ -164,11 +164,16 @@ namespace RealityEngine.Visualization
                 "No interiors. Not photogrammetry. Not the stripped modern ruin.";
             const string templeHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
-                "Khufu mortuary temple. Immediately east of Khufu, between the pyramid and the queens. ~52 x 40 m limestone court + pillared massing.\n" +
-                "Open court (walkable), complete walls (not today's stubs). Causeway descends east from the east door down the escarpment to the Khufu valley temple on the floodplain.";
+                "Khufu mortuary temple. Immediately east of Khufu, between the pyramid and the queens. ~52 x 40 m limestone open court + pillared colonnade (Lehner).\n" +
+                "Walkable: west door from pyramid pavement, antechamber, open court with pillars, east door into the covered causeway. Complete walls (not today's stubs). Not photogrammetry.";
             Ensure(G1aName, pose, p => BuildQueen(p, G1aName, L.g1aEast, L.g1aNorth, L.g1aBase, L.g1aHeight, queensHonesty), pose.surfaceY, true);
             Ensure(G1bName, pose, p => BuildQueen(p, G1bName, L.g1bEast, L.g1bNorth, L.g1bBase, L.g1bHeight, null), pose.surfaceY, true);
             Ensure(G1cName, pose, p => BuildQueen(p, G1cName, L.g1cEast, L.g1cNorth, L.g1cBase, L.g1cHeight, null), pose.surfaceY, true);
+            // Force rebuild when open-court / interior markers missing (replaces closed box massing).
+            GameObject oldKhufuMort = GizaComplex.FindNamed(KhufuMortuaryName);
+            if (oldKhufuMort != null && (oldKhufuMort.transform.Find(KhufuMortuaryName + "_Court") == null
+                || oldKhufuMort.transform.Find(KhufuMortuaryName + "_Interior") == null))
+                DestroyNamed(oldKhufuMort);
             Ensure(KhufuMortuaryName, pose, p => BuildMortuary(p, KhufuMortuaryName, L.khufuTempleEast, 0f, 0f, L.khufuTempleEW, L.khufuTempleNS, false, templeHonesty), pose.surfaceY, true);
 
             // Descend to floodplain Khufu valley temple. Plateau extents no longer follow the full run.
@@ -205,7 +210,8 @@ namespace RealityEngine.Visualization
             float terrace = pose.surfaceY + GizaComplex.KhafreBedrockM;
             const string mortHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
-                "Khafre mortuary temple. Immediately east of Khafre. Open limestone court, granite pillars, complete walls. Walkable.";
+                "Khafre mortuary temple. Immediately east of Khafre. Open limestone court, granite pillars, complete walls (Lehner).\n" +
+                "Walkable: west door from pyramid pavement, antechamber, open court with granite colonnade, east door into the covered causeway to the valley temple. Not photogrammetry.";
             const string valleyHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Khafre valley temple. Granite and limestone, T-shaped pillared halls (walkable block rooms). Dual north/south east entrances (vestibule portals) — Lehner / well-preserved Khafre valley temple.\n" +
@@ -222,6 +228,10 @@ namespace RealityEngine.Visualization
                 || oldCause.transform.Find(KhafreCausewayName + "_Roof") == null))
                 DestroyNamed(oldCause);
 
+            GameObject oldKhafreMort = GizaComplex.FindNamed(KhafreMortuaryName);
+            if (oldKhafreMort != null && (oldKhafreMort.transform.Find(KhafreMortuaryName + "_Court") == null
+                || oldKhafreMort.transform.Find(KhafreMortuaryName + "_Interior") == null))
+                DestroyNamed(oldKhafreMort);
             Ensure(KhafreMortuaryName, pose, p => BuildMortuary(p, KhafreMortuaryName, L.khafreTempleEast, L.khafreTempleNorth, GizaComplex.KhafreBedrockM, L.khafreTempleEW, L.khafreTempleNS, true, mortHonesty), terrace, true);
             Ensure(KhafreValleyName, pose, p => BuildValleyTemple(p, L, valleyHonesty), GizaComplex.CourtY(pose), true);
             Ensure(KhafreCausewayName, pose, p => BuildCauseway(p, KhafreCausewayName, L.khafreCauseStartEast, L.khafreCauseStartNorth, L.khafreCauseEndEast, L.khafreCauseEndNorth, terrace, GizaComplex.CourtY(pose), 10f), pose.surfaceY, false);
@@ -263,13 +273,17 @@ namespace RealityEngine.Visualization
             float floodY = pose.surfaceY - GizaComplex.CliffHeightM + GizaNile.SitAboveDesertM;
             const string honesty =
                 GizaComplex.HonestyPrefix + "\n" +
-                "Menkaure mortuary temple. Immediately east of Menkaure. Open limestone court, complete walls (reconstructed; historically unfinished granite conversion).\n" +
-                "Causeway descends east down the escarpment to the Menkaure valley temple. Queens G3a-c already sit south of Menkaure — not duplicated.";
+                "Menkaure mortuary temple. Immediately east of Menkaure. Open limestone court, complete walls (reconstructed; historically unfinished granite conversion — Lehner).\n" +
+                "Walkable limestone interior: west door from pyramid pavement, antechamber, open court with pillars, east door into the covered causeway. Queens G3a-c already sit south of Menkaure — not duplicated. Not photogrammetry.";
             const string valleyHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Menkaure valley temple. Floodplain-level mudbrick / limestone massing east of the cliff (Lehner plan scale ~44 x 47 m).\n" +
                 "Reconstructed complete shell; historically unfinished in stone then finished in mudbrick (Shepseskaf). Walkable court + antechambers. Not photogrammetry.";
 
+            GameObject oldMenMort = GizaComplex.FindNamed(MenkaureMortuaryName);
+            if (oldMenMort != null && (oldMenMort.transform.Find(MenkaureMortuaryName + "_Court") == null
+                || oldMenMort.transform.Find(MenkaureMortuaryName + "_Interior") == null))
+                DestroyNamed(oldMenMort);
             Ensure(MenkaureMortuaryName, pose, p => BuildMortuary(p, MenkaureMortuaryName, L.menkaureTempleEast, L.menkaureTempleNorth, 0f, L.menkaureTempleEW, L.menkaureTempleNS, false, honesty), pose.surfaceY, true);
 
             GizaComplex.LocalExtents(out _, out float plateauEast, out _, out _);
@@ -361,55 +375,104 @@ namespace RealityEngine.Visualization
             Material pav = GizaBuild.Pavement();
             Material gran = GizaBuild.Granite();
             Material lime = GizaBuild.InteriorLime();
+            Material pillarMat = granitePillars ? gran : tura;
 
-            const float wallH = 5.2f;
-            const float wallT = 1.2f;
+            // Open-court shell: VR headroom well above 3 m; sky-open court (no roof).
+            const float wallH = 5.6f;
+            const float wallT = 1.25f;
             const float floorT = 0.35f;
-            const float doorW = 8f;
+            const float westDoorW = 6.5f;
+            const float eastDoorW = 8.0f;
             float hx = ew * 0.5f;
             float hz = ns * 0.5f;
             float y = wallH * 0.5f;
 
+            // Full footprint pavement (MeshCollider + TeleportationArea via Place Giza Complex).
             var floor = new LabMeshBuilder(8, 12);
             floor.AddBox(new Vector3(0f, floorT * 0.5f, 0f), new Vector3(ew, floorT, ns), Color.white);
             GizaBuild.SpawnMesh(root.transform, name + "_Floor", floor.Build(name + "_Floor"), pav, true);
 
-            var walls = new LabMeshBuilder(80, 120);
-            WallDoorZ(walls, hz - wallT * 0.5f, ew, wallH, wallT, 6f);
-            WallDoorZ(walls, -hz + wallT * 0.5f, ew, wallH, wallT, 6f);
-            walls.AddBox(new Vector3(-hx + wallT * 0.5f, y, 0f), new Vector3(wallT, wallH, ns), Color.white);
-            WallDoorX(walls, hx - wallT * 0.5f, ns, wallH, wallT, doorW);
+            // West range depth (antechamber + sanctum) then open court to the east.
+            float westRange = Mathf.Clamp(ew * 0.30f, 9.5f, 13.5f);
+            float courtPad = 0.6f;
+            float courtEW = ew - wallT * 2f - westRange - courtPad;
+            float courtNS = ns - wallT * 2f - 2.4f;
+            float courtX = -hx + wallT + westRange + courtPad + courtEW * 0.5f;
+            var court = new LabMeshBuilder(8, 12);
+            court.AddBox(new Vector3(courtX, floorT * 0.5f + 0.04f, 0f), new Vector3(courtEW, floorT + 0.08f, courtNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, name + "_Court", court.Build(name + "_Court"), pav, true);
+
+            // Perimeter: solid N/S; west door toward pyramid pavement; east door into causeway.
+            var walls = new LabMeshBuilder(96, 144);
+            walls.AddBox(new Vector3(0f, y, hz - wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
+            walls.AddBox(new Vector3(0f, y, -hz + wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
+            WallDoorX(walls, -hx + wallT * 0.5f, ns, wallH, wallT, westDoorW);
+            WallDoorX(walls, hx - wallT * 0.5f, ns, wallH, wallT, eastDoorW);
             GizaBuild.SpawnMesh(root.transform, name + "_Walls", walls.Build(name + "_Walls"), tura, true);
 
-            var pillars = new LabMeshBuilder(64, 96);
-            float ph = 4.6f;
+            // Interior: west vestibule/antechamber on axis + flanking sanctum rooms (Ensure marker).
+            float anteH = 4.8f;
+            float anteEW = Mathf.Min(7.2f, westRange - 1.6f);
+            float anteNS = Mathf.Min(9.5f, ns * 0.28f);
+            float anteX = -hx + wallT + anteEW * 0.5f + 0.35f;
+            float anteY = floorT + anteH * 0.5f;
+            float sanctEW = anteEW * 0.92f;
+            float sanctNS = Mathf.Min(8.5f, (ns - anteNS) * 0.38f);
+            float sanctH = 4.6f;
+            float sanctY = floorT + sanctH * 0.5f;
+            float sanctZ = anteNS * 0.5f + sanctNS * 0.5f + 0.55f;
+            var interior = new LabMeshBuilder(160, 240);
+            Color stone = Color.white;
+            // Vestibule open west (pyramid door) and east (into court).
+            interior.AddRoom(new Vector3(anteX, anteY, 0f), new Vector3(anteEW, anteH, anteNS), stone, false, false, true, true);
+            // Flanking sancta open east toward the court.
+            interior.AddRoom(new Vector3(anteX, sanctY, sanctZ), new Vector3(sanctEW, sanctH, sanctNS), stone, false, false, false, true);
+            interior.AddRoom(new Vector3(anteX, sanctY, -sanctZ), new Vector3(sanctEW, sanctH, sanctNS), stone, false, false, false, true);
+            GizaBuild.SpawnMesh(root.transform, name + "_Interior", interior.Build(name + "_Interior"), lime, true);
+
+            // Colonnade framing the open court (two N-S rows; processional aisle on axis).
             float ps = granitePillars ? 1.15f : 1.0f;
-            int nx = 3;
-            int nz = 4;
-            float px0 = -2f;
-            float px1 = hx * 0.42f;
-            float pz0 = -hz * 0.40f;
-            float pz1 = hz * 0.40f;
-            for (int i = 0; i < nx; i++)
+            float ph = 4.8f;
+            float py = floorT + ph * 0.5f;
+            float aisle = Mathf.Max(4.5f, courtEW * 0.18f);
+            float rowX0 = courtX - aisle * 0.5f - ps * 0.5f;
+            float rowX1 = courtX + aisle * 0.5f + ps * 0.5f;
+            // Keep a second pair of rows toward the east if court is deep enough.
+            bool deep = courtEW > 16f;
+            float rowX2 = courtX + courtEW * 0.28f;
+            float rowX3 = courtX - courtEW * 0.28f;
+            int nz = Mathf.Clamp(Mathf.RoundToInt(courtNS / 9.5f), 4, 6);
+            float z0 = -courtNS * 0.38f;
+            float z1 = courtNS * 0.38f;
+            var pillars = new LabMeshBuilder(128, 192);
+            for (int j = 0; j < nz; j++)
             {
-                for (int j = 0; j < nz; j++)
+                float v = nz == 1 ? 0.5f : j / (float)(nz - 1);
+                float pz = Mathf.Lerp(z0, z1, v);
+                pillars.AddBox(new Vector3(rowX0, py, pz), new Vector3(ps, ph, ps), Color.white);
+                pillars.AddBox(new Vector3(rowX1, py, pz), new Vector3(ps, ph, ps), Color.white);
+                if (deep)
                 {
-                    float u = nx == 1 ? 0.5f : i / (float)(nx - 1);
-                    float v = nz == 1 ? 0.5f : j / (float)(nz - 1);
-                    pillars.AddBox(
-                        new Vector3(Mathf.Lerp(px0, px1, u), floorT + ph * 0.5f, Mathf.Lerp(pz0, pz1, v)),
-                        new Vector3(ps, ph, ps), Color.white);
+                    pillars.AddBox(new Vector3(rowX2, py, pz), new Vector3(ps, ph, ps), Color.white);
+                    pillars.AddBox(new Vector3(rowX3, py, pz), new Vector3(ps, ph, ps), Color.white);
                 }
             }
-            GizaBuild.SpawnMesh(root.transform, name + "_Pillars", pillars.Build(name + "_Pillars"), granitePillars ? gran : tura, true);
+            GizaBuild.SpawnMesh(root.transform, name + "_Pillars", pillars.Build(name + "_Pillars"), pillarMat, true);
 
-            float sEW = Mathf.Min(10f, ew * 0.32f);
-            float sNS = Mathf.Min(14f, ns * 0.42f);
-            float sH = 4.8f;
-            Vector3 sC = new Vector3(-hx + wallT + sEW * 0.5f + 0.35f, floorT + sH * 0.5f, 0f);
-            var sanctum = new LabMeshBuilder(48, 72);
-            sanctum.AddRoom(sC, new Vector3(sEW, sH, sNS), Color.white, false, false, false, true);
-            GizaBuild.SpawnMesh(root.transform, name + "_Sanctum", sanctum.Build(name + "_Sanctum"), lime, true);
+            // Light architraves atop colonnade rows (still open court — no continuous roof).
+            const float beamH = 0.5f;
+            const float beamW = 1.2f;
+            float beamY = floorT + ph + beamH * 0.5f;
+            float spanZ = (z1 - z0) + ps + 0.35f;
+            var arch = new LabMeshBuilder(48, 72);
+            arch.AddBox(new Vector3(rowX0, beamY, 0f), new Vector3(beamW, beamH, spanZ), Color.white);
+            arch.AddBox(new Vector3(rowX1, beamY, 0f), new Vector3(beamW, beamH, spanZ), Color.white);
+            if (deep)
+            {
+                arch.AddBox(new Vector3(rowX2, beamY, 0f), new Vector3(beamW, beamH, spanZ), Color.white);
+                arch.AddBox(new Vector3(rowX3, beamY, 0f), new Vector3(beamW, beamH, spanZ), Color.white);
+            }
+            GizaBuild.SpawnMesh(root.transform, name + "_Architraves", arch.Build(name + "_Architraves"), pillarMat, true);
 
             if (!string.IsNullOrEmpty(honesty))
             {
