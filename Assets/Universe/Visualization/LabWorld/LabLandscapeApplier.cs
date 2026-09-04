@@ -133,6 +133,7 @@ namespace RealityEngine.Visualization
 
             if (force)
             {
+                GizaField.ForceRebuildAll();
                 if (rootXf != null)
                     SafeDestroy(rootXf.gameObject);
                 _built = false;
@@ -460,6 +461,7 @@ namespace RealityEngine.Visualization
             PlaceDuneSkirts(root, pose, sand, plazaPos);
             PlaceSandWashes(root, pose, sand, plazaPos);
             GizaNile.Ensure(root, pose, plazaPos, xMin, xMax, zMin, zMax);
+            PlaceDesertDust(root, pose);
 
             float terrX = -GizaComplex.KhafreWestM - cx;
             float terrZ = -GizaComplex.KhafreSouthM - cz;
@@ -766,6 +768,134 @@ namespace RealityEngine.Visualization
         public const float KhafreDuneRadiusM = 28f;
         public const float MenkaureDuneRadiusM = 20f;
         public const float QueenDuneRadiusM = 14f;
+
+        const string DustRootName = "GizaDesertDust";
+
+        /// <summary>
+        /// Ambient sand/dust drift over West Field + desert floor. Few systems, low max particles for VR fill-rate.
+        /// No Sprites/Default - URP Particles/Unlit only.
+        /// </summary>
+        void PlaceDesertDust(Transform root, GizaComplex.Pose pose)
+        {
+            if (root == null)
+                return;
+            Transform existing = root.Find(DustRootName);
+            if (existing != null)
+            {
+                if (Application.isPlaying)
+                    Object.Destroy(existing.gameObject);
+                else
+                    Object.DestroyImmediate(existing.gameObject);
+            }
+
+            var dustRoot = new GameObject(DustRootName);
+            dustRoot.transform.SetParent(root, false);
+            dustRoot.transform.localPosition = Vector3.zero;
+            dustRoot.transform.localRotation = Quaternion.identity;
+
+            Material mat = MakeDustMaterial();
+            // West Field loft - local west of Khufu.
+            float kh = KhufuPyramid.BaseMeters * 0.5f;
+            Vector3 westLocal = new Vector3(-(kh + 170f), 4.5f, 0f);
+            Vector3 westWorld = pose.khufuCenter + pose.rot * westLocal;
+            SpawnDustSystem(dustRoot.transform, "GizaDust_WestField", westWorld, pose.rot,
+                new Vector3(140f, 8f, 220f), 90, 0.55f, mat);
+
+            // Broad desert ambience around plateau centre (low rate).
+            Vector3 desertWorld = new Vector3(root.position.x, pose.surfaceY - GizaComplex.CliffHeightM + 6f, root.position.z);
+            SpawnDustSystem(dustRoot.transform, "GizaDust_Desert", desertWorld, Quaternion.identity,
+                new Vector3(900f, 24f, 900f), 120, 0.35f, mat);
+        }
+
+        static Material MakeDustMaterial()
+        {
+            Shader sh = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+            if (sh == null)
+                sh = Shader.Find("Universal Render Pipeline/Unlit");
+            if (sh == null)
+                sh = Shader.Find("Particles/Standard Unlit");
+            if (sh == null)
+            {
+                Debug.LogError("LabLandscapeApplier: no URP particle/unlit shader for desert dust (refusing Sprites/Default).");
+                return null;
+            }
+            var mat = new Material(sh)
+            {
+                name = "RELab_DesertDust",
+                hideFlags = HideFlags.DontSave,
+                color = new Color(0.82f, 0.72f, 0.52f, 0.28f)
+            };
+            if (mat.HasProperty("_BaseColor"))
+                mat.SetColor("_BaseColor", new Color(0.82f, 0.72f, 0.52f, 0.28f));
+            if (mat.HasProperty("_Color"))
+                mat.SetColor("_Color", new Color(0.82f, 0.72f, 0.52f, 0.28f));
+            if (mat.HasProperty("_Surface"))
+                mat.SetFloat("_Surface", 1f); // transparent
+            if (mat.HasProperty("_Blend"))
+                mat.SetFloat("_Blend", 0f); // alpha
+            mat.renderQueue = 3000;
+            return mat;
+        }
+
+        static void SpawnDustSystem(Transform parent, string name, Vector3 worldPos, Quaternion worldRot,
+            Vector3 boxSize, int maxParticles, float rate, Material mat)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, true);
+            go.transform.SetPositionAndRotation(worldPos, worldRot);
+            var ps = go.AddComponent<ParticleSystem>();
+            var main = ps.main;
+            main.playOnAwake = true;
+            main.loop = true;
+            main.startLifetime = 12f;
+            main.startSpeed = new ParticleSystem.MinMaxCurve(0.15f, 0.85f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.18f, 0.55f);
+            main.startColor = new Color(0.86f, 0.76f, 0.56f, 0.22f);
+            main.maxParticles = maxParticles;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.gravityModifier = 0.02f;
+
+            var emission = ps.emission;
+            emission.rateOverTime = rate;
+
+            var shape = ps.shape;
+            shape.enabled = true;
+            shape.shapeType = ParticleSystemShapeType.Box;
+            shape.scale = boxSize;
+
+            var vel = ps.velocityOverLifetime;
+            vel.enabled = true;
+            vel.space = ParticleSystemSimulationSpace.World;
+            vel.x = new ParticleSystem.MinMaxCurve(0.4f, 1.2f);
+            vel.y = new ParticleSystem.MinMaxCurve(-0.05f, 0.15f);
+            vel.z = new ParticleSystem.MinMaxCurve(-0.2f, 0.2f);
+
+            var col = ps.colorOverLifetime;
+            col.enabled = true;
+            var grad = new Gradient();
+            grad.SetKeys(
+                new[] {
+                    new GradientColorKey(new Color(0.9f, 0.8f, 0.6f), 0f),
+                    new GradientColorKey(new Color(0.75f, 0.65f, 0.45f), 1f)
+                },
+                new[] {
+                    new GradientAlphaKey(0f, 0f),
+                    new GradientAlphaKey(0.28f, 0.2f),
+                    new GradientAlphaKey(0.18f, 0.7f),
+                    new GradientAlphaKey(0f, 1f)
+                });
+            col.color = grad;
+
+            var renderer = go.GetComponent<ParticleSystemRenderer>();
+            if (renderer != null)
+            {
+                renderer.renderMode = ParticleSystemRenderMode.Billboard;
+                if (mat != null)
+                    renderer.sharedMaterial = mat;
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+            }
+        }
 
         void PlaceDuneSkirts(Transform root, GizaComplex.Pose pose, Material sand, Vector3 plazaPos)
         {
