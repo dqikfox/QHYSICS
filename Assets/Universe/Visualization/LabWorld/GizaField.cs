@@ -20,6 +20,7 @@ namespace RealityEngine.Visualization
 
         public const string MastabasMarker = "_Mastabas";
         public const string VillageMarker = "_Village";
+        public const string CrowWallMarker = "_CrowWall";
         public const string ShaftMarker = "_Shaft";
         public const string SpeculativeShaftsMarker = "_Shafts";
 
@@ -46,6 +47,12 @@ namespace RealityEngine.Visualization
         public const float VillageSouthOfMenkaureM = 110f;
         public const float VillageEW = 140f;
         public const float VillageNS = 95f;
+        // Wall of the Crow (Heit el-Ghurab north edge) - Lehner schematic scale.
+        public const float CrowWallLengthM = 200f;
+        public const float CrowWallHeightM = 10f;
+        public const float CrowWallThicknessM = 3.6f;
+        public const float CrowGateWidthM = 7.2f;
+        public const float CrowGateHeightM = 6.0f;
 
         // Osiris Shaft near Sphinx / Khafre valley (schematic).
         public const float ShaftEastOfSphinxM = -28f;
@@ -65,7 +72,8 @@ namespace RealityEngine.Visualization
                 (eEast1 - eEast0) * 0.5f + 8f, (eNorth1 - eNorth0) * 0.5f + 8f);
 
             LayoutVillage(out float vEast, out float vNorth);
-            Enc(ref xMin, ref xMax, ref zMin, ref zMax, vEast, vNorth, VillageEW * 0.5f + 12f, VillageNS * 0.5f + 12f);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, vEast, vNorth,
+                Mathf.Max(VillageEW, CrowWallLengthM) * 0.5f + 14f, VillageNS * 0.5f + CrowWallThicknessM + 16f);
 
             LayoutShaft(out float sEast, out float sNorth);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, sEast, sNorth, ShaftWidthM * 0.5f + 10f, ShaftWidthM * 0.5f + 10f);
@@ -112,7 +120,8 @@ namespace RealityEngine.Visualization
         public static void EnsureWorkersVillage(GizaComplex.Pose pose)
         {
             GameObject old = GizaComplex.FindNamed(WorkersVillageName);
-            if (old != null && old.transform.Find(WorkersVillageName + VillageMarker) == null)
+            if (old != null && (old.transform.Find(WorkersVillageName + VillageMarker) == null
+                || old.transform.Find(WorkersVillageName + CrowWallMarker) == null))
                 DestroyNamed(old);
             float floodY = pose.surfaceY - GizaComplex.CliffHeightM + GizaNile.SitAboveDesertM;
             Ensure(WorkersVillageName, pose, BuildWorkersVillage, floodY, true);
@@ -520,10 +529,13 @@ namespace RealityEngine.Visualization
             GizaBuild.SpawnMesh(root.transform, WorkersVillageName + "_Streets",
                 streets.Build(WorkersVillageName + "_Streets"), pav, true);
 
+            BuildWallOfTheCrow(root.transform, ew, ns);
+
             const string honesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Heit el-Ghurab (workers' village) schematic south of the plateau apron / near floodplain.\n" +
-                "Mudbrick house grid + long gallery barracks (Lehner). Walkable streets. Not photogrammetry. Not modern Nazlet el-Samman.";
+                "Mudbrick house grid + long gallery barracks + Wall of the Crow on the north edge (Lehner).\n" +
+                "Walkable streets and crow-wall gateway. Not photogrammetry. Not modern Nazlet el-Samman.";
             GizaBuild.HonestyPlate(root.transform, WorkersVillageName + "_Honesty", honesty, 30f);
             Transform plate = root.transform.Find(WorkersVillageName + "_Honesty");
             if (plate != null)
@@ -532,6 +544,67 @@ namespace RealityEngine.Visualization
                 plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
             }
             return root;
+        }
+
+        /// <summary>
+        /// Wall of the Crow: massive limestone wall along the north edge of Heit el-Ghurab
+        /// with a walkable central gateway. Schematic Lehner scale, not survey points.
+        /// </summary>
+        static void BuildWallOfTheCrow(Transform parent, float villageEW, float villageNS)
+        {
+            Material lime = GizaBuild.CliffRock();
+            Material pav = GizaBuild.Pavement();
+            float len = Mathf.Max(CrowWallLengthM, villageEW * 1.15f);
+            float h = CrowWallHeightM;
+            float t = CrowWallThicknessM;
+            float gateW = CrowGateWidthM;
+            float gateH = CrowGateHeightM;
+            // Sit just north of the house grid so the wall faces the plateau.
+            float wallZ = villageNS * 0.5f + t * 0.55f + 2.5f;
+            float wing = (len - gateW) * 0.5f;
+
+            var wall = new LabMeshBuilder(96, 144);
+            // East and west wings (leave central gateway open).
+            wall.AddBox(new Vector3(-(gateW * 0.5f + wing * 0.5f), h * 0.5f, wallZ),
+                new Vector3(wing, h, t), Color.white);
+            wall.AddBox(new Vector3(gateW * 0.5f + wing * 0.5f, h * 0.5f, wallZ),
+                new Vector3(wing, h, t), Color.white);
+            // Lintel / upper course bridging the gate.
+            float lintelH = Mathf.Max(1.2f, h - gateH);
+            wall.AddBox(new Vector3(0f, gateH + lintelH * 0.5f, wallZ),
+                new Vector3(gateW + 1.2f, lintelH, t * 1.05f), Color.white);
+            // Gate jamb thickening.
+            wall.AddBox(new Vector3(-(gateW * 0.5f + 0.55f), gateH * 0.5f, wallZ),
+                new Vector3(1.1f, gateH, t * 1.15f), Color.white);
+            wall.AddBox(new Vector3(gateW * 0.5f + 0.55f, gateH * 0.5f, wallZ),
+                new Vector3(1.1f, gateH, t * 1.15f), Color.white);
+            // Batter hint: low outer toe along both faces.
+            wall.AddBox(new Vector3(0f, 0.45f, wallZ + t * 0.55f),
+                new Vector3(len * 0.98f, 0.9f, 0.7f), Color.white);
+            wall.AddBox(new Vector3(0f, 0.45f, wallZ - t * 0.55f),
+                new Vector3(len * 0.98f, 0.9f, 0.7f), Color.white);
+            GizaBuild.SpawnMesh(parent, WorkersVillageName + CrowWallMarker,
+                wall.Build(WorkersVillageName + CrowWallMarker), lime, true);
+
+            // Walkable gateway floor + short approach aprons N/S.
+            var gate = new LabMeshBuilder(24, 36);
+            gate.AddBox(new Vector3(0f, 0.1f, wallZ), new Vector3(gateW * 0.92f, 0.18f, t + 4.5f), Color.white);
+            gate.AddBox(new Vector3(0f, 0.08f, wallZ - t * 0.5f - 3.2f), new Vector3(gateW * 1.4f, 0.14f, 3.5f), Color.white);
+            gate.AddBox(new Vector3(0f, 0.08f, wallZ + t * 0.5f + 3.2f), new Vector3(gateW * 1.4f, 0.14f, 3.5f), Color.white);
+            GizaBuild.SpawnMesh(parent, WorkersVillageName + "_CrowGate",
+                gate.Build(WorkersVillageName + "_CrowGate"), pav, true);
+
+            const string crowHonesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Wall of the Crow (Heit el-Ghurab). Massive limestone wall ~200 m E-W with a central gateway\n" +
+                "separating the workers' town from the plateau (Lehner). Schematic massing, not measured courses.";
+            GizaBuild.HonestyPlate(parent, WorkersVillageName + "_CrowHonesty", crowHonesty, 22f);
+            Transform crowPlate = parent.Find(WorkersVillageName + "_CrowHonesty");
+            if (crowPlate != null)
+            {
+                crowPlate.localPosition = new Vector3(len * 0.28f, 2.1f, wallZ + t * 0.5f + 1.2f);
+                crowPlate.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            }
         }
 
         static GameObject BuildOsirisShaft(GizaComplex.Pose pose)
