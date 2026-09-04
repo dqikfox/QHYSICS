@@ -132,9 +132,10 @@ namespace RealityEngine.Visualization
         public static void ExpandExtents(ref float xMin, ref float xMax, ref float zMin, ref float zMax)
         {
             Layout L = Compute();
-            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1aEast, L.g1aNorth, L.g1aBase * 0.5f + 4f);
-            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1bEast, L.g1bNorth, L.g1bBase * 0.5f + 4f);
-            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1cEast, L.g1cNorth, L.g1cBase * 0.5f + 4f);
+            // +16 m east pad covers queen east chapels beyond pavement rings.
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1aEast, L.g1aNorth, L.g1aBase * 0.5f + 16f);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1bEast, L.g1bNorth, L.g1bBase * 0.5f + 16f);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1cEast, L.g1cNorth, L.g1cBase * 0.5f + 16f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.khufuTempleEast, 0f, L.khufuTempleEW * 0.5f + 2f, L.khufuTempleNS * 0.5f + 2f);
             // Cliff-lip pad east of mortuary/queens — do not pull the plateau under the full valley causeway run.
             float khufuLipEast = Mathf.Max(
@@ -173,11 +174,21 @@ namespace RealityEngine.Visualization
                 GizaComplex.HonestyPrefix + "\n" +
                 "Khufu queens G1a (N), G1b, G1c (S). Tura casing ON, electrum pyramidia (reconstructed).\n" +
                 "Bases 49.5 / 49.0 / 46.2 m, original heights ~30.25 / 30.0 / 29.6 m (Lehner). East of Khufu, N-S row south of the causeway.\n" +
-                "No interiors. Not photogrammetry. Not the stripped modern ruin.";
+                "East chapels: small walkable limestone shells (~9.5 x 7.5 m) east of each queen with west door from pavement (Lehner schematic). Not pyramid interiors. Not photogrammetry. Not the stripped modern ruin.";
             const string templeHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Khufu mortuary temple. Immediately east of Khufu, between the pyramid and the queens. ~52 x 40 m limestone open court + pillared colonnade (Lehner).\n" +
                 "Walkable: west door from pyramid pavement, antechamber, open court with pillars, east door into the covered causeway. Complete walls (not today's stubs). Not photogrammetry.";
+            // Force rebuild when east chapel marker missing (casing-only queens).
+            GameObject oldG1a = GizaComplex.FindNamed(G1aName);
+            if (oldG1a != null && oldG1a.transform.Find(G1aName + "_Chapel") == null)
+                DestroyNamed(oldG1a);
+            GameObject oldG1b = GizaComplex.FindNamed(G1bName);
+            if (oldG1b != null && oldG1b.transform.Find(G1bName + "_Chapel") == null)
+                DestroyNamed(oldG1b);
+            GameObject oldG1c = GizaComplex.FindNamed(G1cName);
+            if (oldG1c != null && oldG1c.transform.Find(G1cName + "_Chapel") == null)
+                DestroyNamed(oldG1c);
             Ensure(G1aName, pose, p => BuildQueen(p, G1aName, L.g1aEast, L.g1aNorth, L.g1aBase, L.g1aHeight, queensHonesty), pose.surfaceY, true);
             Ensure(G1bName, pose, p => BuildQueen(p, G1bName, L.g1bEast, L.g1bNorth, L.g1bBase, L.g1bHeight, null), pose.surfaceY, true);
             Ensure(G1cName, pose, p => BuildQueen(p, G1cName, L.g1cEast, L.g1cNorth, L.g1cBase, L.g1cHeight, null), pose.surfaceY, true);
@@ -396,12 +407,61 @@ namespace RealityEngine.Visualization
             Material tura = GizaBuild.TuraCasing();
             Material gold = GizaBuild.Electrum();
             Material pav = GizaBuild.Pavement();
+            Material lime = GizaBuild.InteriorLime();
             GizaBuild.Casing(root.transform, name + "_Casing", baseM, heightM, tura, false, 0f, 0f, 0f, 0f, 0.5f);
             GizaBuild.Pyramidion(root.transform, name + "_Pyramidion", baseM, heightM, 0.5f, gold);
             GizaBuild.PavementRing(root.transform, name + "_Pavement", baseM, 3f, pav);
+            // G1 queens only: east chapel shells. G2a cult pyramid stays casing-only.
+            if (name == G1aName || name == G1bName || name == G1cName)
+                BuildQueenEastChapel(root.transform, name, baseM, lime, tura, pav);
             if (!string.IsNullOrEmpty(honesty))
                 GizaBuild.HonestyPlate(root.transform, name + "_Honesty", honesty, baseM);
             return root;
+        }
+
+        /// <summary>
+        /// Small east chapel east of a queen pyramid (Lehner schematic). Walkable VR headroom; west door from pavement.
+        /// Marker: name_Chapel (force-rebuild).
+        /// </summary>
+        static void BuildQueenEastChapel(Transform parent, string name, float baseM, Material lime, Material tura, Material pav)
+        {
+            const float chapelEW = 9.5f;
+            const float chapelNS = 7.5f;
+            const float gap = 3.5f; // past 3 m pavement ring
+            const float wallH = 4.2f;
+            const float wallT = 0.95f;
+            const float floorT = 0.30f;
+            const float doorW = 3.2f;
+            float hx = chapelEW * 0.5f;
+            float hz = chapelNS * 0.5f;
+            float cx = baseM * 0.5f + gap + hx;
+            float y = wallH * 0.5f;
+
+            var floor = new LabMeshBuilder(8, 12);
+            floor.AddBox(new Vector3(cx, floorT * 0.5f, 0f), new Vector3(chapelEW, floorT, chapelNS), Color.white);
+            GizaBuild.SpawnMesh(parent, name + "_ChapelFloor", floor.Build(name + "_ChapelFloor"), pav, true);
+
+            var walls = new LabMeshBuilder(48, 72);
+            walls.AddBox(new Vector3(cx, y, hz - wallT * 0.5f), new Vector3(chapelEW, wallH, wallT), Color.white);
+            walls.AddBox(new Vector3(cx, y, -hz + wallT * 0.5f), new Vector3(chapelEW, wallH, wallT), Color.white);
+            walls.AddBox(new Vector3(cx + hx - wallT * 0.5f, y, 0f), new Vector3(wallT, wallH, chapelNS), Color.white);
+            WallDoorX(walls, cx - hx + wallT * 0.5f, chapelNS, wallH, wallT, doorW);
+            GizaBuild.SpawnMesh(parent, name + "_Chapel", walls.Build(name + "_Chapel"), tura, true);
+
+            // Interior sanctum open west (door) — lime face so chapel reads as room not solid mass.
+            float anteEW = chapelEW - wallT * 2f - 0.4f;
+            float anteNS = chapelNS - wallT * 2f - 0.6f;
+            float anteH = 3.6f;
+            var interior = new LabMeshBuilder(40, 60);
+            interior.AddRoom(new Vector3(cx, floorT + anteH * 0.5f, 0f), new Vector3(anteEW, anteH, anteNS), Color.white, false, false, true, false);
+            GizaBuild.SpawnMesh(parent, name + "_ChapelInterior", interior.Build(name + "_ChapelInterior"), lime, true);
+
+            // Short approach apron from pavement ring to chapel door.
+            float apronEW = gap - 0.4f;
+            float apronX = baseM * 0.5f + apronEW * 0.5f + 0.15f;
+            var apron = new LabMeshBuilder(8, 12);
+            apron.AddBox(new Vector3(apronX, floorT * 0.5f, 0f), new Vector3(apronEW, floorT, doorW + 1.2f), Color.white);
+            GizaBuild.SpawnMesh(parent, name + "_ChapelApron", apron.Build(name + "_ChapelApron"), pav, true);
         }
 
         static GameObject BuildMortuary(GizaComplex.Pose pose, string name, float east, float north, float up,
