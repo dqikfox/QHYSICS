@@ -3,9 +3,9 @@ using UnityEngine;
 namespace RealityEngine.Visualization
 {
     /// <summary>
-    /// West Field + East Field mastaba cemeteries (west / east of Khufu), Heit el-Ghurab
-    /// workers' village (south apron / floodplain), Osiris Shaft-scale rock-cut complex
-    /// near Sphinx, and an OFF-by-default SPECULATIVE fringe water-shaft diagram
+    /// West / East / Central Field mastaba cemeteries (west + east of Khufu, south of Khafre),
+    /// Heit el-Ghurab workers' village (south apron / floodplain), Osiris Shaft-scale rock-cut
+    /// complex near Sphinx, and an OFF-by-default SPECULATIVE fringe water-shaft diagram
     /// (not proven archaeology).
     /// Schematic Lehner / Google Earth density - not photogrammetry.
     /// Local +X east, +Z north, 1 unit = 1 m.
@@ -14,6 +14,7 @@ namespace RealityEngine.Visualization
     {
         public const string WestFieldName = "KhufuWestField";
         public const string EastFieldName = "KhufuEastField";
+        public const string CentralFieldName = "GizaCentralField";
         public const string WorkersVillageName = "GizaWorkersVillage";
         public const string OsirisShaftName = "OsirisShaft";
         public const string SpeculativeName = "SpeculativeUnderworld";
@@ -41,6 +42,11 @@ namespace RealityEngine.Visualization
         public const float EastFieldDepthM = 120f;
         public const float EastFieldNorthPadM = 48f;
         public const float EastFieldSouthPadM = 35f;
+
+        // Central Field: south of Khafre (Lehner Central Field schematic rock-cut / mastaba streets).
+        public const float CentralFieldGapFromKhafreSouthM = 22f;
+        public const float CentralFieldDepthNS = 95f;
+        public const float CentralFieldHalfEW = 80f;
 
         // Heit el-Ghurab schematic south of Menkaure / plateau apron.
         public const float VillageEastOfMenkaureM = 120f;
@@ -71,6 +77,10 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, (eEast0 + eEast1) * 0.5f, (eNorth0 + eNorth1) * 0.5f,
                 (eEast1 - eEast0) * 0.5f + 8f, (eNorth1 - eNorth0) * 0.5f + 8f);
 
+            LayoutCentral(out float cEast0, out float cEast1, out float cNorth0, out float cNorth1);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, (cEast0 + cEast1) * 0.5f, (cNorth0 + cNorth1) * 0.5f,
+                (cEast1 - cEast0) * 0.5f + 8f, (cNorth1 - cNorth0) * 0.5f + 8f);
+
             LayoutVillage(out float vEast, out float vNorth);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, vEast, vNorth,
                 Mathf.Max(VillageEW, CrowWallLengthM) * 0.5f + 14f, VillageNS * 0.5f + CrowWallThicknessM + 16f);
@@ -96,6 +106,7 @@ namespace RealityEngine.Visualization
         {
             DestroyNamed(GizaComplex.FindNamed(WestFieldName));
             DestroyNamed(GizaComplex.FindNamed(EastFieldName));
+            DestroyNamed(GizaComplex.FindNamed(CentralFieldName));
             DestroyNamed(GizaComplex.FindNamed(WorkersVillageName));
             DestroyNamed(GizaComplex.FindNamed(OsirisShaftName));
         }
@@ -115,6 +126,16 @@ namespace RealityEngine.Visualization
             if (old != null && old.transform.Find(EastFieldName + MastabasMarker) == null)
                 DestroyNamed(old);
             Ensure(EastFieldName, pose, BuildEastField, pose.surfaceY, true);
+        }
+
+        public static void EnsureCentralField(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(CentralFieldName);
+            if (old != null && old.transform.Find(CentralFieldName + MastabasMarker) == null)
+                DestroyNamed(old);
+            // Sit on Khafre terrace height so streets meet the south apron.
+            float terrace = pose.surfaceY + GizaComplex.KhafreBedrockM;
+            Ensure(CentralFieldName, pose, BuildCentralField, terrace, true);
         }
 
         public static void EnsureWorkersVillage(GizaComplex.Pose pose)
@@ -182,6 +203,17 @@ namespace RealityEngine.Visualization
             east1 = east0 + EastFieldDepthM;
             north1 = EastFieldNorthPadM;
             north0 = -khHalf - EastFieldSouthPadM;
+        }
+
+        static void LayoutCentral(out float east0, out float east1, out float north0, out float north1)
+        {
+            float khafreHalf = KhafrePyramid.BaseMeters * 0.5f;
+            float cx = -GizaComplex.KhafreWestM;
+            east0 = cx - CentralFieldHalfEW;
+            east1 = cx + CentralFieldHalfEW;
+            float khafreSouth = -GizaComplex.KhafreSouthM - khafreHalf;
+            north1 = khafreSouth - CentralFieldGapFromKhafreSouthM;
+            north0 = north1 - CentralFieldDepthNS;
         }
 
         static void LayoutVillage(out float east, out float north)
@@ -353,6 +385,91 @@ namespace RealityEngine.Visualization
             {
                 plate.localPosition = new Vector3(-fieldEW * 0.5f - 6f, 1.55f, 0f);
                 plate.localRotation = Quaternion.Euler(0f, -90f, 0f);
+            }
+            return root;
+        }
+
+        static GameObject BuildCentralField(GizaComplex.Pose pose)
+        {
+            LayoutCentral(out float east0, out float east1, out float north0, out float north1);
+            float cx = (east0 + east1) * 0.5f;
+            float cz = (north0 + north1) * 0.5f;
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, cx, cz, GizaComplex.KhafreBedrockM);
+            GameObject root = GizaBuild.Root(CentralFieldName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material mud = GizaBuild.Mudbrick();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+            Material rock = GizaBuild.Bedrock();
+
+            float fieldEW = east1 - east0;
+            float fieldNS = north1 - north0;
+
+            var ground = new LabMeshBuilder(8, 12);
+            ground.AddBox(new Vector3(0f, 0.06f, 0f), new Vector3(fieldEW + 6f, 0.12f, fieldNS + 6f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, CentralFieldName + "_Sand", ground.Build(CentralFieldName + "_Sand"), sand, true);
+
+            // Mixed rock-cut / mastaba massing (Central Field is partly cut into Khafre quarry ledge).
+            const float streetE = 2.8f;
+            const float streetN = 2.6f;
+            const float cellE = 11.0f;
+            const float cellN = 8.5f;
+            float pitchE = cellE + streetE;
+            float pitchN = cellN + streetN;
+            int cols = Mathf.Max(4, Mathf.FloorToInt((fieldEW - streetE) / pitchE));
+            int rows = Mathf.Max(4, Mathf.FloorToInt((fieldNS - streetN) / pitchN));
+            float usedE = cols * pitchE - streetE;
+            float usedN = rows * pitchN - streetN;
+            float x0 = -usedE * 0.5f + cellE * 0.5f;
+            float z0 = -usedN * 0.5f + cellN * 0.5f;
+
+            for (int r = 0; r < rows; r++)
+            {
+                var row = new LabMeshBuilder(cols * 48, cols * 72);
+                float z = z0 + r * pitchN;
+                for (int c = 0; c < cols; c++)
+                {
+                    float x = x0 + c * pitchE;
+                    float hash = ((r * 37 + c * 23) % 17) / 17f;
+                    float ew = cellE * (0.78f + 0.30f * hash);
+                    float ns = cellN * (0.82f + 0.22f * ((c * 13 + r) % 11) / 10f);
+                    float h = 2.4f + 2.6f * (((r * 3 + c) % 7) / 6f);
+                    bool rockCut = (r + c) % 5 == 0;
+                    if (rockCut)
+                    {
+                        // Low rock-cut mastaba shells sit closer to the ledge.
+                        h = 1.6f + 1.4f * hash;
+                        ew *= 1.15f;
+                        ns *= 1.10f;
+                    }
+                    else if ((r + c) % 7 == 0)
+                    {
+                        ew *= 1.45f;
+                        ns *= 1.25f;
+                        h += 1.4f;
+                    }
+                    row.AddBox(new Vector3(x, h * 0.5f, z), new Vector3(ew, h, ns), Color.white);
+                    row.AddBox(new Vector3(x, h + 0.14f, z), new Vector3(ew * 1.02f, 0.28f, ns * 1.02f), Color.white);
+                }
+                Material mat = ((r + 1) % 3 == 0) ? rock : ((r % 2 == 0) ? lime : mud);
+                string rowName = CentralFieldName + "_Row" + r;
+                GizaBuild.SpawnMesh(root.transform, rowName, row.Build(rowName), mat, true);
+            }
+
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, CentralFieldName + MastabasMarker, mark.Build(CentralFieldName + MastabasMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Central Field cemetery south of Khafre. Dense reconstructed schematic mastaba / rock-cut tomb streets (Lehner Central Field).\n" +
+                "Limestone, mudbrick, and bedrock massings with walkable sand corridors. Not photogrammetry. Not excavated chamber interiors.";
+            GizaBuild.HonestyPlate(root.transform, CentralFieldName + "_Honesty", honesty, 34f);
+            Transform plateC = root.transform.Find(CentralFieldName + "_Honesty");
+            if (plateC != null)
+            {
+                plateC.localPosition = new Vector3(0f, 1.55f, fieldNS * 0.5f + 5f);
+                plateC.localRotation = Quaternion.Euler(0f, 180f, 0f);
             }
             return root;
         }
