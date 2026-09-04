@@ -5,7 +5,7 @@ using RealityEngine.Visualization;
 namespace RealityEngine.Survey
 {
     /// <summary>
-    /// Small table-edge TMP for the Khufu cubit survey. Honesty: reconstructed
+    /// Small table-edge TMP for the Giza cubit survey (Khufu + Khafre). Honesty: reconstructed
     /// original (Petrie/Lehner), not a scan. Simulation/published dimensions are source of truth.
     /// </summary>
     [DisallowMultipleComponent]
@@ -69,22 +69,29 @@ namespace RealityEngine.Survey
 
         void Rebuild()
         {
+            float cubit = KhufuPyramid.Cubit;
+            float khafreBaseCubits = KhafrePyramid.BaseMeters / cubit;
+            float khafreHeightCubits = KhafrePyramid.HeightMeters / cubit;
             _sb.Length = 0;
-            _sb.Append("KHUFU SURVEY\n");
+            _sb.Append("GIZA SURVEY\n");
             _sb.Append(GizaComplex.HonestyPrefix).Append('\n');
-            _sb.Append("cubit  ").Append(KhufuPyramid.Cubit.ToString("0.0000")).Append(" m  (royal)\n");
+            _sb.Append("cubit  ").Append(cubit.ToString("0.0000")).Append(" m  (royal)\n");
             _sb.Append("last  ");
             if (CubitRod.HasMeasurement)
                 _sb.Append(CubitRod.DescribeLast());
             else
-                _sb.Append("(grab the cubit rod, aim at Khufu)");
+                _sb.Append("(grab the cubit rod, aim at Khufu or Khafre)");
             _sb.Append('\n');
-            _sb.Append("King's Chamber design  20 x 10 cubits  (");
+            _sb.Append("Khufu  slope 51 deg 50' 40\"  seked 5.5  (14/11)\n");
+            _sb.Append("  base 440 / height 280 cubits  King 20 x 10 (");
             _sb.Append(KhufuPyramid.KingEW.ToString("0.00")).Append(" x ");
             _sb.Append(KhufuPyramid.KingNS.ToString("0.00")).Append(" m)\n");
-            _sb.Append("slope  51 deg 50' 40\"  seked 5.5 palms  (rise 14 / run 11)\n");
-            _sb.Append("base 440 cubits  height 280 cubits  tan = 280/220 = 14/11\n");
-            _sb.Append("Grab the rod on the table. Field Lens ] [ on the casing. Key 0 = Q7.\n");
+            _sb.Append("Khafre  slope 53 deg 10'  seked 5.25  (4/3)\n");
+            _sb.Append("  base ≈ ").Append(khafreBaseCubits.ToString("0")).Append(" / height ≈ ");
+            _sb.Append(khafreHeightCubits.ToString("0")).Append(" cubits  (");
+            _sb.Append(KhafrePyramid.BaseMeters.ToString("0.00")).Append(" x ");
+            _sb.Append(KhafrePyramid.HeightMeters.ToString("0.0")).Append(" m)\n");
+            _sb.Append("Grab the rod. Field Lens on Khufu_Casing or Khafre_Casing. Key 0 = Q7.\n");
             _sb.Append(CubitRod.Honesty);
             _text.text = _sb.ToString();
         }

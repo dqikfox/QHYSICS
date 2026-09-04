@@ -8,14 +8,14 @@ using RealityEngine.Chemistry;
 namespace RealityEngine.Survey
 {
     /// <summary>
-    /// Field Lens / Scale Engine peel on Khufu casing and King's Chamber.
+    /// Field Lens / Scale Engine peel on Khafre casing and burial chamber.
     /// Human: Tura casing already on the monument. Material: ~a dozen block
-    /// outlines near the look-hit (not 2M blocks). Molecular: conceptual calcite
-    /// lattice. Atomic: Ca / C / O cards. E/B parked. Math: seked 5.5 palms.
+    /// outlines near the look-hit (not every course). Molecular: conceptual calcite
+    /// lattice. Atomic: Ca / C / O cards. E/B parked. Math: seked 5.25 palms.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(40)]
-    public sealed class KhufuSurvey : MonoBehaviour
+    public sealed class KhafreSurvey : MonoBehaviour
     {
         public const string Honesty = GizaComplex.HonestyPrefix;
 
@@ -80,15 +80,20 @@ namespace RealityEngine.Survey
 
         public static string SlopeAnswer()
         {
+            float cubit = KhufuPyramid.Cubit;
+            float baseCubits = KhafrePyramid.BaseMeters / cubit;
+            float heightCubits = KhafrePyramid.HeightMeters / cubit;
             string body =
-                "Q7  Why is the slope 51 deg 50'?\n"
-                + "The face is a seked of 5.5 palms: a horizontal run of 5.5 palms for a 1-cubit (7-palm) rise, which is rise 14 / run 11.\n"
-                + "tan theta = 280 / 220 = 14/11. theta = arctan(14/11) = 51 deg 50' 40\" (published).\n"
-                + "Base 440 cubits, height 280 cubits. Royal cubit " + KhufuPyramid.Cubit.ToString("0.0000") + " m.\n"
-                + "Not mysticism. Seked is the Egyptian slope measure; 14/11 is the geometry.\n"
+                "Why is Khafre's slope 53 deg 10'?\n"
+                + "The face is a seked of 5.25 palms (5 1/4): a horizontal run of 5.25 palms for a 1-cubit (7-palm) rise, which is rise 4 / run 3.\n"
+                + "tan theta = 7 / 5.25 = 4/3. theta = arctan(4/3) ≈ 53 deg 08' (published 53 deg 10').\n"
+                + "Base ≈ " + baseCubits.ToString("0") + " cubits (" + KhafrePyramid.BaseMeters.ToString("0.00") + " m), height ≈ "
+                + heightCubits.ToString("0") + " cubits (" + KhafrePyramid.HeightMeters.ToString("0.0") + " m). Royal cubit "
+                + cubit.ToString("0.0000") + " m.\n"
+                + "Not mysticism. Seked is the Egyptian slope measure; 4/3 is the geometry.\n"
                 + Honesty + "\n"
-                + "King's Chamber design 20 x 10 cubits ("
-                + KhufuPyramid.KingEW.ToString("0.00") + " x " + KhufuPyramid.KingNS.ToString("0.00") + " m).";
+                + "Burial chamber in bedrock "
+                + KhafrePyramid.BurialEW.ToString("0.00") + " x " + KhafrePyramid.BurialNS.ToString("0.00") + " m.";
             if (CubitRod.HasMeasurement)
                 body += "\nLive rod: " + CubitRod.DescribeLast();
             return body;
@@ -142,7 +147,7 @@ namespace RealityEngine.Survey
                 Transform t = h.collider.transform;
                 if (t.IsChildOf(transform) && IsOverlay(t))
                     continue;
-                if (!IsKhufuPart(t))
+                if (!IsKhafrePart(t))
                     continue;
                 if (h.distance < best)
                 {
@@ -163,19 +168,19 @@ namespace RealityEngine.Survey
             while (t != null)
             {
                 string n = t.name;
-                if (!string.IsNullOrEmpty(n) && n.StartsWith("KhufuLens", System.StringComparison.Ordinal))
+                if (!string.IsNullOrEmpty(n) && n.StartsWith("KhafreLens", System.StringComparison.Ordinal))
                     return true;
                 t = t.parent;
             }
             return false;
         }
 
-        static bool IsKhufuPart(Transform t)
+        static bool IsKhafrePart(Transform t)
         {
             while (t != null)
             {
                 string n = t.name;
-                if (!string.IsNullOrEmpty(n) && (n == KhufuPyramid.RootName || n.StartsWith("Khufu", System.StringComparison.Ordinal)))
+                if (!string.IsNullOrEmpty(n) && (n == KhafrePyramid.RootName || n.StartsWith("Khafre", System.StringComparison.Ordinal)))
                     return true;
                 t = t.parent;
             }
@@ -209,37 +214,37 @@ namespace RealityEngine.Survey
         {
             if (_material == null)
             {
-                Transform t = transform.Find("KhufuLensMaterial");
+                Transform t = transform.Find("KhafreLensMaterial");
                 if (t != null)
                     _material = t;
             }
             if (_molecular == null)
             {
-                Transform t = transform.Find("KhufuLensMolecular");
+                Transform t = transform.Find("KhafreLensMolecular");
                 if (t != null)
                     _molecular = t;
             }
             if (_atomic == null)
             {
-                Transform t = transform.Find("KhufuLensAtomic");
+                Transform t = transform.Find("KhafreLensAtomic");
                 if (t != null)
                     _atomic = t;
             }
             if (_parked == null)
             {
-                Transform t = transform.Find("KhufuLensParked");
+                Transform t = transform.Find("KhafreLensParked");
                 if (t != null)
                     _parked = t;
             }
             if (_math == null)
             {
-                Transform t = transform.Find("KhufuLensMath");
+                Transform t = transform.Find("KhafreLensMath");
                 if (t != null)
                     _math = t;
             }
             if (_caption == null)
             {
-                Transform t = transform.Find("KhufuLensCaption");
+                Transform t = transform.Find("KhafreLensCaption");
                 if (t != null)
                     _caption = t.GetComponent<TextMeshPro>();
             }
@@ -247,13 +252,13 @@ namespace RealityEngine.Survey
 
         void BuildAll()
         {
-            _matBlock = LabWorldMeshes.MakeLit("RELab_KhufuBlock", new Color(0.78f, 0.72f, 0.60f), 0.06f, 0.22f, false);
+            _matBlock = LabWorldMeshes.MakeLit("RELab_KhafreBlock", new Color(0.78f, 0.72f, 0.60f), 0.06f, 0.22f, false);
             LabWorldMeshes.ApplyAlbedo(_matBlock, LabWorldMeshes.MakeTuraBlockTexture(), Vector2.one);
             _matCa = LabWorldMeshes.MakeLit("RELab_CalciteCa", new Color(0.82f, 0.82f, 0.86f), 0.12f, 0.40f, false);
             _matC = LabWorldMeshes.MakeLit("RELab_CalciteC", new Color(0.22f, 0.22f, 0.24f), 0.08f, 0.28f, false);
             _matO = LabWorldMeshes.MakeLit("RELab_CalciteO", new Color(0.72f, 0.18f, 0.16f), 0.08f, 0.32f, false);
 
-            _material = NewRoot("KhufuLensMaterial");
+            _material = NewRoot("KhafreLensMaterial");
             const int count = 12;
             for (int i = 0; i < count; i++)
             {
@@ -263,27 +268,30 @@ namespace RealityEngine.Survey
                 Primitive(_material, PrimitiveType.Cube, "CourseBlock_" + i, p, new Vector3(1.05f, 0.62f, 0.18f), _matBlock);
             }
 
-            _molecular = NewRoot("KhufuLensMolecular");
+            _molecular = NewRoot("KhafreLensMolecular");
             BuildCalcite(_molecular);
             MakeLabel(_molecular, "CrystalNote",
                 "CaCO3 calcite lattice\nConceptual / Classical crystal\nnot XRD  not MD",
                 new Vector3(0f, 0.42f, 0.05f), 0.018f, new Vector2(18f, 6f), new Color(0.92f, 0.90f, 0.78f));
 
-            _atomic = NewRoot("KhufuLensAtomic");
+            _atomic = NewRoot("KhafreLensAtomic");
             MakeLabel(_atomic, "AtomCard", Element.CalciteAtomCards(), new Vector3(0f, 0.28f, 0.05f), 0.016f, new Vector2(22f, 12f), new Color(0.92f, 0.95f, 0.82f));
 
-            _parked = NewRoot("KhufuLensParked");
-            MakeLabel(_parked, "Parked", "not an EM source\nKhufu is limestone geometry.\nUse the copper coil for B / E.",
+            _parked = NewRoot("KhafreLensParked");
+            MakeLabel(_parked, "Parked", "not an EM source\nKhafre is limestone geometry.\nUse the copper coil for B / E.",
                 new Vector3(0f, 0.22f, 0.05f), 0.018f, new Vector2(18f, 7f), new Color(0.75f, 0.85f, 0.95f));
 
-            _math = NewRoot("KhufuLensMath");
+            float baseCubits = KhafrePyramid.BaseMeters / KhufuPyramid.Cubit;
+            float heightCubits = KhafrePyramid.HeightMeters / KhufuPyramid.Cubit;
+            _math = NewRoot("KhafreLensMath");
             MakeLabel(_math, "Seked",
-                "seked 5.5 palms\n51 deg 50' 40\"\n440 x 280 cubits\ntan = 14/11",
+                "seked 5.25 palms\n53 deg 10'\n"
+                + baseCubits.ToString("0") + " x " + heightCubits.ToString("0") + " cubits\ntan = 4/3",
                 new Vector3(0f, 0.28f, 0.05f), 0.018f, new Vector2(18f, 8f), new Color(0.85f, 0.92f, 1f));
 
-            var capGo = new GameObject("KhufuLensCaption");
+            var capGo = new GameObject("KhafreLensCaption");
             capGo.transform.SetParent(transform, false);
-            capGo.transform.localPosition = new Vector3(0f, 2.2f, KhufuPyramid.BaseMeters * 0.5f + 2f);
+            capGo.transform.localPosition = new Vector3(0f, 2.2f, KhafrePyramid.BaseMeters * 0.5f + 2f);
             capGo.transform.localScale = Vector3.one * 0.018f;
             _caption = capGo.AddComponent<TextMeshPro>();
             _caption.fontSize = 5f;
@@ -323,17 +331,17 @@ namespace RealityEngine.Survey
         {
             if (_caption == null)
                 return;
-            string line = "Khufu casing / King's Chamber\n" + Honesty;
+            string line = "Khafre casing / burial chamber\n" + Honesty;
             if (parked)
                 line += "\nnot an EM source";
             else if (math)
-                line += "\nseked 5.5 palms = 51 deg 50' 40\". 440 x 280 cubits. rise 14 / run 11.";
+                line += "\nseked 5.25 palms = 53 deg 10'. tan = 4/3. Base/height in royal cubits.";
             else if (atomic)
                 line += "\nCa, C, O cards. CaCO3 schematic. Not QM. Not XRD.";
             else if (molecular)
                 line += "\nCalcite lattice schematic. Conceptual / Classical crystal, not XRD.";
             else if (material)
-                line += "\nCourse banding / block outlines near look-hit. Not 2 million blocks.";
+                line += "\nCourse banding / block outlines near look-hit. Not every course.";
             else
                 line += "\nHuman: smooth Tura casing (reconstructed original).";
             _caption.text = line;

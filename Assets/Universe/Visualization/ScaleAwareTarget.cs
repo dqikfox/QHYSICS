@@ -115,7 +115,7 @@ namespace RealityEngine.Visualization
                 else if (L == ScaleLevel.Material)
                     extra += "\nhot / cold bodies";
             }
-            else if (GetComponent<KhufuSurvey>() != null || GetComponentInParent<KhufuSurvey>() != null)
+            else if (GetComponent<KhufuSurvey>() != null || GetComponentInParent<KhufuSurvey>() != null || GetComponent<KhafreSurvey>() != null || GetComponentInParent<KhafreSurvey>() != null)
             {
                 extra = "\n" + GizaComplex.HonestyPrefix;
                 if (L == ScaleLevel.Molecular)
