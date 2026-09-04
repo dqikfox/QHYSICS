@@ -404,6 +404,7 @@ namespace RealityEngine.Visualization
                 "Oasis sand skirts Khufu " + KhufuDuneRadiusM.ToString("0") +
                 " m, Khafre " + KhafreDuneRadiusM.ToString("0") + " m, Menkaure " + MenkaureDuneRadiusM.ToString("0") +
                 " m. East of the cliff: Nile floodplain silt, schematic harbor basin, and valley settlement (true Nile ~8 km further east, not modeled)." +
+                " West Field mastabas west of Khufu; Heit el-Ghurab workers village south; Osiris Shaft near Sphinx (schematic)." +
                 " From the lab: sand around Khufu's base you could eat, Tura courses still on the pyramid. Ctrl+R then Play, or Reality Engine / Place Giza Complex.");
         }
 
@@ -638,7 +639,8 @@ namespace RealityEngine.Visualization
                     continue;
                 string n = cols[i].gameObject.name.ToLowerInvariant();
                 if (n.Contains("honesty") || n.Contains("plate") || n.Contains("airshaft") || n.Contains("emit") || n.Contains("sarcophagus") || n.Contains("hull") || n.Contains("cliff")
-                    || n.Contains("water") || n.Contains("house"))
+                    || n.Contains("water") || n.Contains("house") || n.Contains("heatmap") || n.Contains("surveyframe")
+                    || n.Contains("_shaft") || n.Contains("speculative"))
                     continue;
                 AddTeleport(cols[i].gameObject);
             }
@@ -701,6 +703,61 @@ namespace RealityEngine.Visualization
                     string vn = vch.name.ToLowerInvariant();
                     if (vn.Contains("yard") || vn.Contains("court"))
                         AddTeleport(vch.gameObject);
+                }
+            }
+            Transform westField = root.transform.Find("KhufuWestField");
+            if (westField == null)
+            {
+                GameObject wf = GizaComplex.FindNamed("KhufuWestField");
+                westField = wf != null ? wf.transform : null;
+            }
+            if (westField != null)
+            {
+                for (int i = 0; i < westField.childCount; i++)
+                {
+                    Transform wch = westField.GetChild(i);
+                    if (wch == null)
+                        continue;
+                    string wn = wch.name.ToLowerInvariant();
+                    if (wn.Contains("sand") || wn.Contains("street") || wn.Contains("yard"))
+                        AddTeleport(wch.gameObject);
+                }
+            }
+            Transform workers = root.transform.Find("GizaWorkersVillage");
+            if (workers == null)
+            {
+                GameObject wv = GizaComplex.FindNamed("GizaWorkersVillage");
+                workers = wv != null ? wv.transform : null;
+            }
+            if (workers != null)
+            {
+                for (int i = 0; i < workers.childCount; i++)
+                {
+                    Transform wch = workers.GetChild(i);
+                    if (wch == null)
+                        continue;
+                    string wn = wch.name.ToLowerInvariant();
+                    if (wn.Contains("street") || wn.Contains("yard"))
+                        AddTeleport(wch.gameObject);
+                }
+            }
+            Transform shaft = root.transform.Find("OsirisShaft");
+            if (shaft == null)
+            {
+                GameObject sh = GizaComplex.FindNamed("OsirisShaft");
+                shaft = sh != null ? sh.transform : null;
+            }
+            if (shaft != null)
+            {
+                for (int i = 0; i < shaft.childCount; i++)
+                {
+                    Transform sch = shaft.GetChild(i);
+                    if (sch == null)
+                        continue;
+                    string sn = sch.name.ToLowerInvariant();
+                    if (sn.Contains("apron") || sn.Contains("pad") || sn.Contains("stairs")
+                        || sn.Contains("midledge") || sn.Contains("bottom"))
+                        AddTeleport(sch.gameObject);
                 }
             }
         }
