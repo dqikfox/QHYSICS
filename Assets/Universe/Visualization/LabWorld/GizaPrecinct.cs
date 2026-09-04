@@ -209,12 +209,13 @@ namespace RealityEngine.Visualization
             const string valleyHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Khafre valley temple. Granite and limestone, T-shaped pillared halls (walkable block rooms). Dual north/south east entrances (vestibule portals) — Lehner / well-preserved Khafre valley temple.\n" +
-                "North door opens onto the Sphinx-Khafre link court. Not photogrammetry. Causeway descends from the Khafre mortuary temple.";
+                "Statue niches and empty pedestals along the T-hall (~Lehner seated-statue bays; colossi missing). North door opens onto the Sphinx-Khafre link court. Not photogrammetry. Causeway descends from the Khafre mortuary temple.";
 
             // Force rebuild when dual-portal marker or causeway Terminal is missing.
             GameObject oldValley = GizaComplex.FindNamed(KhafreValleyName);
             if (oldValley != null && (oldValley.transform.Find(KhafreValleyName + "_Portals") == null
-                || oldValley.transform.Find(KhafreValleyName + "_LinkDoor") == null))
+                || oldValley.transform.Find(KhafreValleyName + "_LinkDoor") == null
+                || oldValley.transform.Find(KhafreValleyName + "_Niches") == null))
                 DestroyNamed(oldValley);
             GameObject oldCause = GizaComplex.FindNamed(KhafreCausewayName);
             if (oldCause != null && (oldCause.transform.Find(KhafreCausewayName + "_Terminal") == null
@@ -487,6 +488,41 @@ namespace RealityEngine.Visualization
                 }
             }
             GizaBuild.SpawnMesh(root.transform, KhafreValleyName + "_Pillars", pillars.Build(KhafreValleyName + "_Pillars"), gran, true);
+
+            // Seated-statue niches along T-hall (~Lehner ~23; schematic empty pedestals — missing colossi).
+            var niches = new LabMeshBuilder(320, 480);
+            float nicheD = 1.8f;
+            float nicheW = 2.2f;
+            float nicheH = 4.6f;
+            float nicheY = floorT + nicheH * 0.5f;
+            float pedH = 0.9f;
+            float pedY = floorT + pedH * 0.5f;
+            // Long N/S hall: center (11.5, 0), size 12 x 28 → x 5.5..17.5, z -14..14.
+            float longWest = 5.5f + nicheD * 0.5f + 0.12f;
+            float longEast = 17.5f - nicheD * 0.5f - 0.12f;
+            for (int i = 0; i < 8; i++)
+            {
+                float nz = Mathf.Lerp(-12.2f, 12.2f, i / 7f);
+                niches.AddRoom(new Vector3(longWest, nicheY, nz), new Vector3(nicheD, nicheH, nicheW), Color.white, false, false, false, true);
+                niches.AddBox(new Vector3(longWest, pedY, nz), new Vector3(nicheD * 0.55f, pedH, nicheW * 0.72f), Color.white);
+            }
+            // East long-hall wall: keep dual-portal approach corridors at z≈±10.5 clear.
+            float[] eastZs = { -13.0f, -7.5f, -4.0f, 0f, 4.0f, 7.5f, 13.0f };
+            for (int i = 0; i < eastZs.Length; i++)
+            {
+                float nz = eastZs[i];
+                niches.AddRoom(new Vector3(longEast, nicheY, nz), new Vector3(nicheD, nicheH, nicheW), Color.white, false, false, true, false);
+                niches.AddBox(new Vector3(longEast, pedY, nz), new Vector3(nicheD * 0.55f, pedH, nicheW * 0.72f), Color.white);
+            }
+            // Cross-bar west wall (hall center -4.5, size 22 x 10 → west face x≈-15.5).
+            float crossWest = -15.5f + nicheD * 0.5f + 0.12f;
+            for (int i = 0; i < 5; i++)
+            {
+                float nz = Mathf.Lerp(-3.2f, 3.2f, i / 4f);
+                niches.AddRoom(new Vector3(crossWest, nicheY, nz), new Vector3(nicheD, nicheH, nicheW), Color.white, false, false, false, true);
+                niches.AddBox(new Vector3(crossWest, pedY, nz), new Vector3(nicheD * 0.55f, pedH, nicheW * 0.72f), Color.white);
+            }
+            GizaBuild.SpawnMesh(root.transform, KhafreValleyName + "_Niches", niches.Build(KhafreValleyName + "_Niches"), gran, true);
 
             // East-facade portal vestibules (N/S) protruding slightly outside the east wall.
             const float portalH = 5.0f;
