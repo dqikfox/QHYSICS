@@ -215,7 +215,8 @@ namespace RealityEngine.Visualization
             const string mortHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Khafre mortuary temple. Immediately east of Khafre. Open limestone court, granite pillars, complete walls (Lehner).\n" +
-                "Walkable: west door from pyramid pavement, antechamber, open court with granite colonnade, east door into the covered causeway to the valley temple. Not photogrammetry.";
+                "Five west-range statue niches with empty pedestals (Lehner; colossi missing). Schematic not photogrammetry.\n" +
+                "Walkable: west door from pyramid pavement, antechamber, open court with granite colonnade, east door into the covered causeway to the valley temple.";
             const string valleyHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Khafre valley temple. Granite and limestone, T-shaped pillared halls (walkable block rooms). Dual north/south east entrances (vestibule portals) — Lehner / well-preserved Khafre valley temple.\n" +
@@ -234,7 +235,8 @@ namespace RealityEngine.Visualization
 
             GameObject oldKhafreMort = GizaComplex.FindNamed(KhafreMortuaryName);
             if (oldKhafreMort != null && (oldKhafreMort.transform.Find(KhafreMortuaryName + "_Court") == null
-                || oldKhafreMort.transform.Find(KhafreMortuaryName + "_Interior") == null))
+                || oldKhafreMort.transform.Find(KhafreMortuaryName + "_Interior") == null
+                || oldKhafreMort.transform.Find(KhafreMortuaryName + "_Niches") == null))
                 DestroyNamed(oldKhafreMort);
             Ensure(KhafreMortuaryName, pose, p => BuildMortuary(p, KhafreMortuaryName, L.khafreTempleEast, L.khafreTempleNorth, GizaComplex.KhafreBedrockM, L.khafreTempleEW, L.khafreTempleNS, true, mortHonesty), terrace, true);
             Ensure(KhafreValleyName, pose, p => BuildValleyTemple(p, L, valleyHonesty), GizaComplex.CourtY(pose), true);
@@ -483,6 +485,30 @@ namespace RealityEngine.Visualization
                 arch.AddBox(new Vector3(rowX3, beamY, 0f), new Vector3(beamW, beamH, spanZ), Color.white);
             }
             GizaBuild.SpawnMesh(root.transform, name + "_Architraves", arch.Build(name + "_Architraves"), pillarMat, true);
+
+            // Five west-range statue niches (Khafre only): empty pedestals, Lehner distinctive feature.
+            if (granitePillars)
+            {
+                var niches = new LabMeshBuilder(80, 120);
+                float nicheD = 1.8f;
+                float nicheW = 2.6f;
+                float nicheH = 4.5f;
+                float nicheY = floorT + nicheH * 0.5f;
+                float pedH = 0.9f;
+                float pedY = floorT + pedH * 0.5f;
+                // West face of open court (east face of west range) — recesses open east into court.
+                float courtWest = courtX - courtEW * 0.5f;
+                float nicheX = courtWest + nicheD * 0.5f + 0.12f;
+                float nicheZ0 = -courtNS * 0.36f;
+                float nicheZ1 = courtNS * 0.36f;
+                for (int i = 0; i < 5; i++)
+                {
+                    float nz = Mathf.Lerp(nicheZ0, nicheZ1, i / 4f);
+                    niches.AddRoom(new Vector3(nicheX, nicheY, nz), new Vector3(nicheD, nicheH, nicheW), Color.white, false, false, false, true);
+                    niches.AddBox(new Vector3(nicheX, pedY, nz), new Vector3(nicheD * 0.55f, pedH, nicheW * 0.72f), Color.white);
+                }
+                GizaBuild.SpawnMesh(root.transform, name + "_Niches", niches.Build(name + "_Niches"), gran, true);
+            }
 
             if (!string.IsNullOrEmpty(honesty))
             {
