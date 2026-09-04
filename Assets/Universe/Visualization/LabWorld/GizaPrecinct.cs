@@ -4,7 +4,7 @@ namespace RealityEngine.Visualization
 {
     /// <summary>
     /// Rest of the undamaged Giza necropolis: Khufu queens G1a-c, Khafre cult/satellite G2-a,
-    /// mortuary temples, causeways, boat pits, Khufu/Khafre/Menkaure valley temples, Sphinx temple,
+    /// mortuary temples, causeways, Khufu + Khafre boat pits, Khufu/Khafre/Menkaure valley temples, Sphinx temple,
     /// Sphinx-Khafre link court, temenos walls.
     /// Reconstructed original massing from published plans (Lehner/Petrie). Not photogrammetry.
     /// Architectural local space: +X east, +Z north, 1 unit = 1 m.
@@ -19,6 +19,7 @@ namespace RealityEngine.Visualization
         public const string KhufuCausewayName = "KhufuCauseway";
         public const string KhufuValleyName = "KhufuValleyTemple";
         public const string KhufuBoatPitsName = "KhufuBoatPits";
+        public const string KhafreBoatPitsName = "KhafreBoatPits";
         public const string KhufuEnclosureName = "KhufuEnclosure";
         public const string KhafreMortuaryName = "KhafreMortuary";
         public const string KhafreCausewayName = "KhafreCauseway";
@@ -43,6 +44,7 @@ namespace RealityEngine.Visualization
             public float khufuCauseStartEast, khufuCauseEndEast, khufuCauseLen, khufuCauseWid;
             public float khufuValleyEW, khufuValleyNS, khufuValleyEast, khufuValleyNorth;
             public float boatNorth, boatLen, boatWid;
+            public float khafreBoatEast, khafreBoatNorth, khafreBoatLen, khafreBoatWid;
             public float khafreTempleEW, khafreTempleNS, khafreTempleEast, khafreTempleNorth;
             public float khafreCauseStartEast, khafreCauseStartNorth, khafreCauseEndEast, khafreCauseEndNorth;
             public float valleyEW, valleyNS, valleyEast, valleyNorth;
@@ -109,6 +111,14 @@ namespace RealityEngine.Visualization
             L.g2aEast = -GizaComplex.KhafreWestM + 18f; // slight SE of centerline
             L.g2aNorth = -GizaComplex.KhafreSouthM - hf - khafrePav - 4f - L.g2aBase * 0.5f;
 
+            // Khafre boat pits: two rock-cut cuttings east of G2a on the south terrace (Lehner schematic).
+            L.khafreBoatLen = 42f;
+            L.khafreBoatWid = 6.5f;
+            const float khafreBoatGap = 6f;
+            float khafreBoatSpan = 2f * L.khafreBoatLen + khafreBoatGap;
+            L.khafreBoatEast = L.g2aEast + L.g2aBase * 0.5f + 10f + khafreBoatSpan * 0.5f;
+            L.khafreBoatNorth = L.g2aNorth; // same south terrace band as G2-a
+
             float sphinxEastEnd = GizaComplex.SphinxEastM + GizaSphinx.LengthM * 0.5f;
             L.sphinxTempleEast = sphinxEastEnd + 6f + L.sphinxTempleEW * 0.5f;
             L.sphinxTempleNorth = -GizaComplex.SphinxSouthM;
@@ -145,6 +155,8 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, 0f, L.boatNorth, L.boatLen * 2.5f + 20f, L.boatWid * 0.5f + 12f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.khafreTempleEast, L.khafreTempleNorth, L.khafreTempleEW * 0.5f + 2f, L.khafreTempleNS * 0.5f + 2f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g2aEast, L.g2aNorth, L.g2aBase * 0.5f + 4f);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.khafreBoatEast, L.khafreBoatNorth,
+                L.khafreBoatLen + 16f, L.khafreBoatWid * 0.5f + 12f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.valleyEast, L.valleyNorth, L.valleyEW * 0.5f + 4f, L.valleyNS * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.sphinxTempleEast, L.sphinxTempleNorth, L.sphinxTempleEW * 0.5f + 4f, L.sphinxTempleNS * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.menkaureTempleEast, L.menkaureTempleNorth, L.menkaureTempleEW * 0.5f + 2f, L.menkaureTempleNS * 0.5f + 2f);
@@ -285,6 +297,12 @@ namespace RealityEngine.Visualization
             if (oldG2a != null && oldG2a.transform.Find(G2aName + "_Casing") == null)
                 DestroyNamed(oldG2a);
             Ensure(G2aName, pose, p => BuildQueen(p, G2aName, L.g2aEast, L.g2aNorth, L.g2aBase, L.g2aHeight, g2aHonesty), terrace, true);
+
+            // Khafre boat pits east of G2-a. Force rebuild when rock-cut cutting marker missing.
+            GameObject oldKhafreBoats = GizaComplex.FindNamed(KhafreBoatPitsName);
+            if (oldKhafreBoats != null && oldKhafreBoats.transform.Find(KhafreBoatPitsName + "_Cutting") == null)
+                DestroyNamed(oldKhafreBoats);
+            Ensure(KhafreBoatPitsName, pose, p => BuildKhafreBoatPits(p, L), terrace, true);
 
             GizaField.EnsureCentralField(pose);
         }
@@ -1526,6 +1544,187 @@ namespace RealityEngine.Visualization
             {
                 plate.localPosition = new Vector3(hx + 6f, 1.55f, hz * 0.35f);
                 plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+            return root;
+        }
+
+
+        static GameObject BuildKhafreBoatPits(GizaComplex.Pose pose, Layout L)
+        {
+            // Root at Khufu centre so east/north layout matches other precinct monuments.
+            GameObject root = GizaBuild.Root(KhafreBoatPitsName, pose.parent, pose.khufuCenter, pose.rot);
+            Material rock = GizaBuild.Bedrock();
+            Material lime = GizaBuild.InteriorLime();
+            Material pav = GizaBuild.Pavement();
+            Material tura = GizaBuild.TuraCasing();
+
+            const float depth = 3.4f;
+            const float wallT = 1.1f;
+            const float floorT = 0.4f;
+            const float rimH = 0.5f;
+            const float rimT = 0.85f;
+            const float gap = 6f;
+            const float liningT = 0.35f;
+            int n = 2;
+            float span = n * L.khafreBoatLen + (n - 1) * gap;
+            float x0 = L.khafreBoatEast - span * 0.5f + L.khafreBoatLen * 0.5f;
+            int descendIndex = 0; // west pit: stairs from south rim
+            int coverIndex = 1;   // east pit: cover-slab remnants
+            float z = L.khafreBoatNorth;
+            float halfL = L.khafreBoatLen * 0.5f;
+            float halfW = L.khafreBoatWid * 0.5f;
+
+            var cutting = new LabMeshBuilder(220, 340);
+            var lining = new LabMeshBuilder(120, 180);
+            var rimPav = new LabMeshBuilder(96, 144);
+            var stairs = new LabMeshBuilder(80, 120);
+            var covers = new LabMeshBuilder(40, 60);
+            Color stone = Color.white;
+
+            for (int i = 0; i < n; i++)
+            {
+                float x = x0 + i * (L.khafreBoatLen + gap);
+                cutting.AddBox(new Vector3(x, -depth + floorT * 0.5f, z),
+                    new Vector3(L.khafreBoatLen - wallT * 2f, floorT, L.khafreBoatWid - wallT * 2f), stone);
+                float wy = -depth * 0.5f;
+                cutting.AddBox(new Vector3(x, wy, z + halfW - wallT * 0.5f),
+                    new Vector3(L.khafreBoatLen, depth, wallT), stone);
+                float southZ = z - (halfW - wallT * 0.5f);
+                if (i == descendIndex)
+                {
+                    const float doorW = 3.4f;
+                    float remain = (L.khafreBoatLen - doorW) * 0.5f;
+                    if (remain > 0.3f)
+                    {
+                        float xOff = (doorW + remain) * 0.5f;
+                        cutting.AddBox(new Vector3(x + xOff, wy, southZ),
+                            new Vector3(remain, depth, wallT), stone);
+                        cutting.AddBox(new Vector3(x - xOff, wy, southZ),
+                            new Vector3(remain, depth, wallT), stone);
+                    }
+                }
+                else
+                {
+                    cutting.AddBox(new Vector3(x, wy, southZ),
+                        new Vector3(L.khafreBoatLen, depth, wallT), stone);
+                }
+                cutting.AddBox(new Vector3(x + halfL - wallT * 0.5f, wy, z),
+                    new Vector3(wallT, depth, L.khafreBoatWid - wallT * 2f), stone);
+                cutting.AddBox(new Vector3(x - (halfL - wallT * 0.5f), wy, z),
+                    new Vector3(wallT, depth, L.khafreBoatWid - wallT * 2f), stone);
+
+                cutting.AddBox(new Vector3(x, rimH * 0.5f, z + halfW + rimT * 0.5f),
+                    new Vector3(L.khafreBoatLen + rimT * 2f, rimH, rimT), stone);
+                float southRimZ = z - (halfW + rimT * 0.5f);
+                if (i == descendIndex)
+                {
+                    const float doorW = 3.4f;
+                    float remain = (L.khafreBoatLen - doorW) * 0.5f;
+                    if (remain > 0.3f)
+                    {
+                        float xOff = (doorW + remain) * 0.5f;
+                        cutting.AddBox(new Vector3(x + xOff, rimH * 0.5f, southRimZ),
+                            new Vector3(remain + rimT, rimH, rimT), stone);
+                        cutting.AddBox(new Vector3(x - xOff, rimH * 0.5f, southRimZ),
+                            new Vector3(remain + rimT, rimH, rimT), stone);
+                    }
+                }
+                else
+                {
+                    cutting.AddBox(new Vector3(x, rimH * 0.5f, southRimZ),
+                        new Vector3(L.khafreBoatLen + rimT * 2f, rimH, rimT), stone);
+                }
+                cutting.AddBox(new Vector3(x + halfL + rimT * 0.5f, rimH * 0.5f, z),
+                    new Vector3(rimT, rimH, L.khafreBoatWid), stone);
+                cutting.AddBox(new Vector3(x - (halfL + rimT * 0.5f), rimH * 0.5f, z),
+                    new Vector3(rimT, rimH, L.khafreBoatWid), stone);
+
+                float linH = depth - 0.5f;
+                float ly = -depth + linH * 0.5f + 0.15f;
+                float innerN = halfW - wallT - liningT * 0.5f - 0.02f;
+                float innerE = halfL - wallT - liningT * 0.5f - 0.02f;
+                float innerEW = L.khafreBoatLen - wallT * 2f - 0.2f;
+                float innerNS = L.khafreBoatWid - wallT * 2f - 0.2f;
+                lining.AddBox(new Vector3(x, ly, z + innerN), new Vector3(innerEW, linH, liningT), stone);
+                if (i != descendIndex)
+                    lining.AddBox(new Vector3(x, ly, z - innerN), new Vector3(innerEW, linH, liningT), stone);
+                lining.AddBox(new Vector3(x + innerE, ly, z), new Vector3(liningT, linH, innerNS - liningT * 2f), stone);
+                lining.AddBox(new Vector3(x - innerE, ly, z), new Vector3(liningT, linH, innerNS - liningT * 2f), stone);
+            }
+
+            float corridorY = 0.14f;
+            for (int i = 0; i < n - 1; i++)
+            {
+                float gapX = x0 + i * (L.khafreBoatLen + gap) + halfL + gap * 0.5f;
+                rimPav.AddBox(new Vector3(gapX, corridorY, z),
+                    new Vector3(gap - 0.4f, 0.28f, L.khafreBoatWid + rimT * 2f + 2.5f), stone);
+            }
+            float stripZ_N = z + halfW + rimT + 2.0f;
+            float stripZ_S = z - (halfW + rimT + 2.5f);
+            rimPav.AddBox(new Vector3(L.khafreBoatEast, corridorY, stripZ_N),
+                new Vector3(span + 6f, 0.28f, 3.6f), stone);
+            rimPav.AddBox(new Vector3(L.khafreBoatEast, corridorY, stripZ_S),
+                new Vector3(span + 6f, 0.28f, 4.2f), stone);
+            float endPadX = L.khafreBoatEast + span * 0.5f + 3f;
+            float endPadX2 = L.khafreBoatEast - span * 0.5f - 3f;
+            rimPav.AddBox(new Vector3(endPadX, corridorY, z),
+                new Vector3(5f, 0.28f, L.khafreBoatWid + 6f), stone);
+            rimPav.AddBox(new Vector3(endPadX2, corridorY, z),
+                new Vector3(5f, 0.28f, L.khafreBoatWid + 6f), stone);
+
+            {
+                float x = x0 + descendIndex * (L.khafreBoatLen + gap);
+                int steps = 8;
+                float rise = depth / steps;
+                float run = 0.5f;
+                float stepW = 3.0f;
+                float zTop = z - halfW - rimT * 0.15f;
+                for (int s = 0; s < steps; s++)
+                {
+                    float sy = -(s + 0.5f) * rise;
+                    float sz = zTop + (s + 0.5f) * run;
+                    stairs.AddBox(new Vector3(x, sy, sz),
+                        new Vector3(stepW, rise * 0.92f, run * 0.95f), stone);
+                }
+                stairs.AddBox(new Vector3(x, 0.12f, z - halfW - rimT - 0.7f),
+                    new Vector3(stepW + 0.8f, 0.24f, 1.5f), stone);
+                float zBot = zTop + steps * run;
+                stairs.AddBox(new Vector3(x, -depth + floorT + 0.06f, Mathf.Min(zBot + 0.35f, z + halfW - wallT - 1.2f)),
+                    new Vector3(stepW + 0.6f, 0.12f, 1.6f), stone);
+            }
+
+            {
+                float x = x0 + coverIndex * (L.khafreBoatLen + gap);
+                float slabY = 0.35f;
+                float slabT = 0.55f;
+                covers.AddBox(new Vector3(x - 10f, slabY, z), new Vector3(7f, slabT, L.khafreBoatWid + 0.5f), stone);
+                covers.AddBox(new Vector3(x + 4f, slabY, z), new Vector3(6f, slabT, L.khafreBoatWid + 0.5f), stone);
+                covers.AddBox(new Vector3(x + 14f, slabY, z), new Vector3(5f, slabT, L.khafreBoatWid + 0.3f), stone);
+            }
+
+            GizaBuild.SpawnMesh(root.transform, KhafreBoatPitsName + "_Cutting",
+                cutting.Build(KhafreBoatPitsName + "_Cutting"), rock, true);
+            GizaBuild.SpawnMesh(root.transform, KhafreBoatPitsName + "_Lining",
+                lining.Build(KhafreBoatPitsName + "_Lining"), lime, true);
+            GizaBuild.SpawnMesh(root.transform, KhafreBoatPitsName + "_RimPavement",
+                rimPav.Build(KhafreBoatPitsName + "_RimPavement"), pav, true);
+            GizaBuild.SpawnMesh(root.transform, KhafreBoatPitsName + "_Stairs",
+                stairs.Build(KhafreBoatPitsName + "_Stairs"), pav, true);
+            GizaBuild.SpawnMesh(root.transform, KhafreBoatPitsName + "_CoverSlabs",
+                covers.Build(KhafreBoatPitsName + "_CoverSlabs"), tura, true);
+
+            const string barque =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Khafre solar boat pits — reconstructed rock-cut cuttings on the south terrace east of cult pyramid G2-a (Lehner schematic).\n" +
+                "Two excavated limestone pits (~42 x 6.5 m) with walkable rim pavement; stairs into the west pit (open-top headroom). Partial cover-slab remnants on the east pit are schematic markers only.\n" +
+                "Not a museum boat find. Not photogrammetry. Not sealed timber.";
+            GizaBuild.HonestyPlate(root.transform, KhafreBoatPitsName + "_Honesty", barque, 18f);
+            Transform plate = root.transform.Find(KhafreBoatPitsName + "_Honesty");
+            if (plate != null)
+            {
+                float lx = x0 + coverIndex * (L.khafreBoatLen + gap);
+                plate.localPosition = new Vector3(lx, 1.55f, z - halfW - rimT - 7f);
+                plate.localRotation = Quaternion.Euler(0f, 180f, 0f);
             }
             return root;
         }
