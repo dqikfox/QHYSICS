@@ -410,6 +410,11 @@ namespace RealityEngine.Visualization
                     sphinxSurvey = GetComponentInParent<SphinxSurvey>();
                 if (sphinxSurvey != null)
                     sphinxSurvey.ApplyView(_layer, _scale);
+                MenkaureSurvey menkaureSurvey = GetComponent<MenkaureSurvey>();
+                if (menkaureSurvey == null)
+                    menkaureSurvey = GetComponentInParent<MenkaureSurvey>();
+                if (menkaureSurvey != null)
+                    menkaureSurvey.ApplyView(_layer, _scale);
                 ApplyMaterialLook(L == FieldLensLayer.Material || S == ScaleLevel.Material);
                 return;
             }
@@ -577,10 +582,13 @@ namespace RealityEngine.Visualization
                 extra = "\n" + GizaComplex.HonestyPrefix;
                 bool isKhafre = GetComponent<KhafreSurvey>() != null || GetComponentInParent<KhafreSurvey>() != null;
                 bool isSphinx = GetComponent<SphinxSurvey>() != null || GetComponentInParent<SphinxSurvey>() != null;
+                bool isMenkaure = GetComponent<MenkaureSurvey>() != null || GetComponentInParent<MenkaureSurvey>() != null;
                 if (L == FieldLensLayer.Mathematical)
                 {
                     if (isSphinx)
                         extra += "\nSphinx length/height/width in royal cubits. Lehner/ARCE massing, not a scan.";
+                    else if (isMenkaure)
+                        extra += "\n51 deg 20' 25\". Seked from published slope. Granite courses + Tura. Base/height in royal cubits.";
                     else if (isKhafre)
                         extra += "\nseked 5.25 palms = 53 deg 10'. tan = 4/3. Base/height in royal cubits.";
                     else
@@ -594,6 +602,8 @@ namespace RealityEngine.Visualization
                 {
                     if (isSphinx)
                         extra += "\nJoint / course outlines. Bedrock limestone near look-hit.";
+                    else if (isMenkaure)
+                        extra += "\nCourse banding. Lower Aswan granite + upper Tura near look-hit.";
                     else if (isKhafre)
                         extra += "\nCourse banding / block outlines. Tura casing / limestone near look-hit.";
                     else
