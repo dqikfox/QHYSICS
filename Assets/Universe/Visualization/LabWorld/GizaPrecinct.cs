@@ -141,7 +141,7 @@ namespace RealityEngine.Visualization
                 L.khufuTempleEast + L.khufuTempleEW * 0.5f + 10f,
                 L.g1aEast + L.g1aBase * 0.5f + 10f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, khufuLipEast, 0f, 12f);
-            Enc(ref xMin, ref xMax, ref zMin, ref zMax, 0f, L.boatNorth, L.boatLen * 2.5f + 20f, L.boatWid * 0.5f + 6f);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, 0f, L.boatNorth, L.boatLen * 2.5f + 20f, L.boatWid * 0.5f + 12f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.khafreTempleEast, L.khafreTempleNorth, L.khafreTempleEW * 0.5f + 2f, L.khafreTempleNS * 0.5f + 2f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g2aEast, L.g2aNorth, L.g2aBase * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.valleyEast, L.valleyNorth, L.valleyEW * 0.5f + 4f, L.valleyNS * 0.5f + 4f);
@@ -212,6 +212,10 @@ namespace RealityEngine.Visualization
 
             Ensure(KhufuCausewayName, pose, p => BuildCauseway(p, KhufuCausewayName, L.khufuCauseStartEast, 0f, causeEndEast, 0f, pose.surfaceY, floodY, L.khufuCauseWid), pose.surfaceY, false);
             Ensure(KhufuValleyName, pose, p => BuildKhufuValleyTemple(p, L, valleyHonesty), floodY, true);
+            // Force rebuild when rock-cut cutting marker missing (replaces surface-lined basins).
+            GameObject oldBoats = GizaComplex.FindNamed(KhufuBoatPitsName);
+            if (oldBoats != null && oldBoats.transform.Find(KhufuBoatPitsName + "_Cutting") == null)
+                DestroyNamed(oldBoats);
             Ensure(KhufuBoatPitsName, pose, p => BuildBoatPits(p, L), pose.surfaceY, true);
             Ensure(KhufuEnclosureName, pose, p => BuildEnclosure(p, KhufuEnclosureName, pose.khufuCenter, 0f, KhufuPyramid.BaseMeters * 0.5f + KhufuPyramid.PavementWidthM, L.khufuTempleNS + 4f, true), pose.surfaceY, true);
             GizaField.EnsureWestField(pose);
@@ -1133,53 +1137,201 @@ namespace RealityEngine.Visualization
         static GameObject BuildBoatPits(GizaComplex.Pose pose, Layout L)
         {
             GameObject root = GizaBuild.Root(KhufuBoatPitsName, pose.parent, pose.khufuCenter, pose.rot);
-            Material tura = GizaBuild.TuraCasing();
+            Material rock = GizaBuild.Bedrock();
+            Material lime = GizaBuild.InteriorLime();
             Material pav = GizaBuild.Pavement();
-            Material wood = LabWorldMeshes.MakeLit("RELab_BarqueHull", new Color(0.38f, 0.26f, 0.16f, 1f), 0.05f, 0.22f, false);
-            const float rimH = 2.4f;
-            const float wallT = 0.85f;
+            Material tura = GizaBuild.TuraCasing();
+
+            // Schematic rock-cut depth: walkable rim + descend into one pit with headroom (open top).
+            const float depth = 3.6f;
+            const float wallT = 1.15f;
+            const float floorT = 0.4f;
+            const float rimH = 0.55f;
+            const float rimT = 0.9f;
             const float gap = 8f;
+            const float liningT = 0.35f;
             int n = 5;
             float span = n * L.boatLen + (n - 1) * gap;
             float x0 = -span * 0.5f + L.boatLen * 0.5f;
-            int labelIndex = 3;
+            int descendIndex = 2; // middle pit: stairs from south rim
+            int coverIndex = 3;   // limestone cover-slab remnants (schematic)
+            float z = L.boatNorth;
+            float halfL = L.boatLen * 0.5f;
+            float halfW = L.boatWid * 0.5f;
 
-            var pits = new LabMeshBuilder(160, 240);
-            var floors = new LabMeshBuilder(40, 60);
+            var cutting = new LabMeshBuilder(320, 480);
+            var lining = new LabMeshBuilder(160, 240);
+            var rimPav = new LabMeshBuilder(120, 180);
+            var stairs = new LabMeshBuilder(96, 144);
+            var covers = new LabMeshBuilder(48, 72);
+            Color stone = Color.white;
+
             for (int i = 0; i < n; i++)
             {
                 float x = x0 + i * (L.boatLen + gap);
-                Vector3 c = new Vector3(x, 0f, L.boatNorth);
-                pits.AddBox(new Vector3(c.x, rimH * 0.5f, c.z + L.boatWid * 0.5f - wallT * 0.5f), new Vector3(L.boatLen, rimH, wallT), Color.white);
-                pits.AddBox(new Vector3(c.x, rimH * 0.5f, c.z - L.boatWid * 0.5f + wallT * 0.5f), new Vector3(L.boatLen, rimH, wallT), Color.white);
-                pits.AddBox(new Vector3(c.x + L.boatLen * 0.5f - wallT * 0.5f, rimH * 0.5f, c.z), new Vector3(wallT, rimH, L.boatWid), Color.white);
-                pits.AddBox(new Vector3(c.x - L.boatLen * 0.5f + wallT * 0.5f, rimH * 0.5f, c.z), new Vector3(wallT, rimH, L.boatWid), Color.white);
-                floors.AddBox(new Vector3(c.x, 0.14f, c.z), new Vector3(L.boatLen - wallT * 2f, 0.28f, L.boatWid - wallT * 2f), Color.white);
-            }
-            GizaBuild.SpawnMesh(root.transform, KhufuBoatPitsName + "_Pavement", pits.Build(KhufuBoatPitsName + "_Pavement"), tura, true);
-            GizaBuild.SpawnMesh(root.transform, KhufuBoatPitsName + "_Floor", floors.Build(KhufuBoatPitsName + "_Floor"), pav, true);
+                // Bedrock floor of cutting.
+                cutting.AddBox(new Vector3(x, -depth + floorT * 0.5f, z),
+                    new Vector3(L.boatLen - wallT * 2f, floorT, L.boatWid - wallT * 2f), stone);
+                // Four rock-cut walls (hollow rectangular cutting into plateau limestone).
+                float wy = -depth * 0.5f;
+                cutting.AddBox(new Vector3(x, wy, z + halfW - wallT * 0.5f),
+                    new Vector3(L.boatLen, depth, wallT), stone);
+                // South wall: full length, or stair jambs with open gap on the descend pit.
+                float southZ = z - (halfW - wallT * 0.5f);
+                if (i == descendIndex)
+                {
+                    const float doorW = 3.6f;
+                    float remain = (L.boatLen - doorW) * 0.5f;
+                    if (remain > 0.3f)
+                    {
+                        float xOff = (doorW + remain) * 0.5f;
+                        cutting.AddBox(new Vector3(x + xOff, wy, southZ),
+                            new Vector3(remain, depth, wallT), stone);
+                        cutting.AddBox(new Vector3(x - xOff, wy, southZ),
+                            new Vector3(remain, depth, wallT), stone);
+                    }
+                }
+                else
+                {
+                    cutting.AddBox(new Vector3(x, wy, southZ),
+                        new Vector3(L.boatLen, depth, wallT), stone);
+                }
+                cutting.AddBox(new Vector3(x + halfL - wallT * 0.5f, wy, z),
+                    new Vector3(wallT, depth, L.boatWid - wallT * 2f), stone);
+                cutting.AddBox(new Vector3(x - (halfL - wallT * 0.5f), wy, z),
+                    new Vector3(wallT, depth, L.boatWid - wallT * 2f), stone);
+                // Surface rim coping (south rim opens at stair gap on descend pit).
+                cutting.AddBox(new Vector3(x, rimH * 0.5f, z + halfW + rimT * 0.5f),
+                    new Vector3(L.boatLen + rimT * 2f, rimH, rimT), stone);
+                float southRimZ = z - (halfW + rimT * 0.5f);
+                if (i == descendIndex)
+                {
+                    const float doorW = 3.6f;
+                    float remain = (L.boatLen - doorW) * 0.5f;
+                    if (remain > 0.3f)
+                    {
+                        float xOff = (doorW + remain) * 0.5f;
+                        cutting.AddBox(new Vector3(x + xOff, rimH * 0.5f, southRimZ),
+                            new Vector3(remain + rimT, rimH, rimT), stone);
+                        cutting.AddBox(new Vector3(x - xOff, rimH * 0.5f, southRimZ),
+                            new Vector3(remain + rimT, rimH, rimT), stone);
+                    }
+                }
+                else
+                {
+                    cutting.AddBox(new Vector3(x, rimH * 0.5f, southRimZ),
+                        new Vector3(L.boatLen + rimT * 2f, rimH, rimT), stone);
+                }
+                cutting.AddBox(new Vector3(x + halfL + rimT * 0.5f, rimH * 0.5f, z),
+                    new Vector3(rimT, rimH, L.boatWid), stone);
+                cutting.AddBox(new Vector3(x - (halfL + rimT * 0.5f), rimH * 0.5f, z),
+                    new Vector3(rimT, rimH, L.boatWid), stone);
 
-            float lx = x0 + labelIndex * (L.boatLen + gap);
-            Vector3 hullC = new Vector3(lx, 1.05f, L.boatNorth);
-            var hull = new LabMeshBuilder(24, 36);
-            hull.AddBox(hullC, new Vector3(42f, 1.6f, 4.4f), Color.white);
-            hull.AddBox(hullC + new Vector3(22.5f, 0.1f, 0f), new Vector3(5.5f, 1.1f, 2.6f), Color.white);
-            hull.AddBox(hullC + new Vector3(-22.5f, 0.1f, 0f), new Vector3(5.5f, 1.1f, 2.6f), Color.white);
-            GizaBuild.SpawnMesh(root.transform, KhufuBoatPitsName + "_Hull", hull.Build(KhufuBoatPitsName + "_Hull"), wood, true);
+                // Soft inner limestone lining so the cut reads as worked bedrock.
+                float linH = depth - 0.5f;
+                float ly = -depth + linH * 0.5f + 0.15f;
+                float innerN = halfW - wallT - liningT * 0.5f - 0.02f;
+                float innerE = halfL - wallT - liningT * 0.5f - 0.02f;
+                float innerEW = L.boatLen - wallT * 2f - 0.2f;
+                float innerNS = L.boatWid - wallT * 2f - 0.2f;
+                lining.AddBox(new Vector3(x, ly, z + innerN), new Vector3(innerEW, linH, liningT), stone);
+                if (i != descendIndex)
+                    lining.AddBox(new Vector3(x, ly, z - innerN), new Vector3(innerEW, linH, liningT), stone);
+                lining.AddBox(new Vector3(x + innerE, ly, z), new Vector3(liningT, linH, innerNS - liningT * 2f), stone);
+                lining.AddBox(new Vector3(x - innerE, ly, z), new Vector3(liningT, linH, innerNS - liningT * 2f), stone);
+            }
+
+            // Walkable rim pavement corridors between pits (east-west gaps) + N/S strips along the row.
+            float corridorY = 0.14f;
+            for (int i = 0; i < n - 1; i++)
+            {
+                float gapX = x0 + i * (L.boatLen + gap) + halfL + gap * 0.5f;
+                rimPav.AddBox(new Vector3(gapX, corridorY, z),
+                    new Vector3(gap - 0.4f, 0.28f, L.boatWid + rimT * 2f + 2.5f), stone);
+            }
+            // Continuous north strip (toward Khufu pavement) and south strip (approach).
+            float stripZ_N = z + halfW + rimT + 2.0f;
+            float stripZ_S = z - (halfW + rimT + 2.5f);
+            rimPav.AddBox(new Vector3(0f, corridorY, stripZ_N),
+                new Vector3(span + 6f, 0.28f, 3.6f), stone);
+            rimPav.AddBox(new Vector3(0f, corridorY, stripZ_S),
+                new Vector3(span + 6f, 0.28f, 4.2f), stone);
+            // End pads east/west of the row.
+            float endPadX = span * 0.5f + 3f;
+            rimPav.AddBox(new Vector3(endPadX, corridorY, z),
+                new Vector3(5f, 0.28f, L.boatWid + 6f), stone);
+            rimPav.AddBox(new Vector3(-endPadX, corridorY, z),
+                new Vector3(5f, 0.28f, L.boatWid + 6f), stone);
+
+            // Stairs into middle pit from south rim through wall gap (VR-safe, open-top headroom).
+            {
+                float x = x0 + descendIndex * (L.boatLen + gap);
+                int steps = 9;
+                float rise = depth / steps; // ~0.4 m
+                float run = 0.52f;          // total run ~4.7 m — fits inside ~4.7 m clear N-S
+                float stepW = 3.2f;
+                // s=0 at south rim (high); s increases northward into the pit while descending.
+                float zTop = z - halfW - rimT * 0.15f;
+                for (int s = 0; s < steps; s++)
+                {
+                    float sy = -(s + 0.5f) * rise;
+                    float sz = zTop + (s + 0.5f) * run;
+                    stairs.AddBox(new Vector3(x, sy, sz),
+                        new Vector3(stepW, rise * 0.92f, run * 0.95f), stone);
+                }
+                // Top landing on south rim pavement.
+                stairs.AddBox(new Vector3(x, 0.12f, z - halfW - rimT - 0.7f),
+                    new Vector3(stepW + 0.8f, 0.24f, 1.5f), stone);
+                // Bottom floor pad inside pit after last tread (short of north wall).
+                float zBot = zTop + steps * run;
+                stairs.AddBox(new Vector3(x, -depth + floorT + 0.06f, Mathf.Min(zBot + 0.35f, z + halfW - wallT - 1.2f)),
+                    new Vector3(stepW + 0.6f, 0.12f, 1.6f), stone);
+            }
+
+            // Schematic limestone cover-block remnants on one pit (not the Cairo museum boat).
+            {
+                float x = x0 + coverIndex * (L.boatLen + gap);
+                float slabY = 0.35f;
+                float slabT = 0.55f;
+                // Three partial transverse cover slabs leaving gaps (remnants, not sealed roof).
+                covers.AddBox(new Vector3(x - 12f, slabY, z), new Vector3(8f, slabT, L.boatWid + 0.6f), stone);
+                covers.AddBox(new Vector3(x + 2f, slabY, z), new Vector3(7f, slabT, L.boatWid + 0.6f), stone);
+                covers.AddBox(new Vector3(x + 16f, slabY, z), new Vector3(6f, slabT, L.boatWid + 0.4f), stone);
+                // Thin edge blocks / markers on rim.
+                covers.AddBox(new Vector3(x - halfL + 1.5f, slabY + 0.15f, z + halfW + 0.3f),
+                    new Vector3(2.2f, 0.4f, 0.7f), stone);
+                covers.AddBox(new Vector3(x + halfL - 1.5f, slabY + 0.15f, z + halfW + 0.3f),
+                    new Vector3(2.2f, 0.4f, 0.7f), stone);
+            }
+
+            // Named cutting mesh is the force-rebuild marker (_Cutting).
+            GizaBuild.SpawnMesh(root.transform, KhufuBoatPitsName + "_Cutting",
+                cutting.Build(KhufuBoatPitsName + "_Cutting"), rock, true);
+            GizaBuild.SpawnMesh(root.transform, KhufuBoatPitsName + "_Lining",
+                lining.Build(KhufuBoatPitsName + "_Lining"), lime, true);
+            GizaBuild.SpawnMesh(root.transform, KhufuBoatPitsName + "_RimPavement",
+                rimPav.Build(KhufuBoatPitsName + "_RimPavement"), pav, true);
+            GizaBuild.SpawnMesh(root.transform, KhufuBoatPitsName + "_Stairs",
+                stairs.Build(KhufuBoatPitsName + "_Stairs"), pav, true);
+            GizaBuild.SpawnMesh(root.transform, KhufuBoatPitsName + "_CoverSlabs",
+                covers.Build(KhufuBoatPitsName + "_CoverSlabs"), tura, true);
 
             const string barque =
-                "Khufu solar barque pit (reconstructed pit, not the museum boat).\n" +
                 GizaComplex.HonestyPrefix + "\n" +
-                "Five schematic stone-lined pits along Khufu's south face, ~50 x 7 m (Lehner/Petrie south-side boat pits). Lined basins, not excavated cuttings.";
-            GizaBuild.HonestyPlate(root.transform, KhufuBoatPitsName + "_Honesty", barque, 20f);
+                "Khufu solar boat pits — reconstructed rock-cut cuttings along Khufu's south face, ~50 x 7 m each (Lehner/Petrie south-side boat pits).\n" +
+                "Five schematic excavated limestone pits with walkable rim pavement; stairs into the middle pit (open-top headroom). Partial cover-slab remnants on one pit are schematic markers only.\n" +
+                "Not the Cairo museum boat. Not photogrammetry. Not a sealed timber find.";
+            GizaBuild.HonestyPlate(root.transform, KhufuBoatPitsName + "_Honesty", barque, 22f);
             Transform plate = root.transform.Find(KhufuBoatPitsName + "_Honesty");
             if (plate != null)
             {
-                plate.localPosition = new Vector3(lx, 1.55f, L.boatNorth - L.boatWid * 0.5f - 6f);
+                float lx = x0 + coverIndex * (L.boatLen + gap);
+                plate.localPosition = new Vector3(lx, 1.55f, z - halfW - rimT - 7f);
                 plate.localRotation = Quaternion.Euler(0f, 180f, 0f);
             }
             return root;
         }
+
 
 
         /// <summary>
