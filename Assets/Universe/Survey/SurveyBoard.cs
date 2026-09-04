@@ -5,7 +5,7 @@ using RealityEngine.Visualization;
 namespace RealityEngine.Survey
 {
     /// <summary>
-    /// Small table-edge TMP for the Giza cubit survey (Khufu + Khafre + Sphinx). Honesty: reconstructed
+    /// Small table-edge TMP for the Giza cubit survey (Khufu + Khafre + Menkaure + Sphinx). Honesty: reconstructed
     /// original (Petrie/Lehner), not a scan. Simulation/published dimensions are source of truth.
     /// </summary>
     [DisallowMultipleComponent]
@@ -80,7 +80,7 @@ namespace RealityEngine.Survey
             if (CubitRod.HasMeasurement)
                 _sb.Append(CubitRod.DescribeLast());
             else
-                _sb.Append("(grab the cubit rod, aim at Khufu, Khafre, or Sphinx)");
+                _sb.Append("(grab the cubit rod, aim at Khufu, Khafre, Menkaure, or Sphinx)");
             _sb.Append('\n');
             _sb.Append("Khufu  slope 51 deg 50' 40\"  seked 5.5  (14/11)\n");
             _sb.Append("  base 440 / height 280 cubits  King 20 x 10 (");
@@ -91,6 +91,14 @@ namespace RealityEngine.Survey
             _sb.Append(khafreHeightCubits.ToString("0")).Append(" cubits  (");
             _sb.Append(KhafrePyramid.BaseMeters.ToString("0.00")).Append(" x ");
             _sb.Append(KhafrePyramid.HeightMeters.ToString("0.0")).Append(" m)\n");
+            float menBaseC = MenkaurePyramid.BaseMeters / cubit;
+            float menHtC = MenkaurePyramid.HeightMeters / cubit;
+            float menSeked = 7f / Mathf.Tan(MenkaurePyramid.SlopeDeg * Mathf.Deg2Rad);
+            _sb.Append("Menkaure  slope 51 deg 20' 25\"  seked ≈ ").Append(menSeked.ToString("0.00")).Append("\n");
+            _sb.Append("  base ≈ ").Append(menBaseC.ToString("0.0")).Append(" / height ≈ ");
+            _sb.Append(menHtC.ToString("0.0")).Append(" cubits  (");
+            _sb.Append(MenkaurePyramid.BaseMeters.ToString("0.00")).Append(" x ");
+            _sb.Append(MenkaurePyramid.HeightMeters.ToString("0.0")).Append(" m)  granite + Tura\n");
             float sphinxLenC = GizaSphinx.LengthM / cubit;
             float sphinxHtC = GizaSphinx.HeightM / cubit;
             float sphinxWdC = GizaSphinx.WidthM / cubit;
@@ -100,7 +108,7 @@ namespace RealityEngine.Survey
             _sb.Append(GizaSphinx.LengthM.ToString("0.0")).Append(" x ");
             _sb.Append(GizaSphinx.HeightM.ToString("0.00")).Append(" x ");
             _sb.Append(GizaSphinx.WidthM.ToString("0.0")).Append(" m)\n");
-            _sb.Append("Grab the rod. Field Lens on Khufu_Casing, Khafre_Casing, or Sphinx_Body. Key 0 = Q7.\n");
+            _sb.Append("Grab the rod. Field Lens on Khufu/Khafre/Menkaure casing or Sphinx_Body. Key 0 = Q7.\n");
             _sb.Append(CubitRod.Honesty);
             _text.text = _sb.ToString();
         }

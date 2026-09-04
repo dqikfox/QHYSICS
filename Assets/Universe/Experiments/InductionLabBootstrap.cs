@@ -1634,6 +1634,18 @@ namespace RealityEngine.Experiments
                 BindPyramidTarget(FindChildNamed(sphinx.transform, "Sphinx_Body"));
             }
 
+            GameObject menkaure = GizaComplex.FindNamed(MenkaurePyramid.RootName);
+            if (menkaure != null)
+            {
+                MenkaureSurvey menkaureSurvey = menkaure.GetComponent<MenkaureSurvey>();
+                if (menkaureSurvey == null)
+                    menkaureSurvey = menkaure.AddComponent<MenkaureSurvey>();
+                menkaureSurvey.EnsureBuilt();
+                BindPyramidTarget(FindChildNamed(menkaure.transform, "Menkaure_CasingGranite"));
+                BindPyramidTarget(FindChildNamed(menkaure.transform, "Menkaure_Casing"));
+                BindPyramidTarget(FindChildNamed(menkaure.transform, "Menkaure_Burial"));
+            }
+
             CubitRod rod = EnsureCubitRod();
             SurveyBoard board = EnsureSurveyBoard();
             _cubitRod = rod;

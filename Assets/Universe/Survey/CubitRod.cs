@@ -127,7 +127,7 @@ namespace RealityEngine.Survey
                     continue;
                 if (h.collider.transform == transform || h.collider.transform.IsChildOf(transform))
                     continue;
-                if (!IsKhufuHit(h.collider.transform))
+                if (!IsGizaHit(h.collider.transform))
                     continue;
                 if (h.distance < best)
                 {
@@ -149,12 +149,20 @@ namespace RealityEngine.Survey
             ShowRay(origin, chosen.point);
         }
 
-        static bool IsKhufuHit(Transform t)
+        static bool IsGizaHit(Transform t)
         {
             while (t != null)
             {
                 string n = t.name;
-                if (!string.IsNullOrEmpty(n) && (n == KhufuPyramid.RootName || n.StartsWith("Khufu", System.StringComparison.Ordinal)))
+                if (string.IsNullOrEmpty(n))
+                {
+                    t = t.parent;
+                    continue;
+                }
+                if (n == KhufuPyramid.RootName || n.StartsWith("Khufu", System.StringComparison.Ordinal)
+                    || n == KhafrePyramid.RootName || n.StartsWith("Khafre", System.StringComparison.Ordinal)
+                    || n == MenkaurePyramid.RootName || n.StartsWith("Menkaure", System.StringComparison.Ordinal)
+                    || n == GizaSphinx.RootName || n.StartsWith("Sphinx", System.StringComparison.Ordinal))
                     return true;
                 t = t.parent;
             }
@@ -185,7 +193,7 @@ namespace RealityEngine.Survey
             if (_hasMeasurement)
                 body += "last  " + DescribeLast();
             else
-                body += "aim the tip at Khufu";
+                body += "aim the tip at Giza stone";
             _readout.text = body;
         }
 
