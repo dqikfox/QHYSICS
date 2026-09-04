@@ -203,38 +203,68 @@ namespace RealityEngine.Visualization
             _nileWater = null;
             _mudbrick = null;
             _field = null;
+            _stoneMatRev = -1;
         }
 
-        static Material CachedLit(ref Material slot, string name, Color color, float metallic, float smoothness, Texture2D map, Vector2 scale)
+        static int _stoneMatRev = -1;
+
+        static void EnsureFreshStoneMats()
+        {
+            int rev = LabWorldMeshes.StoneTexRev;
+            if (_stoneMatRev == rev)
+                return;
+            _tura = null;
+            _lime = null;
+            _gran = null;
+            _aswan = null;
+            _pav = null;
+            _rock = null;
+            _cliff = null;
+            _sphinx = null;
+            LabWorldMeshes.InvalidateProcTextures();
+            _stoneMatRev = rev;
+        }
+
+        static Material CachedLit(ref Material slot, string name, Color color, float metallic, float smoothness,
+            Texture2D map, Vector2 scale, Texture2D bump = null, float bumpScale = 1f)
         {
             if (slot != null)
                 return slot;
             slot = LabWorldMeshes.MakeLit(name, color, metallic, smoothness, false);
             LabWorldMeshes.ApplyAlbedo(slot, map, scale);
+            if (bump != null)
+                LabWorldMeshes.ApplyBump(slot, bump, scale, bumpScale);
             return slot;
         }
 
         public static Material TuraCasing()
         {
-            return CachedLit(ref _tura, "RELab_TuraCasing", new Color(0.86f, 0.81f, 0.70f, 1f), 0.02f, 0.18f,
-                LabWorldMeshes.MakeTuraBlockTexture(), Vector2.one);
+            EnsureFreshStoneMats();
+            // Near-white tint so cooler ivory albedo reads; matte ~0.15 (not glossy plastic).
+            return CachedLit(ref _tura, "RELab_TuraCasing", new Color(0.94f, 0.92f, 0.88f, 1f), 0.02f, 0.15f,
+                LabWorldMeshes.MakeTuraBlockTexture(), Vector2.one,
+                LabWorldMeshes.MakeTuraBlockNormal(), 1.15f);
         }
 
         public static Material InteriorLime()
         {
-            return CachedLit(ref _lime, "RELab_GizaCore", new Color(0.62f, 0.56f, 0.48f, 1f), 0.02f, 0.12f,
-                LabWorldMeshes.MakeLimestoneTexture(), Vector2.one);
+            EnsureFreshStoneMats();
+            return CachedLit(ref _lime, "RELab_GizaCore", new Color(0.64f, 0.57f, 0.48f, 1f), 0.02f, 0.12f,
+                LabWorldMeshes.MakeLimestoneTexture(), Vector2.one,
+                LabWorldMeshes.MakeLimestoneNormal(), 1.25f);
         }
 
         public static Material Granite()
         {
-            return CachedLit(ref _gran, "RELab_GizaGranite", new Color(0.38f, 0.28f, 0.26f, 1f), 0.06f, 0.20f,
+            EnsureFreshStoneMats();
+            return CachedLit(ref _gran, "RELab_GizaGranite", new Color(0.40f, 0.30f, 0.28f, 1f), 0.06f, 0.18f,
                 LabWorldMeshes.MakeGraniteTexture(), Vector2.one);
         }
 
         public static Material Aswan()
         {
-            return CachedLit(ref _aswan, "RELab_AswanGranite", new Color(0.50f, 0.28f, 0.24f, 1f), 0.08f, 0.22f,
+            EnsureFreshStoneMats();
+            return CachedLit(ref _aswan, "RELab_AswanGranite", new Color(0.52f, 0.30f, 0.26f, 1f), 0.08f, 0.20f,
                 LabWorldMeshes.MakeGraniteTexture(), Vector2.one);
         }
 
@@ -248,14 +278,19 @@ namespace RealityEngine.Visualization
 
         public static Material Pavement()
         {
-            return CachedLit(ref _pav, "RELab_GizaPavement", new Color(0.74f, 0.68f, 0.56f, 1f), 0.03f, 0.14f,
-                LabWorldMeshes.MakeLimestoneTexture(), Vector2.one);
+            EnsureFreshStoneMats();
+            return CachedLit(ref _pav, "RELab_GizaPavement", new Color(0.76f, 0.71f, 0.62f, 1f), 0.03f, 0.13f,
+                LabWorldMeshes.MakeLimestoneTexture(), Vector2.one,
+                LabWorldMeshes.MakeLimestoneNormal(), 1.05f);
         }
 
         public static Material Bedrock()
         {
-            return CachedLit(ref _rock, "RELab_GizaBedrock", new Color(0.50f, 0.44f, 0.36f, 1f), 0.02f, 0.10f,
-                LabWorldMeshes.MakeLimestoneTexture(), Vector2.one);
+            EnsureFreshStoneMats();
+            // Plateau top: limestone courses, not Oasis sand.
+            return CachedLit(ref _rock, "RELab_GizaBedrock", new Color(0.54f, 0.49f, 0.42f, 1f), 0.02f, 0.11f,
+                LabWorldMeshes.MakeCliffTexture(), Vector2.one,
+                LabWorldMeshes.MakeCliffNormal(), 1.35f);
         }
 
         const string OasisSandResource = "RELab_OasisSand";
@@ -344,14 +379,19 @@ namespace RealityEngine.Visualization
 
         public static Material CliffRock()
         {
-            return CachedLit(ref _cliff, "RELab_HillRock", new Color(0.42f, 0.38f, 0.32f, 1f), 0.03f, 0.12f,
-                LabWorldMeshes.MakeCliffTexture(), Vector2.one);
+            EnsureFreshStoneMats();
+            return CachedLit(ref _cliff, "RELab_HillRock", new Color(0.46f, 0.42f, 0.36f, 1f), 0.03f, 0.12f,
+                LabWorldMeshes.MakeCliffTexture(), Vector2.one,
+                LabWorldMeshes.MakeCliffNormal(), 1.45f);
         }
 
         public static Material SphinxLime()
         {
-            return CachedLit(ref _sphinx, "RELab_SphinxLimestone", new Color(0.78f, 0.72f, 0.58f, 1f), 0.03f, 0.14f,
-                LabWorldMeshes.MakeLimestoneTexture(), Vector2.one);
+            EnsureFreshStoneMats();
+            // Weathered limestone bedrock with readable joints (cliff courses).
+            return CachedLit(ref _sphinx, "RELab_SphinxLimestone", new Color(0.78f, 0.73f, 0.64f, 1f), 0.03f, 0.13f,
+                LabWorldMeshes.MakeCliffTexture(), Vector2.one,
+                LabWorldMeshes.MakeCliffNormal(), 1.40f);
         }
 
         public static Material Emit()
@@ -562,6 +602,7 @@ namespace RealityEngine.Visualization
         {
             if (root == null)
                 return;
+            EnsureFreshStoneMats();
             Material tura = TuraCasing();
             Material lime = InteriorLime();
             Material gran = Granite();

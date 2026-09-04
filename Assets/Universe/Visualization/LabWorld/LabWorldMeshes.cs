@@ -140,13 +140,18 @@ namespace RealityEngine.Visualization
         public const float StoneTileM = 4.8f;
         public const float SandTileM = 2f;
         public const float CliffTileM = 8f;
-        public const int ProcTexSize = 512;
+        // 1024^2 courses stay cheap on RTX-class GPUs; 8 courses / 4.8 m tile => ~0.60 m course height.
+        public const int ProcTexSize = 1024;
+        public const int StoneTexRev = 3;
 
         static Texture2D _turaTex;
+        static Texture2D _turaBump;
         static Texture2D _limeTex;
+        static Texture2D _limeBump;
         static Texture2D _granTex;
         static Texture2D _sandTex;
         static Texture2D _cliffTex;
+        static Texture2D _cliffBump;
         static Texture2D _siltTex;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -154,11 +159,19 @@ namespace RealityEngine.Visualization
         {
             _lit = null;
             _graphiteTemplate = null;
+            InvalidateProcTextures();
+        }
+
+        public static void InvalidateProcTextures()
+        {
             _turaTex = null;
+            _turaBump = null;
             _limeTex = null;
+            _limeBump = null;
             _granTex = null;
             _sandTex = null;
             _cliffTex = null;
+            _cliffBump = null;
             _siltTex = null;
         }
 
@@ -178,32 +191,69 @@ namespace RealityEngine.Visualization
             }
         }
 
+        public static void ApplyBump(Material mat, Texture2D bump, Vector2 scale, float bumpScale = 1f)
+        {
+            if (mat == null || bump == null)
+                return;
+            if (!mat.HasProperty("_BumpMap"))
+                return;
+            mat.SetTexture("_BumpMap", bump);
+            mat.SetTextureScale("_BumpMap", scale);
+            if (mat.HasProperty("_BumpScale"))
+                mat.SetFloat("_BumpScale", bumpScale);
+            mat.EnableKeyword("_NORMALMAP");
+        }
+
         public static Texture2D MakeTuraBlockTexture()
         {
-            if (_turaTex != null)
-                return _turaTex;
-            _turaTex = BuildCourseBlocks(
-                "RELab_TuraBlocks", 8, 8, 5,
-                new Color(0.92f, 0.87f, 0.75f, 1f),
-                new Color(0.84f, 0.78f, 0.64f, 1f),
-                new Color(0.58f, 0.52f, 0.44f, 1f),
-                new Color(0.78f, 0.72f, 0.60f, 1f),
-                0.10f);
+            EnsureTuraMaps();
             return _turaTex;
+        }
+
+        public static Texture2D MakeTuraBlockNormal()
+        {
+            EnsureTuraMaps();
+            return _turaBump;
+        }
+
+        static void EnsureTuraMaps()
+        {
+            if (_turaTex != null && _turaBump != null)
+                return;
+            // Cooler creamy ivory — avoid yellow sand wash / plastic cream.
+            BuildCourseBlocks(
+                "RELab_TuraBlocks", "RELab_TuraBlocksN", 8, 8, 0.085f, 1.15f,
+                new Color(0.93f, 0.90f, 0.84f, 1f),
+                new Color(0.87f, 0.84f, 0.77f, 1f),
+                new Color(0.55f, 0.51f, 0.46f, 1f),
+                new Color(0.80f, 0.76f, 0.70f, 1f),
+                0.11f, out _turaTex, out _turaBump);
         }
 
         public static Texture2D MakeLimestoneTexture()
         {
-            if (_limeTex != null)
-                return _limeTex;
-            _limeTex = BuildCourseBlocks(
-                "RELab_MokattamLime", 6, 5, 6,
-                new Color(0.72f, 0.64f, 0.52f, 1f),
-                new Color(0.58f, 0.52f, 0.42f, 1f),
-                new Color(0.40f, 0.36f, 0.30f, 1f),
-                new Color(0.50f, 0.44f, 0.36f, 1f),
-                0.16f);
+            EnsureLimeMaps();
             return _limeTex;
+        }
+
+        public static Texture2D MakeLimestoneNormal()
+        {
+            EnsureLimeMaps();
+            return _limeBump;
+        }
+
+        static void EnsureLimeMaps()
+        {
+            if (_limeTex != null && _limeBump != null)
+                return;
+            // Warmer Mokattam core limestone with more grit.
+            BuildCourseBlocks(
+                "RELab_MokattamLime", "RELab_MokattamLimeN", 6, 5, 0.10f, 1.35f,
+                new Color(0.74f, 0.66f, 0.54f, 1f),
+                new Color(0.60f, 0.53f, 0.43f, 1f),
+                new Color(0.38f, 0.34f, 0.28f, 1f),
+                new Color(0.52f, 0.46f, 0.37f, 1f),
+                0.20f, out _limeTex, out _limeBump);
         }
 
         public static Texture2D MakeGraniteTexture()
@@ -212,23 +262,34 @@ namespace RealityEngine.Visualization
                 return _granTex;
             const int size = ProcTexSize;
             var pixels = new Color[size * size];
-            var red = new Color(0.56f, 0.28f, 0.24f, 1f);
-            var dark = new Color(0.22f, 0.18f, 0.18f, 1f);
-            var grey = new Color(0.42f, 0.38f, 0.36f, 1f);
-            var pink = new Color(0.62f, 0.42f, 0.38f, 1f);
+            var red = new Color(0.58f, 0.30f, 0.26f, 1f);
+            var dark = new Color(0.16f, 0.14f, 0.14f, 1f);
+            var grey = new Color(0.46f, 0.42f, 0.40f, 1f);
+            var pink = new Color(0.66f, 0.44f, 0.40f, 1f);
+            var mica = new Color(0.78f, 0.74f, 0.70f, 1f);
             for (int y = 0; y < size; y++)
             {
                 for (int x = 0; x < size; x++)
                 {
                     float n = Hash01(x, y, 11);
-                    float g = Hash01(x / 2, y / 2, 23);
-                    Color c = n < 0.18f ? dark : n < 0.55f ? grey : n < 0.82f ? red : pink;
+                    float g = Mathf.PerlinNoise(x * 0.045f, y * 0.045f);
+                    Color c = n < 0.14f ? dark : n < 0.48f ? grey : n < 0.78f ? red : pink;
                     float speckle = Hash01(x * 3, y * 3, 7);
-                    c = Color.Lerp(c, dark, speckle * 0.22f + g * 0.08f);
+                    c = Color.Lerp(c, dark, speckle * 0.18f + g * 0.10f);
+                    if (Hash01(x * 5, y * 5, 19) > 0.965f)
+                        c = mica;
+                    else if (Hash01(x * 7, y * 2, 29) > 0.982f)
+                        c = dark;
+                    float grit = Hash01(x, y, 53) * 0.06f;
+                    c = new Color(
+                        Mathf.Clamp01(c.r * (0.97f + grit)),
+                        Mathf.Clamp01(c.g * (0.97f + grit * 0.9f)),
+                        Mathf.Clamp01(c.b * (0.97f + grit * 0.85f)),
+                        1f);
                     pixels[y * size + x] = c;
                 }
             }
-            _granTex = FinishTex("RELab_AswanSpeckles", size, pixels);
+            _granTex = FinishTex("RELab_AswanSpeckles", size, pixels, false);
             return _granTex;
         }
 
@@ -257,7 +318,7 @@ namespace RealityEngine.Visualization
                     pixels[y * size + x] = c;
                 }
             }
-            _sandTex = FinishTex("RELab_DesertSand", size, pixels);
+            _sandTex = FinishTex("RELab_DesertSand", size, pixels, false);
             return _sandTex;
         }
 
@@ -284,22 +345,34 @@ namespace RealityEngine.Visualization
                     pixels[y * size + x] = c;
                 }
             }
-            _siltTex = FinishTex("RELab_NileSilt", size, pixels);
+            _siltTex = FinishTex("RELab_NileSilt", size, pixels, false);
             return _siltTex;
         }
 
         public static Texture2D MakeCliffTexture()
         {
-            if (_cliffTex != null)
-                return _cliffTex;
-            _cliffTex = BuildCourseBlocks(
-                "RELab_CliffLime", 5, 4, 7,
-                new Color(0.48f, 0.42f, 0.34f, 1f),
-                new Color(0.36f, 0.32f, 0.26f, 1f),
-                new Color(0.24f, 0.22f, 0.18f, 1f),
-                new Color(0.32f, 0.28f, 0.22f, 1f),
-                0.20f);
+            EnsureCliffMaps();
             return _cliffTex;
+        }
+
+        public static Texture2D MakeCliffNormal()
+        {
+            EnsureCliffMaps();
+            return _cliffBump;
+        }
+
+        static void EnsureCliffMaps()
+        {
+            if (_cliffTex != null && _cliffBump != null)
+                return;
+            // Plateau / Sphinx bedrock: weathered limestone courses, not sand.
+            BuildCourseBlocks(
+                "RELab_CliffLime", "RELab_CliffLimeN", 5, 4, 0.12f, 1.55f,
+                new Color(0.52f, 0.47f, 0.40f, 1f),
+                new Color(0.40f, 0.36f, 0.30f, 1f),
+                new Color(0.26f, 0.24f, 0.20f, 1f),
+                new Color(0.34f, 0.30f, 0.25f, 1f),
+                0.22f, out _cliffTex, out _cliffBump);
         }
 
         public static Texture2D MakeCourseTexture()
@@ -307,19 +380,26 @@ namespace RealityEngine.Visualization
             return MakeTuraBlockTexture();
         }
 
-        static Texture2D BuildCourseBlocks(string name, int courses, int blocks, int mortarPx,
-            Color ivory, Color cream, Color mortar, Color vein, float variation)
+        static void BuildCourseBlocks(string albedoName, string bumpName, int courses, int blocks,
+            float mortarFrac, float normalStrength,
+            Color ivory, Color cream, Color mortar, Color vein, float variation,
+            out Texture2D albedo, out Texture2D bump)
         {
             const int size = ProcTexSize;
             var pixels = new Color[size * size];
-            int courseH = Mathf.Max(8, size / Mathf.Max(1, courses));
-            int blockW = Mathf.Max(8, size / Mathf.Max(1, blocks));
-            mortarPx = Mathf.Clamp(mortarPx, 2, courseH / 3);
+            var height = new float[size * size];
+            int courseH = Mathf.Max(12, size / Mathf.Max(1, courses));
+            int blockW = Mathf.Max(12, size / Mathf.Max(1, blocks));
+            int mortarPx = Mathf.Clamp(Mathf.RoundToInt(courseH * mortarFrac), 3, courseH / 3);
+            int bevel = Mathf.Max(2, mortarPx);
+
             for (int y = 0; y < size; y++)
             {
                 int course = y / courseH;
                 int ly = y % courseH;
-                bool jointH = ly < mortarPx || ly >= courseH - 1;
+                int distH = Mathf.Min(ly, courseH - 1 - ly);
+                bool jointH = ly < mortarPx;
+                // Running bond: odd courses shift half a block.
                 int xOff = (course & 1) * (blockW / 2);
                 for (int x = 0; x < size; x++)
                 {
@@ -328,38 +408,89 @@ namespace RealityEngine.Visualization
                         sx += size;
                     int bx = sx / blockW;
                     int lx = sx % blockW;
+                    int distV = Mathf.Min(lx, blockW - lx);
                     bool jointV = lx < mortarPx;
+                    int idx = y * size + x;
                     Color c;
+                    float hgt;
+
                     if (jointH || jointV)
                     {
-                        float mj = Hash01(bx, course, 41) * 0.08f;
-                        c = mortar * (0.96f + mj);
+                        float mj = Hash01(bx, course, 41) * 0.10f;
+                        float shade = 0.90f + mj;
+                        c = new Color(mortar.r * shade, mortar.g * shade, mortar.b * shade, 1f);
+                        hgt = 0.12f + Hash01(x, y, 61) * 0.06f;
                     }
                     else
                     {
-                        float h = Hash01(bx, course, 17);
-                        c = Color.Lerp(ivory, cream, h);
-                        float v = Mathf.PerlinNoise((x + course * 13) * 0.018f, (y + bx * 9) * 0.028f);
-                        c = Color.Lerp(c, vein, v * 0.14f);
-                        float n = Hash01(x, y, 3);
-                        float mul = 1f - variation * 0.5f + n * variation;
-                        c = new Color(c.r * mul, c.g * mul, c.b * mul, 1f);
+                        float blockPick = Hash01(bx, course, 17);
+                        c = Color.Lerp(ivory, cream, blockPick);
+                        float veinN = Mathf.PerlinNoise((x + course * 17) * 0.012f, (y + bx * 11) * 0.020f);
+                        float grit = Mathf.PerlinNoise(x * 0.085f + bx * 0.3f, y * 0.085f + course * 0.2f);
+                        float fine = Hash01(x, y, 3);
+                        c = Color.Lerp(c, vein, veinN * 0.16f);
+                        c = Color.Lerp(c, cream, grit * 0.10f);
+                        float mul = 1f - variation * 0.45f + fine * variation;
+                        // Cooler: slightly lift blue vs green to kill sand-yellow wash.
+                        c = new Color(
+                            Mathf.Clamp01(c.r * mul),
+                            Mathf.Clamp01(c.g * mul * 0.995f),
+                            Mathf.Clamp01(c.b * mul * 1.015f),
+                            1f);
+
+                        int edge = Mathf.Min(distH, distV);
+                        if (edge < bevel)
+                        {
+                            float t = 1f - edge / (float)bevel;
+                            float groove = t * t;
+                            c = Color.Lerp(c, mortar, groove * 0.28f);
+                            hgt = Mathf.Lerp(1f, 0.28f, groove);
+                        }
+                        else
+                        {
+                            hgt = 0.92f + grit * 0.08f + fine * 0.04f;
+                        }
                     }
-                    pixels[y * size + x] = c;
+
+                    pixels[idx] = c;
+                    height[idx] = hgt;
                 }
             }
-            return FinishTex(name, size, pixels);
+
+            albedo = FinishTex(albedoName, size, pixels, false);
+            bump = FinishNormalFromHeight(bumpName, size, height, normalStrength);
         }
 
-        static Texture2D FinishTex(string name, int size, Color[] pixels)
+        static Texture2D FinishNormalFromHeight(string name, int size, float[] height, float strength)
         {
-            var tex = new Texture2D(size, size, TextureFormat.RGBA32, true, false)
+            var pixels = new Color[size * size];
+            float s = strength * 2.4f;
+            for (int y = 0; y < size; y++)
+            {
+                int ym = (y - 1 + size) % size;
+                int yp = (y + 1) % size;
+                for (int x = 0; x < size; x++)
+                {
+                    int xm = (x - 1 + size) % size;
+                    int xp = (x + 1) % size;
+                    float dx = height[y * size + xp] - height[y * size + xm];
+                    float dy = height[yp * size + x] - height[ym * size + x];
+                    Vector3 n = new Vector3(-dx * s, -dy * s, 1f).normalized;
+                    pixels[y * size + x] = new Color(n.x * 0.5f + 0.5f, n.y * 0.5f + 0.5f, n.z * 0.5f + 0.5f, 1f);
+                }
+            }
+            return FinishTex(name, size, pixels, true);
+        }
+
+        static Texture2D FinishTex(string name, int size, Color[] pixels, bool linear)
+        {
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, true, linear)
             {
                 name = name,
                 hideFlags = HideFlags.DontSave,
                 wrapMode = TextureWrapMode.Repeat,
                 filterMode = FilterMode.Bilinear,
-                anisoLevel = 4
+                anisoLevel = 8
             };
             tex.SetPixels(pixels);
             tex.Apply(true, true);
