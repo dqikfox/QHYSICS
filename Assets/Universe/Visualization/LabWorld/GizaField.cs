@@ -8,6 +8,7 @@ namespace RealityEngine.Visualization
     /// Cemetery en Echelon (staggered mastaba strip in the gap west of Khufu / east of West Field),
     /// Gisr el-Mudir (Great Enclosure) unfinished limestone enclosure further west of West Field,
     /// Hemiunu (G 4000) elite mastaba in the West Field (Khufu's vizier; Lehner schematic),
+    /// Senedjemib Inti (G 2370) elite mastaba complex in the NW West Field (Lehner schematic),
     /// Khentkawes I (LG100) rock-cut stepped tomb SE of Central Field / NE of Menkaure,
     /// Heit el-Ghurab workers' village (south apron / floodplain), Osiris Shaft-scale rock-cut
     /// complex near Sphinx, and an OFF-by-default SPECULATIVE fringe water-shaft diagram
@@ -28,6 +29,7 @@ namespace RealityEngine.Visualization
         public const string CemeteryEnEchelonName = "CemeteryEnEchelon";
         public const string GisrElMudirName = "GisrElMudir";
         public const string HemiunuName = "Hemiunu";
+        public const string SenedjemibName = "Senedjemib";
 
         public const string MastabasMarker = "_Mastabas";
         public const string VillageMarker = "_Village";
@@ -71,6 +73,22 @@ namespace RealityEngine.Visualization
         public const float HemiunuChapelEW = 10f;
         public const float HemiunuChapelNS = 7f;
         public const float HemiunuChapelHM = 4.5f;
+
+        // Senedjemib Inti (G 2370): NW West Field elite complex (Lehner schematic).
+        // Further north and slightly west of Hemiunu; open court between mastaba and east chapel.
+        public const float SenedjemibEastInsetFromWestEastEdgeM = 58f;
+        public const float SenedjemibNorthFrac = 0.88f;
+        public const float SenedjemibBodyEW = 36.0f;
+        public const float SenedjemibBodyNS = 18.5f;
+        public const float SenedjemibBodyHM = 8.2f;
+        public const float SenedjemibUpperEW = 33.0f;
+        public const float SenedjemibUpperNS = 16.5f;
+        public const float SenedjemibUpperHM = 1.05f;
+        public const float SenedjemibCourtEW = 8.5f;
+        public const float SenedjemibCourtNS = 12.0f;
+        public const float SenedjemibChapelEW = 9.0f;
+        public const float SenedjemibChapelNS = 6.5f;
+        public const float SenedjemibChapelHM = 4.2f;
 
         // Cemetery en Echelon: staggered strip in the 28 m gap between Khufu west face and West Field.
         public const float EchelonGapFromFaceM = 4f;
@@ -146,6 +164,11 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, hEast, hNorth,
                 HemiunuBodyEW * 0.5f + HemiunuChapelEW + 14f, HemiunuBodyNS * 0.5f + 12f);
 
+            LayoutSenedjemib(out float sEast, out float sNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, sEast, sNorth,
+                SenedjemibBodyEW * 0.5f + SenedjemibCourtEW + SenedjemibChapelEW + 16f,
+                SenedjemibBodyNS * 0.5f + 12f);
+
             LayoutEchelon(out float ecEast0, out float ecEast1, out float ecNorth0, out float ecNorth1);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, (ecEast0 + ecEast1) * 0.5f, (ecNorth0 + ecNorth1) * 0.5f,
                 (ecEast1 - ecEast0) * 0.5f + 6f, (ecNorth1 - ecNorth0) * 0.5f + 6f);
@@ -192,6 +215,7 @@ namespace RealityEngine.Visualization
             DestroyNamed(GizaComplex.FindNamed(WestFieldName));
             DestroyNamed(GizaComplex.FindNamed(GisrElMudirName));
             DestroyNamed(GizaComplex.FindNamed(HemiunuName));
+            DestroyNamed(GizaComplex.FindNamed(SenedjemibName));
             DestroyNamed(GizaComplex.FindNamed(CemeteryEnEchelonName));
             DestroyNamed(GizaComplex.FindNamed(EastFieldName));
             DestroyNamed(GizaComplex.FindNamed(CentralFieldName));
@@ -224,6 +248,14 @@ namespace RealityEngine.Visualization
             if (old != null && old.transform.Find(HemiunuName + MassingMarker) == null)
                 DestroyNamed(old);
             Ensure(HemiunuName, pose, BuildHemiunu, pose.surfaceY, true);
+        }
+
+        public static void EnsureSenedjemib(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(SenedjemibName);
+            if (old != null && old.transform.Find(SenedjemibName + MassingMarker) == null)
+                DestroyNamed(old);
+            Ensure(SenedjemibName, pose, BuildSenedjemib, pose.surfaceY, true);
         }
 
         public static void EnsureCemeteryEnEchelon(GizaComplex.Pose pose)
@@ -337,6 +369,14 @@ namespace RealityEngine.Visualization
             // Northern/eastern West Field: closer to Khufu's NW, oversized elite tomb among cemetery.
             east = east1 - HemiunuEastInsetFromWestEastEdgeM;
             north = north0 + (north1 - north0) * HemiunuNorthFrac;
+        }
+
+        static void LayoutSenedjemib(out float east, out float north)
+        {
+            LayoutWest(out float east0, out float east1, out float north0, out float north1);
+            // NW West Field: north of Hemiunu, slightly deeper west into the cemetery streets.
+            east = east1 - SenedjemibEastInsetFromWestEastEdgeM;
+            north = north0 + (north1 - north0) * SenedjemibNorthFrac;
         }
 
         static void LayoutEchelon(out float east0, out float east1, out float north0, out float north1)
@@ -1011,6 +1051,146 @@ namespace RealityEngine.Visualization
             if (plate != null)
             {
                 plate.localPosition = new Vector3(halfE + chapelEW + 3.5f, 1.6f, chapelNS * 0.5f + 2.5f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+            return root;
+        }
+
+        static GameObject BuildSenedjemib(GizaComplex.Pose pose)
+        {
+            LayoutSenedjemib(out float east, out float north);
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            GameObject root = GizaBuild.Root(SenedjemibName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material mud = GizaBuild.Mudbrick();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+
+            float bodyEW = SenedjemibBodyEW;
+            float bodyNS = SenedjemibBodyNS;
+            float bodyH = SenedjemibBodyHM;
+            float halfE = bodyEW * 0.5f;
+            float courtEW = SenedjemibCourtEW;
+            float courtNS = SenedjemibCourtNS;
+            float chapelEW = SenedjemibChapelEW;
+            float chapelNS = SenedjemibChapelNS;
+            float chapelH = SenedjemibChapelHM;
+
+            // Walkable sand apron covering mastaba + open court + chapel strip.
+            var apron = new LabMeshBuilder(8, 12);
+            apron.AddBox(new Vector3((courtEW + chapelEW) * 0.45f, 0.06f, 0f),
+                new Vector3(bodyEW + courtEW + chapelEW + 18f, 0.12f, Mathf.Max(bodyNS, courtNS) + 14f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SenedjemibName + "_Apron",
+                apron.Build(SenedjemibName + "_Apron"), sand, true);
+
+            // Limestone mastaba body ~36 x 18.5 x 8.2 m.
+            var body = new LabMeshBuilder(8, 12);
+            body.AddBox(new Vector3(0f, bodyH * 0.5f, 0f), new Vector3(bodyEW, bodyH, bodyNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SenedjemibName + "_Body",
+                body.Build(SenedjemibName + "_Body"), lime, true);
+
+            // Upper cornice / mudbrick step.
+            float upperEW = SenedjemibUpperEW;
+            float upperNS = SenedjemibUpperNS;
+            float upperH = SenedjemibUpperHM;
+            var cornice = new LabMeshBuilder(8, 12);
+            cornice.AddBox(new Vector3(0f, bodyH + upperH * 0.5f, 0f),
+                new Vector3(upperEW, upperH, upperNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SenedjemibName + "_Cornice",
+                cornice.Build(SenedjemibName + "_Cornice"), mud, true);
+
+            // Open court east of mastaba (Senedjemib complex hallmark): low limestone walls, open sky.
+            float courtX = halfE + courtEW * 0.5f + 0.35f;
+            float wallT = 0.7f;
+            float courtWallH = 2.4f;
+            var court = new LabMeshBuilder(48, 72);
+            court.AddBox(new Vector3(courtX, 0.1f, 0f), new Vector3(courtEW, 0.2f, courtNS), Color.white);
+            float cy = courtWallH * 0.5f;
+            court.AddBox(new Vector3(courtX, cy, courtNS * 0.5f - wallT * 0.5f),
+                new Vector3(courtEW, courtWallH, wallT), Color.white);
+            court.AddBox(new Vector3(courtX, cy, -(courtNS * 0.5f - wallT * 0.5f)),
+                new Vector3(courtEW, courtWallH, wallT), Color.white);
+            float stub = (courtNS - 3.2f) * 0.5f;
+            float westX = courtX - courtEW * 0.5f + wallT * 0.5f;
+            if (stub > 0.4f)
+            {
+                court.AddBox(new Vector3(westX, cy, 3.2f * 0.5f + stub * 0.5f),
+                    new Vector3(wallT, courtWallH, stub), Color.white);
+                court.AddBox(new Vector3(westX, cy, -(3.2f * 0.5f + stub * 0.5f)),
+                    new Vector3(wallT, courtWallH, stub), Color.white);
+            }
+            GizaBuild.SpawnMesh(root.transform, SenedjemibName + "_Court",
+                court.Build(SenedjemibName + "_Court"), lime, true);
+
+            // East offering chapel beyond court: west door from court, open east.
+            float doorW = 2.6f;
+            float doorH = 3.1f;
+            float chapelX = courtX + courtEW * 0.5f + chapelEW * 0.5f + 0.35f;
+            float floorT = 0.28f;
+            float deckY = 0f;
+            var chapelShell = new LabMeshBuilder(64, 96);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + floorT * 0.5f, 0f),
+                new Vector3(chapelEW, floorT, chapelNS), Color.white);
+            float wallY = deckY + chapelH * 0.5f;
+            chapelShell.AddBox(new Vector3(chapelX, wallY, chapelNS * 0.5f - wallT * 0.5f),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, wallY, -(chapelNS * 0.5f - wallT * 0.5f)),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            float wing = (chapelNS - doorW) * 0.5f;
+            float cWestX = chapelX - chapelEW * 0.5f + wallT * 0.5f;
+            if (wing > 0.35f)
+            {
+                chapelShell.AddBox(new Vector3(cWestX, wallY, doorW * 0.5f + wing * 0.5f),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+                chapelShell.AddBox(new Vector3(cWestX, wallY, -(doorW * 0.5f + wing * 0.5f)),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+            }
+            float lintelH = Mathf.Max(0.7f, chapelH - doorH);
+            chapelShell.AddBox(new Vector3(cWestX, deckY + doorH + lintelH * 0.5f, 0f),
+                new Vector3(wallT * 1.1f, lintelH, doorW + 0.9f), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + chapelH + 0.16f, 0f),
+                new Vector3(chapelEW + 0.3f, 0.32f, chapelNS + 0.3f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SenedjemibName + "_Chapel",
+                chapelShell.Build(SenedjemibName + "_Chapel"), lime, true);
+
+            float anteEW = chapelEW - wallT * 2f - 0.35f;
+            float anteNS = chapelNS - wallT * 2f - 0.5f;
+            float anteH = 3.5f;
+            var interior = new LabMeshBuilder(40, 60);
+            interior.AddRoom(new Vector3(chapelX, deckY + floorT + anteH * 0.5f, 0f),
+                new Vector3(anteEW, anteH, anteNS), Color.white, false, false, true, true);
+            GizaBuild.SpawnMesh(root.transform, SenedjemibName + "_ChapelInterior",
+                interior.Build(SenedjemibName + "_ChapelInterior"), lime, true);
+
+            // Pavement: mastaba east face -> court -> chapel door.
+            var corridor = new LabMeshBuilder(24, 36);
+            float gap1 = courtX - courtEW * 0.5f - halfE;
+            float corr1 = Mathf.Max(1.0f, gap1 + 0.5f);
+            corridor.AddBox(new Vector3(halfE + corr1 * 0.5f, deckY + 0.1f, 0f),
+                new Vector3(corr1, 0.2f, doorW + 1.2f), Color.white);
+            float gap2 = chapelX - chapelEW * 0.5f - (courtX + courtEW * 0.5f);
+            float corr2 = Mathf.Max(0.8f, gap2 + 0.4f);
+            float corr2x = courtX + courtEW * 0.5f + corr2 * 0.5f;
+            corridor.AddBox(new Vector3(corr2x, deckY + 0.1f, 0f),
+                new Vector3(corr2, 0.2f, doorW + 1.0f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SenedjemibName + "_Corridor",
+                corridor.Build(SenedjemibName + "_Corridor"), pav, true);
+
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SenedjemibName + MassingMarker,
+                mark.Build(SenedjemibName + MassingMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Senedjemib Inti (G 2370). Western Cemetery elite mastaba complex (NW of Khufu).\n" +
+                "Lehner schematic massing (~36 x 18.5 x 8.2 m limestone body + cornice, open east court, east offering chapel).\n" +
+                "Not photogrammetry. Not proven interior chambers beyond the schematic chapel.";
+            GizaBuild.HonestyPlate(root.transform, SenedjemibName + "_Honesty", honesty, 26f);
+            Transform plate = root.transform.Find(SenedjemibName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(halfE + courtEW + chapelEW + 3.5f, 1.6f, chapelNS * 0.5f + 2.5f);
                 plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
             }
             return root;
