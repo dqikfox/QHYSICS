@@ -68,7 +68,7 @@ namespace RealityEngine.EditorTools
         [MenuItem(ComplexPath)]
         public static void PlaceGizaComplex()
         {
-            Place(GizaComplex.Spawn.All, "FULL Giza complex force-rebuild: pyramids, temples, causeways, West/East/Central Field mastabas, Gisr el-Mudir, Khentkawes I, workers village + Wall of the Crow, Osiris Shaft, dunes, Nile harbor, desert dust. Reality Engine / Place Giza Complex.");
+            Place(GizaComplex.Spawn.All, "FULL Giza complex force-rebuild: pyramids (incl. G1-d), temples, causeways, West/East/Central Field mastabas, Gisr el-Mudir, Khentkawes I, workers village + Wall of the Crow, Osiris Shaft, dunes, Nile harbor, desert dust. Reality Engine / Place Giza Complex.");
         }
 
         [MenuItem(ComplexPath, true)]

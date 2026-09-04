@@ -3,7 +3,7 @@ using UnityEngine;
 namespace RealityEngine.Visualization
 {
     /// <summary>
-    /// Rest of the undamaged Giza necropolis: Khufu queens G1a-c, Khafre cult/satellite G2-a,
+    /// Rest of the undamaged Giza necropolis: Khufu queens G1a-c, Khufu cult/satellite G1-d, Khafre cult/satellite G2-a,
     /// mortuary temples, causeways, Khufu + Khafre boat pits, Khufu/Khafre/Menkaure valley temples, Sphinx temple,
     /// Sphinx-Khafre link court, temenos walls.
     /// Reconstructed original massing from published plans (Lehner/Petrie). Not photogrammetry.
@@ -14,6 +14,7 @@ namespace RealityEngine.Visualization
         public const string G1aName = "G1a";
         public const string G1bName = "G1b";
         public const string G1cName = "G1c";
+        public const string G1dName = "G1d";
         public const string G2aName = "G2a";
         public const string KhufuMortuaryName = "KhufuMortuary";
         public const string KhufuCausewayName = "KhufuCauseway";
@@ -40,6 +41,7 @@ namespace RealityEngine.Visualization
             public float g1aEast, g1bEast, g1cEast;
             public float g1aNorth, g1bNorth, g1cNorth;
             public float g2aBase, g2aHeight, g2aEast, g2aNorth;
+            public float g1dBase, g1dHeight, g1dEast, g1dNorth;
             public float khufuTempleEW, khufuTempleNS, khufuTempleEast;
             public float khufuCauseStartEast, khufuCauseEndEast, khufuCauseLen, khufuCauseWid;
             public float khufuValleyEW, khufuValleyNS, khufuValleyEast, khufuValleyNorth;
@@ -96,6 +98,12 @@ namespace RealityEngine.Visualization
             L.g1bNorth = L.g1aNorth - L.g1aBase * 0.5f - 10f - L.g1bBase * 0.5f;
             L.g1cNorth = L.g1bNorth - L.g1bBase * 0.5f - 10f - L.g1cBase * 0.5f;
 
+            // Khufu cult / satellite G1-d: SE of Khufu SE corner, west of queens (Lehner).
+            L.g1dBase = 21.75f;
+            L.g1dHeight = 13.2f;
+            L.g1dEast = kh + khPav + 10f + L.g1dBase * 0.5f;
+            L.g1dNorth = -(kh + khPav + 10f + L.g1dBase * 0.5f);
+
             L.boatNorth = -(kh + khPav + 4f + L.boatWid * 0.5f);
 
             float hf = KhafrePyramid.BaseMeters * 0.5f;
@@ -146,6 +154,7 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1aEast, L.g1aNorth, L.g1aBase * 0.5f + 16f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1bEast, L.g1bNorth, L.g1bBase * 0.5f + 16f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1cEast, L.g1cNorth, L.g1cBase * 0.5f + 16f);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g1dEast, L.g1dNorth, L.g1dBase * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.khufuTempleEast, 0f, L.khufuTempleEW * 0.5f + 2f, L.khufuTempleNS * 0.5f + 2f);
             // Cliff-lip pad east of mortuary/queens — do not pull the plateau under the full valley causeway run.
             float khufuLipEast = Mathf.Max(
@@ -210,6 +219,14 @@ namespace RealityEngine.Visualization
             Ensure(G1aName, pose, p => BuildQueen(p, G1aName, L.g1aEast, L.g1aNorth, L.g1aBase, L.g1aHeight, queensHonesty), pose.surfaceY, true);
             Ensure(G1bName, pose, p => BuildQueen(p, G1bName, L.g1bEast, L.g1bNorth, L.g1bBase, L.g1bHeight, null), pose.surfaceY, true);
             Ensure(G1cName, pose, p => BuildQueen(p, G1cName, L.g1cEast, L.g1cNorth, L.g1cBase, L.g1cHeight, null), pose.surfaceY, true);
+            const string g1dHonesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Khufu cult / satellite pyramid G1-d. SE of Khufu (SE corner). Tura casing ON, electrum pyramidion (reconstructed).\n" +
+                "Base ~21.75 m / height ~13.2 m (Lehner schematic). Not a queen pyramid. Not photogrammetry.";
+            GameObject oldG1d = GizaComplex.FindNamed(G1dName);
+            if (oldG1d != null && oldG1d.transform.Find(G1dName + "_Casing") == null)
+                DestroyNamed(oldG1d);
+            Ensure(G1dName, pose, p => BuildQueen(p, G1dName, L.g1dEast, L.g1dNorth, L.g1dBase, L.g1dHeight, g1dHonesty), pose.surfaceY, true);
             // Force rebuild when open-court / interior markers missing (replaces closed box massing).
             GameObject oldKhufuMort = GizaComplex.FindNamed(KhufuMortuaryName);
             if (oldKhufuMort != null && (oldKhufuMort.transform.Find(KhufuMortuaryName + "_Court") == null
@@ -436,7 +453,7 @@ namespace RealityEngine.Visualization
             GizaBuild.Casing(root.transform, name + "_Casing", baseM, heightM, tura, false, 0f, 0f, 0f, 0f, 0.5f);
             GizaBuild.Pyramidion(root.transform, name + "_Pyramidion", baseM, heightM, 0.5f, gold);
             GizaBuild.PavementRing(root.transform, name + "_Pavement", baseM, 3f, pav);
-            // G1 queens only: east chapel shells. G2a cult pyramid stays casing-only.
+            // G1 queens only: east chapel shells. G1d/G2a cult pyramids stay casing-only.
             if (name == G1aName || name == G1bName || name == G1cName)
                 BuildQueenEastChapel(root.transform, name, baseM, lime, tura, pav);
             if (!string.IsNullOrEmpty(honesty))

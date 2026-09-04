@@ -166,6 +166,7 @@ namespace RealityEngine.Visualization
                 || lower == "gizacomplex" || lower.StartsWith("giza")
                 || lower == "g1a" || lower == "g1b" || lower == "g1c"
                 || lower.StartsWith("g1a") || lower.StartsWith("g1b") || lower.StartsWith("g1c")
+                || lower == "g1d" || lower.StartsWith("g1d")
                 || lower == "g2a" || lower.StartsWith("g2a")
                 || lower == "g3a" || lower == "g3b" || lower == "g3c"
                 || lower.Contains("mortuary") || lower.Contains("causeway") || lower.Contains("boatpit")
@@ -706,6 +707,9 @@ namespace RealityEngine.Visualization
             SitFound("G1a", top);
             SitFound("G1b", top);
             SitFound("G1c", top);
+            SitFound("G1d", top);
+            SitFound("G2a", terrace); // was missing; keep landscape sitY correct for prior cult pyramid
+            SitFound("KhafreBoatPits", terrace);
             SitFound("KhufuMortuary", top);
             SitFound("KhufuBoatPits", top);
             SitFound("KhufuEnclosure", top);
