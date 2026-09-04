@@ -4,6 +4,7 @@ namespace RealityEngine.Visualization
 {
     /// <summary>
     /// West / East / Central Field mastaba cemeteries (west + east of Khufu, south of Khafre),
+    /// Khentkawes I (LG100) rock-cut stepped tomb SE of Central Field / NE of Menkaure,
     /// Heit el-Ghurab workers' village (south apron / floodplain), Osiris Shaft-scale rock-cut
     /// complex near Sphinx, and an OFF-by-default SPECULATIVE fringe water-shaft diagram
     /// (not proven archaeology).
@@ -18,12 +19,14 @@ namespace RealityEngine.Visualization
         public const string WorkersVillageName = "GizaWorkersVillage";
         public const string OsirisShaftName = "OsirisShaft";
         public const string SpeculativeName = "SpeculativeUnderworld";
+        public const string KhentkawesName = "Khentkawes";
 
         public const string MastabasMarker = "_Mastabas";
         public const string VillageMarker = "_Village";
         public const string CrowWallMarker = "_CrowWall";
         public const string ShaftMarker = "_Shaft";
         public const string SpeculativeShaftsMarker = "_Shafts";
+        public const string MassingMarker = "_Massing";
 
         // Fringe diagrams claim 33-39 ft shafts (~10-12 m). Schematic only - OFF by default.
         public const float SpeculativeShaftDepthM = 11.5f;
@@ -60,6 +63,23 @@ namespace RealityEngine.Visualization
         public const float CrowGateWidthM = 7.2f;
         public const float CrowGateHeightM = 6.0f;
 
+        // Khentkawes I (LG100): SE of Central Field / NE of Menkaure (Lehner schematic).
+        // east = -MenkaureWestM + EastOfMenkaureM (~-468); north = -MenkaureSouthM + NorthOfMenkaureM (~-588).
+        // Verified vs LayoutCentral: west of Central Field west edge (~42 m gap), south of its south edge.
+        public const float KhentkawesEastOfMenkaureM = 95f;
+        public const float KhentkawesNorthOfMenkaureM = 155f;
+        public const float KhentkawesPodiumM = 45.5f;
+        public const float KhentkawesPodiumHM = 10f;
+        public const float KhentkawesUpperM = 37f;
+        public const float KhentkawesUpperHM = 7f;
+        public const float KhentkawesCapHM = 0.45f;
+        public const float KhentkawesChapelEW = 12f;
+        public const float KhentkawesChapelNS = 8f;
+        public const float KhentkawesChapelHM = 4.5f;
+        public const float KhentkawesBasinEW = 20f;
+        public const float KhentkawesBasinNS = 5f;
+        public const float KhentkawesBasinDepthM = 2f;
+
         // Osiris Shaft near Sphinx / Khafre valley (schematic).
         public const float ShaftEastOfSphinxM = -28f;
         public const float ShaftSouthOfSphinxM = 48f;
@@ -85,6 +105,10 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, vEast, vNorth,
                 Mathf.Max(VillageEW, CrowWallLengthM) * 0.5f + 14f, VillageNS * 0.5f + CrowWallThicknessM + 16f);
 
+            LayoutKhentkawes(out float kEast, out float kNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, kEast, kNorth,
+                KhentkawesPodiumM * 0.5f + 16f, KhentkawesPodiumM * 0.5f + KhentkawesBasinNS + 14f);
+
             LayoutShaft(out float sEast, out float sNorth);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, sEast, sNorth, ShaftWidthM * 0.5f + 10f, ShaftWidthM * 0.5f + 10f);
         }
@@ -108,6 +132,7 @@ namespace RealityEngine.Visualization
             DestroyNamed(GizaComplex.FindNamed(EastFieldName));
             DestroyNamed(GizaComplex.FindNamed(CentralFieldName));
             DestroyNamed(GizaComplex.FindNamed(WorkersVillageName));
+            DestroyNamed(GizaComplex.FindNamed(KhentkawesName));
             DestroyNamed(GizaComplex.FindNamed(OsirisShaftName));
         }
 
@@ -146,6 +171,14 @@ namespace RealityEngine.Visualization
                 DestroyNamed(old);
             float floodY = pose.surfaceY - GizaComplex.CliffHeightM + GizaNile.SitAboveDesertM;
             Ensure(WorkersVillageName, pose, BuildWorkersVillage, floodY, true);
+        }
+
+        public static void EnsureKhentkawes(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(KhentkawesName);
+            if (old != null && old.transform.Find(KhentkawesName + MassingMarker) == null)
+                DestroyNamed(old);
+            Ensure(KhentkawesName, pose, BuildKhentkawes, pose.surfaceY, true);
         }
 
         public static void EnsureOsirisShaft(GizaComplex.Pose pose)
@@ -221,6 +254,12 @@ namespace RealityEngine.Visualization
             float mn = MenkaurePyramid.BaseMeters * 0.5f;
             east = -GizaComplex.MenkaureWestM + VillageEastOfMenkaureM;
             north = -GizaComplex.MenkaureSouthM - mn - VillageSouthOfMenkaureM - VillageNS * 0.5f;
+        }
+
+        static void LayoutKhentkawes(out float east, out float north)
+        {
+            east = -GizaComplex.MenkaureWestM + KhentkawesEastOfMenkaureM;
+            north = -GizaComplex.MenkaureSouthM + KhentkawesNorthOfMenkaureM;
         }
 
         static void LayoutShaft(out float east, out float north)
@@ -470,6 +509,176 @@ namespace RealityEngine.Visualization
             {
                 plateC.localPosition = new Vector3(0f, 1.55f, fieldNS * 0.5f + 5f);
                 plateC.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+            return root;
+        }
+
+
+        static GameObject BuildKhentkawes(GizaComplex.Pose pose)
+        {
+            LayoutKhentkawes(out float east, out float north);
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            GameObject root = GizaBuild.Root(KhentkawesName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+            Material rock = GizaBuild.Bedrock();
+
+            float podium = KhentkawesPodiumM;
+            float podiumH = KhentkawesPodiumHM;
+            float upper = KhentkawesUpperM;
+            float upperH = KhentkawesUpperHM;
+            float capH = KhentkawesCapHM;
+            float half = podium * 0.5f;
+
+            // Sand apron teleportable pad around base.
+            var apron = new LabMeshBuilder(8, 12);
+            apron.AddBox(new Vector3(0f, 0.06f, 0f), new Vector3(podium + 18f, 0.12f, podium + 22f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhentkawesName + "_Apron",
+                apron.Build(KhentkawesName + "_Apron"), sand, true);
+
+            // Lower rock-cut podium ~45.5 x 45.5 x ~10 m (Bedrock).
+            var podiumMesh = new LabMeshBuilder(8, 12);
+            podiumMesh.AddBox(new Vector3(0f, podiumH * 0.5f, 0f), new Vector3(podium, podiumH, podium), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhentkawesName + "_Podium",
+                podiumMesh.Build(KhentkawesName + "_Podium"), rock, true);
+
+            // Upper stepped limestone mastaba recessed on top + thin cap course.
+            float upperY0 = podiumH;
+            var upperMesh = new LabMeshBuilder(16, 24);
+            upperMesh.AddBox(new Vector3(0f, upperY0 + upperH * 0.5f, 0f), new Vector3(upper, upperH, upper), Color.white);
+            upperMesh.AddBox(new Vector3(0f, upperY0 + upperH + capH * 0.5f, 0f),
+                new Vector3(upper * 1.02f, capH, upper * 1.02f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhentkawesName + "_Upper",
+                upperMesh.Build(KhentkawesName + "_Upper"), lime, true);
+
+            // East chapel / vestibule shell with open door toward east + walkable pavement corridor.
+            float chapelEW = KhentkawesChapelEW;
+            float chapelNS = KhentkawesChapelNS;
+            float chapelH = KhentkawesChapelHM;
+            float wallT = 0.85f;
+            float doorW = 2.6f;
+            float doorH = 2.4f; // VR headroom >= 2.0 m
+            float chapelX = half + chapelEW * 0.5f - 0.2f;
+            float deckY = podiumH;
+
+            var chapel = new LabMeshBuilder(64, 96);
+            // Floor
+            chapel.AddBox(new Vector3(chapelX, deckY + 0.12f, 0f), new Vector3(chapelEW, 0.24f, chapelNS), Color.white);
+            // N/S/W walls; east face open as door (leave gap).
+            float wallY = deckY + chapelH * 0.5f;
+            chapel.AddBox(new Vector3(chapelX, wallY, chapelNS * 0.5f - wallT * 0.5f),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            chapel.AddBox(new Vector3(chapelX, wallY, -(chapelNS * 0.5f - wallT * 0.5f)),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            chapel.AddBox(new Vector3(chapelX - chapelEW * 0.5f + wallT * 0.5f, wallY, 0f),
+                new Vector3(wallT, chapelH, chapelNS - wallT * 2f), Color.white);
+            // East jambs around open door.
+            float wing = (chapelNS - doorW) * 0.5f;
+            chapel.AddBox(new Vector3(chapelX + chapelEW * 0.5f - wallT * 0.5f, wallY, doorW * 0.5f + wing * 0.5f),
+                new Vector3(wallT, chapelH, wing), Color.white);
+            chapel.AddBox(new Vector3(chapelX + chapelEW * 0.5f - wallT * 0.5f, wallY, -(doorW * 0.5f + wing * 0.5f)),
+                new Vector3(wallT, chapelH, wing), Color.white);
+            // Lintel above door.
+            float lintelH = Mathf.Max(0.8f, chapelH - doorH);
+            chapel.AddBox(new Vector3(chapelX + chapelEW * 0.5f - wallT * 0.5f, deckY + doorH + lintelH * 0.5f, 0f),
+                new Vector3(wallT * 1.1f, lintelH, doorW + 1.0f), Color.white);
+            // Thin roof slab.
+            chapel.AddBox(new Vector3(chapelX, deckY + chapelH + 0.18f, 0f),
+                new Vector3(chapelEW + 0.4f, 0.36f, chapelNS + 0.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhentkawesName + "_Chapel",
+                chapel.Build(KhentkawesName + "_Chapel"), lime, true);
+
+            // Walkable pavement corridor from apron up to chapel door (east approach).
+            var corridor = new LabMeshBuilder(24, 36);
+            float corrLen = 10f;
+            corridor.AddBox(new Vector3(half + corrLen * 0.5f, deckY + 0.1f, 0f),
+                new Vector3(corrLen, 0.2f, doorW + 1.6f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhentkawesName + "_Corridor",
+                corridor.Build(KhentkawesName + "_Corridor"), pav, true);
+
+            // Short east approach ramp/steps from apron up onto lower deck.
+            int steps = 12;
+            float rise = podiumH / steps;
+            float run = 0.7f;
+            float stepW = 5.5f;
+            var stairs = new LabMeshBuilder(steps * 16, steps * 24);
+            for (int i = 0; i < steps; i++)
+            {
+                // Low steps farther east on the apron; high steps meet the podium deck.
+                float y = (i + 0.5f) * rise;
+                float x = half + 0.15f + (steps - i - 0.5f) * run;
+                stairs.AddBox(new Vector3(x, y, 0f), new Vector3(run * 0.95f, rise * 0.92f, stepW), Color.white);
+            }
+            // Top landing on podium edge.
+            stairs.AddBox(new Vector3(half - 1.2f, podiumH + 0.08f, 0f),
+                new Vector3(2.6f, 0.16f, stepW + 0.8f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhentkawesName + "_Steps",
+                stairs.Build(KhentkawesName + "_Steps"), pav, true);
+
+            // Optional small boat basin south of podium (honesty-labeled schematic).
+            float basinEW = KhentkawesBasinEW;
+            float basinNS = KhentkawesBasinNS;
+            float basinD = KhentkawesBasinDepthM;
+            float basinZ = -(half + basinNS * 0.5f + 2.5f);
+            var basin = new LabMeshBuilder(48, 72);
+            // Hollow recessed basin: floor at bottom + four rock walls (open interior).
+            float wallT = 0.7f;
+            float floorT = 0.35f;
+            basin.AddBox(new Vector3(0f, -basinD + floorT * 0.5f, basinZ),
+                new Vector3(basinEW - wallT * 2f, floorT, basinNS - wallT * 2f), Color.white);
+            float wy = -basinD * 0.5f;
+            basin.AddBox(new Vector3(0f, wy, basinZ + basinNS * 0.5f - wallT * 0.5f),
+                new Vector3(basinEW, basinD, wallT), Color.white);
+            basin.AddBox(new Vector3(0f, wy, basinZ - (basinNS * 0.5f - wallT * 0.5f)),
+                new Vector3(basinEW, basinD, wallT), Color.white);
+            basin.AddBox(new Vector3(basinEW * 0.5f - wallT * 0.5f, wy, basinZ),
+                new Vector3(wallT, basinD, basinNS - wallT * 2f), Color.white);
+            basin.AddBox(new Vector3(-(basinEW * 0.5f - wallT * 0.5f), wy, basinZ),
+                new Vector3(wallT, basinD, basinNS - wallT * 2f), Color.white);
+            // Surface rim.
+            float rimT = 0.7f;
+            float rimH = 0.55f;
+            basin.AddBox(new Vector3(0f, rimH * 0.5f, basinZ + basinNS * 0.5f + rimT * 0.5f),
+                new Vector3(basinEW + rimT * 2f, rimH, rimT), Color.white);
+            basin.AddBox(new Vector3(0f, rimH * 0.5f, basinZ - (basinNS * 0.5f + rimT * 0.5f)),
+                new Vector3(basinEW + rimT * 2f, rimH, rimT), Color.white);
+            basin.AddBox(new Vector3(basinEW * 0.5f + rimT * 0.5f, rimH * 0.5f, basinZ),
+                new Vector3(rimT, rimH, basinNS), Color.white);
+            basin.AddBox(new Vector3(-(basinEW * 0.5f + rimT * 0.5f), rimH * 0.5f, basinZ),
+                new Vector3(rimT, rimH, basinNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhentkawesName + "_BoatBasin",
+                basin.Build(KhentkawesName + "_BoatBasin"), rock, true);
+
+            // Force-rebuild marker.
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhentkawesName + MassingMarker,
+                mark.Build(KhentkawesName + MassingMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Khentkawes I (LG100) rock-cut stepped tomb complex. Petrie/Lehner schematic massing SE of Central Field / NE of Menkaure.\n" +
+                "Lower bedrock podium (~45.5 m square) + upper limestone mastaba, east chapel vestibule, approach steps, optional boat basin.\n" +
+                "Schematic - not photogrammetry. Not excavated chamber interiors.";
+            GizaBuild.HonestyPlate(root.transform, KhentkawesName + "_Honesty", honesty, 28f);
+            Transform plate = root.transform.Find(KhentkawesName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(half + chapelEW + 4f, podiumH + 1.55f, chapelNS * 0.5f + 3f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+
+            // Basin honesty (schematic optional feature).
+            const string basinHonesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Schematic boat basin south of Khentkawes I podium (Lehner-scale hint). Not surveyed excavation. Not photogrammetry.";
+            GizaBuild.HonestyPlate(root.transform, KhentkawesName + "_BasinHonesty", basinHonesty, 16f);
+            Transform bp = root.transform.Find(KhentkawesName + "_BasinHonesty");
+            if (bp != null)
+            {
+                bp.localPosition = new Vector3(basinEW * 0.5f + 3f, 1.4f, basinZ);
+                bp.localRotation = Quaternion.Euler(0f, 90f, 0f);
             }
             return root;
         }

@@ -312,6 +312,7 @@ namespace RealityEngine.Visualization
             Vector3 men = GizaComplex.WorldFromKhufu(pose, -GizaComplex.MenkaureWestM, -GizaComplex.MenkaureSouthM, 0f);
             Ensure(MenkaureEnclosureName, pose, p => BuildEnclosure(p, MenkaureEnclosureName, men, 0f, MenkaurePyramid.BaseMeters * 0.5f + 4f, L.menkaureTempleNS + 4f, false), pose.surfaceY, true);
             GizaField.EnsureWorkersVillage(pose);
+            GizaField.EnsureKhentkawes(pose);
         }
 
         static GameObject Ensure(string name, GizaComplex.Pose pose, System.Func<GizaComplex.Pose, GameObject> build, float sitY, bool sit)
