@@ -16,6 +16,12 @@ namespace RealityEngine.Visualization
         public const string SettlementName = "GizaValleySettlement";
         public const string HonestyName = "GizaNile_Honesty";
 
+        public const string BasinName = "GizaNileHarbor_Basin";
+        public const string QuayName = "GizaNileHarbor_Quay";
+        public const string CanalName = "GizaNileHarbor_Canal";
+        public const string WaterName = "GizaNileHarbor_Water";
+        public const string CanalWaterName = "GizaNileHarbor_CanalWater";
+
         public const float GapFromCliffM = 6f;
         public const float FloodplainWidthM = 720f;
         public const float NorthPadM = 80f;
@@ -23,14 +29,22 @@ namespace RealityEngine.Visualization
         public const float HarborEastOfCliffM = 80f;
         public const float HarborEW = 90f;
         public const float HarborNS = 45f;
-        public const float WaterThickM = 1.2f;
+        /// <summary>Thin opaque water sheet in the recessed basin (was a 1.2 m solid box).</summary>
+        public const float WaterThickM = 0.28f;
+        public const float BasinDepthM = 1.55f;
+        public const float BasinFloorThickM = 0.45f;
+        public const float QuayWidthM = 4.5f;
+        public const float QuayThickM = 0.40f;
+        public const float CanalLengthM = 58f;
+        public const float CanalWidthM = 10f;
+        public const float CanalBankM = 2.4f;
         public const float RimWidthM = 3f;
         public const float RimThickM = 0.35f;
         const float PlazaKeepoutM = 32f;
 
         public const string Honesty =
             "Reconstructed original (undamaged). Lehner: cultivation and harbors at the Giza escarpment foot. Not photogrammetry. Not modern Nazlet el-Samman.\n" +
-            "Nile channel is ~8 km further east — not modeled at 1:1 this slice. This is floodplain silt + a schematic harbor basin + valley settlement.";
+            "Nile channel is ~8 km further east — not modeled at 1:1 this slice. Floodplain silt + recessed walkable harbor basin (stone quay, thin water, west feeder canal toward Khafre valley / Sphinx) + valley settlement.";
 
         public static void Ensure(Transform root, GizaComplex.Pose pose, Vector3 plazaPos,
             float xMin, float xMax, float zMin, float zMax)
@@ -93,15 +107,34 @@ namespace RealityEngine.Visualization
             if (TooClose(world, plazaPos, PlazaKeepoutM + 20f))
                 return;
 
+            // Force-rebuild when recessed-basin markers missing (replaces solid water box).
+            Transform oldHarbor = root.Find(HarborName);
+            if (oldHarbor != null
+                && (oldHarbor.Find(QuayName) == null || oldHarbor.Find(BasinName) == null))
+            {
+                DestroyHarbor(oldHarbor.gameObject);
+            }
+
             Transform harbor = EnsureRoot(root, HarborName, world, pose.rot);
 
-            Mesh water = BuildWaterMesh(HarborEW, HarborNS, WaterThickM);
-            ApplyLocalMesh(harbor, "GizaNileHarborWater", water, GizaBuild.NileWater(),
-                Vector3.zero, Quaternion.identity, true);
+            float floorTop = -BasinDepthM;
+            float floorCy = floorTop - BasinFloorThickM * 0.5f;
+            float waterCy = floorTop + WaterThickM * 0.5f;
+            float quayCy = QuayThickM * 0.5f;
 
-            Mesh rim = BuildRimMesh(HarborEW, HarborNS, RimWidthM, RimThickM);
-            ApplyLocalMesh(harbor, "GizaNileHarborRim", rim, GizaBuild.Pavement(),
-                Vector3.zero, Quaternion.identity, true);
+            Mesh basin = BuildBasinFloor(HarborEW, HarborNS, BasinFloorThickM);
+            ApplyLocalMesh(harbor, BasinName, basin, GizaBuild.Pavement(),
+                new Vector3(0f, floorCy, 0f), Quaternion.identity, true);
+
+            Mesh water = BuildWaterSheet(HarborEW - 1.2f, HarborNS - 1.2f, WaterThickM);
+            ApplyLocalMesh(harbor, WaterName, water, GizaBuild.NileWater(),
+                new Vector3(0f, waterCy, 0f), Quaternion.identity, false);
+
+            Mesh quay = BuildQuayWithWestSlip(HarborEW, HarborNS, QuayWidthM, QuayThickM, BasinDepthM);
+            ApplyLocalMesh(harbor, QuayName, quay, GizaBuild.Pavement(),
+                new Vector3(0f, quayCy, 0f), Quaternion.identity, true);
+
+            PlaceFeederCanal(harbor, floorTop, waterCy, quayCy);
 
             Transform plate = harbor.Find(HonestyName);
             if (plate == null)
@@ -114,6 +147,28 @@ namespace RealityEngine.Visualization
                 plate.localPosition = new Vector3(-HarborEW * 0.5f - 8f, 1.55f, HarborNS * 0.2f);
                 plate.localRotation = Quaternion.Euler(0f, -90f, 0f);
             }
+        }
+
+        static void PlaceFeederCanal(Transform harbor, float floorTop, float waterCy, float quayCy)
+        {
+            // Schematic feeder west (local -X) toward Khafre valley / Sphinx temple alignment.
+            float canalEast = -(HarborEW * 0.5f + CanalLengthM * 0.5f + QuayWidthM * 0.35f);
+            float canalInnerW = CanalWidthM;
+            float canalInnerL = CanalLengthM;
+
+            Mesh banks = BuildCanalBanks(canalInnerL, canalInnerW, CanalBankM, QuayThickM, BasinDepthM);
+            ApplyLocalMesh(harbor, CanalName, banks, GizaBuild.Pavement(),
+                new Vector3(canalEast, quayCy, 0f), Quaternion.identity, true);
+
+            Mesh canalWater = BuildWaterSheet(canalInnerL - 0.6f, canalInnerW - 0.8f, WaterThickM);
+            ApplyLocalMesh(harbor, CanalWaterName, canalWater, GizaBuild.NileWater(),
+                new Vector3(canalEast, waterCy, 0f), Quaternion.identity, false);
+
+            // Recessed canal floor under the thin water (walkable banks only; floor for visual depth).
+            Mesh canalFloor = BuildBasinFloor(canalInnerL - 0.4f, canalInnerW - 0.6f, BasinFloorThickM);
+            float canalFloorCy = floorTop - BasinFloorThickM * 0.5f;
+            ApplyLocalMesh(harbor, "GizaNileHarbor_CanalFloor", canalFloor, GizaBuild.Bedrock(),
+                new Vector3(canalEast, canalFloorCy, 0f), Quaternion.identity, true);
         }
 
         static void PlaceSettlement(Transform root, GizaComplex.Pose pose, Vector3 plazaPos, float east0, float y)
@@ -178,23 +233,85 @@ namespace RealityEngine.Visualization
             return b.Build("GizaValleyYards");
         }
 
-        static Mesh BuildWaterMesh(float ew, float ns, float thick)
+        static Mesh BuildBasinFloor(float ew, float ns, float thick)
         {
             var b = new LabMeshBuilder(24, 36);
-            b.AddBox(new Vector3(0f, thick * 0.5f, 0f), new Vector3(ew, thick, ns), Color.white);
-            return b.Build("GizaNileHarborWater");
+            b.AddBox(Vector3.zero, new Vector3(ew, thick, ns), Color.white);
+            return b.Build(BasinName);
         }
 
-        static Mesh BuildRimMesh(float ew, float ns, float rim, float thick)
+        static Mesh BuildWaterSheet(float ew, float ns, float thick)
         {
-            var b = new LabMeshBuilder(96, 144);
-            float y = thick * 0.5f;
+            var b = new LabMeshBuilder(24, 36);
+            b.AddBox(Vector3.zero, new Vector3(ew, thick, ns), Color.white);
+            return b.Build(WaterName);
+        }
+
+        /// <summary>
+        /// Walkable stone quay rim around the basin, plus a west-side stepped slip toward the cliff.
+        /// Mesh is authored around local Y=0; caller offsets by quayCy.
+        /// </summary>
+        static Mesh BuildQuayWithWestSlip(float ew, float ns, float rim, float thick, float basinDepth)
+        {
+            var b = new LabMeshBuilder(220, 360);
+            Color c = Color.white;
             float outerN = ns + rim * 2f;
-            b.AddBox(new Vector3(-(ew * 0.5f + rim * 0.5f), y, 0f), new Vector3(rim, thick, outerN), Color.white);
-            b.AddBox(new Vector3(ew * 0.5f + rim * 0.5f, y, 0f), new Vector3(rim, thick, outerN), Color.white);
-            b.AddBox(new Vector3(0f, y, -(ns * 0.5f + rim * 0.5f)), new Vector3(ew, thick, rim), Color.white);
-            b.AddBox(new Vector3(0f, y, ns * 0.5f + rim * 0.5f), new Vector3(ew, thick, rim), Color.white);
-            return b.Build("GizaNileHarborRim");
+            // Four rim sides (local Y = 0 center; thick = QuayThickM).
+            b.AddBox(new Vector3(-(ew * 0.5f + rim * 0.5f), 0f, 0f), new Vector3(rim, thick, outerN), c);
+            b.AddBox(new Vector3(ew * 0.5f + rim * 0.5f, 0f, 0f), new Vector3(rim, thick, outerN), c);
+            b.AddBox(new Vector3(0f, 0f, -(ns * 0.5f + rim * 0.5f)), new Vector3(ew, thick, rim), c);
+            b.AddBox(new Vector3(0f, 0f, ns * 0.5f + rim * 0.5f), new Vector3(ew, thick, rim), c);
+
+            // West slip: three descending treads from quay into the basin (toward local -X / cliff).
+            float quayTop = thick * 0.5f;
+            float westInner = -(ew * 0.5f);
+            float treadD = 1.55f;
+            float treadSpan0 = 14f;
+            const int steps = 3;
+            for (int i = 0; i < steps; i++)
+            {
+                float drop = (i + 1) * (basinDepth / (steps + 1f));
+                float treadH = thick + 0.08f;
+                float top = quayTop - drop;
+                float cy = top - treadH * 0.5f;
+                float x = westInner + treadD * 0.5f + i * (treadD * 0.95f);
+                float span = treadSpan0 - i * 1.4f;
+                b.AddBox(new Vector3(x, cy, 0f), new Vector3(treadD, treadH, span), c);
+            }
+
+            return b.Build(QuayName);
+        }
+
+        static Mesh BuildCanalBanks(float length, float width, float bank, float thick, float basinDepth)
+        {
+            var b = new LabMeshBuilder(160, 240);
+            Color c = Color.white;
+            float outerL = length + bank * 2f;
+            // N/S banks and west head; east end opens into harbor basin (no east bank).
+            b.AddBox(new Vector3(0f, 0f, width * 0.5f + bank * 0.5f), new Vector3(outerL, thick, bank), c);
+            b.AddBox(new Vector3(0f, 0f, -(width * 0.5f + bank * 0.5f)), new Vector3(outerL, thick, bank), c);
+            b.AddBox(new Vector3(-(length * 0.5f + bank * 0.5f), 0f, 0f), new Vector3(bank, thick, width + bank * 2f), c);
+
+            // Small west landing / slip at canal head (toward cliff).
+            float landW = 3.2f;
+            float landD = 2.4f;
+            b.AddBox(new Vector3(-(length * 0.5f - landD * 0.4f), 0f, 0f), new Vector3(landD, thick, landW), c);
+            float midDrop = basinDepth * 0.45f;
+            b.AddBox(new Vector3(-(length * 0.5f - landD * 1.1f), -midDrop * 0.35f, 0f),
+                new Vector3(landD * 0.85f, thick + midDrop * 0.5f, landW * 0.75f), c);
+
+            return b.Build(CanalName);
+        }
+
+        static void DestroyHarbor(GameObject go)
+        {
+            if (go == null)
+                return;
+            go.name = go.name + "_Obsolete";
+            if (Application.isPlaying)
+                Object.Destroy(go);
+            else
+                Object.DestroyImmediate(go);
         }
 
         static Transform EnsureRoot(Transform parent, string name, Vector3 worldPos, Quaternion worldRot)
