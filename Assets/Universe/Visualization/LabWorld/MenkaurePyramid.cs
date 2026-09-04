@@ -29,7 +29,7 @@ namespace RealityEngine.Visualization
             "Base 105.5 m. Original height 65.5 m. Slope 51° 20' 25\".\n" +
             "Offset from Khufu centre (approx. WGS84, lat 30°): 563 m west, 743 m south.\n" +
             "North-face original entrance ~4.2 m up, on the centreline. Descending to antechamber + granite burial chamber (barrel vault, lidless coffer).\n" +
-            "Three schematic queens' pyramids on the south side (G3a–c massing only, no interiors).";
+            "Three schematic queens' pyramids on the south side (G3a-c). East chapels: small walkable limestone shells (~9.5 x 7.5 m) east of each queen with west door from pavement (Lehner schematic). Not pyramid interiors. Not photogrammetry.";
 
         public static GameObject Build(Transform parent, Vector3 worldBaseCenter, Quaternion worldRot, bool comfortScale)
         {
@@ -126,6 +126,8 @@ namespace RealityEngine.Visualization
             float south = -BaseMeters * 0.5f - 8f - QueenBaseM * 0.5f;
             float[] xs = { 32f, 0f, -32f };
             string[] names = { "G3a", "G3b", "G3c" };
+            Material pav = GizaBuild.Pavement();
+            Material lime = GizaBuild.InteriorLime();
             for (int i = 0; i < 3; i++)
             {
                 var q = new GameObject(names[i]);
@@ -134,6 +136,9 @@ namespace RealityEngine.Visualization
                 q.transform.localRotation = Quaternion.identity;
                 GizaBuild.Casing(q.transform, names[i] + "_Casing", QueenBaseM, QueenHeightM, tura, false, 0f, 0f, 0f, 0f, 0.45f);
                 GizaBuild.Pyramidion(q.transform, names[i] + "_Pyramidion", QueenBaseM, QueenHeightM, 0.45f, gold);
+                GizaBuild.PavementRing(q.transform, names[i] + "_Pavement", QueenBaseM, 3f, pav);
+                // East chapel shells (Lehner schematic) - marker names[i]_Chapel for force-rebuild.
+                GizaPrecinct.BuildQueenEastChapel(q.transform, names[i], QueenBaseM, lime, tura, pav);
             }
         }
     }

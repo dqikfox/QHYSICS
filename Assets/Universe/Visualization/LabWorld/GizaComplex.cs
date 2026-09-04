@@ -93,6 +93,20 @@ namespace RealityEngine.Visualization
             }
             if ((which & Spawn.Menkaure) != 0)
             {
+                // Force rebuild when G3a east chapel marker missing (casing-only queens).
+                GameObject oldMen = FindNamed(MenkaurePyramid.RootName);
+                if (oldMen != null)
+                {
+                    Transform g3a = oldMen.transform.Find("G3a");
+                    if (g3a == null || g3a.Find("G3a_Chapel") == null)
+                    {
+                        oldMen.name = oldMen.name + "_Obsolete";
+                        if (Application.isPlaying)
+                            Object.Destroy(oldMen);
+                        else
+                            Object.DestroyImmediate(oldMen);
+                    }
+                }
                 Vector3 c = WorldFromKhufu(pose, -MenkaureWestM, -MenkaureSouthM, 0f);
                 EnsureNamed(MenkaurePyramid.RootName, pose, (p) => MenkaurePyramid.Build(p.parent, c, p.rot, p.comfortScale), pose.surfaceY);
                 GizaPrecinct.EnsureMenkaure(pose);

@@ -148,6 +148,12 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.valleyEast, L.valleyNorth, L.valleyEW * 0.5f + 4f, L.valleyNS * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.sphinxTempleEast, L.sphinxTempleNorth, L.sphinxTempleEW * 0.5f + 4f, L.sphinxTempleNS * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.menkaureTempleEast, L.menkaureTempleNorth, L.menkaureTempleEW * 0.5f + 2f, L.menkaureTempleNS * 0.5f + 2f);
+            // Menkaure queens G3a-c south of Menkaure + east chapel pad (mirror G1).
+            float g3South = -GizaComplex.MenkaureSouthM - MenkaurePyramid.BaseMeters * 0.5f - 8f - MenkaurePyramid.QueenBaseM * 0.5f;
+            float g3Half = MenkaurePyramid.QueenBaseM * 0.5f + 16f;
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, -GizaComplex.MenkaureWestM + 32f, g3South, g3Half);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, -GizaComplex.MenkaureWestM, g3South, g3Half);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, -GizaComplex.MenkaureWestM - 32f, g3South, g3Half);
             // Cliff-lip pad east of Menkaure mortuary — do not pull the plateau under the valley descent.
             float menLipEast = L.menkaureTempleEast + L.menkaureTempleEW * 0.5f + 10f;
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, menLipEast, L.menkaureTempleNorth, 12f);
@@ -423,7 +429,7 @@ namespace RealityEngine.Visualization
         /// Small east chapel east of a queen pyramid (Lehner schematic). Walkable VR headroom; west door from pavement.
         /// Marker: name_Chapel (force-rebuild).
         /// </summary>
-        static void BuildQueenEastChapel(Transform parent, string name, float baseM, Material lime, Material tura, Material pav)
+        public static void BuildQueenEastChapel(Transform parent, string name, float baseM, Material lime, Material tura, Material pav)
         {
             const float chapelEW = 9.5f;
             const float chapelNS = 7.5f;
