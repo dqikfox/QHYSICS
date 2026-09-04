@@ -278,7 +278,7 @@ namespace RealityEngine.Visualization
             const string valleyHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Menkaure valley temple. Floodplain-level mudbrick / limestone massing east of the cliff (Lehner plan scale ~44 x 47 m).\n" +
-                "Reconstructed complete shell; historically unfinished in stone then finished in mudbrick (Shepseskaf). Walkable court + antechambers. Not photogrammetry.";
+                "Dual north/south east entrances (vestibule portals) toward the harbor — twin pattern with Khufu valley. Reconstructed complete shell; historically unfinished in stone then finished in mudbrick (Shepseskaf). Walkable court + antechambers. Not photogrammetry.";
 
             GameObject oldMenMort = GizaComplex.FindNamed(MenkaureMortuaryName);
             if (oldMenMort != null && (oldMenMort.transform.Find(MenkaureMortuaryName + "_Court") == null
@@ -298,7 +298,8 @@ namespace RealityEngine.Visualization
                 || oldCause.transform.Find(MenkaureCausewayName + "_Roof") == null))
                 DestroyNamed(oldCause);
             GameObject oldValley = GizaComplex.FindNamed(MenkaureValleyName);
-            if (oldValley != null && oldValley.transform.Find(MenkaureValleyName + "_Halls") == null)
+            if (oldValley != null && (oldValley.transform.Find(MenkaureValleyName + "_Halls") == null
+                || oldValley.transform.Find(MenkaureValleyName + "_Portals") == null))
                 DestroyNamed(oldValley);
 
             Ensure(MenkaureCausewayName, pose, p => BuildCauseway(p, MenkaureCausewayName, L.menCauseStartEast, L.menkaureTempleNorth, L.menCauseEndEast, L.menCauseEndNorth, pose.surfaceY, floodY, 8f), pose.surfaceY, false);
@@ -899,11 +900,27 @@ namespace RealityEngine.Visualization
             floor.AddBox(new Vector3(0f, floorT * 0.5f, 0f), new Vector3(ew, floorT, ns), Color.white);
             GizaBuild.SpawnMesh(root.transform, MenkaureValleyName + "_Floor", floor.Build(MenkaureValleyName + "_Floor"), pav, true);
 
-            var walls = new LabMeshBuilder(48, 72);
+            // Dual east facade doors (N/S) toward harbor — twin pattern with Khufu valley.
+            const float portalDoorW = 3.2f;
+            const float portalZ = 8.5f;
+            var walls = new LabMeshBuilder(80, 120);
             walls.AddBox(new Vector3(0f, y, hz - wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
             walls.AddBox(new Vector3(0f, y, -hz + wallT * 0.5f), new Vector3(ew, wallH, wallT), Color.white);
-            walls.AddBox(new Vector3(hx - wallT * 0.5f, y, 0f), new Vector3(wallT, wallH, ns), Color.white);
             WallDoorX(walls, -hx + wallT * 0.5f, ns, wallH, wallT, 6.0f);
+            float wallX = hx - wallT * 0.5f;
+            float halfDoor = portalDoorW * 0.5f;
+            float northTop = portalZ + halfDoor;
+            float northRemain = hz - northTop;
+            if (northRemain > 0.3f)
+                walls.AddBox(new Vector3(wallX, y, northTop + northRemain * 0.5f), new Vector3(wallT, wallH, northRemain), Color.white);
+            float southBot = -portalZ - halfDoor;
+            float southRemain = southBot - (-hz);
+            if (southRemain > 0.3f)
+                walls.AddBox(new Vector3(wallX, y, southBot - southRemain * 0.5f), new Vector3(wallT, wallH, southRemain), Color.white);
+            float centerLen = (portalZ - halfDoor) - (-portalZ + halfDoor);
+            walls.AddBox(new Vector3(wallX, y, 0f), new Vector3(wallT, wallH, centerLen), Color.white);
+            walls.AddBox(new Vector3(wallX, wallH - 0.4f, portalZ), new Vector3(wallT, 0.8f, portalDoorW + 0.5f), Color.white);
+            walls.AddBox(new Vector3(wallX, wallH - 0.4f, -portalZ), new Vector3(wallT, 0.8f, portalDoorW + 0.5f), Color.white);
             GizaBuild.SpawnMesh(root.transform, MenkaureValleyName + "_Walls", walls.Build(MenkaureValleyName + "_Walls"), mud, true);
 
             var halls = new LabMeshBuilder(160, 240);
@@ -930,6 +947,24 @@ namespace RealityEngine.Visualization
                 }
             }
             GizaBuild.SpawnMesh(root.transform, MenkaureValleyName + "_Pillars", pillars.Build(MenkaureValleyName + "_Pillars"), tura, true);
+
+            // East-facade portal vestibules (N/S) toward harbor.
+            const float portalH = 4.6f;
+            const float portalDepth = 2.8f;
+            const float anteDepth = 2.8f;
+            const float anteW = 3.8f;
+            const float anteH = 4.4f;
+            Material gran = GizaBuild.Granite();
+            var portals = new LabMeshBuilder(96, 144);
+            float portalHy = floorT + portalH * 0.5f;
+            float anteHy = floorT + anteH * 0.5f;
+            float vestibX = hx + portalDepth * 0.5f;
+            float anteX = hx - wallT - anteDepth * 0.5f - 0.1f;
+            portals.AddRoom(new Vector3(vestibX, portalHy, portalZ), new Vector3(portalDepth, portalH, portalDoorW), Color.white, false, false, true, true);
+            portals.AddRoom(new Vector3(vestibX, portalHy, -portalZ), new Vector3(portalDepth, portalH, portalDoorW), Color.white, false, false, true, true);
+            portals.AddRoom(new Vector3(anteX, anteHy, portalZ), new Vector3(anteDepth, anteH, anteW), Color.white, false, false, true, true);
+            portals.AddRoom(new Vector3(anteX, anteHy, -portalZ), new Vector3(anteDepth, anteH, anteW), Color.white, false, false, true, true);
+            GizaBuild.SpawnMesh(root.transform, MenkaureValleyName + "_Portals", portals.Build(MenkaureValleyName + "_Portals"), gran, true);
 
             GizaBuild.HonestyPlate(root.transform, MenkaureValleyName + "_Honesty", honesty, ns);
             Transform plate = root.transform.Find(MenkaureValleyName + "_Honesty");
