@@ -624,11 +624,11 @@ namespace RealityEngine.Visualization
                     mr.sharedMaterial = tura;
                 else if (l.Contains("bedrock") || l.Contains("terrace") || mn.Contains("GizaBedrock"))
                     mr.sharedMaterial = rock;
-                else if (l.Contains("pavement") || l.Contains("_floor") || l.Contains("_deck")
+                else if (l.Contains("pavement") || l.Contains("_floor") || l.Contains("_court") || l.Contains("_deck")
                     || l.Contains("ledge") || l.Contains("terminal") || mn.Contains("GizaPavement"))
                     mr.sharedMaterial = pav;
                 else if (mn.Contains("GizaCore") || l.Contains("passage") || l.Contains("chamber")
-                    || l.Contains("burial") || l.Contains("sanctum") || l.Contains("subterranean")
+                    || l.Contains("burial") || l.Contains("sanctum") || l.Contains("_interior") || l.Contains("antechamber") || l.Contains("subterranean")
                     || l.Contains("reliev") || l.Contains("airshaft") || l.Contains("hall"))
                     mr.sharedMaterial = lime;
             }
