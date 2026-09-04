@@ -68,7 +68,7 @@ namespace RealityEngine.EditorTools
         [MenuItem(ComplexPath)]
         public static void PlaceGizaComplex()
         {
-            Place(GizaComplex.Spawn.All, "full Giza complex (Khufu + G1a-c, temples, causeways, West Field mastabas, workers village, Osiris Shaft, Khafre/Sphinx/Menkaure precinct). Dedupe by child names if already spawned.");
+            Place(GizaComplex.Spawn.All, "FULL Giza complex force-rebuild: pyramids, temples, causeways, West Field mastabas, workers village, Osiris Shaft, dunes, Nile harbor, desert dust. Reality Engine / Place Giza Complex.");
         }
 
         [MenuItem(ComplexPath, true)]
@@ -86,7 +86,7 @@ namespace RealityEngine.EditorTools
                 applier.PlaceMonuments(which);
             Mark(applier);
             Selection.activeGameObject = applier != null ? applier.gameObject : null;
-            Debug.Log("Reality Engine: placed " + detail);
+            Debug.Log("Reality Engine: placed " + detail + " Roots: KhufuWestField, GizaWorkersVillage, OsirisShaft, GizaDesertDust, GizaNileHarbor, LabLandscape.");
         }
 
         static void Mark(LabLandscapeApplier applier)

@@ -60,6 +60,17 @@ namespace RealityEngine.Visualization
             zMax = Mathf.Max(zMax, north + rN);
         }
 
+        /// <summary>
+        /// Destroy West Field / workers village / Osiris Shaft roots so Ensure* rebuilds them.
+        /// Used by Place Giza Complex force path.
+        /// </summary>
+        public static void ForceRebuildAll()
+        {
+            DestroyNamed(GizaComplex.FindNamed(WestFieldName));
+            DestroyNamed(GizaComplex.FindNamed(WorkersVillageName));
+            DestroyNamed(GizaComplex.FindNamed(OsirisShaftName));
+        }
+
         public static void EnsureWestField(GizaComplex.Pose pose)
         {
             GameObject old = GizaComplex.FindNamed(WestFieldName);
