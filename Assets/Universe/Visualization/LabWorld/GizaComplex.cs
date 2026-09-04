@@ -4,7 +4,7 @@ using TMPro;
 namespace RealityEngine.Visualization
 {
     /// <summary>
-    /// Giza necropolis at 1:1. Offsets from Khufu centre are approx. WGS84 at lat 30Â°.
+    /// Giza necropolis at 1:1. Offsets from Khufu centre are approx. WGS84 at lat 30Ã‚Â°.
     /// Architectural local space: origin at Khufu base centre, +Y up, +Z north, +X east.
     /// </summary>
     public static class GizaComplex
@@ -163,7 +163,7 @@ namespace RealityEngine.Visualization
 
     /// <summary>
     /// Shared undamaged true-pyramid casing, pyramidion, pavement, honesty plate.
-    /// 4-face shells only â€” no filled core (walkable interiors do not clip solid rock).
+    /// 4-face shells only Ã¢â‚¬â€ no filled core (walkable interiors do not clip solid rock).
     /// </summary>
     public static class GizaBuild
     {
@@ -330,7 +330,7 @@ namespace RealityEngine.Visualization
         {
             if (_nileWater != null)
                 return _nileWater;
-            _nileWater = LabWorldMeshes.MakeLit("RELab_NileWater", new Color(0.08f, 0.16f, 0.18f, 1f), 0.04f, 0.62f, false);
+            _nileWater = LabWorldMeshes.MakeLit("RELab_NileWater", new Color(0.10f, 0.24f, 0.30f, 1f), 0.04f, 0.62f, false);
             return _nileWater;
         }
 
@@ -722,3 +722,4 @@ namespace RealityEngine.Visualization
         }
     }
 }
+
