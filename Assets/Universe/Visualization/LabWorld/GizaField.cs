@@ -4,6 +4,7 @@ namespace RealityEngine.Visualization
 {
     /// <summary>
     /// West / East / Central Field mastaba cemeteries (west + east of Khufu, south of Khafre),
+    /// Cemetery en Echelon (staggered mastaba strip in the gap west of Khufu / east of West Field),
     /// Khentkawes I (LG100) rock-cut stepped tomb SE of Central Field / NE of Menkaure,
     /// Heit el-Ghurab workers' village (south apron / floodplain), Osiris Shaft-scale rock-cut
     /// complex near Sphinx, and an OFF-by-default SPECULATIVE fringe water-shaft diagram
@@ -20,6 +21,7 @@ namespace RealityEngine.Visualization
         public const string OsirisShaftName = "OsirisShaft";
         public const string SpeculativeName = "SpeculativeUnderworld";
         public const string KhentkawesName = "Khentkawes";
+        public const string CemeteryEnEchelonName = "CemeteryEnEchelon";
 
         public const string MastabasMarker = "_Mastabas";
         public const string VillageMarker = "_Village";
@@ -39,6 +41,12 @@ namespace RealityEngine.Visualization
         public const float WestFieldDepthM = 185f;
         public const float WestFieldNorthPadM = 40f;
         public const float WestFieldSouthPadM = 50f;
+
+        // Cemetery en Echelon: staggered strip in the 28 m gap between Khufu west face and West Field.
+        public const float EchelonGapFromFaceM = 4f;
+        public const float EchelonDepthM = 22f;
+        public const float EchelonNorthPadM = 20f;
+        public const float EchelonSouthPadM = 10f;
 
         // East Field: east of queens G1a-c, dense mastaba streets (Lehner East Field schematic).
         public const float EastFieldGapFromQueensM = 18f;
@@ -93,6 +101,10 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, (wEast0 + wEast1) * 0.5f, (wNorth0 + wNorth1) * 0.5f,
                 (wEast1 - wEast0) * 0.5f + 8f, (wNorth1 - wNorth0) * 0.5f + 8f);
 
+            LayoutEchelon(out float ecEast0, out float ecEast1, out float ecNorth0, out float ecNorth1);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, (ecEast0 + ecEast1) * 0.5f, (ecNorth0 + ecNorth1) * 0.5f,
+                (ecEast1 - ecEast0) * 0.5f + 6f, (ecNorth1 - ecNorth0) * 0.5f + 6f);
+
             LayoutEast(out float eEast0, out float eEast1, out float eNorth0, out float eNorth1);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, (eEast0 + eEast1) * 0.5f, (eNorth0 + eNorth1) * 0.5f,
                 (eEast1 - eEast0) * 0.5f + 8f, (eNorth1 - eNorth0) * 0.5f + 8f);
@@ -129,6 +141,7 @@ namespace RealityEngine.Visualization
         public static void ForceRebuildAll()
         {
             DestroyNamed(GizaComplex.FindNamed(WestFieldName));
+            DestroyNamed(GizaComplex.FindNamed(CemeteryEnEchelonName));
             DestroyNamed(GizaComplex.FindNamed(EastFieldName));
             DestroyNamed(GizaComplex.FindNamed(CentralFieldName));
             DestroyNamed(GizaComplex.FindNamed(WorkersVillageName));
@@ -143,6 +156,14 @@ namespace RealityEngine.Visualization
                 || old.transform.Find(WestFieldName + "_SurveyHeatmap") == null))
                 DestroyNamed(old);
             Ensure(WestFieldName, pose, BuildWestField, pose.surfaceY, true);
+        }
+
+        public static void EnsureCemeteryEnEchelon(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(CemeteryEnEchelonName);
+            if (old != null && old.transform.Find(CemeteryEnEchelonName + MastabasMarker) == null)
+                DestroyNamed(old);
+            Ensure(CemeteryEnEchelonName, pose, BuildCemeteryEnEchelon, pose.surfaceY, true);
         }
 
         public static void EnsureEastField(GizaComplex.Pose pose)
@@ -221,6 +242,17 @@ namespace RealityEngine.Visualization
             east0 = east1 - WestFieldDepthM;
             north1 = khHalf + WestFieldNorthPadM;
             north0 = -khHalf - WestFieldSouthPadM;
+        }
+
+        static void LayoutEchelon(out float east0, out float east1, out float north0, out float north1)
+        {
+            float khHalf = KhufuPyramid.BaseMeters * 0.5f;
+            float westFace = -khHalf;
+            // Small apron from Khufu west face; strip fills most of WestFieldGapFromFaceM (~22 m deep).
+            east1 = westFace - EchelonGapFromFaceM;
+            east0 = east1 - EchelonDepthM;
+            north1 = khHalf + EchelonNorthPadM;
+            north0 = -khHalf - EchelonSouthPadM;
         }
 
         static void LayoutEast(out float east0, out float east1, out float north0, out float north1)
@@ -347,6 +379,85 @@ namespace RealityEngine.Visualization
             if (plate != null)
             {
                 plate.localPosition = new Vector3(fieldEW * 0.5f + 6f, 1.55f, 0f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+            return root;
+        }
+
+        static GameObject BuildCemeteryEnEchelon(GizaComplex.Pose pose)
+        {
+            LayoutEchelon(out float east0, out float east1, out float north0, out float north1);
+            float cx = (east0 + east1) * 0.5f;
+            float cz = (north0 + north1) * 0.5f;
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, cx, cz, 0f);
+            GameObject root = GizaBuild.Root(CemeteryEnEchelonName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material mud = GizaBuild.Mudbrick();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+
+            float fieldEW = east1 - east0;
+            float fieldNS = north1 - north0;
+
+            var ground = new LabMeshBuilder(8, 12);
+            ground.AddBox(new Vector3(0f, 0.06f, 0f), new Vector3(fieldEW + 4f, 0.12f, fieldNS + 4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, CemeteryEnEchelonName + "_Sand",
+                ground.Build(CemeteryEnEchelonName + "_Sand"), sand, true);
+
+            // Narrow staggered strip - odd rows offset by half E-W pitch (en echelon signature).
+            const float streetE = 2.2f;
+            const float streetN = 2.4f;
+            const float cellE = 7.0f;
+            const float cellN = 7.2f;
+            float pitchE = cellE + streetE;
+            float pitchN = cellN + streetN;
+            int cols = Mathf.Max(1, Mathf.FloorToInt((fieldEW - streetE) / pitchE));
+            int rows = Mathf.Max(8, Mathf.FloorToInt((fieldNS - streetN) / pitchN));
+            float usedE = cols * pitchE - streetE;
+            float usedN = rows * pitchN - streetN;
+            float x0 = -usedE * 0.5f + cellE * 0.5f;
+            float z0 = -usedN * 0.5f + cellN * 0.5f;
+
+            for (int r = 0; r < rows; r++)
+            {
+                var row = new LabMeshBuilder(cols * 48, cols * 72);
+                float z = z0 + r * pitchN;
+                float stagger = ((r % 2) == 1) ? pitchE * 0.5f : 0f;
+                for (int c = 0; c < cols; c++)
+                {
+                    float x = x0 + c * pitchE + stagger;
+                    float hash = ((r * 29 + c * 23) % 11) / 11f;
+                    float ew = cellE * (0.82f + 0.24f * hash);
+                    float ns = cellN * (0.84f + 0.20f * ((c * 7 + r) % 9) / 8f);
+                    float h = 2.6f + 1.8f * (((r + c * 2) % 5) / 4f);
+                    if ((r + c) % 8 == 0)
+                    {
+                        ew *= 1.35f;
+                        ns *= 1.20f;
+                        h += 1.1f;
+                    }
+                    row.AddBox(new Vector3(x, h * 0.5f, z), new Vector3(ew, h, ns), Color.white);
+                    row.AddBox(new Vector3(x, h + 0.14f, z), new Vector3(ew * 1.03f, 0.28f, ns * 1.03f), Color.white);
+                }
+                Material mat = (r % 2 == 0) ? lime : mud;
+                string rowName = CemeteryEnEchelonName + "_Row" + r;
+                GizaBuild.SpawnMesh(root.transform, rowName, row.Build(rowName), mat, true);
+            }
+
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, CemeteryEnEchelonName + MastabasMarker,
+                mark.Build(CemeteryEnEchelonName + MastabasMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Cemetery en Echelon west of Khufu. Staggered (en echelon) mastaba strip in the gap between the pyramid pavement and the West Field (Lehner / Reisner schematic).\n" +
+                "Odd rows offset by half E-W pitch. Limestone / mudbrick massings with walkable sand streets. Not photogrammetry. Not excavated chamber interiors.";
+            GizaBuild.HonestyPlate(root.transform, CemeteryEnEchelonName + "_Honesty", honesty, 28f);
+            Transform plate = root.transform.Find(CemeteryEnEchelonName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(fieldEW * 0.5f + 4f, 1.45f, 0f);
                 plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
             }
             return root;
