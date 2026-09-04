@@ -1624,6 +1624,16 @@ namespace RealityEngine.Experiments
                 BindPyramidTarget(FindChildNamed(khafre.transform, "Khafre_Burial"));
             }
 
+            GameObject sphinx = GizaComplex.FindNamed(GizaSphinx.RootName);
+            if (sphinx != null)
+            {
+                SphinxSurvey sphinxSurvey = sphinx.GetComponent<SphinxSurvey>();
+                if (sphinxSurvey == null)
+                    sphinxSurvey = sphinx.AddComponent<SphinxSurvey>();
+                sphinxSurvey.EnsureBuilt();
+                BindPyramidTarget(FindChildNamed(sphinx.transform, "Sphinx_Body"));
+            }
+
             CubitRod rod = EnsureCubitRod();
             SurveyBoard board = EnsureSurveyBoard();
             _cubitRod = rod;
