@@ -58,3 +58,9 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+
+# Too large for GitHub (100 MB limit) — keep local only
+Assets/MetaXR/qwen2.5-0.5b_uint8.sentis
+Assets/MetaXR/qwen2.5-0.5b_uint8.sentis.meta
+Assets/Real Materials/Textures/plaster common normal.png
+Assets/Real Materials/Textures/plaster common normal.png.meta
