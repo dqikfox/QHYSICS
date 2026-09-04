@@ -142,7 +142,7 @@ namespace RealityEngine.Visualization
         public const float CliffTileM = 8f;
         // 1024^2 courses stay cheap on RTX-class GPUs; 8 courses / 4.8 m tile => ~0.60 m course height.
         public const int ProcTexSize = 1024;
-        public const int StoneTexRev = 3;
+        public const int StoneTexRev = 4;
 
         static Texture2D _turaTex;
         static Texture2D _turaBump;
@@ -220,13 +220,13 @@ namespace RealityEngine.Visualization
         {
             if (_turaTex != null && _turaBump != null)
                 return;
-            // Cooler creamy ivory — avoid yellow sand wash / plastic cream.
+            // Cooler ivory limestone (diorama white) — slight cool bias, not sandy-plastic yellow.
             BuildCourseBlocks(
-                "RELab_TuraBlocks", "RELab_TuraBlocksN", 8, 8, 0.085f, 1.15f,
-                new Color(0.93f, 0.90f, 0.84f, 1f),
-                new Color(0.87f, 0.84f, 0.77f, 1f),
-                new Color(0.55f, 0.51f, 0.46f, 1f),
-                new Color(0.80f, 0.76f, 0.70f, 1f),
+                "RELab_TuraBlocks", "RELab_TuraBlocksN", 8, 8, 0.085f, 1.22f,
+                new Color(0.95f, 0.94f, 0.91f, 1f),
+                new Color(0.90f, 0.89f, 0.86f, 1f),
+                new Color(0.50f, 0.49f, 0.47f, 1f),
+                new Color(0.84f, 0.83f, 0.80f, 1f),
                 0.11f, out _turaTex, out _turaBump);
         }
 

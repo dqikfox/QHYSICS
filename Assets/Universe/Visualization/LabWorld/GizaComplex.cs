@@ -259,10 +259,10 @@ namespace RealityEngine.Visualization
         public static Material TuraCasing()
         {
             EnsureFreshStoneMats();
-            // Near-white tint so cooler ivory albedo reads; matte ~0.15 (not glossy plastic).
-            return CachedLit(ref _tura, "RELab_TuraCasing", new Color(0.94f, 0.92f, 0.88f, 1f), 0.02f, 0.15f,
+            // Cool near-white tint for diorama ivory Tura; matte stone ~0.11 (not plastic gloss).
+            return CachedLit(ref _tura, "RELab_TuraCasing", new Color(0.97f, 0.96f, 0.94f, 1f), 0.015f, 0.11f,
                 LabWorldMeshes.MakeTuraBlockTexture(), Vector2.one,
-                LabWorldMeshes.MakeTuraBlockNormal(), 1.15f);
+                LabWorldMeshes.MakeTuraBlockNormal(), 1.22f);
         }
 
         public static Material InteriorLime()
