@@ -405,6 +405,11 @@ namespace RealityEngine.Visualization
                     khafreSurvey = GetComponentInParent<KhafreSurvey>();
                 if (khafreSurvey != null)
                     khafreSurvey.ApplyView(_layer, _scale);
+                SphinxSurvey sphinxSurvey = GetComponent<SphinxSurvey>();
+                if (sphinxSurvey == null)
+                    sphinxSurvey = GetComponentInParent<SphinxSurvey>();
+                if (sphinxSurvey != null)
+                    sphinxSurvey.ApplyView(_layer, _scale);
                 ApplyMaterialLook(L == FieldLensLayer.Material || S == ScaleLevel.Material);
                 return;
             }
@@ -571,9 +576,12 @@ namespace RealityEngine.Visualization
             {
                 extra = "\n" + GizaComplex.HonestyPrefix;
                 bool isKhafre = GetComponent<KhafreSurvey>() != null || GetComponentInParent<KhafreSurvey>() != null;
+                bool isSphinx = GetComponent<SphinxSurvey>() != null || GetComponentInParent<SphinxSurvey>() != null;
                 if (L == FieldLensLayer.Mathematical)
                 {
-                    if (isKhafre)
+                    if (isSphinx)
+                        extra += "\nSphinx length/height/width in royal cubits. Lehner/ARCE massing, not a scan.";
+                    else if (isKhafre)
                         extra += "\nseked 5.25 palms = 53 deg 10'. tan = 4/3. Base/height in royal cubits.";
                     else
                         extra += "\nseked 5.5 palms = 51 deg 50' 40\". 440 x 280 cubits. rise 14 / run 11.";
@@ -583,9 +591,14 @@ namespace RealityEngine.Visualization
                 else if (L == FieldLensLayer.Atomic)
                     extra += "\nCaCO3 calcite schematic. Conceptual / Classical crystal, not XRD.";
                 else if (L == FieldLensLayer.Material)
-                    extra += isKhafre
-                        ? "\nCourse banding / block outlines. Tura casing / limestone near look-hit."
-                        : "\nCourse banding / block outlines. Not 2 million blocks.";
+                {
+                    if (isSphinx)
+                        extra += "\nJoint / course outlines. Bedrock limestone near look-hit.";
+                    else if (isKhafre)
+                        extra += "\nCourse banding / block outlines. Tura casing / limestone near look-hit.";
+                    else
+                        extra += "\nCourse banding / block outlines. Not 2 million blocks.";
+                }
             }
 
             _honesty.text = FieldLens.NameOf(_layer) + "\n" + FieldLens.HonestyOf(_layer) + extra;

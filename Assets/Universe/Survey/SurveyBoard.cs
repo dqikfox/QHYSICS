@@ -5,7 +5,7 @@ using RealityEngine.Visualization;
 namespace RealityEngine.Survey
 {
     /// <summary>
-    /// Small table-edge TMP for the Giza cubit survey (Khufu + Khafre). Honesty: reconstructed
+    /// Small table-edge TMP for the Giza cubit survey (Khufu + Khafre + Sphinx). Honesty: reconstructed
     /// original (Petrie/Lehner), not a scan. Simulation/published dimensions are source of truth.
     /// </summary>
     [DisallowMultipleComponent]
@@ -80,7 +80,7 @@ namespace RealityEngine.Survey
             if (CubitRod.HasMeasurement)
                 _sb.Append(CubitRod.DescribeLast());
             else
-                _sb.Append("(grab the cubit rod, aim at Khufu or Khafre)");
+                _sb.Append("(grab the cubit rod, aim at Khufu, Khafre, or Sphinx)");
             _sb.Append('\n');
             _sb.Append("Khufu  slope 51 deg 50' 40\"  seked 5.5  (14/11)\n");
             _sb.Append("  base 440 / height 280 cubits  King 20 x 10 (");
@@ -91,7 +91,16 @@ namespace RealityEngine.Survey
             _sb.Append(khafreHeightCubits.ToString("0")).Append(" cubits  (");
             _sb.Append(KhafrePyramid.BaseMeters.ToString("0.00")).Append(" x ");
             _sb.Append(KhafrePyramid.HeightMeters.ToString("0.0")).Append(" m)\n");
-            _sb.Append("Grab the rod. Field Lens on Khufu_Casing or Khafre_Casing. Key 0 = Q7.\n");
+            float sphinxLenC = GizaSphinx.LengthM / cubit;
+            float sphinxHtC = GizaSphinx.HeightM / cubit;
+            float sphinxWdC = GizaSphinx.WidthM / cubit;
+            _sb.Append("Sphinx  bedrock limestone  Lehner/ARCE\n");
+            _sb.Append("  ~ ").Append(sphinxLenC.ToString("0.0")).Append(" x ").Append(sphinxHtC.ToString("0.0"));
+            _sb.Append(" x ").Append(sphinxWdC.ToString("0.0")).Append(" cubits  (");
+            _sb.Append(GizaSphinx.LengthM.ToString("0.0")).Append(" x ");
+            _sb.Append(GizaSphinx.HeightM.ToString("0.00")).Append(" x ");
+            _sb.Append(GizaSphinx.WidthM.ToString("0.0")).Append(" m)\n");
+            _sb.Append("Grab the rod. Field Lens on Khufu_Casing, Khafre_Casing, or Sphinx_Body. Key 0 = Q7.\n");
             _sb.Append(CubitRod.Honesty);
             _text.text = _sb.ToString();
         }
