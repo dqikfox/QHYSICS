@@ -152,6 +152,7 @@ namespace RealityEngine.Visualization
                 || lower == "gizacomplex" || lower.StartsWith("giza")
                 || lower == "g1a" || lower == "g1b" || lower == "g1c"
                 || lower.StartsWith("g1a") || lower.StartsWith("g1b") || lower.StartsWith("g1c")
+                || lower == "g2a" || lower.StartsWith("g2a")
                 || lower == "g3a" || lower == "g3b" || lower == "g3c"
                 || lower.Contains("mortuary") || lower.Contains("causeway") || lower.Contains("boatpit")
                 || lower.Contains("enclosure") || lower.Contains("valleytemple")
