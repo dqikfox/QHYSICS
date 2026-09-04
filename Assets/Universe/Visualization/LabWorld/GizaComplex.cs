@@ -718,6 +718,7 @@ namespace RealityEngine.Visualization
             SitFound("MenkaureMortuary", top);
             SitFound("MenkaureEnclosure", top);
             SitFound("KhufuWestField", top);
+            SitFound("GisrElMudir", top);
             SitFound("CemeteryEnEchelon", top);
             SitFound("KhufuEastField", top);
             SitFound("GizaCentralField", terrace);
