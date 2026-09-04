@@ -177,6 +177,7 @@ namespace RealityEngine.Visualization
                 || lower.Contains("osirisshaft") || lower.Contains("workersvillage")
                 || lower.Contains("trialpassages") || lower.Contains("khufutrial")
                 || lower.Contains("hemiunu") || lower.Contains("g4000")
+                || lower.Contains("senedjemib") || lower.Contains("g2370")
                 || lower.StartsWith("lablandscape");
         }
     }
@@ -727,6 +728,7 @@ namespace RealityEngine.Visualization
             SitFound("KhufuWestField", top);
             SitFound("GisrElMudir", top);
             SitFound("Hemiunu", top);
+            SitFound("Senedjemib", top);
             SitFound("CemeteryEnEchelon", top);
             SitFound("KhufuEastField", top);
             SitFound("GizaCentralField", terrace);
