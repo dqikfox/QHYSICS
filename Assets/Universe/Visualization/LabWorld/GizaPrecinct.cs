@@ -283,6 +283,7 @@ namespace RealityEngine.Visualization
             Ensure(KhufuEnclosureName, pose, p => BuildEnclosure(p, KhufuEnclosureName, pose.khufuCenter, 0f, KhufuPyramid.BaseMeters * 0.5f + KhufuPyramid.PavementWidthM, L.khufuTempleNS + 4f, true), pose.surfaceY, true);
             GizaField.EnsureWestField(pose);
             GizaField.EnsureGisrElMudir(pose);
+            GizaField.EnsureHemiunu(pose);
             GizaField.EnsureCemeteryEnEchelon(pose);
             GizaField.EnsureEastField(pose);
         }
