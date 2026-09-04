@@ -130,7 +130,7 @@ namespace RealityEngine.Survey
                 _camera = Camera.main;
             if (_camera == null)
                 return;
-            int n = Physics.RaycastNonAlloc(_camera.transform.position, _camera.transform.forward, _hits, 400f, ~0, QueryTriggerInteraction.Ignore);
+            int n = UnityEngine.Physics.RaycastNonAlloc(_camera.transform.position, _camera.transform.forward, _hits, 400f, ~0, QueryTriggerInteraction.Ignore);
             float best = float.PositiveInfinity;
             bool any = false;
             RaycastHit chosen = default;
@@ -248,6 +248,7 @@ namespace RealityEngine.Survey
         void BuildAll()
         {
             _matBlock = LabWorldMeshes.MakeLit("RELab_KhufuBlock", new Color(0.78f, 0.72f, 0.60f), 0.06f, 0.22f, false);
+            LabWorldMeshes.ApplyAlbedo(_matBlock, LabWorldMeshes.MakeTuraBlockTexture(), Vector2.one);
             _matCa = LabWorldMeshes.MakeLit("RELab_CalciteCa", new Color(0.82f, 0.82f, 0.86f), 0.12f, 0.40f, false);
             _matC = LabWorldMeshes.MakeLit("RELab_CalciteC", new Color(0.22f, 0.22f, 0.24f), 0.08f, 0.28f, false);
             _matO = LabWorldMeshes.MakeLit("RELab_CalciteO", new Color(0.72f, 0.18f, 0.16f), 0.08f, 0.32f, false);

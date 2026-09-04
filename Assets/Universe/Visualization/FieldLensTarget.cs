@@ -22,7 +22,7 @@ namespace RealityEngine.Visualization
 
     /// <summary>
     /// Per-object Field Lens peel. Enables/disables child viz per layer.
-    /// Samples live sim (MagneticDipole.CalculateFieldAt, coil flux/EMF/I) — no decorative noise.
+    /// Samples live sim (MagneticDipole.CalculateFieldAt, coil flux/EMF/I) â€” no decorative noise.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensTarget : MonoBehaviour
@@ -149,7 +149,7 @@ namespace RealityEngine.Visualization
             while (t != null)
             {
                 string n = t.name;
-                if (!string.IsNullOrEmpty(n) && (n.StartsWith("Bio", System.StringComparison.Ordinal) || n.StartsWith("KhufuLens", System.StringComparison.Ordinal) || n.StartsWith("HeatEnergy", System.StringComparison.Ordinal) || n.StartsWith("HeatMath", System.StringComparison.Ordinal) || n.StartsWith("HeatParked", System.StringComparison.Ordinal) || n.StartsWith("HeatCaption", System.StringComparison.Ordinal) || n.StartsWith("HeatMaterial", System.StringComparison.Ordinal)))
+                if (!string.IsNullOrEmpty(n) && (n.StartsWith("Bio", System.StringComparison.Ordinal) || n.StartsWith("KhufuLens", System.StringComparison.Ordinal) || n.StartsWith("KhafreLens", System.StringComparison.Ordinal) || n.StartsWith("HeatEnergy", System.StringComparison.Ordinal) || n.StartsWith("HeatMath", System.StringComparison.Ordinal) || n.StartsWith("HeatParked", System.StringComparison.Ordinal) || n.StartsWith("HeatCaption", System.StringComparison.Ordinal) || n.StartsWith("HeatMaterial", System.StringComparison.Ordinal)))
                     return false;
                 t = t.parent;
             }
@@ -400,6 +400,11 @@ namespace RealityEngine.Visualization
                     survey = GetComponentInParent<KhufuSurvey>();
                 if (survey != null)
                     survey.ApplyView(_layer, _scale);
+                KhafreSurvey khafreSurvey = GetComponent<KhafreSurvey>();
+                if (khafreSurvey == null)
+                    khafreSurvey = GetComponentInParent<KhafreSurvey>();
+                if (khafreSurvey != null)
+                    khafreSurvey.ApplyView(_layer, _scale);
                 ApplyMaterialLook(L == FieldLensLayer.Material || S == ScaleLevel.Material);
                 return;
             }
@@ -518,7 +523,7 @@ namespace RealityEngine.Visualization
             string extra = "";
             FieldLensLayer L = (FieldLensLayer)_layer;
             if (L == FieldLensLayer.EnergyFlow)
-                extra = "\nEducational approximation — not a full EM energy-flow solver";
+                extra = "\nEducational approximation â€” not a full EM energy-flow solver";
             else if (L == FieldLensLayer.Atomic)
             {
                 extra = "\nNot a literal quantum state";
@@ -565,14 +570,22 @@ namespace RealityEngine.Visualization
             if (_kind == FieldLensTargetKind.Pyramid)
             {
                 extra = "\n" + GizaComplex.HonestyPrefix;
+                bool isKhafre = GetComponent<KhafreSurvey>() != null || GetComponentInParent<KhafreSurvey>() != null;
                 if (L == FieldLensLayer.Mathematical)
-                    extra += "\nseked 5.5 palms = 51 deg 50' 40\". 440 x 280 cubits. rise 14 / run 11.";
+                {
+                    if (isKhafre)
+                        extra += "\nseked 5.25 palms = 53 deg 10'. tan = 4/3. Base/height in royal cubits.";
+                    else
+                        extra += "\nseked 5.5 palms = 51 deg 50' 40\". 440 x 280 cubits. rise 14 / run 11.";
+                }
                 else if (L == FieldLensLayer.Electric || L == FieldLensLayer.Magnetic || L == FieldLensLayer.Charge || L == FieldLensLayer.EnergyFlow)
                     extra += "\nnot an EM source";
                 else if (L == FieldLensLayer.Atomic)
                     extra += "\nCaCO3 calcite schematic. Conceptual / Classical crystal, not XRD.";
                 else if (L == FieldLensLayer.Material)
-                    extra += "\nCourse banding / block outlines. Not 2 million blocks.";
+                    extra += isKhafre
+                        ? "\nCourse banding / block outlines. Tura casing / limestone near look-hit."
+                        : "\nCourse banding / block outlines. Not 2 million blocks.";
             }
 
             _honesty.text = FieldLens.NameOf(_layer) + "\n" + FieldLens.HonestyOf(_layer) + extra;

@@ -116,7 +116,7 @@ namespace RealityEngine.Survey
         {
             Vector3 axis = transform.up;
             Vector3 origin = transform.position + axis * (LengthMeters * 0.48f);
-            int n = Physics.RaycastNonAlloc(origin, axis, _hits, 80f, ~0, QueryTriggerInteraction.Ignore);
+            int n = UnityEngine.Physics.RaycastNonAlloc(origin, axis, _hits, 80f, ~0, QueryTriggerInteraction.Ignore);
             float best = float.PositiveInfinity;
             RaycastHit chosen = default;
             bool any = false;

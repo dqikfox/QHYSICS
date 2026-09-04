@@ -19,7 +19,7 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Experiments
 {
     /// <summary>
-    /// Reality Engine v1.0 — Persistent lab + gradient ledger (coil + cell + toy heat path).
+    /// Reality Engine v1.0 â€” Persistent lab + gradient ledger (coil + cell + toy heat path).
     /// Spawns a grabable bar magnet, copper coil, resistive load, sampled B overlay,
     /// Field Lens peels, and a TMP readout beside Faraday's breadboard. Does not touch SpiceSharp.
     /// </summary>
@@ -1611,6 +1611,17 @@ namespace RealityEngine.Experiments
                 survey.EnsureBuilt();
                 BindPyramidTarget(FindChildNamed(khufu.transform, "Khufu_Casing"));
                 BindPyramidTarget(FindChildNamed(khufu.transform, "Khufu_KingChamber"));
+            }
+
+            GameObject khafre = GizaComplex.FindNamed(KhafrePyramid.RootName);
+            if (khafre != null)
+            {
+                KhafreSurvey khafreSurvey = khafre.GetComponent<KhafreSurvey>();
+                if (khafreSurvey == null)
+                    khafreSurvey = khafre.AddComponent<KhafreSurvey>();
+                khafreSurvey.EnsureBuilt();
+                BindPyramidTarget(FindChildNamed(khafre.transform, "Khafre_Casing"));
+                BindPyramidTarget(FindChildNamed(khafre.transform, "Khafre_Burial"));
             }
 
             CubitRod rod = EnsureCubitRod();
