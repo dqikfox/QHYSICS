@@ -82,6 +82,16 @@ namespace RealityEngine.Visualization
         {
             if ((which & Spawn.Khufu) != 0)
             {
+                // Force rebuild when Petrie relieving graffiti marker missing.
+                GameObject oldKhufu = FindNamed(KhufuPyramid.RootName);
+                if (oldKhufu != null && oldKhufu.transform.Find("Khufu_RelievingGraffiti") == null)
+                {
+                    oldKhufu.name = oldKhufu.name + "_Obsolete";
+                    if (Application.isPlaying)
+                        Object.Destroy(oldKhufu);
+                    else
+                        Object.DestroyImmediate(oldKhufu);
+                }
                 EnsureNamed(KhufuPyramid.RootName, pose, (p) => KhufuPyramid.Build(p.parent, p.khufuCenter, p.rot, p.comfortScale), pose.surfaceY);
                 GizaPrecinct.EnsureKhufu(pose);
             }
@@ -113,9 +123,10 @@ namespace RealityEngine.Visualization
             }
             if ((which & Spawn.Sphinx) != 0)
             {
-                // Force rebuild when Dream Stele is missing (pre-stele body massing).
+                // Force rebuild when Dream Stele or attested translation plaque missing.
                 GameObject oldSphinx = FindNamed(GizaSphinx.RootName);
-                if (oldSphinx != null && oldSphinx.transform.Find(GizaSphinx.DreamSteleName) == null)
+                if (oldSphinx != null && (oldSphinx.transform.Find(GizaSphinx.DreamSteleName) == null
+                    || oldSphinx.transform.Find(GizaSphinx.DreamSteleName + "_Text") == null))
                 {
                     oldSphinx.name = oldSphinx.name + "_Obsolete";
                     if (Application.isPlaying)
@@ -178,6 +189,9 @@ namespace RealityEngine.Visualization
                 || lower.Contains("trialpassages") || lower.Contains("khufutrial")
                 || lower.Contains("hemiunu") || lower.Contains("g4000")
                 || lower.Contains("senedjemib") || lower.Contains("g2370")
+                || lower.Contains("ankhhaf") || lower.Contains("g7510")
+                || lower.Contains("debehen") || lower.Contains("menkaurequarry")
+                || lower.Contains("gizasurveyanomalies") || lower.Contains("surveyanomal")
                 || lower.StartsWith("lablandscape");
         }
     }
@@ -729,12 +743,16 @@ namespace RealityEngine.Visualization
             SitFound("GisrElMudir", top);
             SitFound("Hemiunu", top);
             SitFound("Senedjemib", top);
+            SitFound("Ankhhaf", top);
+            SitFound("Debehen", terrace);
+            SitFound("MenkaureQuarry", top);
             SitFound("CemeteryEnEchelon", top);
             SitFound("KhufuEastField", top);
             SitFound("GizaCentralField", terrace);
             SitFound("MenkaureField", top);
             SitFound("Khentkawes", top);
             SitFound("OsirisShaft", court);
+            SitFound("GizaSurveyAnomalies", top);
             float flood = pose.surfaceY - GizaComplex.CliffHeightM + GizaNile.SitAboveDesertM;
             SitFound("KhufuValleyTemple", flood);
             SitFound("MenkaureValleyTemple", flood);

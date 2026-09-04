@@ -9,7 +9,11 @@ namespace RealityEngine.Visualization
     /// Gisr el-Mudir (Great Enclosure) unfinished limestone enclosure further west of West Field,
     /// Hemiunu (G 4000) elite mastaba in the West Field (Khufu's vizier; Lehner schematic),
     /// Senedjemib Inti (G 2370) elite mastaba complex in the NW West Field (Lehner schematic),
+    /// Ankhhaf (G 7510) elite mastaba in the East Field (Lehner schematic),
+    /// Debehen rock-cut tomb in the Central Field (Lehner schematic),
+    /// Menkaure quarry / ramp remnants schematic SW of Menkaure,
     /// Khentkawes I (LG100) rock-cut stepped tomb SE of Central Field / NE of Menkaure,
+    /// GizaSurveyAnomalies OFF-by-default speculative thermal/GPR solids,
     /// Heit el-Ghurab workers' village (south apron / floodplain), Osiris Shaft-scale rock-cut
     /// complex near Sphinx, and an OFF-by-default SPECULATIVE fringe water-shaft diagram
     /// (not proven archaeology).
@@ -30,6 +34,11 @@ namespace RealityEngine.Visualization
         public const string GisrElMudirName = "GisrElMudir";
         public const string HemiunuName = "Hemiunu";
         public const string SenedjemibName = "Senedjemib";
+        public const string AnkhhafName = "Ankhhaf";
+        public const string DebehenName = "Debehen";
+        public const string MenkaureQuarryName = "MenkaureQuarry";
+        public const string SurveyAnomaliesName = "GizaSurveyAnomalies";
+        public const string BakeriesMarker = "_Bakeries";
 
         public const string MastabasMarker = "_Mastabas";
         public const string VillageMarker = "_Village";
@@ -89,6 +98,39 @@ namespace RealityEngine.Visualization
         public const float SenedjemibChapelEW = 9.0f;
         public const float SenedjemibChapelNS = 6.5f;
         public const float SenedjemibChapelHM = 4.2f;
+
+        // Ankhhaf (G 7510): oversized East Field elite mastaba (Khafre's vizier; Lehner schematic).
+        // Northern East Field, closer to Khufu east apron than the dense street grid.
+        public const float AnkhhafWestInsetFromEastWestEdgeM = 22f;
+        public const float AnkhhafNorthFrac = 0.78f;
+        public const float AnkhhafBodyEW = 51.0f;
+        public const float AnkhhafBodyNS = 26.0f;
+        public const float AnkhhafBodyHM = 10.5f;
+        public const float AnkhhafUpperEW = 47.0f;
+        public const float AnkhhafUpperNS = 23.0f;
+        public const float AnkhhafUpperHM = 1.2f;
+        public const float AnkhhafChapelEW = 11f;
+        public const float AnkhhafChapelNS = 7.5f;
+        public const float AnkhhafChapelHM = 4.6f;
+
+        // Debehen: Central Field rock-cut elite tomb (Lehner schematic massing).
+        public const float DebehenEastFrac = 0.62f;
+        public const float DebehenNorthFrac = 0.28f;
+        public const float DebehenBodyEW = 28.0f;
+        public const float DebehenBodyNS = 18.0f;
+        public const float DebehenBodyHM = 7.5f;
+        public const float DebehenCourtEW = 10.0f;
+        public const float DebehenCourtNS = 12.0f;
+        public const float DebehenChapelEW = 8.5f;
+        public const float DebehenChapelNS = 6.0f;
+        public const float DebehenChapelHM = 4.0f;
+
+        // Menkaure quarry / ramp remnants: SW of Menkaure on plateau (schematic cuttings).
+        public const float MenkaureQuarryWestOfMenkaureM = 95f;
+        public const float MenkaureQuarrySouthOfMenkaureM = 55f;
+        public const float MenkaureQuarryEWM = 70f;
+        public const float MenkaureQuarryNSM = 48f;
+        public const float MenkaureQuarryDepthM = 6.5f;
 
         // Cemetery en Echelon: staggered strip in the 28 m gap between Khufu west face and West Field.
         public const float EchelonGapFromFaceM = 4f;
@@ -169,6 +211,18 @@ namespace RealityEngine.Visualization
                 SenedjemibBodyEW * 0.5f + SenedjemibCourtEW + SenedjemibChapelEW + 16f,
                 SenedjemibBodyNS * 0.5f + 12f);
 
+            LayoutAnkhhaf(out float aEast, out float aNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, aEast, aNorth,
+                AnkhhafBodyEW * 0.5f + AnkhhafChapelEW + 16f, AnkhhafBodyNS * 0.5f + 12f);
+
+            LayoutDebehen(out float dEast, out float dNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, dEast, dNorth,
+                DebehenBodyEW * 0.5f + DebehenCourtEW + DebehenChapelEW + 14f, DebehenBodyNS * 0.5f + 12f);
+
+            LayoutMenkaureQuarry(out float qEast, out float qNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, qEast, qNorth,
+                MenkaureQuarryEWM * 0.5f + 12f, MenkaureQuarryNSM * 0.5f + 12f);
+
             LayoutEchelon(out float ecEast0, out float ecEast1, out float ecNorth0, out float ecNorth1);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, (ecEast0 + ecEast1) * 0.5f, (ecNorth0 + ecNorth1) * 0.5f,
                 (ecEast1 - ecEast0) * 0.5f + 6f, (ecNorth1 - ecNorth0) * 0.5f + 6f);
@@ -216,6 +270,10 @@ namespace RealityEngine.Visualization
             DestroyNamed(GizaComplex.FindNamed(GisrElMudirName));
             DestroyNamed(GizaComplex.FindNamed(HemiunuName));
             DestroyNamed(GizaComplex.FindNamed(SenedjemibName));
+            DestroyNamed(GizaComplex.FindNamed(AnkhhafName));
+            DestroyNamed(GizaComplex.FindNamed(DebehenName));
+            DestroyNamed(GizaComplex.FindNamed(MenkaureQuarryName));
+            DestroyNamed(GizaComplex.FindNamed(SurveyAnomaliesName));
             DestroyNamed(GizaComplex.FindNamed(CemeteryEnEchelonName));
             DestroyNamed(GizaComplex.FindNamed(EastFieldName));
             DestroyNamed(GizaComplex.FindNamed(CentralFieldName));
@@ -258,6 +316,39 @@ namespace RealityEngine.Visualization
             Ensure(SenedjemibName, pose, BuildSenedjemib, pose.surfaceY, true);
         }
 
+        public static void EnsureAnkhhaf(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(AnkhhafName);
+            if (old != null && old.transform.Find(AnkhhafName + MassingMarker) == null)
+                DestroyNamed(old);
+            Ensure(AnkhhafName, pose, BuildAnkhhaf, pose.surfaceY, true);
+        }
+
+        public static void EnsureDebehen(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(DebehenName);
+            if (old != null && old.transform.Find(DebehenName + MassingMarker) == null)
+                DestroyNamed(old);
+            float terrace = pose.surfaceY + GizaComplex.KhafreBedrockM;
+            Ensure(DebehenName, pose, BuildDebehen, terrace, true);
+        }
+
+        public static void EnsureMenkaureQuarry(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(MenkaureQuarryName);
+            if (old != null && old.transform.Find(MenkaureQuarryName + MassingMarker) == null)
+                DestroyNamed(old);
+            Ensure(MenkaureQuarryName, pose, BuildMenkaureQuarry, pose.surfaceY, true);
+        }
+
+        public static void EnsureSurveyAnomalies(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(SurveyAnomaliesName);
+            if (old != null && old.transform.Find(SurveyAnomaliesName + "_Honesty") == null)
+                DestroyNamed(old);
+            Ensure(SurveyAnomaliesName, pose, BuildSurveyAnomalies, pose.surfaceY, true);
+        }
+
         public static void EnsureCemeteryEnEchelon(GizaComplex.Pose pose)
         {
             GameObject old = GizaComplex.FindNamed(CemeteryEnEchelonName);
@@ -296,7 +387,8 @@ namespace RealityEngine.Visualization
         {
             GameObject old = GizaComplex.FindNamed(WorkersVillageName);
             if (old != null && (old.transform.Find(WorkersVillageName + VillageMarker) == null
-                || old.transform.Find(WorkersVillageName + CrowWallMarker) == null))
+                || old.transform.Find(WorkersVillageName + CrowWallMarker) == null
+                || old.transform.Find(WorkersVillageName + BakeriesMarker) == null))
                 DestroyNamed(old);
             float floodY = pose.surfaceY - GizaComplex.CliffHeightM + GizaNile.SitAboveDesertM;
             Ensure(WorkersVillageName, pose, BuildWorkersVillage, floodY, true);
@@ -377,6 +469,28 @@ namespace RealityEngine.Visualization
             // NW West Field: north of Hemiunu, slightly deeper west into the cemetery streets.
             east = east1 - SenedjemibEastInsetFromWestEastEdgeM;
             north = north0 + (north1 - north0) * SenedjemibNorthFrac;
+        }
+
+        static void LayoutAnkhhaf(out float east, out float north)
+        {
+            LayoutEast(out float east0, out float east1, out float north0, out float north1);
+            // Northern East Field elite mastaba G7510 (Lehner schematic).
+            east = east0 + AnkhhafWestInsetFromEastWestEdgeM + AnkhhafBodyEW * 0.5f;
+            north = north0 + (north1 - north0) * AnkhhafNorthFrac;
+        }
+
+        static void LayoutDebehen(out float east, out float north)
+        {
+            LayoutCentral(out float east0, out float east1, out float north0, out float north1);
+            east = east0 + (east1 - east0) * DebehenEastFrac;
+            north = north0 + (north1 - north0) * DebehenNorthFrac;
+        }
+
+        static void LayoutMenkaureQuarry(out float east, out float north)
+        {
+            float mn = MenkaurePyramid.BaseMeters * 0.5f;
+            east = -GizaComplex.MenkaureWestM - MenkaureQuarryWestOfMenkaureM;
+            north = -GizaComplex.MenkaureSouthM - mn - MenkaureQuarrySouthOfMenkaureM;
         }
 
         static void LayoutEchelon(out float east0, out float east1, out float north0, out float north1)
@@ -1196,6 +1310,305 @@ namespace RealityEngine.Visualization
             return root;
         }
 
+
+        static GameObject BuildAnkhhaf(GizaComplex.Pose pose)
+        {
+            LayoutAnkhhaf(out float east, out float north);
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            GameObject root = GizaBuild.Root(AnkhhafName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material mud = GizaBuild.Mudbrick();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+
+            float bodyEW = AnkhhafBodyEW;
+            float bodyNS = AnkhhafBodyNS;
+            float bodyH = AnkhhafBodyHM;
+            float halfE = bodyEW * 0.5f;
+            float chapelEW = AnkhhafChapelEW;
+            float chapelNS = AnkhhafChapelNS;
+            float chapelH = AnkhhafChapelHM;
+
+            var apron = new LabMeshBuilder(8, 12);
+            apron.AddBox(new Vector3(chapelEW * 0.35f, 0.06f, 0f),
+                new Vector3(bodyEW + chapelEW + 18f, 0.12f, bodyNS + 16f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, AnkhhafName + "_Apron",
+                apron.Build(AnkhhafName + "_Apron"), sand, true);
+
+            var body = new LabMeshBuilder(8, 12);
+            body.AddBox(new Vector3(0f, bodyH * 0.5f, 0f), new Vector3(bodyEW, bodyH, bodyNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, AnkhhafName + "_Body",
+                body.Build(AnkhhafName + "_Body"), lime, true);
+
+            var cornice = new LabMeshBuilder(8, 12);
+            cornice.AddBox(new Vector3(0f, bodyH + AnkhhafUpperHM * 0.5f, 0f),
+                new Vector3(AnkhhafUpperEW, AnkhhafUpperHM, AnkhhafUpperNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, AnkhhafName + "_Cornice",
+                cornice.Build(AnkhhafName + "_Cornice"), mud, true);
+
+            float wallT = 0.75f;
+            float doorW = 2.9f;
+            float doorH = 3.2f;
+            float chapelX = halfE + chapelEW * 0.5f + 0.5f;
+            float floorT = 0.28f;
+            float deckY = 0f;
+            var chapelShell = new LabMeshBuilder(64, 96);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + floorT * 0.5f, 0f),
+                new Vector3(chapelEW, floorT, chapelNS), Color.white);
+            float wallY = deckY + chapelH * 0.5f;
+            chapelShell.AddBox(new Vector3(chapelX, wallY, chapelNS * 0.5f - wallT * 0.5f),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, wallY, -(chapelNS * 0.5f - wallT * 0.5f)),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            float wing = (chapelNS - doorW) * 0.5f;
+            float westX = chapelX - chapelEW * 0.5f + wallT * 0.5f;
+            if (wing > 0.35f)
+            {
+                chapelShell.AddBox(new Vector3(westX, wallY, doorW * 0.5f + wing * 0.5f),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+                chapelShell.AddBox(new Vector3(westX, wallY, -(doorW * 0.5f + wing * 0.5f)),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+            }
+            float lintelH = Mathf.Max(0.7f, chapelH - doorH);
+            chapelShell.AddBox(new Vector3(westX, deckY + doorH + lintelH * 0.5f, 0f),
+                new Vector3(wallT * 1.1f, lintelH, doorW + 0.9f), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + chapelH + 0.16f, 0f),
+                new Vector3(chapelEW + 0.3f, 0.32f, chapelNS + 0.3f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, AnkhhafName + "_Chapel",
+                chapelShell.Build(AnkhhafName + "_Chapel"), lime, true);
+
+            var interior = new LabMeshBuilder(40, 60);
+            interior.AddRoom(new Vector3(chapelX, deckY + floorT + 1.8f, 0f),
+                new Vector3(chapelEW - wallT * 2f - 0.35f, 3.6f, chapelNS - wallT * 2f - 0.5f),
+                Color.white, false, false, true, true);
+            GizaBuild.SpawnMesh(root.transform, AnkhhafName + "_ChapelInterior",
+                interior.Build(AnkhhafName + "_ChapelInterior"), lime, true);
+
+            var corridor = new LabMeshBuilder(16, 24);
+            float gap = chapelX - chapelEW * 0.5f - halfE;
+            float corrLen = Mathf.Max(1.2f, gap + 0.6f);
+            corridor.AddBox(new Vector3(halfE + corrLen * 0.5f, deckY + 0.1f, 0f),
+                new Vector3(corrLen, 0.2f, doorW + 1.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, AnkhhafName + "_Corridor",
+                corridor.Build(AnkhhafName + "_Corridor"), pav, true);
+
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, AnkhhafName + MassingMarker,
+                mark.Build(AnkhhafName + MassingMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Ankhhaf (G 7510). Khafre's vizier — Eastern Cemetery elite mastaba.\n" +
+                "Lehner schematic massing (~51 x 26 x 10.5 m limestone body + cornice, east offering chapel).\n" +
+                "Not photogrammetry. Not proven interior chambers beyond the schematic chapel.";
+            GizaBuild.HonestyPlate(root.transform, AnkhhafName + "_Honesty", honesty, 28f);
+            Transform plate = root.transform.Find(AnkhhafName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(halfE + chapelEW + 3.5f, 1.6f, chapelNS * 0.5f + 2.5f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+            return root;
+        }
+
+        static GameObject BuildDebehen(GizaComplex.Pose pose)
+        {
+            LayoutDebehen(out float east, out float north);
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            GameObject root = GizaBuild.Root(DebehenName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material rock = GizaBuild.Bedrock();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+
+            float bodyEW = DebehenBodyEW;
+            float bodyNS = DebehenBodyNS;
+            float bodyH = DebehenBodyHM;
+            float halfE = bodyEW * 0.5f;
+            float courtEW = DebehenCourtEW;
+            float courtNS = DebehenCourtNS;
+            float chapelEW = DebehenChapelEW;
+            float chapelNS = DebehenChapelNS;
+            float chapelH = DebehenChapelHM;
+
+            var apron = new LabMeshBuilder(8, 12);
+            apron.AddBox(new Vector3((courtEW + chapelEW) * 0.4f, 0.06f, 0f),
+                new Vector3(bodyEW + courtEW + chapelEW + 16f, 0.12f, Mathf.Max(bodyNS, courtNS) + 14f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DebehenName + "_Apron",
+                apron.Build(DebehenName + "_Apron"), sand, true);
+
+            // Rock-cut facade / podium (Central Field cliff-cut character).
+            var podium = new LabMeshBuilder(8, 12);
+            podium.AddBox(new Vector3(0f, bodyH * 0.35f, 0f), new Vector3(bodyEW, bodyH * 0.7f, bodyNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DebehenName + "_Podium",
+                podium.Build(DebehenName + "_Podium"), rock, true);
+
+            var body = new LabMeshBuilder(8, 12);
+            body.AddBox(new Vector3(0f, bodyH * 0.7f + bodyH * 0.15f, 0f),
+                new Vector3(bodyEW * 0.92f, bodyH * 0.3f, bodyNS * 0.9f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DebehenName + "_Superstructure",
+                body.Build(DebehenName + "_Superstructure"), lime, true);
+
+            float courtX = halfE + courtEW * 0.5f + 0.3f;
+            var court = new LabMeshBuilder(8, 12);
+            court.AddBox(new Vector3(courtX, 0.12f, 0f), new Vector3(courtEW, 0.24f, courtNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DebehenName + "_Court",
+                court.Build(DebehenName + "_Court"), pav, true);
+
+            float chapelX = courtX + courtEW * 0.5f + chapelEW * 0.5f + 0.2f;
+            float wallT = 0.7f;
+            var chapel = new LabMeshBuilder(48, 72);
+            chapel.AddBox(new Vector3(chapelX, 0.14f, 0f), new Vector3(chapelEW, 0.28f, chapelNS), Color.white);
+            chapel.AddBox(new Vector3(chapelX, chapelH * 0.5f, chapelNS * 0.5f - wallT * 0.5f),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            chapel.AddBox(new Vector3(chapelX, chapelH * 0.5f, -(chapelNS * 0.5f - wallT * 0.5f)),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            chapel.AddBox(new Vector3(chapelX + chapelEW * 0.5f - wallT * 0.5f, chapelH * 0.5f, 0f),
+                new Vector3(wallT, chapelH, chapelNS), Color.white);
+            chapel.AddBox(new Vector3(chapelX, chapelH + 0.14f, 0f),
+                new Vector3(chapelEW + 0.2f, 0.28f, chapelNS + 0.2f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DebehenName + "_Chapel",
+                chapel.Build(DebehenName + "_Chapel"), lime, true);
+
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DebehenName + MassingMarker,
+                mark.Build(DebehenName + MassingMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Debehen. Central Field rock-cut elite tomb (Lehner schematic massing south of Khafre).\n" +
+                "Bedrock podium + limestone superstructure, east court and offering chapel.\n" +
+                "Not photogrammetry. Not full chamber interiors.";
+            GizaBuild.HonestyPlate(root.transform, DebehenName + "_Honesty", honesty, 22f);
+            Transform plate = root.transform.Find(DebehenName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(chapelX + chapelEW * 0.5f + 3f, 1.55f, chapelNS * 0.5f + 2f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+            return root;
+        }
+
+        static GameObject BuildMenkaureQuarry(GizaComplex.Pose pose)
+        {
+            LayoutMenkaureQuarry(out float east, out float north);
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            GameObject root = GizaBuild.Root(MenkaureQuarryName, pose.parent, world, pose.rot);
+            Material rock = GizaBuild.Bedrock();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+            Material cliff = GizaBuild.CliffRock();
+
+            float ew = MenkaureQuarryEWM;
+            float ns = MenkaureQuarryNSM;
+            float depth = MenkaureQuarryDepthM;
+
+            var apron = new LabMeshBuilder(8, 12);
+            apron.AddBox(new Vector3(0f, 0.05f, 0f), new Vector3(ew + 16f, 0.1f, ns + 20f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MenkaureQuarryName + "_Apron",
+                apron.Build(MenkaureQuarryName + "_Apron"), sand, true);
+
+            // Stepped quarry cuttings (schematic open pit).
+            var cut = new LabMeshBuilder(64, 96);
+            cut.AddBox(new Vector3(0f, -depth * 0.35f, 0f), new Vector3(ew * 0.92f, depth * 0.7f, ns * 0.75f), Color.white);
+            cut.AddBox(new Vector3(-ew * 0.15f, -depth * 0.55f, -ns * 0.05f),
+                new Vector3(ew * 0.55f, depth * 0.4f, ns * 0.45f), Color.white);
+            // Bench / ledge remnants.
+            cut.AddBox(new Vector3(ew * 0.35f, -1.2f, ns * 0.2f), new Vector3(ew * 0.28f, 2.4f, ns * 0.2f), Color.white);
+            cut.AddBox(new Vector3(-ew * 0.32f, -0.9f, -ns * 0.18f), new Vector3(ew * 0.22f, 1.8f, ns * 0.18f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MenkaureQuarryName + "_Cuttings",
+                cut.Build(MenkaureQuarryName + "_Cuttings"), rock, true);
+
+            // Ramp remnant rising NE toward Menkaure (schematic construction ramp stub).
+            var ramp = new LabMeshBuilder(24, 36);
+            float rampLen = 38f;
+            float rampW = 8f;
+            ramp.AddBox(new Vector3(ew * 0.2f + rampLen * 0.25f, 1.1f, ns * 0.45f + 4f),
+                new Vector3(rampLen, 2.2f, rampW), Color.white);
+            ramp.AddBox(new Vector3(ew * 0.2f + rampLen * 0.55f, 2.4f, ns * 0.45f + 10f),
+                new Vector3(rampLen * 0.7f, 1.6f, rampW * 0.85f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MenkaureQuarryName + "_Ramp",
+                ramp.Build(MenkaureQuarryName + "_Ramp"), cliff, true);
+
+            // Rubble spoil heaps.
+            var spoil = new LabMeshBuilder(24, 36);
+            spoil.AddBox(new Vector3(-ew * 0.4f, 1.2f, ns * 0.55f), new Vector3(12f, 2.4f, 10f), Color.white);
+            spoil.AddBox(new Vector3(ew * 0.42f, 0.9f, -ns * 0.5f), new Vector3(14f, 1.8f, 9f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MenkaureQuarryName + "_Spoil",
+                spoil.Build(MenkaureQuarryName + "_Spoil"), sand, true);
+
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MenkaureQuarryName + MassingMarker,
+                mark.Build(MenkaureQuarryName + MassingMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Menkaure quarry / ramp remnants schematic SW of Menkaure (Lehner plateau quarry zone).\n" +
+                "Open limestone cuttings, spoil heaps, and a stub construction ramp — not photogrammetry.\n" +
+                "Not a claim of precise excavated trench geometry.";
+            GizaBuild.HonestyPlate(root.transform, MenkaureQuarryName + "_Honesty", honesty, 24f);
+            Transform plate = root.transform.Find(MenkaureQuarryName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(0f, 1.55f, ns * 0.5f + 8f);
+                plate.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+            return root;
+        }
+
+        static GameObject BuildSurveyAnomalies(GizaComplex.Pose pose)
+        {
+            // Root stays ACTIVE for the honesty plate + empty container; speculative solids are OFF children.
+            LayoutWest(out float wEast0, out float wEast1, out float wNorth0, out float wNorth1);
+            float cx = (wEast0 + wEast1) * 0.5f - 18f;
+            float cz = (wNorth0 + wNorth1) * 0.5f + 12f;
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, cx, cz, 0f);
+            GameObject root = GizaBuild.Root(SurveyAnomaliesName, pose.parent, world, pose.rot);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "GizaSurveyAnomalies — SPECULATIVE thermal / GPR solids from unpublished or contested geophysics.\n" +
+                "Children under this root are OFF by default. Enable in Hierarchy to view schematic anomaly boxes.\n" +
+                "NOT excavated buildings. NOT proven chambers. Honesty-labeled survey speculation only.";
+            GizaBuild.HonestyPlate(root.transform, SurveyAnomaliesName + "_Honesty", honesty, 30f);
+            Transform plate = root.transform.Find(SurveyAnomaliesName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(0f, 1.7f, 18f);
+                plate.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+
+            var speculative = new GameObject(SurveyAnomaliesName + "_SpeculativeSolids");
+            speculative.transform.SetParent(root.transform, false);
+            speculative.SetActive(false);
+
+            Material glow = LabWorldMeshes.MakeLit("RELab_SurveyAnomaly", new Color(0.95f, 0.25f, 0.12f, 1f), 0.05f, 0.15f, false);
+            var solids = new LabMeshBuilder(48, 72);
+            // Schematic "void" / anomaly boxes under West Field strip — not buildings.
+            solids.AddBox(new Vector3(-8f, -3.5f, 4f), new Vector3(14f, 4f, 9f), Color.white);
+            solids.AddBox(new Vector3(10f, -2.8f, -6f), new Vector3(11f, 3.2f, 7f), Color.white);
+            solids.AddBox(new Vector3(2f, -5.0f, 14f), new Vector3(8f, 3.5f, 8f), Color.white);
+            GizaBuild.SpawnMesh(speculative.transform, SurveyAnomaliesName + "_AnomalyBoxes",
+                solids.Build(SurveyAnomaliesName + "_AnomalyBoxes"), glow, false);
+
+            const string solidHonesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "SPECULATIVE solid from thermal/GPR imaging schematic — not excavated.\n" +
+                "Enable parent SpeculativeSolids only for honesty-labeled survey visualization.";
+            GizaBuild.HonestyPlate(speculative.transform, SurveyAnomaliesName + "_SolidHonesty", solidHonesty, 20f);
+            Transform sp = speculative.transform.Find(SurveyAnomaliesName + "_SolidHonesty");
+            if (sp != null)
+            {
+                sp.localPosition = new Vector3(0f, 1.4f, -12f);
+                sp.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            }
+            return root;
+        }
+
+
         static GameObject BuildKhentkawes(GizaComplex.Pose pose)
         {
             LayoutKhentkawes(out float east, out float north);
@@ -1367,9 +1780,10 @@ namespace RealityEngine.Visualization
 
         static void BuildSurveyHeatmap(Transform parent, float fieldEW, float fieldNS)
         {
-            float stripEW = fieldEW * 0.28f;
-            float stripNS = fieldNS * 0.55f;
-            float x = -fieldEW * 0.5f + stripEW * 0.5f + 4f;
+            // Expanded West Field survey strip (cyan->red schematic thermal/GPR AOI).
+            float stripEW = fieldEW * 0.42f;
+            float stripNS = fieldNS * 0.72f;
+            float x = -fieldEW * 0.5f + stripEW * 0.5f + 2f;
             var quad = new LabMeshBuilder(8, 12);
             float y = 0.18f;
             float hx = stripEW * 0.5f;
@@ -1398,7 +1812,8 @@ namespace RealityEngine.Visualization
 
             const string heatHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
-                "Geophysical survey schematic overlay (cyan→yellow→red). Not excavated chambers. Not a real GPR volume.";
+                "West Field geophysical survey schematic overlay (cyan->yellow->red thermal/GPR heatmap).\n" +
+                "Expanded strip AOI. Not excavated chambers. Not a real GPR volume. Honesty-labeled survey only.";
             GizaBuild.HonestyPlate(parent, WestFieldName + "_SurveyHonesty", heatHonesty, 18f);
             Transform hp = parent.Find(WestFieldName + "_SurveyHonesty");
             if (hp != null)
@@ -1457,6 +1872,58 @@ namespace RealityEngine.Visualization
             }
             float v = (t - 0.66f) / 0.34f;
             return Color.Lerp(new Color(0.98f, 0.92f, 0.12f, 1f), new Color(0.95f, 0.12f, 0.08f, 1f), v);
+        }
+
+        /// <summary>
+        /// Second survey overlay near Khufu boat pits / Trial Passages — geophysical anomaly schematic.
+        /// </summary>
+        public static void EnsureBoatPitSurveyOverlay(Transform parent)
+        {
+            if (parent == null)
+                return;
+            if (parent.Find("KhufuBoatPits_SurveyHeatmap") != null)
+                return;
+
+            float stripEW = 42f;
+            float stripNS = 55f;
+            float x = -18f;
+            float z = -8f;
+            float y = 0.22f;
+            float hx = stripEW * 0.5f;
+            float hz = stripNS * 0.5f;
+            var quad = new LabMeshBuilder(8, 12);
+            Vector3 a = new Vector3(x - hx, y, z - hz);
+            Vector3 b = new Vector3(x + hx, y, z - hz);
+            Vector3 c = new Vector3(x + hx, y, z + hz);
+            Vector3 d = new Vector3(x - hx, y, z + hz);
+            quad.AddQuad(a, b, c, d, Vector3.up,
+                new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f), Color.white);
+            Material heat = MakeHeatmapMaterial();
+            GizaBuild.SpawnMesh(parent, "KhufuBoatPits_SurveyHeatmap",
+                quad.Build("KhufuBoatPits_SurveyHeatmap"), heat, false);
+
+            Material outline = LabWorldMeshes.MakeLit("RELab_BoatPitSurveyOutline", new Color(0.92f, 0.18f, 0.12f, 1f), 0.05f, 0.2f, false);
+            var frame = new LabMeshBuilder(32, 48);
+            const float t = 0.5f;
+            float fy = y + 0.05f;
+            frame.AddBox(new Vector3(x, fy, z + hz - t * 0.5f), new Vector3(stripEW, 0.08f, t), Color.white);
+            frame.AddBox(new Vector3(x, fy, z - hz + t * 0.5f), new Vector3(stripEW, 0.08f, t), Color.white);
+            frame.AddBox(new Vector3(x - hx + t * 0.5f, fy, z), new Vector3(t, 0.08f, stripNS), Color.white);
+            frame.AddBox(new Vector3(x + hx - t * 0.5f, fy, z), new Vector3(t, 0.08f, stripNS), Color.white);
+            GizaBuild.SpawnMesh(parent, "KhufuBoatPits_SurveyFrame",
+                frame.Build("KhufuBoatPits_SurveyFrame"), outline, false);
+
+            const string heatHonesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Geophysical anomaly schematic near Khufu boat pits / Trial Passages (cyan->red heatmap).\n" +
+                "Not excavated. Not a real GPR volume — honesty-labeled survey overlay only.";
+            GizaBuild.HonestyPlate(parent, "KhufuBoatPits_SurveyHonesty", heatHonesty, 16f);
+            Transform hp = parent.Find("KhufuBoatPits_SurveyHonesty");
+            if (hp != null)
+            {
+                hp.localPosition = new Vector3(x, 1.4f, z + hz + 4f);
+                hp.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            }
         }
 
         static GameObject BuildWorkersVillage(GizaComplex.Pose pose)
@@ -1537,12 +2004,13 @@ namespace RealityEngine.Visualization
             GizaBuild.SpawnMesh(root.transform, WorkersVillageName + "_Streets",
                 streets.Build(WorkersVillageName + "_Streets"), pav, true);
 
+            BuildBakeriesWorkshops(root.transform, ew, ns);
             BuildWallOfTheCrow(root.transform, ew, ns);
 
             const string honesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Heit el-Ghurab (workers' village) schematic south of the plateau apron / near floodplain.\n" +
-                "Mudbrick house grid + long gallery barracks + Wall of the Crow on the north edge (Lehner).\n" +
+                "Mudbrick house grid + long gallery barracks + bakeries/workshops + Wall of the Crow on the north edge (Lehner).\n" +
                 "Walkable streets and crow-wall gateway. Not photogrammetry. Not modern Nazlet el-Samman.";
             GizaBuild.HonestyPlate(root.transform, WorkersVillageName + "_Honesty", honesty, 30f);
             Transform plate = root.transform.Find(WorkersVillageName + "_Honesty");
@@ -1555,6 +2023,62 @@ namespace RealityEngine.Visualization
         }
 
         /// <summary>
+        static void BuildBakeriesWorkshops(Transform parent, float villageEW, float villageNS)
+        {
+            Material mud = GizaBuild.Mudbrick();
+            Material pav = GizaBuild.Pavement();
+            Material silt = GizaBuild.NileSilt();
+
+            // SE industrial block of Heit el-Ghurab: bakeries + workshops (Lehner excavation zone schematic).
+            float bx = villageEW * 0.28f;
+            float bz = -villageNS * 0.32f;
+            var yards = new LabMeshBuilder(8, 12);
+            yards.AddBox(new Vector3(bx, 0.06f, bz), new Vector3(42f, 0.12f, 28f), Color.white);
+            GizaBuild.SpawnMesh(parent, WorkersVillageName + "_BakeryYards",
+                yards.Build(WorkersVillageName + "_BakeryYards"), silt, true);
+
+            var block = new LabMeshBuilder(160, 240);
+            for (int g = 0; g < 3; g++)
+            {
+                float gz = bz - 8f + g * 7.5f;
+                float gh = 2.8f;
+                float gl = 28f + g * 2f;
+                block.AddBox(new Vector3(bx, gh * 0.5f, gz), new Vector3(gl, gh, 5.2f), Color.white);
+                for (int o = 0; o < 6; o++)
+                {
+                    float ox = bx - gl * 0.35f + o * (gl * 0.7f / 5f);
+                    block.AddBox(new Vector3(ox, 0.55f, gz + 2.1f), new Vector3(1.6f, 1.1f, 1.6f), Color.white);
+                    block.AddBox(new Vector3(ox, 1.25f, gz + 2.1f), new Vector3(1.2f, 0.5f, 1.2f), Color.white);
+                }
+            }
+            for (int w = 0; w < 4; w++)
+            {
+                float wx = bx + 16f;
+                float wz = bz - 10f + w * 6.5f;
+                float wh = 2.5f + (w % 2) * 0.4f;
+                block.AddBox(new Vector3(wx, wh * 0.5f, wz), new Vector3(9f, wh, 4.5f), Color.white);
+            }
+            GizaBuild.SpawnMesh(parent, WorkersVillageName + BakeriesMarker,
+                block.Build(WorkersVillageName + BakeriesMarker), mud, true);
+
+            var pads = new LabMeshBuilder(24, 36);
+            pads.AddBox(new Vector3(bx, 0.1f, bz + 12f), new Vector3(36f, 0.16f, 3.2f), Color.white);
+            GizaBuild.SpawnMesh(parent, WorkersVillageName + "_BakeryStreet",
+                pads.Build(WorkersVillageName + "_BakeryStreet"), pav, true);
+
+            const string bakeryHonesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Heit el-Ghurab bakeries / workshops schematic (Lehner excavation industrial zone SE of galleries).\n" +
+                "Mudbrick bakery galleries with oven stubs + workshop sheds. Not photogrammetry.";
+            GizaBuild.HonestyPlate(parent, WorkersVillageName + "_BakeryHonesty", bakeryHonesty, 18f);
+            Transform bp = parent.Find(WorkersVillageName + "_BakeryHonesty");
+            if (bp != null)
+            {
+                bp.localPosition = new Vector3(bx + 22f, 1.45f, bz);
+                bp.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+        }
+
         /// Wall of the Crow: massive limestone wall along the north edge of Heit el-Ghurab
         /// with a walkable central gateway. Schematic Lehner scale, not survey points.
         /// </summary>

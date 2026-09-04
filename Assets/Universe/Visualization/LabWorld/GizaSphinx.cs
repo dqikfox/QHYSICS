@@ -167,6 +167,34 @@ namespace RealityEngine.Visualization
                 plate.localPosition = new Vector3(steleX + 2.4f, 1.55f, 0f);
                 plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
             }
+
+            // Attested English translation (abridged) of Thutmose IV Dream Stele — NOT invented lines.
+            // Source tradition: standard Egyptological translations (e.g. Ancient Egypt Site / Breasted tradition).
+            // Hieroglyphs on the granite slab remain schematic; readable text is English + honesty.
+            const string steleText =
+                "Dream Stele of Thutmose IV — attested content (English translation).\n" +
+                "Hieroglyphs on this slab are SCHEMATIC of the known stele; readable text is translation, not invented lines.\n\n" +
+                "Year 1, third month of Inundation, day 19, under Menkheperure Thutmose IV.\n\n" +
+                "One of those days, prince Thutmose came at midday and sat in the shadow of this great god.\n" +
+                "Sleep seized him at the zenith, and he found the Majesty of this noble god speaking like a father to his son:\n\n" +
+                "\"Look at me, see me, my son Thutmose. I am your father, Harmakhis-Khepri-Atum,\n" +
+                "and I shall give you the kingship on earth before all the living.\n" +
+                "You shall wear the White and the Red Crowns upon the throne of Geb.\n" +
+                "The earth shall be yours in its length and width — all that the Eye of the Lord-of-All illuminates.\n" +
+                "My face is yours, my heart is yours, for you are a protector to me;\n" +
+                "my condition is like one in need — the sands of the desert upon which I lie have reached me.\n" +
+                "Run to me; do that which I desire, knowing you are my son and my protector.\n" +
+                "Come forth, and I shall be with you; I shall be your leader.\"\n\n" +
+                "(Remainder of the stele is fragmented / lost — not invented here.)";
+            GizaBuild.HonestyPlate(parent, DreamSteleName + "_Text", steleText, steleW + 6f);
+            Transform txt = parent.Find(DreamSteleName + "_Text");
+            if (txt != null)
+            {
+                // Face east toward temple, readable from Sphinx court side of stele.
+                txt.localPosition = new Vector3(steleX + 1.35f, 2.35f, 0f);
+                txt.localRotation = Quaternion.Euler(0f, 90f, 0f);
+                txt.localScale = new Vector3(0.72f, 0.85f, 0.72f);
+            }
         }
     }
 }
