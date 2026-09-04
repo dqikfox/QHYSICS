@@ -11,6 +11,7 @@ using RealityEngine.AI;
 using RealityEngine.Chemistry;
 using RealityEngine.Biology;
 using RealityEngine.Physics.Thermo;
+using RealityEngine.Physics.Cosmos;
 using RealityEngine.Survey;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -87,6 +88,7 @@ namespace RealityEngine.Experiments
         ExperimentRunner _experiment;
         Scientist _scientist;
         MuscleCell _muscleCell;
+        CosmosToy _cosmosToy;
         BiologyBoard _biologyBoard;
         HeatCoupler _heatCoupler;
         ConservationBoard _conservationBoard;
@@ -105,6 +107,7 @@ namespace RealityEngine.Experiments
         public ExperimentRunner Experiment => _experiment;
         public Scientist Scientist => _scientist;
         public MuscleCell MuscleCell => _muscleCell;
+        public CosmosToy CosmosToy => _cosmosToy;
         public BiologyBoard BiologyBoard => _biologyBoard;
         public HeatCoupler HeatCoupler => _heatCoupler;
         public ConservationBoard ConservationBoard => _conservationBoard;
@@ -197,6 +200,7 @@ namespace RealityEngine.Experiments
                     existing.EnsureLabStyle();
                     existing.EnsureThermo();
                     existing.EnsureLedger();
+                    existing.EnsureCosmos();
                     return existing;
                 }
 
@@ -214,6 +218,7 @@ namespace RealityEngine.Experiments
                 bootstrap.EnsureLabStyle();
                 bootstrap.EnsureThermo();
                 bootstrap.EnsureLedger();
+                bootstrap.EnsureCosmos();
                 return bootstrap;
             }
             finally
@@ -244,6 +249,7 @@ namespace RealityEngine.Experiments
                 EnsureLabStyle();
                 EnsureThermo();
                 EnsureLedger();
+                EnsureCosmos();
             }
         }
 
@@ -321,6 +327,7 @@ namespace RealityEngine.Experiments
                 EnsureLabStyle();
                 EnsureThermo();
                 EnsureLedger();
+                EnsureCosmos();
                 _built = true;
                 return;
             }
@@ -367,6 +374,9 @@ namespace RealityEngine.Experiments
             EnsureBiology();
             EnsureSurvey();
             EnsureLabStyle();
+            EnsureThermo();
+            EnsureLedger();
+            EnsureCosmos();
             _built = true;
         }
 
@@ -1924,9 +1934,9 @@ namespace RealityEngine.Experiments
                 couplerRot = Quaternion.FromToRotation(Vector3.up, right);
             }
 
-            hotPos = NudgeAwayFrom(hotPos, 0.06f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard", "CubitRod", "SurveyBoard");
-            coldPos = NudgeAwayFrom(coldPos, 0.06f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard", "CubitRod", "SurveyBoard");
-            couplerPos = NudgeAwayFrom(couplerPos, 0.08f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard", "CubitRod", "SurveyBoard");
+            hotPos = NudgeAwayFrom(hotPos, 0.06f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard", "CubitRod", "SurveyBoard", "CosmosToy");
+            coldPos = NudgeAwayFrom(coldPos, 0.06f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard", "CubitRod", "SurveyBoard", "CosmosToy");
+            couplerPos = NudgeAwayFrom(couplerPos, 0.08f, "MuscleCell", "BiologyBoard", "ScientistBoard", "ChemistryBoard", "CubitRod", "SurveyBoard", "CosmosToy");
 
             hot.transform.position = hotPos;
             cold.transform.position = coldPos;
@@ -1948,6 +1958,40 @@ namespace RealityEngine.Experiments
                 pos.x = b.max.x + radius + 0.08f;
             }
             return pos;
+        }
+
+
+        public void EnsureCosmos()
+        {
+            CacheChildren();
+            if (_scaleEngine == null)
+                EnsureScaleEngine();
+
+            Transform existing = transform.Find(CosmosToy.RootName);
+            GameObject go;
+            if (existing != null)
+            {
+                go = existing.gameObject;
+            }
+            else
+            {
+                go = new GameObject(CosmosToy.RootName);
+                go.transform.SetParent(transform, true);
+            }
+            go.SetActive(true);
+            PlaceOnTableGrab(go.transform, 0.30f, 0.22f);
+
+            CosmosToy toy = go.GetComponent<CosmosToy>();
+            if (toy == null)
+                toy = go.AddComponent<CosmosToy>();
+            toy.EnsureBuilt();
+            if (_scaleEngine != null)
+                toy.Configure(_scaleEngine);
+
+            if (_scaleEngine != null)
+                BindScaleTarget(go, _scaleEngine);
+
+            _cosmosToy = toy;
         }
 
         public void EnsureLedger()
