@@ -157,6 +157,8 @@ namespace RealityEngine.Visualization
                 || lower.Contains("enclosure") || lower.Contains("valleytemple")
                 || lower.Contains("nile") || lower.Contains("floodplain") || lower.Contains("harbor")
                 || lower.Contains("village") || lower.Contains("settlement")
+                || lower.Contains("westfield") || lower.Contains("mastaba")
+                || lower.Contains("osirisshaft") || lower.Contains("workersvillage")
                 || lower.StartsWith("lablandscape");
         }
     }
@@ -629,7 +631,9 @@ namespace RealityEngine.Visualization
                 if (l.Contains("floodplain") || l.Contains("nile") || l.Contains("harbor")
                     || l.Contains("village") || l.Contains("silt") || l.Contains("settlement")
                     || l.Contains("field") || l.Contains("mudbrick") || l.Contains("yard")
-                    || l.Contains("house"))
+                    || l.Contains("house") || l.Contains("mastaba") || l.Contains("westfield")
+                    || l.Contains("heatmap") || l.Contains("survey") || l.Contains("osirisshaft")
+                    || l.Contains("speculative"))
                     continue;
                 if (l.Contains("pyramidion") || mn.Contains("Pyramidion"))
                     mr.sharedMaterial = gold;
@@ -698,9 +702,12 @@ namespace RealityEngine.Visualization
             SitFound("SphinxEnclosure", court);
             SitFound("MenkaureMortuary", top);
             SitFound("MenkaureEnclosure", top);
+            SitFound("KhufuWestField", top);
+            SitFound("OsirisShaft", court);
             float flood = pose.surfaceY - GizaComplex.CliffHeightM + GizaNile.SitAboveDesertM;
             SitFound("KhufuValleyTemple", flood);
             SitFound("MenkaureValleyTemple", flood);
+            SitFound("GizaWorkersVillage", flood);
         }
 
         static void SitFound(string name, float sitY)
@@ -726,6 +733,12 @@ namespace RealityEngine.Visualization
                 r = RendererNamedContains(t, "_Body");
             if (r == null)
                 r = RendererNamedContains(t, "_Floor");
+            if (r == null)
+                r = RendererNamedContains(t, "_Sand");
+            if (r == null)
+                r = RendererNamedContains(t, "_Yards");
+            if (r == null)
+                r = RendererNamedContains(t, "_Apron");
             if (r == null)
                 r = RendererNamedContains(t, "_Deck");
             if (r == null)

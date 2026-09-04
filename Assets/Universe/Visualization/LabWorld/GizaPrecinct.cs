@@ -139,6 +139,7 @@ namespace RealityEngine.Visualization
             // Cliff-lip pad east of Menkaure mortuary — do not pull the plateau under the valley descent.
             float menLipEast = L.menkaureTempleEast + L.menkaureTempleEW * 0.5f + 10f;
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, menLipEast, L.menkaureTempleNorth, 12f);
+            GizaField.ExpandExtents(ref xMin, ref xMax, ref zMin, ref zMax);
         }
 
         static void Enc(ref float xMin, ref float xMax, ref float zMin, ref float zMax, float east, float north, float r)
@@ -202,6 +203,7 @@ namespace RealityEngine.Visualization
             Ensure(KhufuValleyName, pose, p => BuildKhufuValleyTemple(p, L, valleyHonesty), floodY, true);
             Ensure(KhufuBoatPitsName, pose, p => BuildBoatPits(p, L), pose.surfaceY, true);
             Ensure(KhufuEnclosureName, pose, p => BuildEnclosure(p, KhufuEnclosureName, pose.khufuCenter, 0f, KhufuPyramid.BaseMeters * 0.5f + KhufuPyramid.PavementWidthM, L.khufuTempleNS + 4f, true), pose.surfaceY, true);
+            GizaField.EnsureWestField(pose);
         }
 
         public static void EnsureKhafre(GizaComplex.Pose pose)
@@ -265,6 +267,7 @@ namespace RealityEngine.Visualization
             if (oldEnc != null && oldEnc.transform.Find(SphinxEnclosureName + "_Ditch") == null)
                 DestroyNamed(oldEnc);
             Ensure(SphinxEnclosureName, pose, p => BuildSphinxEnclosure(p), GizaComplex.CourtY(pose), true);
+            GizaField.EnsureOsirisShaft(pose);
         }
 
         public static void EnsureMenkaure(GizaComplex.Pose pose)
@@ -306,6 +309,7 @@ namespace RealityEngine.Visualization
             Ensure(MenkaureValleyName, pose, p => BuildMenkaureValleyTemple(p, L, valleyHonesty), floodY, true);
             Vector3 men = GizaComplex.WorldFromKhufu(pose, -GizaComplex.MenkaureWestM, -GizaComplex.MenkaureSouthM, 0f);
             Ensure(MenkaureEnclosureName, pose, p => BuildEnclosure(p, MenkaureEnclosureName, men, 0f, MenkaurePyramid.BaseMeters * 0.5f + 4f, L.menkaureTempleNS + 4f, false), pose.surfaceY, true);
+            GizaField.EnsureWorkersVillage(pose);
         }
 
         static GameObject Ensure(string name, GizaComplex.Pose pose, System.Func<GizaComplex.Pose, GameObject> build, float sitY, bool sit)
