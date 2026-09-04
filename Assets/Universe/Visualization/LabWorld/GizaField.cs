@@ -4,7 +4,8 @@ namespace RealityEngine.Visualization
 {
     /// <summary>
     /// West Field mastaba cemetery (west of Khufu), Heit el-Ghurab workers' village
-    /// (south apron / floodplain), and Osiris Shaft-scale rock-cut complex near Sphinx.
+    /// (south apron / floodplain), Osiris Shaft-scale rock-cut complex near Sphinx,
+    /// and an OFF-by-default SPECULATIVE fringe water-shaft diagram (not proven archaeology).
     /// Schematic Lehner / Google Earth density - not photogrammetry.
     /// Local +X east, +Z north, 1 unit = 1 m.
     /// </summary>
@@ -18,6 +19,13 @@ namespace RealityEngine.Visualization
         public const string MastabasMarker = "_Mastabas";
         public const string VillageMarker = "_Village";
         public const string ShaftMarker = "_Shaft";
+        public const string SpeculativeShaftsMarker = "_Shafts";
+
+        // Fringe diagrams claim 33-39 ft shafts (~10-12 m). Schematic only - OFF by default.
+        public const float SpeculativeShaftDepthM = 11.5f;
+        public const float SpeculativeShaftWidthM = 3.2f;
+        public const float SpeculativeShaftWallT = 0.35f;
+        public const float SpeculativeGridPitchM = 18f;
 
         // West Field: ~90 m west of Khufu west face, dense N-S cemetery strip.
         public const float WestFieldGapFromFaceM = 28f;
@@ -92,7 +100,8 @@ namespace RealityEngine.Visualization
         public static void EnsureOsirisShaft(GizaComplex.Pose pose)
         {
             GameObject old = GizaComplex.FindNamed(OsirisShaftName);
-            if (old != null && old.transform.Find(OsirisShaftName + ShaftMarker) == null)
+            if (old != null && (old.transform.Find(OsirisShaftName + ShaftMarker) == null
+                || old.transform.Find(SpeculativeName + "/" + SpeculativeName + SpeculativeShaftsMarker) == null))
                 DestroyNamed(old);
             Ensure(OsirisShaftName, pose, BuildOsirisShaft, GizaComplex.CourtY(pose), true);
         }
@@ -521,21 +530,119 @@ namespace RealityEngine.Visualization
                 plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
             }
 
-            // Speculative fringe water-network note - OFF by default; honesty only (do not build shaft forest).
-            var speculative = new GameObject(SpeculativeName);
-            speculative.transform.SetParent(root.transform, false);
-            speculative.SetActive(false);
-            const string fringe =
-                "SPECULATIVE fringe diagram only.\n" +
-                GizaComplex.HonestyPrefix + "\n" +
-                "Some popular diagrams claim a plateau-wide underground water-shaft network (33-39 ft shafts). That claim is NOT modeled here.\n" +
-                "This child exists as an honesty marker only - enable to read; do not treat as excavated archaeology.";
-            GizaBuild.HonestyPlate(speculative.transform, SpeculativeName + "_Honesty", fringe, 14f);
-            Transform sp = speculative.transform.Find(SpeculativeName + "_Honesty");
-            if (sp != null)
-                sp.localPosition = new Vector3(0f, 1.55f, hw + 8f);
+            // SPECULATIVE fringe water-network diagram - OFF by default. Enable SpeculativeUnderworld in Hierarchy to view.
+            // Not excavated archaeology. Shaft depths ~33-39 ft from popular fringe diagrams only.
+            BuildSpeculativeUnderworld(root.transform, hw);
 
             return root;
+        }
+
+        static void BuildSpeculativeUnderworld(Transform osirisRoot, float osirisHalf)
+        {
+            var speculative = new GameObject(SpeculativeName);
+            speculative.transform.SetParent(osirisRoot, false);
+            speculative.SetActive(false);
+
+            Material diagram = MakeSpeculativeDiagramMaterial();
+            Material rock = GizaBuild.CliffRock();
+
+            float depth = SpeculativeShaftDepthM;
+            float sw = SpeculativeShaftWidthM;
+            float wallT = SpeculativeShaftWallT;
+            float pitch = SpeculativeGridPitchM;
+            int cols = 4;
+            int rows = 3;
+            float gridEW = (cols - 1) * pitch;
+            float gridNS = (rows - 1) * pitch;
+            // Offset west/north of Osiris toward Khafre terrace fringe (local +X east, +Z north).
+            float originX = -osirisHalf - 22f - gridEW * 0.5f;
+            float originZ = osirisHalf + 16f;
+
+            var shafts = new LabMeshBuilder(cols * rows * 48 + 64, cols * rows * 72 + 96);
+            var links = new LabMeshBuilder(cols * rows * 24 + 32, cols * rows * 36 + 48);
+            float half = sw * 0.5f;
+            float inner = sw - wallT * 2f;
+            float wy = -depth * 0.5f;
+
+            for (int r = 0; r < rows; r++)
+            {
+                for (int c = 0; c < cols; c++)
+                {
+                    float x = originX + c * pitch;
+                    float z = originZ + r * pitch;
+                    // Four thin schematic shaft walls (open mouth, no floor plug - diagram not walkable maze).
+                    shafts.AddBox(new Vector3(x, wy, z + half - wallT * 0.5f), new Vector3(sw, depth, wallT), Color.white);
+                    shafts.AddBox(new Vector3(x, wy, z - (half - wallT * 0.5f)), new Vector3(sw, depth, wallT), Color.white);
+                    shafts.AddBox(new Vector3(x + half - wallT * 0.5f, wy, z), new Vector3(wallT, depth, sw - wallT * 2f), Color.white);
+                    shafts.AddBox(new Vector3(x - (half - wallT * 0.5f), wy, z), new Vector3(wallT, depth, sw - wallT * 2f), Color.white);
+                    // Surface collar tick so the mouth reads in the diagram.
+                    float rim = 0.55f;
+                    shafts.AddBox(new Vector3(x, rim * 0.5f, z + half + 0.25f), new Vector3(sw + 0.8f, rim, 0.5f), Color.white);
+                    shafts.AddBox(new Vector3(x, rim * 0.5f, z - (half + 0.25f)), new Vector3(sw + 0.8f, rim, 0.5f), Color.white);
+                    shafts.AddBox(new Vector3(x + half + 0.25f, rim * 0.5f, z), new Vector3(0.5f, rim, sw), Color.white);
+                    shafts.AddBox(new Vector3(x - (half + 0.25f), rim * 0.5f, z), new Vector3(0.5f, rim, sw), Color.white);
+
+                    // Mid-depth link stubs toward neighbors (schematic tunnels, not proven galleries).
+                    float linkY = -depth * 0.55f;
+                    float linkH = 1.4f;
+                    float linkT = 1.1f;
+                    if (c < cols - 1)
+                    {
+                        float lx = x + pitch * 0.5f;
+                        links.AddBox(new Vector3(lx, linkY, z), new Vector3(pitch - inner, linkH, linkT), Color.white);
+                    }
+                    if (r < rows - 1)
+                    {
+                        float lz = z + pitch * 0.5f;
+                        links.AddBox(new Vector3(x, linkY, lz), new Vector3(linkT, linkH, pitch - inner), Color.white);
+                    }
+                }
+            }
+
+            GizaBuild.SpawnMesh(speculative.transform, SpeculativeName + SpeculativeShaftsMarker,
+                shafts.Build(SpeculativeName + SpeculativeShaftsMarker), diagram, false);
+            GizaBuild.SpawnMesh(speculative.transform, SpeculativeName + "_Links",
+                links.Build(SpeculativeName + "_Links"), diagram, false);
+
+            // Ground footprint frame so the grid extent is obvious when toggled on.
+            var frame = new LabMeshBuilder(16, 24);
+            float fx = originX + gridEW * 0.5f;
+            float fz = originZ + gridNS * 0.5f;
+            float fe = gridEW * 0.5f + pitch * 0.55f;
+            float fn = gridNS * 0.5f + pitch * 0.55f;
+            float ft = 0.35f;
+            frame.AddBox(new Vector3(fx, 0.08f, fz + fn), new Vector3(fe * 2f, 0.16f, ft), Color.white);
+            frame.AddBox(new Vector3(fx, 0.08f, fz - fn), new Vector3(fe * 2f, 0.16f, ft), Color.white);
+            frame.AddBox(new Vector3(fx + fe, 0.08f, fz), new Vector3(ft, 0.16f, fn * 2f), Color.white);
+            frame.AddBox(new Vector3(fx - fe, 0.08f, fz), new Vector3(ft, 0.16f, fn * 2f), Color.white);
+            GizaBuild.SpawnMesh(speculative.transform, SpeculativeName + "_Frame",
+                frame.Build(SpeculativeName + "_Frame"), rock, false);
+
+            string fringe =
+                "SPECULATIVE fringe diagram only - OFF by default.\n" +
+                GizaComplex.HonestyPrefix + "\n" +
+                "Popular fringe diagrams claim a plateau-wide underground water-shaft network (~33-39 ft / ~10-12 m shafts) under the Khafre / Sphinx area.\n" +
+                "This 4x3 cyan schematic (~" + SpeculativeShaftDepthM.ToString("0.0") + " m shafts + mid-depth stubs) is THAT claim drawn as a toggleable diagram.\n" +
+                "It is NOT excavated archaeology, NOT proven chambers, and NOT part of the Osiris Shaft reconstruction. Enable SpeculativeUnderworld in the Hierarchy to view.";
+            GizaBuild.HonestyPlate(speculative.transform, SpeculativeName + "_Honesty", fringe, 22f);
+            Transform sp = speculative.transform.Find(SpeculativeName + "_Honesty");
+            if (sp != null)
+            {
+                sp.localPosition = new Vector3(originX + gridEW * 0.5f, 1.7f, originZ + gridNS + 10f);
+                sp.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+        }
+
+        static Material MakeSpeculativeDiagramMaterial()
+        {
+            // Distinct cyan diagram look so it never reads as real limestone archaeology.
+            Material mat = LabWorldMeshes.MakeLit("RELab_SpeculativeUnderworld",
+                new Color(0.12f, 0.55f, 0.72f, 1f), 0.05f, 0.35f, true);
+            if (mat != null && mat.HasProperty("_EmissionColor"))
+                mat.SetColor("_EmissionColor", new Color(0.08f, 0.45f, 0.62f, 1f));
+            if (mat != null && mat.HasProperty("_BaseColor"))
+                mat.SetColor("_BaseColor", new Color(0.18f, 0.62f, 0.78f, 0.92f));
+            return mat;
         }
 
         static Mesh BuildMidLedgeRing(float inner, float midY, float thick)
