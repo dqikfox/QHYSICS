@@ -703,8 +703,10 @@ namespace RealityEngine.Visualization
             SitFound("MenkaureMortuary", top);
             SitFound("MenkaureEnclosure", top);
             SitFound("KhufuWestField", top);
+            SitFound("CemeteryEnEchelon", top);
             SitFound("KhufuEastField", top);
             SitFound("GizaCentralField", terrace);
+            SitFound("MenkaureField", top);
             SitFound("Khentkawes", top);
             SitFound("OsirisShaft", court);
             float flood = pose.surfaceY - GizaComplex.CliffHeightM + GizaNile.SitAboveDesertM;

@@ -314,6 +314,7 @@ namespace RealityEngine.Visualization
             Ensure(MenkaureEnclosureName, pose, p => BuildEnclosure(p, MenkaureEnclosureName, men, 0f, MenkaurePyramid.BaseMeters * 0.5f + 4f, L.menkaureTempleNS + 4f, false), pose.surfaceY, true);
             GizaField.EnsureWorkersVillage(pose);
             GizaField.EnsureKhentkawes(pose);
+            GizaField.EnsureMenkaureField(pose);
         }
 
         static GameObject Ensure(string name, GizaComplex.Pose pose, System.Func<GizaComplex.Pose, GameObject> build, float sitY, bool sit)
