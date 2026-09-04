@@ -6,6 +6,7 @@ namespace RealityEngine.Visualization
     /// West / East / Central / Menkaure Field mastaba cemeteries (west + east of Khufu,
     /// south of Khafre, south of Menkaure queens G3a-c),
     /// Cemetery en Echelon (staggered mastaba strip in the gap west of Khufu / east of West Field),
+    /// Gisr el-Mudir (Great Enclosure) unfinished limestone enclosure further west of West Field,
     /// Khentkawes I (LG100) rock-cut stepped tomb SE of Central Field / NE of Menkaure,
     /// Heit el-Ghurab workers' village (south apron / floodplain), Osiris Shaft-scale rock-cut
     /// complex near Sphinx, and an OFF-by-default SPECULATIVE fringe water-shaft diagram
@@ -24,6 +25,7 @@ namespace RealityEngine.Visualization
         public const string SpeculativeName = "SpeculativeUnderworld";
         public const string KhentkawesName = "Khentkawes";
         public const string CemeteryEnEchelonName = "CemeteryEnEchelon";
+        public const string GisrElMudirName = "GisrElMudir";
 
         public const string MastabasMarker = "_Mastabas";
         public const string VillageMarker = "_Village";
@@ -31,6 +33,7 @@ namespace RealityEngine.Visualization
         public const string ShaftMarker = "_Shaft";
         public const string SpeculativeShaftsMarker = "_Shafts";
         public const string MassingMarker = "_Massing";
+        public const string WallsMarker = "_Walls";
 
         // Fringe diagrams claim 33-39 ft shafts (~10-12 m). Schematic only - OFF by default.
         public const float SpeculativeShaftDepthM = 11.5f;
@@ -43,6 +46,15 @@ namespace RealityEngine.Visualization
         public const float WestFieldDepthM = 185f;
         public const float WestFieldNorthPadM = 40f;
         public const float WestFieldSouthPadM = 50f;
+
+        // Gisr el-Mudir (Great Enclosure): unfinished OK limestone enclosure west of West Field (Lehner schematic).
+        public const float GisrGapWestOfWestFieldM = 42f;
+        public const float GisrEWM = 300f;
+        public const float GisrNSM = 330f;
+        public const float GisrWallThicknessM = 10f;
+        public const float GisrWallHeightM = 4.2f;
+        public const float GisrGateWidthM = 12f;
+        public const float GisrNorthBiasM = 40f;
 
         // Cemetery en Echelon: staggered strip in the 28 m gap between Khufu west face and West Field.
         public const float EchelonGapFromFaceM = 4f;
@@ -110,6 +122,10 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, (wEast0 + wEast1) * 0.5f, (wNorth0 + wNorth1) * 0.5f,
                 (wEast1 - wEast0) * 0.5f + 8f, (wNorth1 - wNorth0) * 0.5f + 8f);
 
+            LayoutGisr(out float gEast0, out float gEast1, out float gNorth0, out float gNorth1);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, (gEast0 + gEast1) * 0.5f, (gNorth0 + gNorth1) * 0.5f,
+                (gEast1 - gEast0) * 0.5f + 12f, (gNorth1 - gNorth0) * 0.5f + 12f);
+
             LayoutEchelon(out float ecEast0, out float ecEast1, out float ecNorth0, out float ecNorth1);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, (ecEast0 + ecEast1) * 0.5f, (ecNorth0 + ecNorth1) * 0.5f,
                 (ecEast1 - ecEast0) * 0.5f + 6f, (ecNorth1 - ecNorth0) * 0.5f + 6f);
@@ -154,6 +170,7 @@ namespace RealityEngine.Visualization
         public static void ForceRebuildAll()
         {
             DestroyNamed(GizaComplex.FindNamed(WestFieldName));
+            DestroyNamed(GizaComplex.FindNamed(GisrElMudirName));
             DestroyNamed(GizaComplex.FindNamed(CemeteryEnEchelonName));
             DestroyNamed(GizaComplex.FindNamed(EastFieldName));
             DestroyNamed(GizaComplex.FindNamed(CentralFieldName));
@@ -170,6 +187,14 @@ namespace RealityEngine.Visualization
                 || old.transform.Find(WestFieldName + "_SurveyHeatmap") == null))
                 DestroyNamed(old);
             Ensure(WestFieldName, pose, BuildWestField, pose.surfaceY, true);
+        }
+
+        public static void EnsureGisrElMudir(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(GisrElMudirName);
+            if (old != null && old.transform.Find(GisrElMudirName + WallsMarker) == null)
+                DestroyNamed(old);
+            Ensure(GisrElMudirName, pose, BuildGisrElMudir, pose.surfaceY, true);
         }
 
         public static void EnsureCemeteryEnEchelon(GizaComplex.Pose pose)
@@ -266,6 +291,17 @@ namespace RealityEngine.Visualization
             north0 = -khHalf - WestFieldSouthPadM;
         }
 
+        static void LayoutGisr(out float east0, out float east1, out float north0, out float north1)
+        {
+            LayoutWest(out float wEast0, out float unusedEast1, out float unusedNorth0, out float unusedNorth1);
+            // Clear gap west of West Field west edge; enclosure extends further west.
+            east1 = wEast0 - GisrGapWestOfWestFieldM;
+            east0 = east1 - GisrEWM;
+            float nMid = GisrNorthBiasM;
+            north0 = nMid - GisrNSM * 0.5f;
+            north1 = nMid + GisrNSM * 0.5f;
+        }
+
         static void LayoutEchelon(out float east0, out float east1, out float north0, out float north1)
         {
             float khHalf = KhufuPyramid.BaseMeters * 0.5f;
@@ -332,6 +368,83 @@ namespace RealityEngine.Visualization
         {
             east = GizaComplex.SphinxEastM + ShaftEastOfSphinxM;
             north = -GizaComplex.SphinxSouthM - ShaftSouthOfSphinxM;
+        }
+
+
+        static GameObject BuildGisrElMudir(GizaComplex.Pose pose)
+        {
+            LayoutGisr(out float east0, out float east1, out float north0, out float north1);
+            float cx = (east0 + east1) * 0.5f;
+            float cz = (north0 + north1) * 0.5f;
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, cx, cz, 0f);
+            GameObject root = GizaBuild.Root(GisrElMudirName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material sand = GizaBuild.DesertSand();
+            Material rock = GizaBuild.CliffRock();
+
+            float ew = east1 - east0;
+            float ns = north1 - north0;
+            float hx = ew * 0.5f;
+            float hz = ns * 0.5f;
+            float t = GisrWallThicknessM;
+            float h = GisrWallHeightM;
+            float gateW = GisrGateWidthM;
+            float apron = 8f;
+
+            // Walkable sand: interior fill + exterior rim apron for teleport.
+            var ground = new LabMeshBuilder(8, 12);
+            ground.AddBox(new Vector3(0f, 0.06f, 0f),
+                new Vector3(ew + apron * 2f, 0.12f, ns + apron * 2f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, GisrElMudirName + "_Sand",
+                ground.Build(GisrElMudirName + "_Sand"), sand, true);
+
+            // Thick unfinished limestone walls; east wall has open gate facing West Field.
+            var walls = new LabMeshBuilder(48, 72);
+            float y = h * 0.5f;
+            // South / north solid runs (full E-W).
+            walls.AddBox(new Vector3(0f, y, -hz + t * 0.5f), new Vector3(ew, h, t), Color.white);
+            walls.AddBox(new Vector3(0f, y, hz - t * 0.5f), new Vector3(ew, h, t), Color.white);
+            // West solid.
+            walls.AddBox(new Vector3(-hx + t * 0.5f, y, 0f), new Vector3(t, h, ns - t * 2f), Color.white);
+            // East gate: split north/south segments (Crow / WallDoorX pattern, open walkthrough).
+            float remain = (ns - t * 2f - gateW) * 0.5f;
+            float eastX = hx - t * 0.5f;
+            if (remain > 0.5f)
+            {
+                float zOff = (gateW + remain) * 0.5f;
+                walls.AddBox(new Vector3(eastX, y, zOff), new Vector3(t, h, remain), Color.white);
+                walls.AddBox(new Vector3(eastX, y, -zOff), new Vector3(t, h, remain), Color.white);
+            }
+            // Low unfinished course stubs at gate jambs (not a finished lintel).
+            walls.AddBox(new Vector3(eastX, 0.55f, gateW * 0.5f + 0.6f),
+                new Vector3(t * 1.05f, 1.1f, 1.2f), Color.white);
+            walls.AddBox(new Vector3(eastX, 0.55f, -(gateW * 0.5f + 0.6f)),
+                new Vector3(t * 1.05f, 1.1f, 1.2f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, GisrElMudirName + WallsMarker,
+                walls.Build(GisrElMudirName + WallsMarker), lime, true);
+
+            // Sparse interior rubble / unfinished wall stubs near walls (cheap).
+            var rubble = new LabMeshBuilder(32, 48);
+            rubble.AddBox(new Vector3(-hx + t + 6f, 0.55f, hz * 0.35f), new Vector3(4.5f, 1.1f, 2.2f), Color.white);
+            rubble.AddBox(new Vector3(-hx + t + 9f, 0.4f, -hz * 0.42f), new Vector3(3.2f, 0.8f, 2.8f), Color.white);
+            rubble.AddBox(new Vector3(hx * 0.15f, 0.45f, hz - t - 5f), new Vector3(5.5f, 0.9f, 2.0f), Color.white);
+            rubble.AddBox(new Vector3(-hx * 0.25f, 0.35f, -hz + t + 4.5f), new Vector3(3.8f, 0.7f, 2.4f), Color.white);
+            rubble.AddBox(new Vector3(hx - t - 8f, 0.5f, hz * 0.2f), new Vector3(2.6f, 1.0f, 3.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, GisrElMudirName + "_Rubble",
+                rubble.Build(GisrElMudirName + "_Rubble"), rock, true);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Gisr el-Mudir (Great Enclosure). Massive unfinished limestone enclosure west of the West Field.\n" +
+                "Purpose debated — Lehner schematic massing, not photogrammetry, not a pyramid.";
+            GizaBuild.HonestyPlate(root.transform, GisrElMudirName + "_Honesty", honesty, 36f);
+            Transform plate = root.transform.Find(GisrElMudirName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(hx - t - 4f, 2.0f, 0f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+            return root;
         }
 
         static GameObject BuildWestField(GizaComplex.Pose pose)
