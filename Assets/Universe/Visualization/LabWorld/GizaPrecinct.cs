@@ -3,8 +3,9 @@ using UnityEngine;
 namespace RealityEngine.Visualization
 {
     /// <summary>
-    /// Rest of the undamaged Giza necropolis: Khufu queens G1a-c, mortuary temples,
-    /// causeways, boat pits, Khufu/Khafre/Menkaure valley temples, Sphinx temple, Sphinx-Khafre link court, temenos walls.
+    /// Rest of the undamaged Giza necropolis: Khufu queens G1a-c, Khafre cult/satellite G2-a,
+    /// mortuary temples, causeways, boat pits, Khufu/Khafre/Menkaure valley temples, Sphinx temple,
+    /// Sphinx-Khafre link court, temenos walls.
     /// Reconstructed original massing from published plans (Lehner/Petrie). Not photogrammetry.
     /// Architectural local space: +X east, +Z north, 1 unit = 1 m.
     /// </summary>
@@ -13,6 +14,7 @@ namespace RealityEngine.Visualization
         public const string G1aName = "G1a";
         public const string G1bName = "G1b";
         public const string G1cName = "G1c";
+        public const string G2aName = "G2a";
         public const string KhufuMortuaryName = "KhufuMortuary";
         public const string KhufuCausewayName = "KhufuCauseway";
         public const string KhufuValleyName = "KhufuValleyTemple";
@@ -36,6 +38,7 @@ namespace RealityEngine.Visualization
             public float g1aHeight, g1bHeight, g1cHeight;
             public float g1aEast, g1bEast, g1cEast;
             public float g1aNorth, g1bNorth, g1cNorth;
+            public float g2aBase, g2aHeight, g2aEast, g2aNorth;
             public float khufuTempleEW, khufuTempleNS, khufuTempleEast;
             public float khufuCauseStartEast, khufuCauseEndEast, khufuCauseLen, khufuCauseWid;
             public float khufuValleyEW, khufuValleyNS, khufuValleyEast, khufuValleyNorth;
@@ -99,6 +102,13 @@ namespace RealityEngine.Visualization
             L.khafreCauseStartEast = L.khafreTempleEast + L.khafreTempleEW * 0.5f;
             L.khafreCauseStartNorth = L.khafreTempleNorth;
 
+            // Khafre cult / satellite G2-a: south of Khafre, slight SE bias (Lehner).
+            L.g2aBase = 21f;
+            L.g2aHeight = 12.5f;
+            float khafrePav = 5f; // match KhafrePyramid pavement ring width in Build
+            L.g2aEast = -GizaComplex.KhafreWestM + 18f; // slight SE of centerline
+            L.g2aNorth = -GizaComplex.KhafreSouthM - hf - khafrePav - 4f - L.g2aBase * 0.5f;
+
             float sphinxEastEnd = GizaComplex.SphinxEastM + GizaSphinx.LengthM * 0.5f;
             L.sphinxTempleEast = sphinxEastEnd + 6f + L.sphinxTempleEW * 0.5f;
             L.sphinxTempleNorth = -GizaComplex.SphinxSouthM;
@@ -133,6 +143,7 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, khufuLipEast, 0f, 12f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, 0f, L.boatNorth, L.boatLen * 2.5f + 20f, L.boatWid * 0.5f + 6f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.khafreTempleEast, L.khafreTempleNorth, L.khafreTempleEW * 0.5f + 2f, L.khafreTempleNS * 0.5f + 2f);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g2aEast, L.g2aNorth, L.g2aBase * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.valleyEast, L.valleyNorth, L.valleyEW * 0.5f + 4f, L.valleyNS * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.sphinxTempleEast, L.sphinxTempleNorth, L.sphinxTempleEW * 0.5f + 4f, L.sphinxTempleNS * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.menkaureTempleEast, L.menkaureTempleNorth, L.menkaureTempleEW * 0.5f + 2f, L.menkaureTempleNS * 0.5f + 2f);
@@ -243,6 +254,17 @@ namespace RealityEngine.Visualization
             Ensure(KhafreCausewayName, pose, p => BuildCauseway(p, KhafreCausewayName, L.khafreCauseStartEast, L.khafreCauseStartNorth, L.khafreCauseEndEast, L.khafreCauseEndNorth, terrace, GizaComplex.CourtY(pose), 10f), pose.surfaceY, false);
             Vector3 khafre = GizaComplex.WorldFromKhufu(pose, -GizaComplex.KhafreWestM, -GizaComplex.KhafreSouthM, GizaComplex.KhafreBedrockM);
             Ensure(KhafreEnclosureName, pose, p => BuildEnclosure(p, KhafreEnclosureName, khafre, GizaComplex.KhafreBedrockM, KhafrePyramid.BaseMeters * 0.5f + 5f, L.khafreTempleNS + 4f, false), terrace, true);
+
+            // Khafre cult / satellite G2-a (south of Khafre, SE bias). Force rebuild if casing marker missing.
+            const string g2aHonesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Khafre cult / satellite pyramid G2-a. South of Khafre (SE bias). Tura casing ON, electrum pyramidion (reconstructed).\n" +
+                "Base ~21 m, height ~12.5 m schematic (Lehner). No interior. Not photogrammetry.";
+            GameObject oldG2a = GizaComplex.FindNamed(G2aName);
+            if (oldG2a != null && oldG2a.transform.Find(G2aName + "_Casing") == null)
+                DestroyNamed(oldG2a);
+            Ensure(G2aName, pose, p => BuildQueen(p, G2aName, L.g2aEast, L.g2aNorth, L.g2aBase, L.g2aHeight, g2aHonesty), terrace, true);
+
             GizaField.EnsureCentralField(pose);
         }
 
