@@ -405,7 +405,7 @@ namespace RealityEngine.Visualization
                 "Oasis sand skirts Khufu " + KhufuDuneRadiusM.ToString("0") +
                 " m, Khafre " + KhafreDuneRadiusM.ToString("0") + " m, Menkaure " + MenkaureDuneRadiusM.ToString("0") +
                 " m. East of the cliff: Nile floodplain silt, schematic harbor basin, and valley settlement (true Nile ~8 km further east, not modeled)." +
-                " West/East/Central Field mastabas (west+east of Khufu, south of Khafre); Gisr el-Mudir great enclosure west of West Field; Heit el-Ghurab workers village + Wall of the Crow south; Osiris Shaft near Sphinx (schematic); SpeculativeUnderworld water-shaft fringe diagram OFF by default." +
+                " West/East/Central Field mastabas (west+east of Khufu, south of Khafre); Gisr el-Mudir great enclosure west of West Field; Khufu Trial Passages south of Khufu (west of boat pits); Heit el-Ghurab workers village + Wall of the Crow south; Osiris Shaft near Sphinx (schematic); SpeculativeUnderworld water-shaft fringe diagram OFF by default." +
                 " From the lab: sand around Khufu's base you could eat, Tura courses still on the pyramid. Ctrl+R then Play, or Reality Engine / Place Giza Complex.");
         }
 

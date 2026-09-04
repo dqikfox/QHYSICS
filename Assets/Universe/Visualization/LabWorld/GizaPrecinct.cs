@@ -4,7 +4,7 @@ namespace RealityEngine.Visualization
 {
     /// <summary>
     /// Rest of the undamaged Giza necropolis: Khufu queens G1a-c, Khufu cult/satellite G1-d, Khafre cult/satellite G2-a,
-    /// mortuary temples, causeways, Khufu + Khafre boat pits, Khufu/Khafre/Menkaure valley temples, Sphinx temple,
+    /// mortuary temples, causeways, Khufu + Khafre boat pits, Khufu Trial Passages, Khufu/Khafre/Menkaure valley temples, Sphinx temple,
     /// Sphinx-Khafre link court, temenos walls.
     /// Reconstructed original massing from published plans (Lehner/Petrie). Not photogrammetry.
     /// Architectural local space: +X east, +Z north, 1 unit = 1 m.
@@ -20,6 +20,7 @@ namespace RealityEngine.Visualization
         public const string KhufuCausewayName = "KhufuCauseway";
         public const string KhufuValleyName = "KhufuValleyTemple";
         public const string KhufuBoatPitsName = "KhufuBoatPits";
+        public const string KhufuTrialPassagesName = "KhufuTrialPassages";
         public const string KhafreBoatPitsName = "KhafreBoatPits";
         public const string KhufuEnclosureName = "KhufuEnclosure";
         public const string KhafreMortuaryName = "KhafreMortuary";
@@ -46,6 +47,7 @@ namespace RealityEngine.Visualization
             public float khufuCauseStartEast, khufuCauseEndEast, khufuCauseLen, khufuCauseWid;
             public float khufuValleyEW, khufuValleyNS, khufuValleyEast, khufuValleyNorth;
             public float boatNorth, boatLen, boatWid;
+            public float trialEast, trialNorth, trialLen, trialWid;
             public float khafreBoatEast, khafreBoatNorth, khafreBoatLen, khafreBoatWid;
             public float khafreTempleEW, khafreTempleNS, khafreTempleEast, khafreTempleNorth;
             public float khafreCauseStartEast, khafreCauseStartNorth, khafreCauseEndEast, khafreCauseEndNorth;
@@ -106,6 +108,13 @@ namespace RealityEngine.Visualization
 
             L.boatNorth = -(kh + khPav + 4f + L.boatWid * 0.5f);
 
+            // Khufu Trial Passages: unfinished rock-cut practice corridors south of Khufu (Lehner/Petrie schematic).
+            // Sit west of centreline and south of the south boat-pit row so cuttings do not collide.
+            L.trialLen = 30f;
+            L.trialWid = 1.35f;
+            L.trialEast = -42f;
+            L.trialNorth = L.boatNorth - L.boatWid * 0.5f - 16f;
+
             float hf = KhafrePyramid.BaseMeters * 0.5f;
             L.khafreTempleEast = -GizaComplex.KhafreWestM + hf + 5f + 2f + L.khafreTempleEW * 0.5f;
             L.khafreTempleNorth = -GizaComplex.KhafreSouthM;
@@ -162,6 +171,9 @@ namespace RealityEngine.Visualization
                 L.g1aEast + L.g1aBase * 0.5f + 10f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, khufuLipEast, 0f, 12f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, 0f, L.boatNorth, L.boatLen * 2.5f + 20f, L.boatWid * 0.5f + 12f);
+            // Trial Passages south pad (mouth at trialNorth, corridor runs further south).
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.trialEast, L.trialNorth - L.trialLen * 0.5f,
+                L.trialWid * 0.5f + 14f, L.trialLen * 0.5f + 18f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.khafreTempleEast, L.khafreTempleNorth, L.khafreTempleEW * 0.5f + 2f, L.khafreTempleNS * 0.5f + 2f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.g2aEast, L.g2aNorth, L.g2aBase * 0.5f + 4f);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, L.khafreBoatEast, L.khafreBoatNorth,
@@ -263,6 +275,11 @@ namespace RealityEngine.Visualization
             if (oldBoats != null && oldBoats.transform.Find(KhufuBoatPitsName + "_Cutting") == null)
                 DestroyNamed(oldBoats);
             Ensure(KhufuBoatPitsName, pose, p => BuildBoatPits(p, L), pose.surfaceY, true);
+            // Force rebuild when Trial Passages cutting marker missing.
+            GameObject oldTrials = GizaComplex.FindNamed(KhufuTrialPassagesName);
+            if (oldTrials != null && oldTrials.transform.Find(KhufuTrialPassagesName + "_Cutting") == null)
+                DestroyNamed(oldTrials);
+            Ensure(KhufuTrialPassagesName, pose, p => BuildKhufuTrialPassages(p, L), pose.surfaceY, true);
             Ensure(KhufuEnclosureName, pose, p => BuildEnclosure(p, KhufuEnclosureName, pose.khufuCenter, 0f, KhufuPyramid.BaseMeters * 0.5f + KhufuPyramid.PavementWidthM, L.khufuTempleNS + 4f, true), pose.surfaceY, true);
             GizaField.EnsureWestField(pose);
             GizaField.EnsureGisrElMudir(pose);
@@ -1434,7 +1451,226 @@ namespace RealityEngine.Visualization
             return root;
         }
 
+        /// <summary>
+        /// Unfinished rock-cut Trial Passages south of Khufu (Lehner/Petrie schematic).
+        /// Practice corridor slopes before the Great Pyramid interiors — not the pyramid itself.
+        /// Mouth west of centreline, south of the south boat-pit row.
+        /// </summary>
+        static GameObject BuildKhufuTrialPassages(GizaComplex.Pose pose, Layout L)
+        {
+            GameObject root = GizaBuild.Root(KhufuTrialPassagesName, pose.parent, pose.khufuCenter, pose.rot);
+            Material rock = GizaBuild.Bedrock();
+            Material lime = GizaBuild.InteriorLime();
+            Material pav = GizaBuild.Pavement();
 
+            float x = L.trialEast;
+            float zMouth = L.trialNorth;
+            float len = L.trialLen;
+            float wid = L.trialWid;
+            float halfW = wid * 0.5f;
+            const float depth = 7.2f;
+            const float wallT = 0.9f;
+            const float floorT = 0.38f;
+            const float head = 2.2f;
+            const float liningT = 0.28f;
+            const float rimH = 0.5f;
+            const float rimT = 0.85f;
+            const float openLen = 8f; // open-top entrance for VR comfort
+            Color stone = Color.white;
+
+            var cutting = new LabMeshBuilder(420, 640);
+            var lining = new LabMeshBuilder(220, 340);
+            var floor = new LabMeshBuilder(180, 280);
+            var rimPav = new LabMeshBuilder(80, 120);
+            var stairs = new LabMeshBuilder(120, 180);
+
+            // Stepped descending corridor: s=0 at mouth (north, high), s increases south while descending.
+            int steps = 16;
+            float run = len / steps;
+            float rise = depth / steps;
+            float zEnd = zMouth - len;
+
+            // Corridor floor treads + side bedrock walls + lime lining.
+            for (int s = 0; s < steps; s++)
+            {
+                float sy = -(s + 0.5f) * rise;
+                float sz = zMouth - (s + 0.5f) * run;
+                float clearW = wid;
+                // Floor tread (walkable).
+                floor.AddBox(new Vector3(x, sy + floorT * 0.5f, sz),
+                    new Vector3(clearW, floorT, run * 0.98f), stone);
+                // Bedrock side walls (full height of local trench).
+                float wallH = head + (s + 1) * rise * 0.15f + 0.6f;
+                if (wallH < head + 0.8f) wallH = head + 0.8f;
+                float wy = sy + wallH * 0.35f;
+                cutting.AddBox(new Vector3(x + halfW + wallT * 0.5f, wy, sz),
+                    new Vector3(wallT, wallH, run * 1.02f), stone);
+                cutting.AddBox(new Vector3(x - (halfW + wallT * 0.5f), wy, sz),
+                    new Vector3(wallT, wallH, run * 1.02f), stone);
+                // Soft limestone lining on inner faces.
+                float ly = sy + head * 0.45f;
+                lining.AddBox(new Vector3(x + halfW - liningT * 0.5f - 0.02f, ly, sz),
+                    new Vector3(liningT, head * 0.9f, run * 0.95f), stone);
+                lining.AddBox(new Vector3(x - (halfW - liningT * 0.5f - 0.02f), ly, sz),
+                    new Vector3(liningT, head * 0.9f, run * 0.95f), stone);
+                // Roof / ceiling only past open entrance (partially open OK further down — leave gaps).
+                bool roofed = (s + 0.5f) * run > openLen;
+                if (roofed && (s % 3 != 1))
+                {
+                    float cy = sy + head + 0.2f;
+                    cutting.AddBox(new Vector3(x, cy, sz),
+                        new Vector3(clearW + wallT * 2f, 0.45f, run * 0.95f), stone);
+                }
+            }
+
+            // Surface entrance collar / open-top mouth rim (north).
+            float mouthY = rimH * 0.5f;
+            cutting.AddBox(new Vector3(x, mouthY, zMouth + 1.2f),
+                new Vector3(wid + wallT * 2f + rimT * 2f, rimH, rimT), stone);
+            cutting.AddBox(new Vector3(x + halfW + wallT + rimT * 0.5f, mouthY, zMouth - openLen * 0.35f),
+                new Vector3(rimT, rimH, openLen * 0.8f), stone);
+            cutting.AddBox(new Vector3(x - (halfW + wallT + rimT * 0.5f), mouthY, zMouth - openLen * 0.35f),
+                new Vector3(rimT, rimH, openLen * 0.8f), stone);
+
+            // Short horizontal mid chamber (~55% down).
+            float midT = 0.55f;
+            float midZ = zMouth - midT * len;
+            float midY = -midT * depth;
+            float midEW = 3.6f;
+            float midNS = 4.0f;
+            float midHead = 2.4f;
+            floor.AddBox(new Vector3(x, midY + floorT * 0.5f, midZ),
+                new Vector3(midEW - 0.3f, floorT, midNS - 0.3f), stone);
+            float mwy = midY + midHead * 0.45f;
+            // East/west chamber walls with stub-branch door gaps near midZ.
+            float stubDoor = 1.35f;
+            float ewRemain = (midNS - stubDoor) * 0.5f;
+            float eastX = x + midEW * 0.5f - wallT * 0.5f;
+            float westX = x - (midEW * 0.5f - wallT * 0.5f);
+            if (ewRemain > 0.25f)
+            {
+                float zOff = (stubDoor + ewRemain) * 0.5f;
+                cutting.AddBox(new Vector3(eastX, mwy, midZ + zOff), new Vector3(wallT, midHead, ewRemain), stone);
+                cutting.AddBox(new Vector3(eastX, mwy, midZ - zOff), new Vector3(wallT, midHead, ewRemain), stone);
+                cutting.AddBox(new Vector3(westX, mwy, midZ + zOff), new Vector3(wallT, midHead, ewRemain), stone);
+                cutting.AddBox(new Vector3(westX, mwy, midZ - zOff), new Vector3(wallT, midHead, ewRemain), stone);
+            }
+            // North/south jambs leave corridor-width doorways so the descending lane continues.
+            float doorGap = wid + 0.15f;
+            float jambRemain = (midEW - doorGap) * 0.5f;
+            if (jambRemain > 0.25f)
+            {
+                float xOff = (doorGap + jambRemain) * 0.5f;
+                float nz = midZ + midNS * 0.5f - wallT * 0.5f;
+                float sz = midZ - (midNS * 0.5f - wallT * 0.5f);
+                cutting.AddBox(new Vector3(x + xOff, mwy, nz), new Vector3(jambRemain, midHead, wallT), stone);
+                cutting.AddBox(new Vector3(x - xOff, mwy, nz), new Vector3(jambRemain, midHead, wallT), stone);
+                cutting.AddBox(new Vector3(x + xOff, mwy, sz), new Vector3(jambRemain, midHead, wallT), stone);
+                cutting.AddBox(new Vector3(x - xOff, mwy, sz), new Vector3(jambRemain, midHead, wallT), stone);
+            }
+            // Mid chamber lime lining on E/W faces.
+            lining.AddBox(new Vector3(x + midEW * 0.5f - wallT - liningT * 0.5f, mwy, midZ),
+                new Vector3(liningT, midHead * 0.85f, midNS - wallT * 2f - 0.2f), stone);
+            lining.AddBox(new Vector3(x - (midEW * 0.5f - wallT - liningT * 0.5f), mwy, midZ),
+                new Vector3(liningT, midHead * 0.85f, midNS - wallT * 2f - 0.2f), stone);
+            // Partial mid ceiling (open gap over corridor centreline for comfort).
+            cutting.AddBox(new Vector3(x + 1.1f, midY + midHead + 0.15f, midZ),
+                new Vector3(1.2f, 0.4f, midNS * 0.7f), stone);
+            cutting.AddBox(new Vector3(x - 1.1f, midY + midHead + 0.15f, midZ),
+                new Vector3(1.2f, 0.4f, midNS * 0.7f), stone);
+
+            // Stub unfinished east branch (dead-end practice cutting).
+            float stubZ = midZ - 0.4f;
+            float stubY = midY;
+            float stubLen = 5.5f;
+            float stubW = 1.2f;
+            float stubX = x + midEW * 0.5f + stubLen * 0.5f - 0.2f;
+            floor.AddBox(new Vector3(stubX, stubY + floorT * 0.5f, stubZ),
+                new Vector3(stubLen - 0.4f, floorT, stubW), stone);
+            float swy = stubY + head * 0.4f;
+            cutting.AddBox(new Vector3(stubX, swy, stubZ + stubW * 0.5f + wallT * 0.4f),
+                new Vector3(stubLen, head, wallT), stone);
+            cutting.AddBox(new Vector3(stubX, swy, stubZ - (stubW * 0.5f + wallT * 0.4f)),
+                new Vector3(stubLen, head, wallT), stone);
+            // Unfinished dead-end face (thicker rough stub).
+            cutting.AddBox(new Vector3(stubX + stubLen * 0.5f - wallT * 0.6f, swy, stubZ),
+                new Vector3(wallT * 1.4f, head, stubW + wallT), stone);
+            lining.AddBox(new Vector3(stubX, swy, stubZ + stubW * 0.5f - liningT * 0.5f),
+                new Vector3(stubLen - 0.6f, head * 0.8f, liningT), stone);
+
+            // Stub unfinished west branch (shorter dead-end).
+            float wStubLen = 3.8f;
+            float wStubX = x - midEW * 0.5f - wStubLen * 0.5f + 0.2f;
+            floor.AddBox(new Vector3(wStubX, stubY + floorT * 0.5f, stubZ + 0.3f),
+                new Vector3(wStubLen - 0.4f, floorT, stubW * 0.9f), stone);
+            cutting.AddBox(new Vector3(wStubX, swy, stubZ + 0.3f + stubW * 0.45f + wallT * 0.4f),
+                new Vector3(wStubLen, head * 0.9f, wallT), stone);
+            cutting.AddBox(new Vector3(wStubX, swy, stubZ + 0.3f - (stubW * 0.45f + wallT * 0.4f)),
+                new Vector3(wStubLen, head * 0.9f, wallT), stone);
+            cutting.AddBox(new Vector3(wStubX - wStubLen * 0.5f + wallT * 0.7f, swy, stubZ + 0.3f),
+                new Vector3(wallT * 1.5f, head * 0.9f, stubW), stone);
+
+            // South dead-end unfinished face of main corridor.
+            float endY = -depth + head * 0.4f;
+            cutting.AddBox(new Vector3(x, endY, zEnd - wallT * 0.5f),
+                new Vector3(wid + wallT * 2f, head + 1.2f, wallT * 1.3f), stone);
+
+            // Stairs from surface apron down into open mouth (north approach).
+            {
+                int n = 7;
+                float sRise = 0.38f;
+                float sRun = 0.5f;
+                float stepW = wid + 0.6f;
+                float zTop = zMouth + 2.4f;
+                for (int s = 0; s < n; s++)
+                {
+                    float sy = -(s + 0.5f) * sRise;
+                    float sz = zTop - (s + 0.5f) * sRun;
+                    stairs.AddBox(new Vector3(x, sy, sz),
+                        new Vector3(stepW, sRise * 0.92f, sRun * 0.95f), stone);
+                }
+                // Top landing on rim pavement.
+                stairs.AddBox(new Vector3(x, 0.12f, zMouth + 3.4f),
+                    new Vector3(stepW + 1.2f, 0.24f, 1.6f), stone);
+            }
+
+            // Rim pavement apron around entrance mouth.
+            float corridorY = 0.14f;
+            rimPav.AddBox(new Vector3(x, corridorY, zMouth + 4.2f),
+                new Vector3(wid + 8f, 0.28f, 4.5f), stone);
+            rimPav.AddBox(new Vector3(x + halfW + 3.2f, corridorY, zMouth + 0.5f),
+                new Vector3(3.5f, 0.28f, 6f), stone);
+            rimPav.AddBox(new Vector3(x - (halfW + 3.2f), corridorY, zMouth + 0.5f),
+                new Vector3(3.5f, 0.28f, 6f), stone);
+            rimPav.AddBox(new Vector3(x, corridorY, zMouth - openLen * 0.5f),
+                new Vector3(wid + 5.5f, 0.28f, openLen + 1.5f), stone);
+
+            // Named cutting mesh is the force-rebuild marker (_Cutting).
+            GizaBuild.SpawnMesh(root.transform, KhufuTrialPassagesName + "_Cutting",
+                cutting.Build(KhufuTrialPassagesName + "_Cutting"), rock, true);
+            GizaBuild.SpawnMesh(root.transform, KhufuTrialPassagesName + "_Lining",
+                lining.Build(KhufuTrialPassagesName + "_Lining"), lime, true);
+            GizaBuild.SpawnMesh(root.transform, KhufuTrialPassagesName + "_Floor",
+                floor.Build(KhufuTrialPassagesName + "_Floor"), lime, true);
+            GizaBuild.SpawnMesh(root.transform, KhufuTrialPassagesName + "_RimPavement",
+                rimPav.Build(KhufuTrialPassagesName + "_RimPavement"), pav, true);
+            GizaBuild.SpawnMesh(root.transform, KhufuTrialPassagesName + "_Stairs",
+                stairs.Build(KhufuTrialPassagesName + "_Stairs"), pav, true);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Khufu Trial Passages — unfinished rock-cut trial corridors south of the Great Pyramid (Lehner/Petrie schematic).\n" +
+                "Used to practice passage slopes before cutting Khufu interiors. Descending corridor, short mid chamber, stub unfinished branches.\n" +
+                "Not photogrammetry. Not the Great Pyramid interior itself.";
+            GizaBuild.HonestyPlate(root.transform, KhufuTrialPassagesName + "_Honesty", honesty, 16f);
+            Transform plate = root.transform.Find(KhufuTrialPassagesName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(x + 4.5f, 1.55f, zMouth + 5.5f);
+                plate.localRotation = Quaternion.Euler(0f, 200f, 0f);
+            }
+            return root;
+        }
 
         /// <summary>
         /// Walkable paved terrace in the gap between Sphinx temple (south) and Khafre valley temple (north).
