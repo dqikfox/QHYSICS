@@ -287,6 +287,12 @@ namespace RealityEngine.Visualization
             GizaField.EnsureSenedjemib(pose);
             GizaField.EnsureCemeteryEnEchelon(pose);
             GizaField.EnsureEastField(pose);
+            GizaField.EnsureAnkhhaf(pose);
+            GizaField.EnsureSurveyAnomalies(pose);
+            // Boat-pit / Trial Passages survey overlay (geophysical anomaly schematic).
+            GameObject boats = GizaComplex.FindNamed(KhufuBoatPitsName);
+            if (boats != null)
+                GizaField.EnsureBoatPitSurveyOverlay(boats.transform);
         }
 
         public static void EnsureKhafre(GizaComplex.Pose pose)
@@ -342,6 +348,7 @@ namespace RealityEngine.Visualization
             Ensure(KhafreBoatPitsName, pose, p => BuildKhafreBoatPits(p, L), terrace, true);
 
             GizaField.EnsureCentralField(pose);
+            GizaField.EnsureDebehen(pose);
         }
 
         public static void EnsureSphinx(GizaComplex.Pose pose)
@@ -415,6 +422,7 @@ namespace RealityEngine.Visualization
             GizaField.EnsureWorkersVillage(pose);
             GizaField.EnsureKhentkawes(pose);
             GizaField.EnsureMenkaureField(pose);
+            GizaField.EnsureMenkaureQuarry(pose);
         }
 
         static GameObject Ensure(string name, GizaComplex.Pose pose, System.Func<GizaComplex.Pose, GameObject> build, float sitY, bool sit)

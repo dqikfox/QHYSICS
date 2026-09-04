@@ -257,6 +257,56 @@ namespace RealityEngine.Visualization
             Vector3 topFloor = new Vector3(kingC.x, y, kingC.z);
             rel.AddGableRoof(topFloor, KingEW, KingNS, 0f, 1.6f, rg);
             GizaBuild.SpawnMesh(parent, "Khufu_Relieving", rel.Build("Khufu_Relieving"), granite, true);
+            BuildRelievingGraffiti(parent, kingC, floor.y + KingH, KingEW, KingNS);
+        }
+
+        /// <summary>
+        /// Petrie/Vyse-attested quarry marks / crew graffiti in the relieving chambers above the King's Chamber.
+        /// Latin transliteration + cartouche note only (TMP LiberationSans lacks Egyptian Hieroglyphs).
+        /// Names verified from standard Egyptology: Friends of Khufu; White Crown of Khnum-Khufu is Powerful.
+        /// Schematic placement on honesty plaques next to the relieving stack — not invented glyph sequences.
+        /// </summary>
+        static void BuildRelievingGraffiti(Transform parent, Vector3 kingC, float relBaseY, float ew, float ns)
+        {
+            // Marker for force-rebuild when graffiti missing on older Khufu roots.
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(kingC.x, relBaseY + 0.2f, kingC.z), new Vector3(0.35f, 0.12f, 0.35f), Color.white);
+            GizaBuild.SpawnMesh(parent, "Khufu_RelievingGraffiti", mark.Build("Khufu_RelievingGraffiti"),
+                GizaBuild.Pavement(), false);
+
+            // Attested gang names (Vyse 1837 / Petrie documentation of relieving-chamber red ochre marks).
+            const string friends =
+                "Petrie relieving-chamber marks — schematic placement.\n" +
+                "Attested crew graffiti (red ochre quarry marks), Vyse/Petrie:\n" +
+                "Friends of Khufu\n" +
+                "Transliteration: smrw nw Hwfw (Friends of Khufu)\n" +
+                "Cartouche of Khufu: Hwfw / translit. khwfw (Latin only — TMP has no Egyptian Hieroglyphs font).\n" +
+                "NOT invented glyph sequences. Placement schematic next to relieving stack.";
+            const string whiteCrown =
+                "Petrie relieving-chamber marks — schematic placement.\n" +
+                "Attested gang name in Khufu relieving chambers (standard Egyptology / Vyse finds):\n" +
+                "The White Crown of Khnum-Khufu is Powerful\n" +
+                "Transliteration: hedjet khnemu-khwfw (White Crown of Khnum-Khufu)\n" +
+                "Cartouche of Khufu: Hwfw / translit. khwfw (Latin transliteration only).\n" +
+                "NOT invented. Schematic plaque beside granite relieving chambers.";
+
+            GizaBuild.HonestyPlate(parent, "Khufu_Graffiti_FriendsOfKhufu", friends, 8f);
+            Transform f = parent.Find("Khufu_Graffiti_FriendsOfKhufu");
+            if (f != null)
+            {
+                f.localPosition = new Vector3(kingC.x + ew * 0.5f + 1.8f, relBaseY + 1.2f, kingC.z);
+                f.localRotation = Quaternion.Euler(0f, 90f, 0f);
+                f.localScale = new Vector3(0.55f, 0.55f, 0.55f);
+            }
+
+            GizaBuild.HonestyPlate(parent, "Khufu_Graffiti_WhiteCrown", whiteCrown, 8f);
+            Transform w = parent.Find("Khufu_Graffiti_WhiteCrown");
+            if (w != null)
+            {
+                w.localPosition = new Vector3(kingC.x - ew * 0.5f - 1.8f, relBaseY + 2.4f, kingC.z);
+                w.localRotation = Quaternion.Euler(0f, -90f, 0f);
+                w.localScale = new Vector3(0.55f, 0.55f, 0.55f);
+            }
         }
 
         static void BuildAirShafts(Transform parent, Vector3 anteStart, Material mat)
