@@ -175,6 +175,7 @@ namespace RealityEngine.Visualization
                 || lower.Contains("village") || lower.Contains("settlement")
                 || lower.Contains("westfield") || lower.Contains("eastfield") || lower.Contains("mastaba")
                 || lower.Contains("osirisshaft") || lower.Contains("workersvillage")
+                || lower.Contains("trialpassages") || lower.Contains("khufutrial")
                 || lower.StartsWith("lablandscape");
         }
     }
@@ -712,6 +713,7 @@ namespace RealityEngine.Visualization
             SitFound("KhafreBoatPits", terrace);
             SitFound("KhufuMortuary", top);
             SitFound("KhufuBoatPits", top);
+            SitFound("KhufuTrialPassages", top);
             SitFound("KhufuEnclosure", top);
             SitFound("KhafreMortuary", terrace);
             SitFound("KhafreValleyTemple", court);

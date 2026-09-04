@@ -68,7 +68,7 @@ namespace RealityEngine.EditorTools
         [MenuItem(ComplexPath)]
         public static void PlaceGizaComplex()
         {
-            Place(GizaComplex.Spawn.All, "FULL Giza complex force-rebuild: pyramids (incl. G1-d), temples, causeways, West/East/Central Field mastabas, Gisr el-Mudir, Khentkawes I, workers village + Wall of the Crow, Osiris Shaft, dunes, Nile harbor, desert dust. Reality Engine / Place Giza Complex.");
+            Place(GizaComplex.Spawn.All, "FULL Giza complex force-rebuild: pyramids (incl. G1-d), temples, causeways, Khufu Trial Passages, West/East/Central Field mastabas, Gisr el-Mudir, Khentkawes I, workers village + Wall of the Crow, Osiris Shaft, dunes, Nile harbor, desert dust. Reality Engine / Place Giza Complex.");
         }
 
         [MenuItem(ComplexPath, true)]
@@ -86,7 +86,7 @@ namespace RealityEngine.EditorTools
                 applier.PlaceMonuments(which);
             Mark(applier);
             Selection.activeGameObject = applier != null ? applier.gameObject : null;
-            Debug.Log("Reality Engine: placed " + detail + " Roots: KhufuWestField, GisrElMudir, GizaCentralField, Khentkawes, GizaWorkersVillage, OsirisShaft, GizaDesertDust, GizaNileHarbor, LabLandscape.");
+            Debug.Log("Reality Engine: placed " + detail + " Roots: KhufuWestField, GisrElMudir, KhufuTrialPassages, GizaCentralField, Khentkawes, GizaWorkersVillage, OsirisShaft, GizaDesertDust, GizaNileHarbor, LabLandscape.");
         }
 
         static void Mark(LabLandscapeApplier applier)
