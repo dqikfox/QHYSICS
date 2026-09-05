@@ -11,7 +11,7 @@ namespace RealityEngine.EditorTools
     [InitializeOnLoad]
     static class PlaceGizaOnce
     {
-        const string PrefKey = "QHYSICS.PlaceGizaOnce.Pending2";
+        const string PrefKey = "QHYSICS.PlaceGizaOnce.Pending3";
 
         static PlaceGizaOnce()
         {
@@ -66,4 +66,5 @@ namespace RealityEngine.EditorTools
         }
     }
 }
+
 

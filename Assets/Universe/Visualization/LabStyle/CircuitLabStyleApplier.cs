@@ -247,6 +247,21 @@ namespace RealityEngine.Visualization
             GameObject go = mr.gameObject;
             string n = go.name;
 
+            // Never restyle Giza / LabLandscape (AutoFixPink runs after PlaceGizaOnce).
+            Transform t = go.transform;
+            int guard = 0;
+            while (t != null && guard++ < 32)
+            {
+                string ln = string.IsNullOrEmpty(t.name) ? "" : t.name.ToLowerInvariant();
+                if (ln == "lablandscape" || ln.StartsWith("lablandscape")
+                    || GizaComplex.IsMonumentName(ln))
+                {
+                    reason = "Giza/LabLandscape";
+                    return true;
+                }
+                t = t.parent;
+            }
+
             if (go.GetComponent<TMP_Text>() != null || go.GetComponent<TextMeshPro>() != null)
             {
                 reason = "TMP label";
