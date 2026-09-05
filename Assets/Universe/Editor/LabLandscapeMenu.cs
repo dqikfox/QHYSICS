@@ -86,7 +86,7 @@ namespace RealityEngine.EditorTools
                 applier.PlaceMonuments(which);
             Mark(applier);
             Selection.activeGameObject = applier != null ? applier.gameObject : null;
-            Debug.Log("Reality Engine: placed " + detail + " Roots: KhufuWestField, Hemiunu, Senedjemib, Ankhhaf, Debehen, MenkaureQuarry, GisrElMudir, KhufuTrialPassages, GizaCentralField, Khentkawes, GizaWorkersVillage, OsirisShaft, GizaSurveyAnomalies, GizaDesertDust, GizaNileHarbor, LabLandscape.");
+            Debug.Log("Reality Engine: placed " + detail + " (StripBlackOrphans + ReapplyMaterials). Roots: KhufuWestField, Hemiunu, Senedjemib, Ankhhaf, Debehen, MenkaureQuarry, GisrElMudir, KhufuTrialPassages, GizaCentralField, Khentkawes, GizaWorkersVillage, OsirisShaft, GizaSurveyAnomalies, GizaDesertDust, GizaNileHarbor, LabLandscape.");
         }
 
         static void Mark(LabLandscapeApplier applier)

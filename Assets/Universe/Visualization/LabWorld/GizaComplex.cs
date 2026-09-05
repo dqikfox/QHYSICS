@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 
 namespace RealityEngine.Visualization
@@ -782,7 +782,99 @@ namespace RealityEngine.Visualization
                     || l.Contains("burial") || l.Contains("sanctum") || l.Contains("_interior") || l.Contains("antechamber") || l.Contains("subterranean")
                     || l.Contains("reliev") || l.Contains("airshaft") || l.Contains("hall"))
                     mr.sharedMaterial = lime;
+                else if (LabWorldMeshes.MaterialLooksBroken(mr.sharedMaterial))
+                    mr.sharedMaterial = sand;
             }
+        }
+
+
+        /// <summary>
+        /// Remove DontSave-era CreatePrimitive crumbs and *_Obsolete leftovers; re-tint broken black/pink mats.
+        /// </summary>
+        public static int StripBlackOrphans(Transform root)
+        {
+            int removed = 0;
+            // Scene-wide obsolete markers from force-rebuild renames.
+            Transform[] all = Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (int i = 0; i < all.Length; i++)
+            {
+                Transform t = all[i];
+                if (t == null)
+                    continue;
+                string n = t.name;
+                if (string.IsNullOrEmpty(n))
+                    continue;
+                if (n.EndsWith("_Obsolete", System.StringComparison.Ordinal))
+                {
+                    SafeDestroyGo(t.gameObject);
+                    removed++;
+                }
+            }
+
+            if (root == null)
+            {
+                GameObject named = GameObject.Find(LabLandscapeApplier.RootName);
+                if (named != null)
+                    root = named.transform;
+            }
+            if (root == null)
+                return removed;
+
+            MeshRenderer[] mrs = root.GetComponentsInChildren<MeshRenderer>(true);
+            for (int i = 0; i < mrs.Length; i++)
+            {
+                MeshRenderer mr = mrs[i];
+                if (mr == null)
+                    continue;
+                Material mat = mr.sharedMaterial;
+                bool broken = LabWorldMeshes.MaterialLooksBroken(mat);
+                if (!broken)
+                    continue;
+
+                string obj = mr.gameObject.name;
+                string l = string.IsNullOrEmpty(obj) ? "" : obj.ToLowerInvariant();
+
+                // Stray CreatePrimitive leftovers (Cube/Sphere/…) with void mats — delete.
+                if (IsPrimitiveLeftoverName(l) && !l.StartsWith("hill_"))
+                {
+                    SafeDestroyGo(mr.gameObject);
+                    removed++;
+                    continue;
+                }
+
+                // Named landscape / monument pieces — reassign sand/stone instead of delete.
+                if (l.Contains("sand") || l.Contains("desert") || l.Contains("dune") || l.Contains("wash")
+                    || l.Contains("plateau") || l.Contains("gizaplateau"))
+                    mr.sharedMaterial = DesertSand();
+                else if (l.StartsWith("hill_") || l.Contains("cliff"))
+                    mr.sharedMaterial = CliffRock();
+                else if (l.Contains("casing") || l.Contains("tura"))
+                    mr.sharedMaterial = TuraCasing();
+                else if (l.Contains("pavement") || l.Contains("floor") || l.Contains("court"))
+                    mr.sharedMaterial = Pavement();
+                else
+                    mr.sharedMaterial = InteriorLime();
+            }
+
+            ReapplyMaterials(root);
+            return removed;
+        }
+
+        static bool IsPrimitiveLeftoverName(string lower)
+        {
+            return lower == "cube" || lower == "sphere" || lower == "capsule"
+                || lower == "cylinder" || lower == "plane" || lower == "quad"
+                || lower == "gameobject" || lower.StartsWith("gameobject ");
+        }
+
+        static void SafeDestroyGo(GameObject go)
+        {
+            if (go == null)
+                return;
+            if (Application.isPlaying)
+                UnityEngine.Object.Destroy(go);
+            else
+                UnityEngine.Object.DestroyImmediate(go);
         }
 
         public static void SitExisting(GizaComplex.Pose pose)
@@ -910,4 +1002,5 @@ namespace RealityEngine.Visualization
         }
     }
 }
+
 

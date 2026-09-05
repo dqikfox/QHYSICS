@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -92,6 +92,21 @@ namespace RealityEngine.Visualization
                 return true;
             return ShaderLooksPink(mat.shader);
         }
+
+        public static bool MaterialLooksBroken(Material mat)
+        {
+            if (MaterialLooksPink(mat))
+                return true;
+            if (mat.HasProperty("_BaseColor"))
+            {
+                Color c = mat.GetColor("_BaseColor");
+                // Solid near-black on opaque URP Lit = OasisTerrain / DontSave crumb void slabs.
+                if (c.a > 0.5f && (c.r + c.g + c.b) < 0.08f)
+                    return true;
+            }
+            return false;
+        }
+
 
         /// <summary>
         /// Runtime clones may DontSave; Edit-mode Place must persist mats into the open scene
@@ -252,7 +267,7 @@ namespace RealityEngine.Visualization
         {
             if (_turaTex != null && _turaBump != null)
                 return;
-            // Cooler ivory limestone (diorama white) — slight cool bias, not sandy-plastic yellow.
+            // Cooler ivory limestone (diorama white) â€” slight cool bias, not sandy-plastic yellow.
             BuildCourseBlocks(
                 "RELab_TuraBlocks", "RELab_TuraBlocksN", 8, 8, 0.085f, 1.22f,
                 new Color(0.95f, 0.94f, 0.91f, 1f),
@@ -1388,3 +1403,4 @@ namespace RealityEngine.Visualization
         }
     }
 }
+
