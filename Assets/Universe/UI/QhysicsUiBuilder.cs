@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 using TMPro;
+
+using UiButton = UnityEngine.UI.Button;
 
 namespace RealityEngine.UI
 {
@@ -11,7 +13,7 @@ namespace RealityEngine.UI
     /// </summary>
     public static class QhysicsUiBuilder
     {
-        public static Canvas CreateWorldCanvas(string name, Transform parent, Vector2 refSizePx)
+        public static UnityEngine.Canvas CreateWorldCanvas(string name, Transform parent, Vector2 refSizePx)
         {
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
@@ -38,7 +40,7 @@ namespace RealityEngine.UI
             Camera main = Camera.main;
             if (main != null)
                 return main;
-            var cams = Object.FindObjectsByType<Camera>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var cams = Object.FindObjectsByType<Camera>(FindObjectsInactive.Exclude);
             for (int i = 0; i < cams.Length; i++)
             {
                 if (cams[i] != null && cams[i].CompareTag("MainCamera"))
@@ -55,7 +57,7 @@ namespace RealityEngine.UI
             return cams.Length > 0 ? cams[0] : null;
         }
 
-        public static void WireEventCamera(Canvas canvas)
+        public static void WireEventCamera(UnityEngine.Canvas canvas)
         {
             if (canvas == null)
                 return;
@@ -63,7 +65,7 @@ namespace RealityEngine.UI
             if (cam != null)
                 canvas.worldCamera = cam;
             if (canvas.GetComponent<TrackedDeviceGraphicRaycaster>() == null)
-                canvas.AddComponent<TrackedDeviceGraphicRaycaster>();
+                canvas.gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
             GraphicRaycaster gr = canvas.GetComponent<GraphicRaycaster>();
             if (gr != null && !(gr is TrackedDeviceGraphicRaycaster))
                 gr.enabled = false;
@@ -71,7 +73,7 @@ namespace RealityEngine.UI
 
         public static void EnsureXrUiInputModule()
         {
-            EventSystem es = Object.FindFirstObjectByType<EventSystem>();
+            EventSystem es = Object.FindAnyObjectByType<EventSystem>();
             if (es == null)
             {
                 var go = new GameObject("EventSystem");
@@ -127,10 +129,11 @@ namespace RealityEngine.UI
             return tmp;
         }
 
-        public static Button ChipButton(Transform parent, string name, string label, Vector2 size, UnityEngine.Events.UnityAction onClick)
+        // CircuitLab defines a global Button class that shadows UnityEngine.UI.Button.
+        public static UiButton ChipButton(Transform parent, string name, string label, Vector2 size, UnityEngine.Events.UnityAction onClick)
         {
             Image bg = Panel(parent, name, QhysicsUiStyle.ChipBg, size);
-            var btn = bg.gameObject.AddComponent<Button>();
+            var btn = bg.gameObject.AddComponent<UiButton>();
             var colors = btn.colors;
             colors.normalColor = QhysicsUiStyle.ChipBg;
             colors.highlightedColor = QhysicsUiStyle.ChipBgActive;
@@ -192,4 +195,3 @@ namespace RealityEngine.UI
         }
     }
 }
-

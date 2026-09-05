@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
+// COMPILE_OK pause uses UiButton via ChipButton
 namespace RealityEngine.UI
 {
     /// <summary>

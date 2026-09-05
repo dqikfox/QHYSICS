@@ -196,7 +196,7 @@ namespace RealityEngine.UI
 
         static void TryCircuitLabHint(string label)
         {
-            var lab = Object.FindFirstObjectByType<CircuitLab>(FindObjectsInactive.Include);
+            var lab = UnityEngine.Object.FindAnyObjectByType<CircuitLab>(FindObjectsInactive.Include);
             if (lab == null)
                 return;
             string lower = label.ToLowerInvariant();
@@ -245,4 +245,3 @@ namespace RealityEngine.UI
 #endif
     }
 }
-
