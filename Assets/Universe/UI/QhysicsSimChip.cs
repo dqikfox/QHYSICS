@@ -122,7 +122,7 @@ namespace RealityEngine.UI
             _paused = false;
             _savedScale = scale;
             Time.timeScale = scale;
-            Debug.Log("QHYSICS SimChip: timeScale=" + scale);
+            // speed applied
             RefreshLabel();
         }
 
@@ -133,13 +133,13 @@ namespace RealityEngine.UI
                 _savedScale = Mathf.Max(0.01f, Time.timeScale);
                 Time.timeScale = 0f;
                 _paused = true;
-                Debug.Log("QHYSICS SimChip: Pause");
+                
             }
             else
             {
                 Time.timeScale = _savedScale > 0.01f ? _savedScale : 1f;
                 _paused = false;
-                Debug.Log("QHYSICS SimChip: Resume @" + Time.timeScale + "x");
+                
             }
             RefreshLabel();
         }
@@ -154,7 +154,7 @@ namespace RealityEngine.UI
             }
             // Unscaled step stub: briefly nudge scale then pause again next frame via coroutine-less flag.
             StartCoroutine(StepCoroutine());
-            Debug.Log("QHYSICS SimChip: Step (stub)");
+            
             RefreshLabel();
         }
 
@@ -172,7 +172,7 @@ namespace RealityEngine.UI
             Time.timeScale = 1f;
             _savedScale = 1f;
             _paused = false;
-            Debug.Log("QHYSICS SimChip: Reset timeScale=1 (scene state stub)");
+            QhysicsLabActions.ResetCircuitLab();
             RefreshLabel();
         }
 

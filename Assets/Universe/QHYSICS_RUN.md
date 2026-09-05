@@ -1,4 +1,6 @@
-﻿# QHYSICS daily run (Editor)
+**See also root `QHYSICS_PLAY.md` for full Play steps.**
+
+# QHYSICS daily run (Editor)
 
 **Do not use Ctrl+B for daily testing.** Ctrl+B / Build and Run builds an Android APK or Windows player (shipping only). Quest ADB must be authorized for APK installs.
 

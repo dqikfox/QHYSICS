@@ -1,15 +1,13 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-// COMPILE_OK pause uses UiButton via ChipButton
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// Sparse pause panel: Resume / New Experiment / Settings(disabled) / Exit Play (editor only).
+    /// Sparse pause panel: Resume / Reset Experiment / Settings / Exit Play (editor only).
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(204)]
@@ -66,12 +64,8 @@ namespace RealityEngine.UI
             title.rectTransform.sizeDelta = new Vector2(600f, 56f);
 
             QhysicsUiBuilder.ChipButton(face.transform, "Resume", "Resume", new Vector2(520f, 96f), Resume);
-            QhysicsUiBuilder.ChipButton(face.transform, "NewExperiment", "New Experiment", new Vector2(520f, 96f), NewExperiment);
-            var settings = QhysicsUiBuilder.ChipButton(face.transform, "Settings", "Settings", new Vector2(520f, 96f), null);
-            settings.interactable = false;
-            var dim = settings.targetGraphic as Image;
-            if (dim != null)
-                dim.color = new Color(0.2f, 0.2f, 0.22f, 0.55f);
+            QhysicsUiBuilder.ChipButton(face.transform, "NewExperiment", "Reset Experiment", new Vector2(520f, 96f), NewExperiment);
+            QhysicsUiBuilder.ChipButton(face.transform, "Settings", "Settings", new Vector2(520f, 96f), OpenSettings);
 
 #if UNITY_EDITOR
             QhysicsUiBuilder.ChipButton(face.transform, "ExitPlay", "Exit Play", new Vector2(520f, 96f), ExitPlay);
@@ -119,14 +113,22 @@ namespace RealityEngine.UI
         {
             Time.timeScale = 1f;
             SetOpen(false);
-            Debug.Log("QHYSICS PausePanel: Resume");
         }
 
         void NewExperiment()
         {
             Time.timeScale = 1f;
+            QhysicsLabActions.ResetCircuitLab();
             SetOpen(false);
-            Debug.Log("QHYSICS PausePanel: New Experiment (stub)");
+        }
+
+        void OpenSettings()
+        {
+            Time.timeScale = 1f;
+            SetOpen(false);
+            var settings = UnityEngine.Object.FindAnyObjectByType<QhysicsSettingsPanel>(FindObjectsInactive.Include);
+            if (settings != null)
+                settings.SetOpen(true);
         }
 
 #if UNITY_EDITOR

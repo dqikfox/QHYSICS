@@ -190,7 +190,7 @@ namespace RealityEngine.UI
             if (Time.unscaledTime < _spawnCooldown)
                 return;
             _spawnCooldown = Time.unscaledTime + 0.2f;
-            Debug.Log("QHYSICS Toolbelt [" + _category + "]: " + label + " (stub - CircuitLab spawn later)");
+            // chip selected — use table dispensers to spawn
             TryCircuitLabHint(label);
         }
 
@@ -202,7 +202,7 @@ namespace RealityEngine.UI
             string lower = label.ToLowerInvariant();
             if (lower.Contains("wire") || lower.Contains("battery") || lower.Contains("switch")
                 || lower.Contains("bulb") || lower.Contains("magnet") || lower.Contains("coil"))
-                Debug.Log("QHYSICS: CircuitLab present - use table dispensers for " + label + " this tick.");
+                ; // CircuitLab present
         }
 
         bool WasTogglePressed()

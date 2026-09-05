@@ -61,6 +61,9 @@ namespace RealityEngine.UI
             QhysicsContextStrip.Ensure(root);
             QhysicsSimChip.Ensure(root);
             QhysicsPausePanel.Ensure(root);
+            QhysicsSettingsPanel.Ensure(root);
+            QhysicsOnboarding.Ensure(root);
+            QhysicsMainMenu.Ensure(root);
 
             var canvases = root.GetComponentsInChildren<Canvas>(true);
             for (int i = 0; i < canvases.Length; i++)
