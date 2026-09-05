@@ -1,4 +1,4 @@
-﻿using UnityEditor;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using RealityEngine.Visualization;
@@ -11,7 +11,7 @@ namespace RealityEngine.EditorTools
     [InitializeOnLoad]
     static class PlaceGizaOnce
     {
-        const string PrefKey = "QHYSICS.PlaceGizaOnce.Pending3";
+        const string PrefKey = "QHYSICS.PlaceGizaOnce.Pending4_BlackSlabStrip";
 
         static PlaceGizaOnce()
         {

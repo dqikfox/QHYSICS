@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -32,7 +32,7 @@ namespace RealityEngine.Visualization
 
         static readonly string[] HideContains =
         {
-            // Prefer exact meadow/RHEF tokens. Do NOT use bare "tree"/"grass" — too broad.
+            // Prefer exact meadow/RHEF tokens. Do NOT use bare "tree"/"grass" â€” too broad.
             "waterblock", "meadow", "rhef_spruce", "rhef_pine", "rhef_tree",
             "rhef_grass", "rhef_bush", "rhef_"
         };
@@ -152,6 +152,7 @@ namespace RealityEngine.Visualization
                 GizaComplex.Pose pose = ReadPose(rootXf);
                 GizaComplex.Ensure(pose, GizaComplex.Spawn.All);
                 FitPlateau(rootXf, pose);
+                GizaBuild.StripBlackOrphans(rootXf);
                 GizaBuild.ReapplyMaterials(rootXf);
                 GizaBuild.SitExisting(pose);
                 AddTeleports(rootXf.gameObject);
@@ -199,7 +200,7 @@ namespace RealityEngine.Visualization
         static bool ShouldKeep(Transform t)
         {
             // Keep MountainScene ONLY on the transform itself (sky/distant).
-            // Do NOT keep because an ancestor is MountainScene — Faraday Terrain/Trees
+            // Do NOT keep because an ancestor is MountainScene â€” Faraday Terrain/Trees
             // live under MountainScene and must still be hidden/disabled.
             string self = SafeLower(t.name);
             if (self.Contains("mountainscene"))
@@ -327,6 +328,7 @@ namespace RealityEngine.Visualization
             GizaComplex.Pose pose = ReadPose(root);
             GizaComplex.Ensure(pose, which);
             FitPlateau(root, pose);
+            GizaBuild.StripBlackOrphans(root);
             GizaBuild.ReapplyMaterials(root);
             GizaBuild.SitExisting(pose);
             AddTeleports(root.gameObject);
@@ -341,6 +343,7 @@ namespace RealityEngine.Visualization
                 GizaComplex.Pose poseExisting = ReadPose(found.transform);
                 GizaComplex.Ensure(poseExisting, which);
                 FitPlateau(found.transform, poseExisting);
+                GizaBuild.StripBlackOrphans(found.transform);
                 GizaBuild.ReapplyMaterials(found.transform);
                 GizaBuild.SitExisting(poseExisting);
                 AddTeleports(found);
@@ -410,6 +413,7 @@ namespace RealityEngine.Visualization
             StorePose(root.transform, pose);
             FitPlateau(root.transform, pose);
             GizaComplex.Ensure(pose, which);
+            GizaBuild.StripBlackOrphans(root.transform);
             GizaBuild.ReapplyMaterials(root.transform);
             GizaBuild.SitExisting(pose);
             AddTeleports(root);
@@ -1255,3 +1259,4 @@ namespace RealityEngine.Visualization
         }
     }
 }
+
