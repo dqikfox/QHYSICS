@@ -68,7 +68,6 @@ namespace RealityEngine.Visualization
         public static void LocalExtents(out float xMin, out float xMax, out float zMin, out float zMax)
         {
             float kh = KhufuPyramid.BaseMeters * 0.5f;
-            float hf = KhafrePyramid.BaseMeters * 0.5f;
             float mn = MenkaurePyramid.BaseMeters * 0.5f;
             float q = 16f;
             xMin = -MenkaureWestM - mn - 8f;
