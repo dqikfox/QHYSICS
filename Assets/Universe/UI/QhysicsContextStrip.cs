@@ -20,6 +20,8 @@ namespace RealityEngine.UI
         TextMeshProUGUI _hints;
         Camera _cam;
         float _nextPoll;
+        float _nextInteractorRefresh;
+        XRBaseInteractor[] _interactors;
         Transform _followTarget;
 
         public static QhysicsContextStrip Ensure(Transform parent)
@@ -111,7 +113,12 @@ namespace RealityEngine.UI
             IXRInteractable best = null;
             bool selected = false;
 
-            var interactors = Object.FindObjectsByType<XRBaseInteractor>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            if (_interactors == null || Time.unscaledTime >= _nextInteractorRefresh)
+            {
+                _nextInteractorRefresh = Time.unscaledTime + 1f;
+                _interactors = Object.FindObjectsByType<XRBaseInteractor>(FindObjectsInactive.Exclude);
+            }
+            var interactors = _interactors;
             for (int i = 0; i < interactors.Length; i++)
             {
                 var interactor = interactors[i];

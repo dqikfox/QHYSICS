@@ -20,6 +20,10 @@ namespace RealityEngine.UI
         TextMeshProUGUI _experiment;
         UnityEngine.UI.Image _dot;
         Camera _cam;
+        UnityEngine.Canvas _canvasCached;
+        Transform _cachedLeftHand;
+        Transform _cachedRightHand;
+        float _nextHandScan;
         ExperimentRunner _runner;
         float _nextRefresh;
 
@@ -89,7 +93,9 @@ namespace RealityEngine.UI
 
             Follow(_cam);
             QhysicsUiBuilder.FaceCamera(transform, _cam);
-            QhysicsUiBuilder.WireEventCamera(GetComponentInChildren<Canvas>());
+            if (_canvasCached == null)
+                _canvasCached = GetComponentInChildren<Canvas>();
+            QhysicsUiBuilder.WireEventCamera(_canvasCached);
 
             if (Time.unscaledTime < _nextRefresh)
                 return;
@@ -124,10 +130,14 @@ namespace RealityEngine.UI
             return v.sqrMagnitude > 1e-6f ? v.normalized : Vector3.forward;
         }
 
-        static Transform FindHand(bool left)
+        Transform FindHand(bool left)
         {
+            if (Time.unscaledTime < _nextHandScan)
+                return left ? _cachedLeftHand : _cachedRightHand;
+            _nextHandScan = Time.unscaledTime + 1.5f;
             string token = left ? "left" : "right";
-            var all = Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var all = Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude);
+            Transform found = null;
             for (int i = 0; i < all.Length; i++)
             {
                 if (all[i] == null)
@@ -136,9 +146,14 @@ namespace RealityEngine.UI
                 if ((n.Contains("controller") || n.Contains("hand") || n.Contains("interactor"))
                     && n.Contains(token)
                     && !n.Contains("model"))
-                    return all[i];
+                {
+                    found = all[i];
+                    break;
+                }
             }
-            return null;
+            if (left) _cachedLeftHand = found;
+            else _cachedRightHand = found;
+            return found;
         }
 
         void RefreshLabels()
