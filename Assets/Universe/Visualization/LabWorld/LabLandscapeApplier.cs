@@ -11,8 +11,8 @@ namespace RealityEngine.Visualization
     /// spawn a Giza sand/stone plateau, and place the undamaged 1:1 Giza complex
     /// (Khufu, queens G1a-c, temples, causeways, boat pits, Khafre, Menkaure, Sphinx) beyond the circuit table. Play auto-applies.
     /// Does not move XR Origin. Does not disable MountainScene.
-    /// Test: Ctrl+R, Play Faraday.unity. From the lab: sand around Khufu's base you could eat,
-    /// desert beyond the east cliff, Tura courses still on the pyramid, not magenta, not a plastic plane.
+    /// Test: Ctrl+R, Play Faraday.unity. No Faraday green meadow/tree clumps beside Giza;
+    /// plateau + desert are Oasis sand (not a dark plastic slab); MountainScene sky/distant mountains stay.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(40)]
@@ -32,7 +32,8 @@ namespace RealityEngine.Visualization
 
         static readonly string[] HideContains =
         {
-            "waterblock", "meadow", "rhef_spruce", "rhef_pine", "rhef_tree"
+            "waterblock", "meadow", "rhef_spruce", "rhef_pine", "rhef_tree",
+            "tree", "grass", "bush", "rhef_"
         };
 
         readonly HashSet<Transform> _hidden = new HashSet<Transform>();
@@ -191,6 +192,13 @@ namespace RealityEngine.Visualization
 
         static bool ShouldKeep(Transform t)
         {
+            // Keep MountainScene ONLY on the transform itself (sky/distant).
+            // Do NOT keep because an ancestor is MountainScene — Faraday Terrain/Trees
+            // live under MountainScene and must still be hidden/disabled.
+            string self = SafeLower(t.name);
+            if (self.Contains("mountainscene"))
+                return true;
+
             Transform p = t;
             int guard = 0;
             while (p != null && guard++ < 24)
@@ -200,7 +208,7 @@ namespace RealityEngine.Visualization
                     return true;
                 if (n == "circuitlab" || n == "circuittable" || n == "breadboard" || n == "circuitlabhandle")
                     return true;
-                if (n == "realityengine" || n == "induction lab" || n == RootName.ToLowerInvariant() || n.Contains("mountainscene"))
+                if (n == "realityengine" || n == "induction lab" || n == RootName.ToLowerInvariant())
                     return true;
                 if (n == "lablandscape" || GizaComplex.IsMonumentName(n))
                     return true;
@@ -262,8 +270,8 @@ namespace RealityEngine.Visualization
                     audio[i].enabled = false;
             }
 
-            if (t.childCount > 0 || terrain != null)
-                t.gameObject.SetActive(false);
+            // Always deactivate so Terrain/Trees meadow roots stay gone even as leaves.
+            t.gameObject.SetActive(false);
         }
 
         static void TintLightAndFog()
@@ -447,7 +455,8 @@ namespace RealityEngine.Visualization
             Material rock = GizaBuild.Bedrock();
 
             Mesh topMesh = LabWorldMeshes.BuildPlateauTop(plateauX, plateauZ, PlateauDiv, court, TopNoiseM);
-            ApplyLandMesh(root, "GizaPlateau", topMesh, rock, plateauPos, pose.rot, true, false, true);
+            // Oasis sand on plateau top (not dark Bedrock slab). Cliffs stay cliff rock.
+            ApplyLandMesh(root, "GizaPlateau", topMesh, sand, plateauPos, pose.rot, true, false, true);
 
             Mesh cliffMesh = LabWorldMeshes.BuildPlateauCliffs(
                 plateauX, plateauZ, PlateauDiv, court, GizaComplex.CliffHeightM,
