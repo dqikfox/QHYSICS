@@ -88,9 +88,9 @@ namespace RealityEngine.Visualization
                 {
                     oldKhufu.name = oldKhufu.name + "_Obsolete";
                     if (Application.isPlaying)
-                        Object.Destroy(oldKhufu);
+                        UnityEngine.Object.Destroy(oldKhufu);
                     else
-                        Object.DestroyImmediate(oldKhufu);
+                        UnityEngine.Object.DestroyImmediate(oldKhufu);
                 }
                 EnsureNamed(KhufuPyramid.RootName, pose, (p) => KhufuPyramid.Build(p.parent, p.khufuCenter, p.rot, p.comfortScale), pose.surfaceY);
                 GizaPrecinct.EnsureKhufu(pose);
@@ -112,9 +112,9 @@ namespace RealityEngine.Visualization
                     {
                         oldMen.name = oldMen.name + "_Obsolete";
                         if (Application.isPlaying)
-                            Object.Destroy(oldMen);
+                            UnityEngine.Object.Destroy(oldMen);
                         else
-                            Object.DestroyImmediate(oldMen);
+                            UnityEngine.Object.DestroyImmediate(oldMen);
                     }
                 }
                 Vector3 c = WorldFromKhufu(pose, -MenkaureWestM, -MenkaureSouthM, 0f);
@@ -130,9 +130,9 @@ namespace RealityEngine.Visualization
                 {
                     oldSphinx.name = oldSphinx.name + "_Obsolete";
                     if (Application.isPlaying)
-                        Object.Destroy(oldSphinx);
+                        UnityEngine.Object.Destroy(oldSphinx);
                     else
-                        Object.DestroyImmediate(oldSphinx);
+                        UnityEngine.Object.DestroyImmediate(oldSphinx);
                 }
                 Vector3 c = WorldFromKhufu(pose, SphinxEastM, -SphinxSouthM, 0f);
                 EnsureNamed(GizaSphinx.RootName, pose, (p) => GizaSphinx.Build(p.parent, c, p.rot), CourtY(pose));
@@ -371,10 +371,14 @@ namespace RealityEngine.Visualization
                 _sand = new Material(oasis)
                 {
                     name = "RELab_OasisSand",
-                    hideFlags = HideFlags.DontSave
+                    hideFlags = LabWorldMeshes.EphemeralFlags
                 };
                 WarmOasisSand(_sand);
-                return _sand;
+                if (!LabWorldMeshes.MaterialLooksPink(_sand))
+                    return _sand;
+                if (Application.isPlaying) UnityEngine.Object.Destroy(_sand);
+                else UnityEngine.Object.DestroyImmediate(_sand);
+                _sand = null;
             }
 
             Material gravel = LoadOasisAsset(OasisGravelResource, OasisGravelPath);
@@ -383,14 +387,18 @@ namespace RealityEngine.Visualization
                 _sand = new Material(gravel)
                 {
                     name = "RELab_OasisSand",
-                    hideFlags = HideFlags.DontSave
+                    hideFlags = LabWorldMeshes.EphemeralFlags
                 };
                 WarmOasisSand(_sand);
                 Texture2D albedo = null;
                 if (_sand.HasProperty("_BaseMap"))
                     albedo = _sand.GetTexture("_BaseMap") as Texture2D;
                 LabWorldMeshes.ApplyAlbedo(_sand, albedo, new Vector2(0.08f, 0.08f));
-                return _sand;
+                if (!LabWorldMeshes.MaterialLooksPink(_sand))
+                    return _sand;
+                if (Application.isPlaying) UnityEngine.Object.Destroy(_sand);
+                else UnityEngine.Object.DestroyImmediate(_sand);
+                _sand = null;
             }
 
             return CachedLit(ref _sand, "RELab_GizaSand", new Color(0.86f, 0.74f, 0.52f, 1f), 0.02f, 0.12f,
@@ -639,13 +647,16 @@ namespace RealityEngine.Visualization
             board.transform.SetParent(go.transform, false);
             board.transform.localPosition = Vector3.zero;
             board.transform.localScale = new Vector3(3.6f, 1.7f, 0.04f);
+            MeshRenderer boardMr = board.GetComponent<MeshRenderer>();
+            if (boardMr != null)
+                boardMr.sharedMaterial = Plate();
             Collider boardCol = board.GetComponent<Collider>();
             if (boardCol != null)
             {
                 if (Application.isPlaying)
-                    Object.Destroy(boardCol);
+                    UnityEngine.Object.Destroy(boardCol);
                 else
-                    Object.DestroyImmediate(boardCol);
+                    UnityEngine.Object.DestroyImmediate(boardCol);
             }
             MeshRenderer mr = board.GetComponent<MeshRenderer>();
             if (mr != null)

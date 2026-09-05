@@ -93,27 +93,54 @@ namespace RealityEngine.Visualization
             return ShaderLooksPink(mat.shader);
         }
 
+        /// <summary>
+        /// Runtime clones may DontSave; Edit-mode Place must persist mats into the open scene
+        /// (DontSave mats die on domain reload and leave magenta CreatePrimitive crumbs).
+        /// </summary>
+        public static HideFlags EphemeralFlags =>
+            Application.isPlaying ? HideFlags.DontSave : HideFlags.None;
+
         public static Material MakeLit(string name, Color color, float metallic, float smoothness, bool emission)
         {
+            Material mat = null;
             Material template = GraphiteTemplate;
-            Material mat;
-            if (template != null)
+            if (template != null && !MaterialLooksPink(template))
             {
                 mat = new Material(template)
                 {
                     name = name,
-                    hideFlags = HideFlags.DontSave
+                    hideFlags = EphemeralFlags
                 };
             }
-            else
+            if (mat == null || MaterialLooksPink(mat))
             {
+                if (mat != null)
+                {
+                    if (Application.isPlaying) UnityEngine.Object.Destroy(mat);
+                    else UnityEngine.Object.DestroyImmediate(mat);
+                }
                 Shader sh = LitShader;
+                if (sh == null || ShaderLooksPink(sh))
+                {
+                    sh = Shader.Find(LitShaderName);
+                    if (sh != null && ShaderLooksPink(sh))
+                        sh = null;
+                }
                 if (sh == null)
+                {
+                    sh = Shader.Find("Universal Render Pipeline/Simple Lit");
+                    if (sh != null && ShaderLooksPink(sh))
+                        sh = null;
+                }
+                if (sh == null)
+                {
+                    Debug.LogError("LabWorldMeshes: URP Lit missing. Load RELab_Graphite. Not falling back to Sprites/Default (magenta in URP).");
                     return null;
+                }
                 mat = new Material(sh)
                 {
                     name = name,
-                    hideFlags = HideFlags.DontSave
+                    hideFlags = EphemeralFlags
                 };
             }
             if (mat.HasProperty("_BaseColor"))
@@ -133,6 +160,11 @@ namespace RealityEngine.Visualization
             {
                 mat.EnableKeyword("_EMISSION");
                 mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+            }
+            if (MaterialLooksPink(mat))
+            {
+                Debug.LogError("LabWorldMeshes.MakeLit: still pink after URP Lit harden for " + name);
+                return null;
             }
             return mat;
         }
@@ -487,7 +519,7 @@ namespace RealityEngine.Visualization
             var tex = new Texture2D(size, size, TextureFormat.RGBA32, true, linear)
             {
                 name = name,
-                hideFlags = HideFlags.DontSave,
+                hideFlags = EphemeralFlags,
                 wrapMode = TextureWrapMode.Repeat,
                 filterMode = FilterMode.Bilinear,
                 anisoLevel = 8
@@ -513,7 +545,7 @@ namespace RealityEngine.Visualization
             var tex = new Texture2D(size, size, TextureFormat.RGBA32, false, true)
             {
                 name = "RELab_GizaPlaza",
-                hideFlags = HideFlags.DontSave,
+                hideFlags = EphemeralFlags,
                 wrapMode = TextureWrapMode.Repeat,
                 filterMode = FilterMode.Bilinear,
                 anisoLevel = 2
@@ -540,7 +572,7 @@ namespace RealityEngine.Visualization
             var tex = new Texture2D(size, size, TextureFormat.RGBA32, false, true)
             {
                 name = "RELab_GraphitePlaza",
-                hideFlags = HideFlags.DontSave,
+                hideFlags = EphemeralFlags,
                 wrapMode = TextureWrapMode.Repeat,
                 filterMode = FilterMode.Bilinear,
                 anisoLevel = 2
@@ -1217,7 +1249,8 @@ namespace RealityEngine.Visualization
             var mesh = new Mesh
             {
                 name = name,
-                hideFlags = HideFlags.DontSave,
+                // Edit-mode Place must keep meshes; DontSave vanishes after domain reload (void + pink crumbs).
+                hideFlags = Application.isPlaying ? HideFlags.DontSave : HideFlags.None,
                 indexFormat = _v.Count > 65000
                     ? UnityEngine.Rendering.IndexFormat.UInt32
                     : UnityEngine.Rendering.IndexFormat.UInt16

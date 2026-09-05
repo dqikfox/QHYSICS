@@ -32,8 +32,9 @@ namespace RealityEngine.Visualization
 
         static readonly string[] HideContains =
         {
+            // Prefer exact meadow/RHEF tokens. Do NOT use bare "tree"/"grass" — too broad.
             "waterblock", "meadow", "rhef_spruce", "rhef_pine", "rhef_tree",
-            "tree", "grass", "bush", "rhef_"
+            "rhef_grass", "rhef_bush", "rhef_"
         };
 
         readonly HashSet<Transform> _hidden = new HashSet<Transform>();
@@ -129,8 +130,13 @@ namespace RealityEngine.Visualization
                 if (named != null)
                     rootXf = named.transform;
             }
+            // Edit-mode Place may force-rebuild. Play Start/ApplyNow(false) must NOT wipe an
+            // existing LabLandscape (half-failed rebuild left the magenta void).
             if (!force && rootXf != null && rootXf.Find("GizaDesert") == null)
-                force = true;
+            {
+                if (!Application.isPlaying)
+                    force = true;
+            }
 
             if (force)
             {
@@ -222,12 +228,15 @@ namespace RealityEngine.Visualization
             string n = t.name;
             if (string.IsNullOrEmpty(n))
                 return false;
+            string lower = n.ToLowerInvariant();
+            if (lower == "lablandscape" || lower.StartsWith("lablandscape")
+                || GizaComplex.IsMonumentName(lower))
+                return false;
             for (int i = 0; i < HideExact.Length; i++)
             {
                 if (string.Equals(n, HideExact[i], System.StringComparison.OrdinalIgnoreCase))
                     return true;
             }
-            string lower = n.ToLowerInvariant();
             for (int i = 0; i < HideContains.Length; i++)
             {
                 if (lower.Contains(HideContains[i]))
@@ -849,7 +858,7 @@ namespace RealityEngine.Visualization
             var mat = new Material(sh)
             {
                 name = "RELab_DesertDust",
-                hideFlags = HideFlags.DontSave,
+                hideFlags = LabWorldMeshes.EphemeralFlags,
                 color = new Color(0.82f, 0.72f, 0.52f, 0.28f)
             };
             if (mat.HasProperty("_BaseColor"))
