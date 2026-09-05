@@ -247,8 +247,8 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, kEast, kNorth,
                 KhentkawesPodiumM * 0.5f + 16f, KhentkawesPodiumM * 0.5f + KhentkawesBasinNS + 14f);
 
-            LayoutShaft(out float sEast, out float sNorth);
-            Enc(ref xMin, ref xMax, ref zMin, ref zMax, sEast, sNorth, ShaftWidthM * 0.5f + 10f, ShaftWidthM * 0.5f + 10f);
+            LayoutShaft(out float shEast, out float shNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, shEast, shNorth, ShaftWidthM * 0.5f + 10f, ShaftWidthM * 0.5f + 10f);
         }
 
         static void Enc(ref float xMin, ref float xMax, ref float zMin, ref float zMax,
@@ -1718,19 +1718,19 @@ namespace RealityEngine.Visualization
             float basinZ = -(half + basinNS * 0.5f + 2.5f);
             var basin = new LabMeshBuilder(48, 72);
             // Hollow recessed basin: floor at bottom + four rock walls (open interior).
-            float wallT = 0.7f;
+            float basinWallT = 0.7f;
             float floorT = 0.35f;
             basin.AddBox(new Vector3(0f, -basinD + floorT * 0.5f, basinZ),
-                new Vector3(basinEW - wallT * 2f, floorT, basinNS - wallT * 2f), Color.white);
+                new Vector3(basinEW - basinWallT * 2f, floorT, basinNS - basinWallT * 2f), Color.white);
             float wy = -basinD * 0.5f;
-            basin.AddBox(new Vector3(0f, wy, basinZ + basinNS * 0.5f - wallT * 0.5f),
-                new Vector3(basinEW, basinD, wallT), Color.white);
-            basin.AddBox(new Vector3(0f, wy, basinZ - (basinNS * 0.5f - wallT * 0.5f)),
-                new Vector3(basinEW, basinD, wallT), Color.white);
-            basin.AddBox(new Vector3(basinEW * 0.5f - wallT * 0.5f, wy, basinZ),
-                new Vector3(wallT, basinD, basinNS - wallT * 2f), Color.white);
-            basin.AddBox(new Vector3(-(basinEW * 0.5f - wallT * 0.5f), wy, basinZ),
-                new Vector3(wallT, basinD, basinNS - wallT * 2f), Color.white);
+            basin.AddBox(new Vector3(0f, wy, basinZ + basinNS * 0.5f - basinWallT * 0.5f),
+                new Vector3(basinEW, basinD, basinWallT), Color.white);
+            basin.AddBox(new Vector3(0f, wy, basinZ - (basinNS * 0.5f - basinWallT * 0.5f)),
+                new Vector3(basinEW, basinD, basinWallT), Color.white);
+            basin.AddBox(new Vector3(basinEW * 0.5f - basinWallT * 0.5f, wy, basinZ),
+                new Vector3(basinWallT, basinD, basinNS - basinWallT * 2f), Color.white);
+            basin.AddBox(new Vector3(-(basinEW * 0.5f - basinWallT * 0.5f), wy, basinZ),
+                new Vector3(basinWallT, basinD, basinNS - basinWallT * 2f), Color.white);
             // Surface rim.
             float rimT = 0.7f;
             float rimH = 0.55f;

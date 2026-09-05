@@ -658,9 +658,9 @@ namespace RealityEngine.Visualization
                 float nicheZ1 = courtNS * 0.36f;
                 for (int i = 0; i < 5; i++)
                 {
-                    float nz = Mathf.Lerp(nicheZ0, nicheZ1, i / 4f);
-                    niches.AddRoom(new Vector3(nicheX, nicheY, nz), new Vector3(nicheD, nicheH, nicheW), Color.white, false, false, false, true);
-                    niches.AddBox(new Vector3(nicheX, pedY, nz), new Vector3(nicheD * 0.55f, pedH, nicheW * 0.72f), Color.white);
+                    float nicheZ = Mathf.Lerp(nicheZ0, nicheZ1, i / 4f);
+                    niches.AddRoom(new Vector3(nicheX, nicheY, nicheZ), new Vector3(nicheD, nicheH, nicheW), Color.white, false, false, false, true);
+                    niches.AddBox(new Vector3(nicheX, pedY, nicheZ), new Vector3(nicheD * 0.55f, pedH, nicheW * 0.72f), Color.white);
                 }
                 GizaBuild.SpawnMesh(root.transform, name + "_Niches", niches.Build(name + "_Niches"), gran, true);
             }
