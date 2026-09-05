@@ -76,7 +76,8 @@ namespace RealityEngine.EditorTools
             int replaced = ReplacePinkRenderers();
 
             CircuitLabStyleApplier applier = CircuitLabStyleApplier.EnsureApplied();
-            applier.ApplyNow(true);
+            if (applier != null)
+                applier.ApplyNow(true);
 
             InductionLabBootstrap bootstrap = Object.FindFirstObjectByType<InductionLabBootstrap>(FindObjectsInactive.Include);
             if (bootstrap != null)
@@ -85,7 +86,8 @@ namespace RealityEngine.EditorTools
             if (applyLandscape)
             {
                 LabLandscapeApplier landscape = LabLandscapeApplier.EnsureApplied();
-                landscape.ApplyNow(true);
+                if (landscape != null)
+                    landscape.ApplyNow(true);
             }
 
             replaced += ReplacePinkRenderers();
