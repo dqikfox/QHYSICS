@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,7 +8,7 @@ namespace RealityEngine.Visualization
 {
     /// <summary>
     /// Reality Engine lab style: restyles Faraday Circuit Lab meshes to a dark
-    /// graphite / copper scientific bench. Materials only — no gameplay, grab,
+    /// graphite / copper scientific bench. Materials only â€” no gameplay, grab,
     /// collider, XR Origin, or breadboard-layout changes.
     /// </summary>
     [DisallowMultipleComponent]
@@ -633,7 +633,7 @@ namespace RealityEngine.Visualization
             var tex = new Texture2D(size, size, TextureFormat.RGBA32, false, true)
             {
                 name = "RELab_Grid",
-                hideFlags = HideFlags.DontSave,
+                hideFlags = LabWorldMeshes.EphemeralFlags,
                 wrapMode = TextureWrapMode.Repeat,
                 filterMode = FilterMode.Bilinear,
                 anisoLevel = 2

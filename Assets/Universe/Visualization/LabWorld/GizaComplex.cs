@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 namespace RealityEngine.Visualization
 {
     /// <summary>
-    /// Giza necropolis at 1:1. Offsets from Khufu centre are approx. WGS84 at lat 30Ãƒâ€šÃ‚Â°.
+    /// Giza necropolis at 1:1. Offsets from Khufu centre are approx. WGS84 at lat 30ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°.
     /// Architectural local space: origin at Khufu base centre, +Y up, +Z north, +X east.
     /// </summary>
     public static class GizaComplex
@@ -195,7 +195,7 @@ namespace RealityEngine.Visualization
                 || lower.Contains("kanefer") || lower.Contains("g2150")
                 || lower.Contains("ankhhaf") || lower.Contains("g7510")
                 || lower.Contains("meresankh") || lower.Contains("g7530") || lower.Contains("g7540")
-                || lower.Contains("kawab") || lower.Contains("kawÃ¡b") || lower.Contains("g7110") || lower.Contains("g7120")
+                || lower.Contains("kawab") || lower.Contains("kawÃƒÂ¡b") || lower.Contains("g7110") || lower.Contains("g7120")
                 || lower.Contains("idu") || lower.Contains("g7102")
                 || lower.Contains("qar") || lower.Contains("g7101")
                 || lower.Contains("khufukhaf") || lower.Contains("g7130") || lower.Contains("g7140")
@@ -210,7 +210,7 @@ namespace RealityEngine.Visualization
 
     /// <summary>
     /// Shared undamaged true-pyramid casing, pyramidion, pavement, honesty plate.
-    /// 4-face shells only ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no filled core (walkable interiors do not clip solid rock).
+    /// 4-face shells only ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â no filled core (walkable interiors do not clip solid rock).
     /// </summary>
     public static class GizaBuild
     {
@@ -268,6 +268,7 @@ namespace RealityEngine.Visualization
             _rock = null;
             _cliff = null;
             _sphinx = null;
+            _sand = null; // throne: force Oasis sand / URP Lit refresh with StoneTexRev
             LabWorldMeshes.InvalidateProcTextures();
             _stoneMatRev = rev;
         }
@@ -834,7 +835,7 @@ namespace RealityEngine.Visualization
                 string obj = mr.gameObject.name;
                 string l = string.IsNullOrEmpty(obj) ? "" : obj.ToLowerInvariant();
 
-                // Stray CreatePrimitive leftovers (Cube/Sphere/…) with void mats — delete.
+                // Stray CreatePrimitive leftovers (Cube/Sphere/â€¦) with void mats â€” delete.
                 if (IsPrimitiveLeftoverName(l) && !l.StartsWith("hill_"))
                 {
                     SafeDestroyGo(mr.gameObject);
@@ -842,7 +843,7 @@ namespace RealityEngine.Visualization
                     continue;
                 }
 
-                // Named landscape / monument pieces — reassign sand/stone instead of delete.
+                // Named landscape / monument pieces â€” reassign sand/stone instead of delete.
                 if (l.Contains("sand") || l.Contains("desert") || l.Contains("dune") || l.Contains("wash")
                     || l.Contains("plateau") || l.Contains("gizaplateau"))
                     mr.sharedMaterial = DesertSand();
