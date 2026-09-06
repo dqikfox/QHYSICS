@@ -86,6 +86,13 @@ namespace RealityEngine.Player
             {
                 if (!_cc.enabled)
                     _cc.enabled = true;
+                if (_cc.height < 0.5f)
+                    _cc.height = standHeight;
+                if (_cc.radius < 0.05f)
+                    _cc.radius = 0.15f;
+                _cc.slopeLimit = 45f;
+                if (_cc.stepOffset < 0.1f || _cc.stepOffset > 0.5f)
+                    _cc.stepOffset = 0.35f;
                 _baseCcHeight = _cc.height > 0.1f ? _cc.height : standHeight;
                 _baseCcCenter = _cc.center;
             }

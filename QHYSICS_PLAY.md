@@ -11,7 +11,15 @@
 
 ## Who is the player?
 
-**XR Origin IS the player** (camera + hands under Camera Offset). There is no separate humanoid avatar. On desktop (no headset), a simple capsule + hand proxies appear under the camera for reference. If the headset shows nothing, you are not linked / not simulating â€” not missing a character mesh.
+**XR Origin IS the player** (CharacterController + Camera Offset + Main Camera + XRI hands).
+
+On **desktop** (Editor Ctrl+P, no Quest Link / no running XR display):
+- A simple **DesktopBody** (torso + head + hand proxies) stands under XR Origin - not parented to Main Camera / never under Giza pyramids.
+- Head uses layer 31 so your own camera does not draw it (first-person).
+- Hand proxies sit in front of the view; **E / LMB grab** attaches held props to the right-hand attach point.
+- Bottom **hotbar 1-8** is the desktop inventory (VR toolbelt still works via M / Tab).
+
+On **Quest Link**: desktop body hides; XR locomotion + controller hands take over. If the headset shows nothing, fix Link - you are not missing a character mesh.
 
 ## Play steps â€” Meta Quest Link (Quest 3S)
 
@@ -39,9 +47,9 @@ If Play works in Editor Game view but the headset stays on the Quest home / blac
 Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest Link).
 
 1. Open `Assets/Scenes/Faraday.unity`.
-2. Optional once: **Reality Engine -> Place Desktop Player** (also auto-ensures on Play via bootstrap), then **Ctrl+S**.
+2. Optional once: **Reality Engine -> Ensure Player Character** (or Place Desktop Player; also auto-ensures on Play / Enter Sandbox).
 3. Press **Ctrl+P**. Do **not** need Oculus Link or XR Device Simulator.
-4. You should see a simple capsule/hands under the camera and a bottom hotbar.
+4. You should spawn on **LabPlaza**, see a simple standing body + FP hands, and a bottom hotbar 1-8.
 
 ### Keyboard map (desktop)
 

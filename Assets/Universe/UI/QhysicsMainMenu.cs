@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using RealityEngine.XR;
 using RealityEngine.Experiments;
+using RealityEngine.Player;
 
 namespace RealityEngine.UI
 {
@@ -106,7 +107,9 @@ namespace RealityEngine.UI
             var lab = InductionLabBootstrap.EnsureLabInScene(scene);
             if (lab != null)
                 lab.BuildLab();
+            // Plaza spawn + desktop character stack (body, WASD, hotbar, BuildingBlock cam strip).
             LabPlayerSpawn.EnsureApplied();
+            QhysicsDesktopBootstrap.Ensure();
         }
 
         void OpenSettings()
