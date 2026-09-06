@@ -29,7 +29,8 @@ namespace RealityEngine.UI
             "CIRCUIT Switch: hold near a Coil â€” N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
             "CIRCUIT Battery: hold near a Coil â€” N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
             "CIRCUIT Wire: hold near a Coil â€” classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
-            "Desktop: while holding Battery/Resistor/Switch/Wire/Multimeter, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
+            "MEASURE Stopwatch: T/Y or VR trigger; desktop LMB toggles, scroll-down resets (wall-clock).",
+            "Desktop: while holding Battery/Resistor/Switch/Wire/Multimeter/Stopwatch, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
         };
 
         Canvas _canvas;
