@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// Short dismissible world-space tips: Welcome â†’ Grab â†’ Try table. Not a trap.
+    /// Short dismissible world-space tips: Welcome Ã¢â€ â€™ Grab Ã¢â€ â€™ Try table. Not a trap.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(205)]
@@ -21,6 +21,7 @@ namespace RealityEngine.UI
             "PHYSICS Field Lens: grab it, N/P or VR trigger peels layers (honesty tags on readout).",
             "PHYSICS Magnet/Dipole: grab a live classical MagneticDipole (Probe reads B).",
             "PHYSICS Coil: grab a live classical InductionCoil; move a Magnet through it (Multimeter reads Emf/I).",
+            "MEASURE Multimeter: binds nearest InductionCircuit (lab or PHYSICS Coil); tip shows target + distance.",
         };
 
         Canvas _canvas;
