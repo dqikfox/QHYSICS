@@ -53,6 +53,8 @@ namespace RealityEngine.Player
                 return SpawnMultimeterStub(worldPos);
             if (key == "resistor")
                 return SpawnLoadResistor(worldPos);
+            if (key == "lamp" || key == "led" || key == "glow")
+                return SpawnLoadBulb(worldPos);
             if (key == "magnet")
                 return SpawnHandheldMagnet(worldPos, pureDipole: false);
             if (key == "dipole")
@@ -520,7 +522,7 @@ namespace RealityEngine.Player
 
     /// <summary>
     /// Handheld Field Lens proxy: while held (or near camera), XR activate / N steps next layer, P steps previous.
-    /// Drives the existing scene FieldLens host Ã¢â‚¬â€ does not spawn a second lens.
+    /// Drives the existing scene FieldLens host ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â does not spawn a second lens.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensHandheld : MonoBehaviour
@@ -717,3 +719,4 @@ namespace RealityEngine.Player
         }
     }
 }
+
