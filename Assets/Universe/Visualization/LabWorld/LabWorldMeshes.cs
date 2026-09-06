@@ -189,7 +189,7 @@ namespace RealityEngine.Visualization
         public const float CliffTileM = 8f;
         // 1024^2 courses stay cheap on RTX-class GPUs; 8 courses / 4.8 m tile => ~0.60 m course height.
         public const int ProcTexSize = 1024;
-        public const int StoneTexRev = 4;
+        public const int StoneTexRev = 5; /* throne plastic mat refresh v2 */
 
         static Texture2D _turaTex;
         static Texture2D _turaBump;
