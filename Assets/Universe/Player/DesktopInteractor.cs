@@ -35,6 +35,12 @@ namespace RealityEngine.Player
         public Transform Held => _held;
         public Transform HoverTarget { get; private set; }
 
+        /// <summary>Drop without throw — used by New Run before clearing spawned gadgets.</summary>
+        public void ReleaseHeld()
+        {
+            Drop(false);
+        }
+
         void Awake()
         {
             _mpb = new MaterialPropertyBlock();
