@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using RealityEngine.Player;
 
@@ -141,12 +141,11 @@ namespace RealityEngine.XR
         }
     }
 
-    /// <summary>Shows XR controller proxies only while an XR display is running.</summary>
+    /// <summary>Shows XR controller proxies only while an XR display is running and no richer Hand Presence mesh is present.</summary>
     [DisallowMultipleComponent]
     public sealed class XrProxyVisibility : MonoBehaviour
     {
         Renderer[] _renderers;
-        bool _lastShow = true;
 
         void Awake()
         {
@@ -160,19 +159,38 @@ namespace RealityEngine.XR
 
         public void Refresh()
         {
-            bool show = DesktopPlayerController.IsXrDisplayRunning();
+            bool show = DesktopPlayerController.IsXrDisplayRunning() && !HasSiblingRichModel();
             if (_renderers == null || _renderers.Length == 0)
                 _renderers = GetComponentsInChildren<Renderer>(true);
-            if (show == _lastShow && _renderers != null)
-            {
-                // Still force once in case renderers were rebuilt.
-            }
-            _lastShow = show;
             for (int i = 0; i < _renderers.Length; i++)
             {
                 if (_renderers[i] != null)
                     _renderers[i].enabled = show;
             }
+        }
+
+        bool HasSiblingRichModel()
+        {
+            Transform hand = transform.parent;
+            if (hand == null)
+                return false;
+            for (int i = 0; i < hand.childCount; i++)
+            {
+                Transform c = hand.GetChild(i);
+                if (c == null || c == transform)
+                    continue;
+                if (c.name != null && c.name.IndexOf("Hand Presence", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    // Hand Presence root itself has no mesh; look for spawned children with renderers.
+                    Renderer[] rs = c.GetComponentsInChildren<Renderer>(true);
+                    for (int r = 0; r < rs.Length; r++)
+                    {
+                        if (rs[r] != null && rs[r].enabled && rs[r].gameObject.activeInHierarchy)
+                            return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

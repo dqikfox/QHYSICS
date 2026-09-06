@@ -29,7 +29,7 @@ public class HandPresence : MonoBehaviour
         if (devices.Count > 0)
         {
             targetDevice = devices[0];
-            GameObject prefab = controllerPrefabs.Find(controller => controller.name == targetDevice.name);
+            GameObject prefab = (controllerPrefabs != null) ? controllerPrefabs.Find(controller => controller != null && controller.name == targetDevice.name) : null;
             if (prefab)
             {
                 spawnedController = Instantiate(prefab, transform);
@@ -37,11 +37,15 @@ public class HandPresence : MonoBehaviour
             else
             {
                 Debug.LogError("Did not find corresponding controller model");
-                spawnedController = Instantiate(controllerPrefabs[0], transform);
+                if (controllerPrefabs != null && controllerPrefabs.Count > 0 && controllerPrefabs[0] != null)
+                    spawnedController = Instantiate(controllerPrefabs[0], transform);
             }
 
-            spawnedHandModel = Instantiate(handModelPrefab, transform);
-            handAnimator = spawnedHandModel.GetComponent<Animator>();
+            if (handModelPrefab != null)
+            {
+                spawnedHandModel = Instantiate(handModelPrefab, transform);
+                handAnimator = spawnedHandModel != null ? spawnedHandModel.GetComponent<Animator>() : null;
+            }
         }
     }
 
@@ -81,18 +85,19 @@ public class HandPresence : MonoBehaviour
             targetDevice.TryGetFeatureValue(CommonUsages.gripButton, out gripPressed);
 
             // Activate Pinch Collider so we can detect pinch collisions with other objects
-            pinchCollider.gameObject.SetActive(triggerPressed && !gripPressed);
+            if (pinchCollider != null)
+                pinchCollider.SetActive(triggerPressed && !gripPressed);
 
             if (showController)
             {
-                spawnedHandModel.SetActive(false);
-                spawnedController.SetActive(true);
+                if (spawnedHandModel != null) spawnedHandModel.SetActive(false);
+                if (spawnedController != null) spawnedController.SetActive(true);
             }
             else
             {
-                spawnedHandModel.SetActive(true);
-                spawnedController.SetActive(false);
-                UpdateHandAnimation();
+                if (spawnedHandModel != null) spawnedHandModel.SetActive(true);
+                if (spawnedController != null) spawnedController.SetActive(false);
+                if (handAnimator != null) UpdateHandAnimation();
             }
         }
     }
