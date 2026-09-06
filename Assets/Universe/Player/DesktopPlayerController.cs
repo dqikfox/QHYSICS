@@ -25,11 +25,14 @@ namespace RealityEngine.Player
         [SerializeField] float lookSensitivity = 1.55f;
         [SerializeField] float jumpSpeed = 5.2f;
         [SerializeField] float crouchHeight = 1.0f;
-        [SerializeField] float standHeight = 1.8f;
+        [SerializeField] float standHeight = 1.72f;
         [SerializeField] float gravity = -20f;
         [SerializeField] float desktopEyeHeight = 1.65f;
         [SerializeField] float minPitch = -80f;
         [SerializeField] float maxPitch = 80f;
+        const float MinLookSensitivity = 0.35f;
+        const float MaxLookSensitivity = 3.5f;
+        const float DesktopFovDefault = 75f;
 
         Transform _origin;
         Transform _cameraOffset;
@@ -41,7 +44,7 @@ namespace RealityEngine.Player
         bool _crouching;
         bool _desktopActive;
         bool _cursorOwned;
-        float _baseCcHeight = 1.8f;
+        float _baseCcHeight = 1.72f;
         Vector3 _baseCcCenter;
 
         public bool IsDesktopActive => _desktopActive;
@@ -86,17 +89,12 @@ namespace RealityEngine.Player
                 _cc = _origin.gameObject.AddComponent<CharacterController>();
             if (_cc != null)
             {
+                LabPlayerSpawnCompat.ApplyCharacterControllerProfile(_cc);
                 if (!_cc.enabled)
                     _cc.enabled = true;
-                if (_cc.height < 0.5f)
-                    _cc.height = standHeight;
-                if (_cc.radius < 0.05f)
-                    _cc.radius = 0.15f;
-                _cc.slopeLimit = 45f;
-                if (_cc.stepOffset < 0.1f || _cc.stepOffset > 0.5f)
-                    _cc.stepOffset = 0.35f;
-                _baseCcHeight = _cc.height > 0.1f ? _cc.height : standHeight;
+                _baseCcHeight = _cc.height > 0.1f ? _cc.height : LabPlayerSpawnCompat.CcHeight;
                 _baseCcCenter = _cc.center;
+                standHeight = _baseCcHeight;
             }
             _cameraOffset = _origin.Find(LabPlayerSpawnCompat.CameraOffsetName);
             if (_cameraOffset == null)
@@ -143,6 +141,20 @@ namespace RealityEngine.Player
             }
 
             ApplyDesktopEyeHeight(force: true);
+            SoftClampDesktopFov();
+        }
+
+        /// <summary>Desktop comfort FOV only — leave XR / extreme artistic FOVs alone when display is running.</summary>
+        void SoftClampDesktopFov()
+        {
+            if (_mainCamera == null || IsXrDisplayRunning())
+                return;
+            var cam = _mainCamera.GetComponent<Camera>();
+            if (cam == null)
+                return;
+            // Note: desktop default ~75; clamp only if wildly off (broken scene / prefab).
+            if (cam.fieldOfView < 50f || cam.fieldOfView > 100f)
+                cam.fieldOfView = DesktopFovDefault;
         }
 
         /// <summary>Desktop floor-relative eye height on Camera Offset (~1.6-1.7m). XR Floor leaves offset at 0.</summary>
@@ -315,8 +327,9 @@ namespace RealityEngine.Player
         void ApplyLook()
         {
             Vector2 delta = ReadMouseDelta();
-            _yaw += delta.x * lookSensitivity * 0.12f;
-            _pitch -= delta.y * lookSensitivity * 0.12f;
+            float sens = Mathf.Clamp(lookSensitivity, MinLookSensitivity, MaxLookSensitivity);
+            _yaw += delta.x * sens * 0.12f;
+            _pitch -= delta.y * sens * 0.12f;
             _pitch = Mathf.Clamp(_pitch, minPitch, maxPitch);
 
             _origin.rotation = Quaternion.Euler(0f, _yaw, 0f);
@@ -485,6 +498,33 @@ namespace RealityEngine.Player
         public const string OriginName = "XR Origin";
         public const string CameraOffsetName = "Camera Offset";
         public const string MainCameraName = "Main Camera";
+
+        // Match DesktopBody capsule (standing ~1.72m, shoulder half-width ~0.22).
+        public const float CcHeight = 1.72f;
+        public const float CcRadius = 0.22f;
+        public const float CcSkin = 0.08f;
+        public const float CcStepOffset = 0.30f;
+
+        /// <summary>
+        /// Shared CharacterController profile so locomotion capsule matches DesktopBody
+        /// and does not fall through plaza or wedge into the lab table.
+        /// </summary>
+        public static void ApplyCharacterControllerProfile(CharacterController cc)
+        {
+            if (cc == null)
+                return;
+            bool was = cc.enabled;
+            cc.enabled = false;
+            cc.height = CcHeight;
+            cc.radius = CcRadius;
+            cc.skinWidth = CcSkin;
+            cc.center = new Vector3(0f, CcHeight * 0.5f, 0f);
+            cc.slopeLimit = 45f;
+            // stepOffset must stay below height; keep modest so table lips do not snag.
+            cc.stepOffset = Mathf.Min(CcStepOffset, CcHeight * 0.35f);
+            cc.minMoveDistance = 0f;
+            cc.enabled = true;
+        }
 
         static readonly string[] MonumentTokens =
         {
