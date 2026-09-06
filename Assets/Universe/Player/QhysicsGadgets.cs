@@ -210,12 +210,54 @@ namespace RealityEngine.Player
                     Debug.Log("QhysicsGadgets: Scale -> " + scale.CurrentScaleName);
                     return true;
                 }
-                case "teleport":
-                case "sky":
                 case "save":
+                {
+                    var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+                    var lab = InductionLabBootstrap.EnsureLabInScene(scene);
+                    if (lab != null)
+                        lab.BuildLab();
+                    var runner = Object.FindAnyObjectByType<ExperimentRunner>(FindObjectsInactive.Include);
+                    if (runner == null)
+                    {
+                        Debug.LogWarning("QhysicsGadgets: Save — ExperimentRunner missing after Induction ensure.");
+                        return true;
+                    }
+                    string path = runner.Save();
+                    Debug.Log("QhysicsGadgets: Save -> " + (path ?? "(failed)"));
+                    return true;
+                }
                 case "load":
-                    // Keep unfinished chips available but non-destructive.
-                    Debug.Log("QhysicsGadgets: '" + label + "' parked (use locomotion / Scale Engine / pause menu).");
+                {
+                    var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+                    var lab = InductionLabBootstrap.EnsureLabInScene(scene);
+                    if (lab != null)
+                        lab.BuildLab();
+                    var runner = Object.FindAnyObjectByType<ExperimentRunner>(FindObjectsInactive.Include);
+                    if (runner == null)
+                    {
+                        Debug.LogWarning("QhysicsGadgets: Load — ExperimentRunner missing after Induction ensure.");
+                        return true;
+                    }
+                    bool ok = runner.LoadLatest();
+                    Debug.Log("QhysicsGadgets: LoadLatest -> " + (ok ? runner.StatusLine : "no run file"));
+                    return true;
+                }
+                case "teleport":
+                {
+                    LabPlayerSpawn.EnsureApplied();
+                    var desktop = DesktopPlayerController.Instance;
+                    if (desktop != null)
+                    {
+                        var origin = GameObject.Find(LabPlayerSpawn.OriginName);
+                        if (origin != null)
+                            desktop.Bind(origin.transform);
+                    }
+                    Debug.Log("QhysicsGadgets: Teleport -> plaza spawn");
+                    return true;
+                }
+                case "sky":
+                    // Keep unfinished chip available but non-destructive.
+                    Debug.Log("QhysicsGadgets: '" + label + "' parked (sky/time-of-day not wired yet).");
                     return true;
                 default:
                     return false;
