@@ -15,6 +15,7 @@ namespace RealityEngine.XR
     /// Parks Faraday's XR Origin on the lab plaza (north of the circuit table, looking
     /// south at Khufu). Unparents from MountainScene at runtime. Rewires XRI 3.6
     /// teleport + both-hand snap. Does not disable MountainScene. Does not rebuild OVR.
+    /// Always repositions on Play even when Origin is already in the scene.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(120)]
@@ -23,11 +24,13 @@ namespace RealityEngine.XR
         public const string OriginName = "XR Origin";
         public const string CameraOffsetName = "Camera Offset";
         const string HostName = "RealityEngine";
+        const string MainCameraName = "Main Camera";
         const float StandNorthOfTableM = 2.0f;
         const float CcHeight = 1.8f;
         const float CcSkin = 0.08f;
         const float CcRadius = 0.15f;
         const float SinkResetM = 4f;
+        const float BadOriginY = -10f;
 
         static int _appliedFrame = -1;
         bool _parked;
@@ -39,6 +42,7 @@ namespace RealityEngine.XR
         TeleportationProvider _teleport;
 #pragma warning disable CS0618
         DeviceBasedSnapTurnProvider _snap;
+        LocomotionSystem _locoSystem;
 #pragma warning restore CS0618
         Behaviour[] _locomotion;
         bool _locomotionPaused;
@@ -65,6 +69,9 @@ namespace RealityEngine.XR
             EnsureApplied();
         }
 
+        /// <summary>
+        /// Ensure a LabPlayerSpawn exists and force-apply plaza pose (editor menu + Play).
+        /// </summary>
         public static LabPlayerSpawn EnsureApplied()
         {
             LabPlayerSpawn existing = Object.FindFirstObjectByType<LabPlayerSpawn>(FindObjectsInactive.Include);
@@ -84,18 +91,20 @@ namespace RealityEngine.XR
             if (!existing.isActiveAndEnabled && existing.gameObject.activeInHierarchy)
                 existing.enabled = true;
 
-            existing.ApplyNow(false);
+            // Always force — Origin may already be in scene at a bad MountainScene-local pose.
+            existing.ApplyNow(true);
             return existing;
         }
 
         void Awake()
         {
-            ApplyNow(false);
+            _parked = false;
+            ApplyNow(true);
         }
 
         void Start()
         {
-            ApplyNow(false);
+            ApplyNow(true);
             if (Application.isPlaying)
                 StartCoroutine(ApplyDelayed());
         }
@@ -103,9 +112,9 @@ namespace RealityEngine.XR
         IEnumerator ApplyDelayed()
         {
             yield return null;
-            ApplyNow(false);
+            ApplyNow(true);
             yield return null;
-            ApplyNow(false);
+            ApplyNow(true);
         }
 
         void Update()
@@ -137,8 +146,11 @@ namespace RealityEngine.XR
             UnparentKeepingWorld(originXf);
             PreserveCameraRig(originXf);
             EnsureFloorTracking(_origin);
+            EnsureMainCamera(originXf, _origin);
             EnsureCharacterController(originXf);
-            bool parked = ParkOnLabPlaza(originXf, force || !_parked);
+            // On Play / force: always snap even if previously parked in this domain.
+            bool snapPose = force || !_parked || Application.isPlaying;
+            bool parked = ParkOnLabPlaza(originXf, snapPose);
             if (parked)
                 _parked = true;
 
@@ -195,6 +207,38 @@ namespace RealityEngine.XR
                 return;
             if (origin.RequestedTrackingOriginMode != XROrigin.TrackingOriginMode.Floor)
                 origin.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Floor;
+        }
+
+        static void EnsureMainCamera(Transform originXf, XROrigin origin)
+        {
+            Transform offset = originXf.Find(CameraOffsetName);
+            if (offset == null && origin != null && origin.CameraFloorOffsetObject != null)
+                offset = origin.CameraFloorOffsetObject.transform;
+            if (offset == null)
+                return;
+
+            Transform camTf = FindChildNamed(offset, MainCameraName);
+            Camera cam = null;
+            if (camTf != null)
+                cam = camTf.GetComponent<Camera>();
+            if (cam == null)
+                cam = offset.GetComponentInChildren<Camera>(true);
+            if (cam == null)
+            {
+                Debug.LogWarning("LabPlayerSpawn: Main Camera missing under Camera Offset; not rebuilding OVR.");
+                return;
+            }
+
+            camTf = cam.transform;
+            if (!camTf.gameObject.activeSelf)
+                camTf.gameObject.SetActive(true);
+            if (!cam.enabled)
+                cam.enabled = true;
+            if (!camTf.CompareTag("MainCamera"))
+                camTf.tag = "MainCamera";
+
+            if (origin != null && origin.Camera != cam)
+                origin.Camera = cam;
         }
 
         void EnsureCharacterController(Transform originXf)
@@ -261,9 +305,15 @@ namespace RealityEngine.XR
             }
             else
             {
-                stand.y = table.min.y;
+                // Never retain a sunk/MountainScene-local Y (e.g. -94) when plaza is missing.
+                float tableFloor = table.min.y;
                 if (table.size.y > 8f)
-                    stand.y = originXf.position.y;
+                    tableFloor = table.center.y - Mathf.Min(table.extents.y, 2.5f);
+                float originY = originXf.position.y;
+                if (originY > BadOriginY && originY > tableFloor - 1f && originY < tableFloor + 5f)
+                    stand.y = originY;
+                else
+                    stand.y = tableFloor;
                 _plazaY = stand.y;
             }
 
@@ -282,6 +332,7 @@ namespace RealityEngine.XR
 
             Debug.Log(
                 "LabPlayerSpawn: XR Origin at " + stand.ToString("F2") +
+                " Y=" + stand.y.ToString("F2") +
                 " (lab plaza, north of table, facing Khufu). Floor tracking. Teleport rewired.");
             return true;
         }
@@ -374,6 +425,13 @@ namespace RealityEngine.XR
                 }
                 _snap.controllers = list;
             }
+
+            // Legacy LocomotionSystem.m_XROrigin is often fileID 0 in Faraday — wire it.
+            _locoSystem = originXf.GetComponent<LocomotionSystem>();
+            if (_locoSystem == null)
+                _locoSystem = originXf.GetComponentInChildren<LocomotionSystem>(true);
+            if (_locoSystem != null && _origin != null && _locoSystem.xrOrigin == null)
+                _locoSystem.xrOrigin = _origin;
 #pragma warning restore CS0618
 
             _teleportCtrl = originXf.GetComponent<TeleportationController>();
@@ -404,6 +462,15 @@ namespace RealityEngine.XR
                 Debug.LogWarning("LabPlayerSpawn: TeleportationProvider missing on XR Origin; teleport areas stay unwired.");
                 return;
             }
+
+            // XRI 3.6 TeleportationProvider uses LocomotionMediator; legacy scenes still serialize
+            // LocomotionSystem.m_XROrigin (shown near Teleportation Provider). Keep both wired.
+#pragma warning disable CS0618
+            if (_locoSystem == null)
+                _locoSystem = originXf.GetComponent<LocomotionSystem>();
+            if (_locoSystem != null && _origin != null && _locoSystem.xrOrigin == null)
+                _locoSystem.xrOrigin = _origin;
+#pragma warning restore CS0618
 
             EnsureTeleportAreaOn("LabPlaza");
             EnsureTeleportAreaOn("GizaPlateau");
