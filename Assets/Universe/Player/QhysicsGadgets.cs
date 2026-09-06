@@ -54,8 +54,8 @@ namespace RealityEngine.Player
                 return SpawnNamedCloneOrProxy("Coil", worldPos, new Color(0.85f, 0.65f, 0.2f));
             if (key == "stopwatch")
                 return SpawnStopwatch(worldPos);
-            if (key == "probe")
-                return SpawnPrimitiveProxy(label.Trim(), worldPos, new Color(0.35f, 0.55f, 0.75f));
+            if (key == "probe" || key == "field probe" || key == "bprobe" || key == "b-probe")
+                return SpawnFieldProbe(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -403,6 +403,18 @@ namespace RealityEngine.Player
             return go;
         }
 
+        static GameObject SpawnFieldProbe(Vector3 worldPos)
+        {
+            // Real MEASURE tool: classical B(r) at tip from MagneticDipole sources.
+            var go = SpawnPrimitiveProxy("FieldProbe", worldPos, new Color(0.25f, 0.45f, 0.7f));
+            go.name = FieldProbe.RootName;
+            go.transform.localScale = new Vector3(0.04f, 0.04f, 0.16f);
+            var probe = go.GetComponent<FieldProbe>();
+            if (probe == null)
+                probe = go.AddComponent<FieldProbe>();
+            probe.EnsureBuilt();
+            return go;
+        }
         static GameObject SpawnPrimitiveProxy(string name, Vector3 worldPos, Color color)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
