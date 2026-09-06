@@ -19,13 +19,15 @@ namespace RealityEngine.Player
     {
         public const string HostName = "QhysicsDesktopPlayer";
 
-        [SerializeField] float walkSpeed = 3.2f;
-        [SerializeField] float sprintSpeed = 6.5f;
-        [SerializeField] float lookSensitivity = 1.6f;
-        [SerializeField] float jumpSpeed = 5.5f;
+        // Plaza locomotion feel (desktop only; XR uses SmoothMovement + snap).
+        [SerializeField] float walkSpeed = 3.4f;
+        [SerializeField] float sprintSpeed = 6.8f;
+        [SerializeField] float lookSensitivity = 1.55f;
+        [SerializeField] float jumpSpeed = 5.2f;
         [SerializeField] float crouchHeight = 1.0f;
         [SerializeField] float standHeight = 1.8f;
-        [SerializeField] float gravity = -18f;
+        [SerializeField] float gravity = -20f;
+        [SerializeField] float desktopEyeHeight = 1.65f;
         [SerializeField] float minPitch = -80f;
         [SerializeField] float maxPitch = 80f;
 
@@ -139,6 +141,71 @@ namespace RealityEngine.Player
                 Vector3 e = _mainCamera.localEulerAngles;
                 _pitch = e.x > 180f ? e.x - 360f : e.x;
             }
+
+            ApplyDesktopEyeHeight(force: true);
+        }
+
+        /// <summary>Desktop floor-relative eye height on Camera Offset (~1.6-1.7m). XR Floor leaves offset at 0.</summary>
+        public void ApplyDesktopEyeHeight(bool force = false)
+        {
+            if (_origin == null)
+                return;
+            bool xr = IsXrDisplayRunning();
+            if (_cameraOffset == null)
+            {
+                _cameraOffset = _origin.Find(LabPlayerSpawnCompat.CameraOffsetName);
+                var xrOrigin = _origin.GetComponent<XROrigin>();
+                if (_cameraOffset == null && xrOrigin != null && xrOrigin.CameraFloorOffsetObject != null)
+                    _cameraOffset = xrOrigin.CameraFloorOffsetObject.transform;
+            }
+            if (_cameraOffset == null)
+                return;
+
+            var xrComp = _origin.GetComponent<XROrigin>();
+            if (xr)
+            {
+                // Floor tracking: do not invent a standing offset under the HMD.
+                if (xrComp != null && xrComp.RequestedTrackingOriginMode != XROrigin.TrackingOriginMode.Floor)
+                    xrComp.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Floor;
+                if (force || Mathf.Abs(_cameraOffset.localPosition.y) > 0.01f)
+                {
+                    Vector3 lp = _cameraOffset.localPosition;
+                    // Only zero when we previously raised it for desktop; leave non-zero XR floors alone if already ~0.
+                    if (Mathf.Abs(lp.y - desktopEyeHeight) < 0.05f || force)
+                    {
+                        lp.y = 0f;
+                        _cameraOffset.localPosition = lp;
+                    }
+                }
+                if (xrComp != null && Mathf.Abs(xrComp.CameraYOffset) > 0.01f && force)
+                    xrComp.CameraYOffset = 0f;
+                return;
+            }
+
+            // Desktop: Camera Offset Y = eye height so Main Camera sits at ~1.65m above plaza.
+            Vector3 dlp = _cameraOffset.localPosition;
+            if (force || Mathf.Abs(dlp.y - desktopEyeHeight) > 0.02f)
+            {
+                dlp.y = desktopEyeHeight;
+                _cameraOffset.localPosition = dlp;
+            }
+            if (_mainCamera != null)
+            {
+                Vector3 camLp = _mainCamera.localPosition;
+                if (Mathf.Abs(camLp.y) > 0.05f)
+                {
+                    camLp.y = 0f;
+                    _mainCamera.localPosition = camLp;
+                }
+            }
+            if (xrComp != null)
+            {
+                if (xrComp.RequestedTrackingOriginMode != XROrigin.TrackingOriginMode.Floor)
+                    xrComp.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Floor;
+                // Device-mode leftover Y offset fights desktop Camera Offset height.
+                if (Mathf.Abs(xrComp.CameraYOffset) > 0.01f)
+                    xrComp.CameraYOffset = 0f;
+            }
         }
 
         void OnEnable()
@@ -189,6 +256,14 @@ namespace RealityEngine.Player
             }
 
             EnsureCursorLocked();
+            if (ReadRecalibrateHeight())
+            {
+                LabPlayerSpawnCompat.EnsurePlayerNotUnderMonument(_origin);
+                ApplyDesktopEyeHeight(force: true);
+                RealityEngine.XR.LabPlayerSpawn.RecalibratePlayerHeight(_origin, _origin.GetComponent<XROrigin>(), true);
+            }
+            else
+                ApplyDesktopEyeHeight(force: false);
             ApplyLook();
             ApplyMove();
         }
@@ -294,9 +369,12 @@ namespace RealityEngine.Player
             if (wish.sqrMagnitude > 1f)
                 wish.Normalize();
 
-            if (_cc.isGrounded)
+            // Stick to plaza ground; avoid floaty hops from residual upward velocity.
+            bool grounded = _cc.isGrounded;
+            if (grounded)
             {
-                _vertVel = -1f;
+                if (_vertVel < 0f)
+                    _vertVel = -2f;
                 if (jump)
                     _vertVel = jumpSpeed;
             }
@@ -305,7 +383,9 @@ namespace RealityEngine.Player
 
             Vector3 motion = wish * speed;
             motion.y = _vertVel;
-            _cc.Move(motion * Time.deltaTime);
+            CollisionFlags flags = _cc.Move(motion * Time.deltaTime);
+            if ((flags & CollisionFlags.Below) != 0 && _vertVel < 0f)
+                _vertVel = -2f;
         }
 
         static Vector2 ReadMouseDelta()
@@ -380,6 +460,19 @@ namespace RealityEngine.Player
 #endif
 #if ENABLE_LEGACY_INPUT_MANAGER
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+                return true;
+#endif
+            return false;
+        }
+
+        static bool ReadRecalibrateHeight()
+        {
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null && Keyboard.current.hKey.wasPressedThisFrame)
+                return true;
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.GetKeyDown(KeyCode.H))
                 return true;
 #endif
             return false;

@@ -8,6 +8,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 using RealityEngine.Visualization;
+using RealityEngine.Player;
 
 namespace RealityEngine.XR
 {
@@ -31,6 +32,10 @@ namespace RealityEngine.XR
         const float CcRadius = 0.15f;
         const float SinkResetM = 4f;
         const float BadOriginY = -10f;
+        /// <summary>Desktop eye height on Camera Offset (XR Floor keeps offset at 0).</summary>
+        public const float DesktopEyeHeightM = 1.65f;
+        const float XrContinuousMoveSpeed = 2.0f;
+        const float XrSnapTurnDegrees = 45f;
 
         static int _appliedFrame = -1;
         bool _parked;
@@ -47,6 +52,7 @@ namespace RealityEngine.XR
         Behaviour[] _locomotion;
         bool _locomotionPaused;
         float _nextTrackCheck;
+        bool _wasXrDisplay;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void HookSceneLoad()
@@ -155,6 +161,7 @@ namespace RealityEngine.XR
             EnsureFloorTracking(_origin);
             EnsureMainCamera(originXf, _origin);
             EnsureCharacterController(originXf);
+            RecalibratePlayerHeight(originXf, _origin, force);
             // On Play / force: always snap even if previously parked in this domain.
             bool snapPose = force || !_parked || Application.isPlaying;
             bool parked = ParkOnLabPlaza(originXf, snapPose);
@@ -165,6 +172,8 @@ namespace RealityEngine.XR
             WireTeleport(originXf);
             WireHands(originXf);
             ApplyTrackingPause();
+            // Re-apply height after locomotion wire (desktop eye vs XR floor).
+            RecalibratePlayerHeight(originXf, _origin, force);
         }
 
         static Transform FindXrOrigin()
@@ -278,6 +287,70 @@ namespace RealityEngine.XR
                 return;
             if (origin.RequestedTrackingOriginMode != XROrigin.TrackingOriginMode.Floor)
                 origin.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Floor;
+        }
+
+        /// <summary>
+        /// Floor tracking + desktop eye height (~1.65m). Called from EnsureApplied / Enter Sandbox.
+        /// XR Link: Camera Offset Y = 0 (HMD drives height). Desktop: Camera Offset Y = eye height.
+        /// </summary>
+        public static void RecalibratePlayerHeight(Transform originXf = null, XROrigin origin = null, bool force = true)
+        {
+            if (originXf == null)
+                originXf = FindXrOrigin();
+            if (originXf == null)
+                return;
+            if (origin == null)
+                origin = originXf.GetComponent<XROrigin>();
+            EnsureFloorTracking(origin);
+
+            Transform offset = originXf.Find(CameraOffsetName);
+            if (offset == null && origin != null && origin.CameraFloorOffsetObject != null)
+                offset = origin.CameraFloorOffsetObject.transform;
+            if (offset == null)
+                return;
+
+            bool xr = DesktopPlayerController.IsXrDisplayRunning();
+            Vector3 lp = offset.localPosition;
+            if (xr)
+            {
+                if (force || Mathf.Abs(lp.y) > 0.02f)
+                {
+                    // Clear desktop standing offset so Floor tracking is authoritative.
+                    if (force || Mathf.Abs(lp.y - DesktopEyeHeightM) < 0.08f)
+                    {
+                        lp.y = 0f;
+                        offset.localPosition = lp;
+                    }
+                }
+                if (origin != null && force)
+                    origin.CameraYOffset = 0f;
+            }
+            else
+            {
+                if (force || Mathf.Abs(lp.y - DesktopEyeHeightM) > 0.02f)
+                {
+                    lp.y = DesktopEyeHeightM;
+                    offset.localPosition = lp;
+                }
+                if (origin != null && Mathf.Abs(origin.CameraYOffset) > 0.01f)
+                    origin.CameraYOffset = 0f;
+                Transform cam = FindChildNamed(offset, MainCameraName);
+                if (cam == null && origin != null && origin.Camera != null)
+                    cam = origin.Camera.transform;
+                if (cam != null)
+                {
+                    Vector3 camLp = cam.localPosition;
+                    if (Mathf.Abs(camLp.y) > 0.05f)
+                    {
+                        camLp.y = 0f;
+                        cam.localPosition = camLp;
+                    }
+                }
+            }
+
+            var desktop = DesktopPlayerController.Instance;
+            if (desktop != null)
+                desktop.ApplyDesktopEyeHeight(force);
         }
 
         static void EnsureMainCamera(Transform originXf, XROrigin origin)
@@ -461,6 +534,11 @@ namespace RealityEngine.XR
             _move = originXf.GetComponent<SmoothMovementController>();
             if (_move != null)
             {
+                // Comfort-safe continuous move on plaza (not desktop WASD).
+                if (_move.speed < 1.2f || _move.speed > 2.8f)
+                    _move.speed = XrContinuousMoveSpeed;
+                else
+                    _move.speed = Mathf.Clamp(_move.speed, 1.5f, 2.5f);
                 if (_move.tableCollider == null)
                 {
                     Transform tableXf = FindNamedContains("circuittable");
@@ -475,7 +553,7 @@ namespace RealityEngine.XR
             _snap = originXf.GetComponent<DeviceBasedSnapTurnProvider>();
             if (_snap != null)
             {
-                _snap.turnAmount = 45f;
+                _snap.turnAmount = XrSnapTurnDegrees;
                 _snap.enableTurnLeftRight = true;
                 _snap.enableTurnAround = true;
                 List<XRBaseController> list = _snap.controllers;
@@ -696,6 +774,23 @@ namespace RealityEngine.XR
 
         void ApplyTrackingPause()
         {
+            bool xr = DesktopPlayerController.IsXrDisplayRunning();
+            if (xr != _wasXrDisplay)
+            {
+                _wasXrDisplay = xr;
+                if (_origin != null)
+                    RecalibratePlayerHeight(_origin.transform, _origin, true);
+            }
+
+            // Desktop owns CharacterController when no XR display — do not let SmoothMove/snap fight WASD.
+            if (!xr)
+            {
+                if (!_locomotionPaused)
+                    SetLocomotionEnabled(false);
+                _locomotionPaused = true;
+                return;
+            }
+
             bool valid = HeadTrackingValid();
             if (valid)
             {

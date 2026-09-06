@@ -60,6 +60,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Shift** | Sprint |
 | **Space** | Jump |
 | **Ctrl** | Crouch |
+| **H** | Recalibrate eye height (~1.65m Camera Offset / Floor) |
 | **1-8** | Hotbar: Wire, Battery, Switch, Bulb, Magnet, Field Lens, Cubit Rod, Delete |
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
@@ -67,9 +68,9 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **F** / **RMB** | Drop |
 | **R** | Throw |
 | **Esc** / **P** | Pause (releases cursor) - Resume re-locks |
-| **M** / **Tab** | VR Toolbelt (still available) |
+| **M** / **Tab** | Toolbelt (worn at hip/chest with lag — not glued to camera) |
 
-When a Quest Link headset is connected / XR display running, desktop locomotion disables and XR locomotion is preferred. Giza + QHYSICS UI are unchanged.
+When a Quest Link headset is connected / XR display running, desktop locomotion disables and XR continuous-move + snap turn own the CharacterController (no fight with WASD). Toolbelt follows HipAnchor on DesktopBody / XR Origin. Enter Sandbox / Fix Player Spawn recalibrates Floor + eye height.
 
 ## Play steps â€” checklist
 
