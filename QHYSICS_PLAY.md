@@ -1,37 +1,37 @@
-# QHYSICS — how to Play (Editor)
+# QHYSICS â€” how to Play (Editor)
 
-**Daily testing = Ctrl+P (Play).** Do **not** use Ctrl+B for daily runs — that builds an APK/player.
-**Ctrl+P ≠ APK.** Headset view needs **Meta Quest Link** (or Device Simulator on desktop).
+**Daily testing = Ctrl+P (Play).** Do **not** use Ctrl+B for daily runs â€” that builds an APK/player.
+**Ctrl+P â‰  APK.** Headset view needs **Meta Quest Link** (or Device Simulator on desktop).
 
 ## One Editor only
 
 - Project: `C:\Users\KING\projects\QHYSICS`
 - Branch: `reality-engine`
-- Unity: **6000.7.0a4** (one instance — never a second Editor on this project)
+- Unity: **6000.7.0a4** (one instance â€” never a second Editor on this project)
 
 ## Who is the player?
 
-**XR Origin IS the player** (camera + hands under Camera Offset). There is no separate humanoid avatar. On desktop (no headset), a simple capsule + hand proxies appear under the camera for reference. If the headset shows nothing, you are not linked / not simulating — not missing a character mesh.
+**XR Origin IS the player** (camera + hands under Camera Offset). There is no separate humanoid avatar. On desktop (no headset), a simple capsule + hand proxies appear under the camera for reference. If the headset shows nothing, you are not linked / not simulating â€” not missing a character mesh.
 
-## Play steps — Meta Quest Link (Quest 3S)
+## Play steps â€” Meta Quest Link (Quest 3S)
 
 1. On PC: install/open **Meta Quest Link** (Air Link or cable). Quest in Developer Mode, same account, PC allowed.
-2. Put on headset → enable **Link** / connect to this PC. Confirm Link status is Connected.
+2. Put on headset â†’ enable **Link** / connect to this PC. Confirm Link status is Connected.
 3. In Unity (only one Editor): open `Assets/Scenes/Faraday.unity`.
-4. Optional once: **Reality Engine → Fix Player Spawn** (or **Reset Player at Lab**) then **Ctrl+S** — parks XR Origin on LabPlaza north of the circuit table facing Khufu, enables Main Camera, wires locomotion XR Origin.
+4. Optional once: **Reality Engine â†’ Fix Player Spawn** (or **Reset Player at Lab**) then **Ctrl+S** â€” parks XR Origin on LabPlaza north of the circuit table facing Khufu, enables Main Camera, wires locomotion XR Origin.
 5. Press **Ctrl+P** (Play). Game view mirrors the HMD via OpenXR + Link.
-6. First run: world **Main Menu → Enter Sandbox** (or skip if already entered).
+6. First run: world **Main Menu â†’ Enter Sandbox** (or skip if already entered).
 7. Interact: teleport / smooth move on plaza, grab circuit parts, Toolbelt **M / Tab / Menu**, Pause **Esc / P**.
 
-If Play works in Editor Game view but the headset stays on the Quest home / black: Link is not active — fix Link first. Do not build APK for daily testing.
+If Play works in Editor Game view but the headset stays on the Quest home / black: Link is not active â€” fix Link first. Do not build APK for daily testing.
 
-## Play steps — XR Device Simulator (desktop, no headset)
+## Play steps â€” XR Device Simulator (desktop, no headset)
 
-1. Package Manager → **XR Interaction Toolkit** → Samples → import **XR Device Simulator** (once).
-2. Project Settings → **XR Plug-in Management** → **XR Interaction Toolkit** → enable **Use XR Device Simulator in scenes** / auto-instantiate (or add the `XR Device Simulator` prefab to Faraday).
-   - Asset: `Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset` — set simulator prefab after sample import; `Automatically Instantiate Simulator Prefab` can be on for Editor-only.
-3. Open Faraday → **Ctrl+P**. Use keyboard/mouse per simulator HUD (move/look/grip).
-4. Optional: **Reality Engine → Fix Player Spawn** before Play if Origin pose looks wrong in Hierarchy.
+1. Package Manager â†’ **XR Interaction Toolkit** â†’ Samples â†’ import **XR Device Simulator** (once).
+2. Project Settings â†’ **XR Plug-in Management** â†’ **XR Interaction Toolkit** â†’ enable **Use XR Device Simulator in scenes** / auto-instantiate (or add the `XR Device Simulator` prefab to Faraday).
+   - Asset: `Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset` â€” set simulator prefab after sample import; `Automatically Instantiate Simulator Prefab` can be on for Editor-only.
+3. Open Faraday â†’ **Ctrl+P**. Use keyboard/mouse per simulator HUD (move/look/grip).
+4. Optional: **Reality Engine â†’ Fix Player Spawn** before Play if Origin pose looks wrong in Hierarchy.
 
 
 ## Play steps - Desktop keyboard (no headset, no Device Simulator)
@@ -52,7 +52,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Shift** | Sprint |
 | **Space** | Jump |
 | **Ctrl** | Crouch |
-| **1-8** | Hotbar: Wire, Battery, Switch, Bulb, Resistor, Magnet, Multimeter, Delete |
+| **1-8** | Hotbar: Wire, Battery, Switch, Bulb, Magnet, Field Lens, Cubit Rod, Delete |
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
@@ -63,28 +63,28 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 
 When a Quest Link headset is connected / XR display running, desktop locomotion disables and XR locomotion is preferred. Giza + QHYSICS UI are unchanged.
 
-## Play steps — checklist
+## Play steps â€” checklist
 
 1. Open `Assets/Scenes/Faraday.unity` (Build Settings already has Faraday enabled).
 2. Confirm Hierarchy has **LabLandscape** (Giza) and **QhysicsUI** (or RealityEngine host). If missing:
-   - Menu **Reality Engine → Place Giza Complex**
-   - Menu **Reality Engine → Place QHYSICS UI**
-   - **Ctrl+S** / File → Save so placement persists.
-3. Optional: **Reality Engine → Fix Player Spawn** (XR Origin on plaza, Main Camera MainCamera+enabled, facing Khufu).
+   - Menu **Reality Engine â†’ Place Giza Complex**
+   - Menu **Reality Engine â†’ Place QHYSICS UI**
+   - **Ctrl+S** / File â†’ Save so placement persists.
+3. Optional: **Reality Engine â†’ Fix Player Spawn** (XR Origin on plaza, Main Camera MainCamera+enabled, facing Khufu).
 4. Press **Ctrl+P** (or the Play button).
 5. Headset: Quest Link / OpenXR, **or** Editor with **XR Device Simulator**.
-6. First run: world **Main Menu → Enter Sandbox** (or skip if already entered). Short onboarding tips are dismissible (Next / Skip).
+6. First run: world **Main Menu â†’ Enter Sandbox** (or skip if already entered). Short onboarding tips are dismissible (Next / Skip).
 7. Interact:
    - Move with XRI locomotion / teleport on plaza
    - Grab circuit parts from table dispensers (grip)
-   - Build Battery → Wire → Bulb → Switch loop
+   - Build Battery â†’ Wire â†’ Bulb â†’ Switch loop
    - **M / Tab / Menu / B / Grip** toggles Toolbelt
-   - **Esc / P** opens Pause → Resume / Reset Experiment / Settings / Exit Play (Editor)
+   - **Esc / P** opens Pause â†’ Resume / Reset Experiment / Settings / Exit Play (Editor)
    - SimChip (`> 1x`) cycles sim speed / pause / reset (Reset also calls CircuitLab.Reset)
 
 ## Shipping only
 
-- **Ctrl+B** / Build and Run → Android (Quest) or Windows player.
+- **Ctrl+B** / Build and Run â†’ Android (Quest) or Windows player.
 - Quest: Developer Mode + authorized `adb devices` before APK install.
 - Do **not** build APK unless `adb devices` shows the authorized Quest serial you intend to flash.
 
@@ -95,3 +95,4 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 - `Sprites/Default` for Giza/lab surfaces
 - Disabling MountainScene
 - Assuming Ctrl+P installs to the headset (it does not)
+
