@@ -65,6 +65,8 @@ namespace RealityEngine.Player
                 return SpawnStopwatch(worldPos);
             if (key == "probe" || key == "field probe" || key == "bprobe" || key == "b-probe")
                 return SpawnFieldProbe(worldPos);
+            if (key == "switch")
+                return SpawnLoadSwitch(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -433,6 +435,19 @@ namespace RealityEngine.Player
             if (lr == null)
                 lr = go.AddComponent<LoadResistorGadget>();
             lr.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadSwitch(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: classical series open/closed on nearest InductionCoil.
+            var go = SpawnPrimitiveProxy("Switch", worldPos, new Color(0.35f, 0.55f, 0.35f));
+            go.name = LoadSwitchGadget.RootName;
+            go.transform.localScale = new Vector3(0.1f, 0.05f, 0.14f);
+            var sw = go.GetComponent<LoadSwitchGadget>();
+            if (sw == null)
+                sw = go.AddComponent<LoadSwitchGadget>();
+            sw.EnsureBuilt();
             return go;
         }
 

@@ -26,6 +26,7 @@ namespace RealityEngine.UI
             "Lab + PHYSICS coils auto-bind every MagneticDipole — gadget Magnet through lab Coil still drives Emf/I.",
             "CIRCUIT Resistor: hold near a Coil to apply classical R_load (N/P or VR trigger cycles 2/8/50/OPEN); Multimeter I changes.",
             "CIRCUIT Lamp: hold near a Coil — glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
+            "CIRCUIT Switch: hold near a Coil — N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
         };
 
         Canvas _canvas;
