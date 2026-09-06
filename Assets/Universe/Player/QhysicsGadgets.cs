@@ -219,7 +219,7 @@ namespace RealityEngine.Player
                     var runner = Object.FindAnyObjectByType<ExperimentRunner>(FindObjectsInactive.Include);
                     if (runner == null)
                     {
-                        Debug.LogWarning("QhysicsGadgets: Save — ExperimentRunner missing after Induction ensure.");
+                        Debug.LogWarning("QhysicsGadgets: Save Ã¢â‚¬â€ ExperimentRunner missing after Induction ensure.");
                         return true;
                     }
                     string path = runner.Save();
@@ -235,7 +235,7 @@ namespace RealityEngine.Player
                     var runner = Object.FindAnyObjectByType<ExperimentRunner>(FindObjectsInactive.Include);
                     if (runner == null)
                     {
-                        Debug.LogWarning("QhysicsGadgets: Load — ExperimentRunner missing after Induction ensure.");
+                        Debug.LogWarning("QhysicsGadgets: Load Ã¢â‚¬â€ ExperimentRunner missing after Induction ensure.");
                         return true;
                     }
                     bool ok = runner.LoadLatest();
@@ -374,10 +374,17 @@ namespace RealityEngine.Player
             return null;
         }
 
+
         static GameObject SpawnMultimeterStub(Vector3 worldPos)
         {
-            var go = SpawnPrimitiveProxy("Multimeter", worldPos, new Color(0.2f, 0.25f, 0.3f));
+            // Real MEASURE tool: live InductionCircuit EMF/I/Phi (classical Faraday).
+            var go = SpawnPrimitiveProxy("Multimeter", worldPos, new Color(0.18f, 0.22f, 0.28f));
+            go.name = MultimeterProbe.RootName;
             go.transform.localScale = new Vector3(0.12f, 0.04f, 0.18f);
+            var probe = go.GetComponent<MultimeterProbe>();
+            if (probe == null)
+                probe = go.AddComponent<MultimeterProbe>();
+            probe.EnsureBuilt();
             return go;
         }
 
@@ -429,7 +436,7 @@ namespace RealityEngine.Player
 
     /// <summary>
     /// Handheld Field Lens proxy: while held (or near camera), steps FieldLens layers with [ ] / N P.
-    /// Does not replace the scene FieldLens host ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â drives the existing one.
+    /// Does not replace the scene FieldLens host ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â drives the existing one.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensHandheld : MonoBehaviour
