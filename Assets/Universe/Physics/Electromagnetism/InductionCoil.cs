@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 namespace RealityEngine.Physics.Electromagnetism
@@ -103,6 +103,12 @@ namespace RealityEngine.Physics.Electromagnetism
             turns = Mathf.Max(1, turnCount);
             radius = Mathf.Max(0.001f, radiusMeters);
             resistance = Mathf.Max(0f, windingOhms);
+            loadResistance = Mathf.Max(0f, loadOhms);
+        }
+
+        /// <summary>Set series load R only (ohms). Used by CIRCUIT Resistor gadget.</summary>
+        public void SetLoadResistance(float loadOhms)
+        {
             loadResistance = Mathf.Max(0f, loadOhms);
         }
 

@@ -24,6 +24,7 @@ namespace RealityEngine.UI
             "PHYSICS Coil: grab a live classical InductionCoil; move a Magnet through it (Multimeter reads Emf/I).",
             "MEASURE Multimeter: binds nearest InductionCircuit (lab or PHYSICS Coil); tip shows target + distance.",
             "Lab + PHYSICS coils auto-bind every MagneticDipole — gadget Magnet through lab Coil still drives Emf/I.",
+            "CIRCUIT Resistor: hold near a Coil to apply classical R_load (N/P or VR trigger cycles 2/8/50/OPEN); Multimeter I changes.",
         };
 
         Canvas _canvas;
