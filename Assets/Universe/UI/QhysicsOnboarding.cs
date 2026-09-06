@@ -19,6 +19,7 @@ namespace RealityEngine.UI
             "Desktop: WASD move, mouse look, E/LMB grab, F drop, R throw.\nVR: grip / trigger. Hotbar 1-8 / scroll.",
             "Try a loop: Battery -> Wire -> Bulb -> Switch.\nEsc/P pause. Toolbelt New Run resets the table.",
             "PHYSICS Field Lens: grab it, N/P or VR trigger peels layers (honesty tags on readout)."
+            "PHYSICS Magnet/Dipole: grab a live classical MagneticDipole (Probe reads B)."
         };
 
         Canvas _canvas;
