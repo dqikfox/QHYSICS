@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using RealityEngine.UI;
 #if ENABLE_INPUT_SYSTEM
@@ -33,6 +33,7 @@ namespace RealityEngine.Player
         MaterialPropertyBlock _mpb;
 
         public Transform Held => _held;
+        public Transform HoverTarget { get; private set; }
 
         void Awake()
         {
@@ -252,9 +253,13 @@ namespace RealityEngine.Player
                 next = r;
             }
             if (next == _hoverRenderer)
+            {
+                HoverTarget = (col != null && IsGrabTarget(col)) ? col.transform : null;
                 return;
+            }
             ClearHover();
             _hoverRenderer = next;
+            HoverTarget = (col != null && IsGrabTarget(col)) ? col.transform : null;
             if (_hoverRenderer == null)
                 return;
             var mat = _hoverRenderer.sharedMaterial;
@@ -277,6 +282,7 @@ namespace RealityEngine.Player
 
         void ClearHover()
         {
+            HoverTarget = null;
             if (_hoverRenderer == null)
                 return;
             _hoverRenderer.SetPropertyBlock(null);
@@ -339,7 +345,7 @@ namespace RealityEngine.Player
 
         static bool WasThrowPressed()
         {
-            // Same as drop with momentum Ã¢â‚¬â€ F/R already throws when held; treat R as throw preference.
+            // Same as drop with momentum ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â F/R already throws when held; treat R as throw preference.
 #if ENABLE_INPUT_SYSTEM
             if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
                 return true;
@@ -352,4 +358,7 @@ namespace RealityEngine.Player
         }
     }
 }
+
+
+
 

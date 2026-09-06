@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 #if ENABLE_INPUT_SYSTEM
@@ -9,7 +9,7 @@ namespace RealityEngine.Player
 {
     /// <summary>
     /// Grabbable MEASURE stopwatch: wall-clock timer for timing magnet sweeps / runs.
-    /// Honesty: Editor/player Time.unscaledTime — not a sim clock or atomic standard.
+    /// Honesty: Editor/player Time.unscaledTime â€” not a sim clock or atomic standard.
     /// Desktop: T toggle, Y reset (when near/held). VR: activate (trigger) toggles while selected.
     /// </summary>
     [DisallowMultipleComponent]
@@ -25,6 +25,9 @@ namespace RealityEngine.Player
         float _lap;
         float _startedAt;
         float _inputCooldown;
+
+        public bool IsRunning => _running;
+        public float DisplaySeconds => _running ? _lap + (Time.unscaledTime - _startedAt) : _elapsed;
 
         public void EnsureBuilt()
         {
@@ -205,3 +208,4 @@ namespace RealityEngine.Player
         }
     }
 }
+
