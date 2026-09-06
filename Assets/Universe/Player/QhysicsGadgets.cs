@@ -56,7 +56,7 @@ namespace RealityEngine.Player
                 return SpawnPrimitiveProxy(label.Trim(), worldPos, new Color(0.35f, 0.55f, 0.75f));
 
 
-            // World / experiment chips Ã¢â‚¬â€ real actions (not spawns)
+            // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
                 return null;
 
@@ -256,9 +256,11 @@ namespace RealityEngine.Player
                     return true;
                 }
                 case "sky":
-                    // Keep unfinished chip available but non-destructive.
-                    Debug.Log("QhysicsGadgets: '" + label + "' parked (sky/time-of-day not wired yet).");
+                {
+                    string sky = QhysicsLabActions.CycleSky();
+                    Debug.Log("QhysicsGadgets: Sky -> " + sky);
                     return true;
+                }
                 default:
                     return false;
             }
