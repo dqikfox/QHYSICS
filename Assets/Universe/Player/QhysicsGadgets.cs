@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9,6 +10,9 @@ using RealityEngine.Core;
 using RealityEngine.UI;
 using RealityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace RealityEngine.Player
 {
@@ -320,6 +324,7 @@ namespace RealityEngine.Player
 
             var driver = go.AddComponent<FieldLensHandheld>();
             driver.Bind(lens);
+            driver.EnsureBuilt();
             EnsureGrabPhysics(go, 0.12f);
             return go;
         }
@@ -462,40 +467,201 @@ namespace RealityEngine.Player
     }
 
     /// <summary>
-    /// Handheld Field Lens proxy: while held (or near camera), steps FieldLens layers with [ ] / N P.
-    /// Does not replace the scene FieldLens host ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â drives the existing one.
+    /// Handheld Field Lens proxy: while held (or near camera), XR activate / N steps next layer, P steps previous.
+    /// Drives the existing scene FieldLens host — does not spawn a second lens.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensHandheld : MonoBehaviour
     {
+        public const string Honesty = "Classical / conceptual layer peel. Not a microscope.";
+
         FieldLens _lens;
         XRGrabInteractable _grab;
+        TextMeshPro _readout;
+        float _inputCooldown;
+        float _nextRefresh;
 
         public void Bind(FieldLens lens)
         {
             _lens = lens;
             _grab = GetComponent<XRGrabInteractable>();
+            WireGrab();
+        }
+
+        public void EnsureBuilt()
+        {
+            if (_grab == null)
+                _grab = GetComponent<XRGrabInteractable>();
+            if (_lens == null)
+                _lens = Object.FindFirstObjectByType<FieldLens>(FindObjectsInactive.Include);
+            WireGrab();
+            if (_readout == null)
+                BuildReadout();
+            RefreshText();
+        }
+
+        void Awake()
+        {
+            EnsureBuilt();
+        }
+
+        void OnEnable()
+        {
+            WireGrab();
+        }
+
+        void OnDisable()
+        {
+            UnwireGrab();
         }
 
         void Update()
         {
             if (_lens == null)
                 _lens = Object.FindFirstObjectByType<FieldLens>(FindObjectsInactive.Include);
+
+            if (IsActiveContext() && Time.unscaledTime >= _inputCooldown)
+            {
+                if (WasNextPressed())
+                {
+                    _inputCooldown = Time.unscaledTime + 0.2f;
+                    StepNext();
+                }
+                else if (WasPrevPressed())
+                {
+                    _inputCooldown = Time.unscaledTime + 0.2f;
+                    StepPrev();
+                }
+            }
+
+            if (Time.unscaledTime >= _nextRefresh)
+            {
+                _nextRefresh = Time.unscaledTime + 0.2f;
+                RefreshText();
+            }
+        }
+
+        void WireGrab()
+        {
+            if (_grab == null)
+                _grab = GetComponent<XRGrabInteractable>();
+            if (_grab == null)
+                return;
+            _grab.activated.RemoveListener(OnActivated);
+            _grab.activated.AddListener(OnActivated);
+        }
+
+        void UnwireGrab()
+        {
+            if (_grab == null)
+                return;
+            _grab.activated.RemoveListener(OnActivated);
+        }
+
+        void OnActivated(UnityEngine.XR.Interaction.Toolkit.ActivateEventArgs _)
+        {
+            if (Time.unscaledTime < _inputCooldown)
+                return;
+            _inputCooldown = Time.unscaledTime + 0.2f;
+            StepNext();
+        }
+
+        void StepNext()
+        {
             if (_lens == null)
                 return;
+            _lens.StepNext();
+            RefreshText();
+            Debug.Log("QHYSICS: Field Lens -> " + _lens.CurrentLayerName + " [" + _lens.CurrentHonestyTag + "]");
+        }
 
-            bool held = _grab != null && _grab.isSelected;
-            // Desktop: also treat as "active" when close to camera and no XR select
-            if (!held)
-            {
-                Camera cam = Camera.main;
-                if (cam != null && (transform.position - cam.transform.position).sqrMagnitude < 2.5f * 2.5f)
-                    held = true;
-            }
-            if (!held)
+        void StepPrev()
+        {
+            if (_lens == null)
                 return;
+            _lens.StepPrevious();
+            RefreshText();
+            Debug.Log("QHYSICS: Field Lens -> " + _lens.CurrentLayerName + " [" + _lens.CurrentHonestyTag + "]");
+        }
 
-            // Keyboard step is already on FieldLens when enableKeyboard; keep a local hint once.
+        bool IsActiveContext()
+        {
+            if (_grab != null && _grab.isSelected)
+                return true;
+            Camera cam = Camera.main;
+            if (cam == null)
+                return false;
+            return (transform.position - cam.transform.position).sqrMagnitude < 2.5f * 2.5f;
+        }
+
+        static bool WasNextPressed()
+        {
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null
+                && (Keyboard.current.nKey.wasPressedThisFrame || Keyboard.current.rightBracketKey.wasPressedThisFrame))
+                return true;
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.GetKeyDown(KeyCode.N) || Input.GetKeyDown(KeyCode.RightBracket))
+                return true;
+#endif
+            return false;
+        }
+
+        static bool WasPrevPressed()
+        {
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null
+                && (Keyboard.current.pKey.wasPressedThisFrame || Keyboard.current.leftBracketKey.wasPressedThisFrame))
+                return true;
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.GetKeyDown(KeyCode.P) || Input.GetKeyDown(KeyCode.LeftBracket))
+                return true;
+#endif
+            return false;
+        }
+
+        void BuildReadout()
+        {
+            Transform existing = transform.Find("Readout");
+            GameObject go;
+            if (existing != null)
+                go = existing.gameObject;
+            else
+            {
+                go = new GameObject("Readout");
+                go.transform.SetParent(transform, false);
+                go.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+                go.transform.localRotation = Quaternion.identity;
+                go.transform.localScale = Vector3.one * 0.08f;
+            }
+
+            _readout = go.GetComponent<TextMeshPro>();
+            if (_readout == null)
+                _readout = go.AddComponent<TextMeshPro>();
+            _readout.fontSize = 24f;
+            _readout.alignment = TextAlignmentOptions.Center;
+            _readout.color = new Color(0.35f, 0.9f, 1f, 1f);
+            _readout.textWrappingMode = TextWrappingModes.Normal;
+            _readout.rectTransform.sizeDelta = new Vector2(36f, 18f);
+            _readout.text = "FIELD LENS\nNormal\nN/P or trigger";
+        }
+
+        void RefreshText()
+        {
+            if (_readout == null)
+                return;
+            if (_lens == null)
+            {
+                _readout.text = "FIELD LENS\n(no host)\nspawn Induction first";
+                return;
+            }
+            _readout.text =
+                "FIELD LENS\n"
+                + _lens.CurrentLayerName + "\n"
+                + "[" + _lens.CurrentHonestyTag + "]\n"
+                + "N/P or trigger";
         }
     }
 }
