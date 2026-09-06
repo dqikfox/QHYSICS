@@ -40,6 +40,10 @@ namespace RealityEngine.Physics.Electromagnetism
         float loadResistance = 8.0f;
 
         [SerializeField]
+        [Tooltip("Optional classical series EMF (volts) added to Faraday EMF. Used by CIRCUIT Battery gadget.")]
+        float externalSeriesEmf;
+
+        [SerializeField]
         [Tooltip("Number of concentric sample rings on the coil disk (plus a center sample). Keep small for Quest 3S.")]
         int radialSamples = 4;
 
@@ -81,6 +85,7 @@ namespace RealityEngine.Physics.Electromagnetism
         public float Radius => Mathf.Max(0.001f, radius);
         public float Resistance => Mathf.Max(0f, resistance);
         public float LoadResistance => Mathf.Max(0f, loadResistance);
+        public float ExternalSeriesEmf => externalSeriesEmf;
         public float Flux => _flux;
         public float FluxRate => _dFluxDt;
         public float Emf => _emf;
@@ -110,6 +115,12 @@ namespace RealityEngine.Physics.Electromagnetism
         public void SetLoadResistance(float loadOhms)
         {
             loadResistance = Mathf.Max(0f, loadOhms);
+        }
+
+        /// <summary>Set classical series EMF (volts) added to Faraday EMF. Used by CIRCUIT Battery.</summary>
+        public void SetExternalSeriesEmf(float volts)
+        {
+            externalSeriesEmf = volts;
         }
 
         /// <summary>
@@ -209,7 +220,8 @@ namespace RealityEngine.Physics.Electromagnetism
             if (paused)
             {
                 _dFluxDt = 0f;
-                _emf = 0f;
+                // Keep classical series battery EMF while paused (no Faraday dΦ/dt).
+                _emf = externalSeriesEmf;
                 _previousFlux = _flux;
                 _hasPreviousFlux = true;
                 return;
@@ -220,8 +232,8 @@ namespace RealityEngine.Physics.Electromagnetism
             else
                 _dFluxDt = 0f;
 
-            // Lumped Faraday law. Sign: EMF opposes flux increase (Lenz).
-            _emf = -Turns * _dFluxDt;
+            // Lumped Faraday law + optional classical series EMF (Battery). Sign: Faraday opposes flux increase (Lenz).
+            _emf = -Turns * _dFluxDt + externalSeriesEmf;
             _previousFlux = _flux;
             _hasPreviousFlux = true;
         }
