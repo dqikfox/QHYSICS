@@ -69,6 +69,8 @@ namespace RealityEngine.Player
                 return SpawnLoadSwitch(worldPos);
             if (key == "battery" || key == "cell" || key == "emf")
                 return SpawnLoadBattery(worldPos);
+            if (key == "wire" || key == "long wire" || key == "longwire" || key == "jumper")
+                return SpawnLoadWire(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -463,6 +465,19 @@ namespace RealityEngine.Player
             if (bat == null)
                 bat = go.AddComponent<LoadBatteryGadget>();
             bat.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadWire(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: classical series jumper R_load on nearest InductionCoil.
+            var go = SpawnPrimitiveProxy("Wire", worldPos, new Color(0.72f, 0.45f, 0.18f));
+            go.name = LoadWireGadget.RootName;
+            go.transform.localScale = new Vector3(0.22f, 0.025f, 0.025f);
+            var w = go.GetComponent<LoadWireGadget>();
+            if (w == null)
+                w = go.AddComponent<LoadWireGadget>();
+            w.EnsureBuilt();
             return go;
         }
 
