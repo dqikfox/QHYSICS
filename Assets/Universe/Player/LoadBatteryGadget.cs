@@ -16,7 +16,7 @@ namespace RealityEngine.Player
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(10)]
-    public sealed class LoadBatteryGadget : MonoBehaviour
+    public sealed class LoadBatteryGadget : MonoBehaviour, IDesktopActivatable
     {
         public const string RootName = "Gadget_Battery";
         public const string Honesty = "Classical series EMF on InductionCoil. Ideal lumped voltage source.";
@@ -157,6 +157,8 @@ namespace RealityEngine.Player
             ApplyOrRelease();
             RefreshText();
         }
+
+        public void DesktopActivate(int delta) => Cycle(delta);
 
         void EnsureCoils(bool force)
         {

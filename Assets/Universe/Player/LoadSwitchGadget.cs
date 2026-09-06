@@ -16,7 +16,7 @@ namespace RealityEngine.Player
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(40)]
-    public sealed class LoadSwitchGadget : MonoBehaviour
+    public sealed class LoadSwitchGadget : MonoBehaviour, IDesktopActivatable
     {
         public const string RootName = "Gadget_Switch";
         public const string Honesty = "Classical series open/closed on InductionCoil. Lumped switch model.";
@@ -153,6 +153,8 @@ namespace RealityEngine.Player
             ApplyOrRelease();
             RefreshText();
         }
+
+        public void DesktopActivate(int delta) => Toggle();
 
         void EnsureCoils(bool force)
         {

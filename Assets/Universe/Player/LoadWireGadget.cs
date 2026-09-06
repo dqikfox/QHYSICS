@@ -17,7 +17,7 @@ namespace RealityEngine.Player
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(-10)]
-    public sealed class LoadWireGadget : MonoBehaviour
+    public sealed class LoadWireGadget : MonoBehaviour, IDesktopActivatable
     {
         public const string RootName = "Gadget_Wire";
         public const string Honesty = "Classical series jumper R_load on InductionCoil. Lumped ohmic conductor.";
@@ -160,6 +160,8 @@ namespace RealityEngine.Player
             ApplyOrRelease();
             RefreshText();
         }
+
+        public void DesktopActivate(int delta) => Cycle(delta);
 
         void EnsureCoils(bool force)
         {

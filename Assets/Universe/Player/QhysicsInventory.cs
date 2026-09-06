@@ -97,7 +97,12 @@ namespace RealityEngine.Player
 
             int scroll = ReadScrollCycle();
             if (scroll != 0)
-                Select((_selected + scroll + SlotLabels.Length) % SlotLabels.Length);
+            {
+                // While holding a cyclable CIRCUIT gadget, scroll is the desktop trigger.
+                var di = Object.FindFirstObjectByType<DesktopInteractor>();
+                if (di == null || !di.HoldsActivatable)
+                    Select((_selected + scroll + SlotLabels.Length) % SlotLabels.Length);
+            }
 
             if (WasQPressed())
                 Select((_selected + SlotLabels.Length - 1) % SlotLabels.Length);
