@@ -113,6 +113,13 @@ namespace RealityEngine.Player
 
         void EnsureHoldPoint()
         {
+            // Prefer character right-hand attach so held props follow the player body.
+            Transform attach = QhysicsDesktopBootstrap.FindHandAttach();
+            if (attach != null)
+            {
+                _holdPoint = attach;
+                return;
+            }
             if (_holdPoint != null)
                 return;
             var go = new GameObject("DesktopHoldPoint");
@@ -122,22 +129,32 @@ namespace RealityEngine.Player
 
         void KeepHeldInFront()
         {
-            if (_cam == null || _held == null)
+            if (_held == null || _cam == null)
                 return;
+            EnsureHoldPoint();
+            if (_holdPoint == null)
+                return;
+
+            // Held props sit at holdDistance; drive the character right hand so the grip looks attached.
             Vector3 target = _cam.transform.position + _cam.transform.forward * holdDistance;
-            _holdPoint.position = target;
-            _holdPoint.rotation = _cam.transform.rotation;
+            Quaternion rot = _cam.transform.rotation;
+            Transform hand = _holdPoint;
+            if (_holdPoint.parent != null && _holdPoint.parent.name == QhysicsDesktopBootstrap.RightHandName)
+                hand = _holdPoint.parent;
+            hand.position = target;
+            hand.rotation = rot;
+
             if (_heldRb != null && !_heldRb.isKinematic)
             {
                 _heldRb.linearVelocity = Vector3.zero;
                 _heldRb.angularVelocity = Vector3.zero;
                 _heldRb.MovePosition(target);
-                _heldRb.MoveRotation(_holdPoint.rotation);
+                _heldRb.MoveRotation(rot);
             }
             else
             {
                 _held.position = target;
-                _held.rotation = _holdPoint.rotation;
+                _held.rotation = rot;
             }
         }
 
@@ -188,6 +205,7 @@ namespace RealityEngine.Player
             // Never grab Giza / pyramids / mastabas (would look like "a pyramid moves").
             if (LabPlayerSpawnCompat.IsMonumentTransform(root))
                 return;
+            EnsureHoldPoint();
 
             // Do not steal dispenser shelf template still parented under Dispenser
             if (root.parent != null && root.parent.GetComponent<Dispenser>() != null)

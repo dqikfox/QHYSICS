@@ -10,9 +10,11 @@ namespace RealityEngine.EditorTools
 {
     public static class DesktopPlayerMenu
     {
-        const string Path = "Reality Engine/Place Desktop Player";
+        const string PathPlace = "Reality Engine/Place Desktop Player";
+        const string PathEnsure = "Reality Engine/Ensure Player Character";
 
-        [MenuItem(Path)]
+        [MenuItem(PathPlace)]
+        [MenuItem(PathEnsure)]
         public static void PlaceDesktopPlayer()
         {
             LabPlayerSpawn.EnsureApplied();
@@ -26,11 +28,12 @@ namespace RealityEngine.EditorTools
 
             Selection.activeGameObject = boot != null ? boot.gameObject : null;
             Debug.Log(
-                "Reality Engine: Place Desktop Player. Keyboard WASD + mouse look when no XR headset. " +
-                "Hotbar 1-8 / Q / scroll. E grab, F/R drop. LMB spawn. Ctrl+S then Ctrl+P without Link to test.");
+                "Reality Engine: Ensure Player Character. XR Origin on plaza + desktop body/hands under Origin. " +
+                "WASD + mouse look when no XR headset. Hotbar 1-8. E grab / F drop. Ctrl+S only if you want scene persist; Ctrl+P to test.");
         }
 
-        [MenuItem(Path, true)]
+        [MenuItem(PathPlace, true)]
+        [MenuItem(PathEnsure, true)]
         public static bool PlaceDesktopPlayerValidate() => true;
     }
 }

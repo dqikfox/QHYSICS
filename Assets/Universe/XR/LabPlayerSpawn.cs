@@ -317,15 +317,18 @@ namespace RealityEngine.XR
             _cc = originXf.GetComponent<CharacterController>();
             if (_cc == null)
             {
-                Debug.LogWarning("LabPlayerSpawn: CharacterController missing on XR Origin; not adding a Rigidbody.");
-                return;
+                // Desktop + XRI locomotion both need a CC on XR Origin only (never on monuments).
+                _cc = originXf.gameObject.AddComponent<CharacterController>();
+                Debug.Log("LabPlayerSpawn: added CharacterController on XR Origin for plaza locomotion.");
             }
             _cc.enabled = false;
             _cc.height = CcHeight;
             _cc.skinWidth = CcSkin;
-            if (_cc.radius > CcRadius)
+            if (_cc.radius > CcRadius || _cc.radius < 0.05f)
                 _cc.radius = CcRadius;
             _cc.center = new Vector3(0f, CcHeight * 0.5f, 0f);
+            _cc.slopeLimit = 45f;
+            _cc.stepOffset = 0.35f;
             // Always leave CC enabled for desktop + XR locomotion (was briefly off for resize).
             _cc.enabled = true;
         }
