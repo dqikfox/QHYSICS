@@ -52,7 +52,9 @@ namespace RealityEngine.Player
                 return SpawnMagnetOrDipole(worldPos);
             if (key == "coil")
                 return SpawnNamedCloneOrProxy("Coil", worldPos, new Color(0.85f, 0.65f, 0.2f));
-            if (key == "probe" || key == "stopwatch")
+            if (key == "stopwatch")
+                return SpawnStopwatch(worldPos);
+            if (key == "probe")
                 return SpawnPrimitiveProxy(label.Trim(), worldPos, new Color(0.35f, 0.55f, 0.75f));
 
 
@@ -219,7 +221,7 @@ namespace RealityEngine.Player
                     var runner = Object.FindAnyObjectByType<ExperimentRunner>(FindObjectsInactive.Include);
                     if (runner == null)
                     {
-                        Debug.LogWarning("QhysicsGadgets: Save Ã¢â‚¬â€ ExperimentRunner missing after Induction ensure.");
+                        Debug.LogWarning("QhysicsGadgets: Save ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ExperimentRunner missing after Induction ensure.");
                         return true;
                     }
                     string path = runner.Save();
@@ -235,7 +237,7 @@ namespace RealityEngine.Player
                     var runner = Object.FindAnyObjectByType<ExperimentRunner>(FindObjectsInactive.Include);
                     if (runner == null)
                     {
-                        Debug.LogWarning("QhysicsGadgets: Load Ã¢â‚¬â€ ExperimentRunner missing after Induction ensure.");
+                        Debug.LogWarning("QhysicsGadgets: Load ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ExperimentRunner missing after Induction ensure.");
                         return true;
                     }
                     bool ok = runner.LoadLatest();
@@ -388,6 +390,19 @@ namespace RealityEngine.Player
             return go;
         }
 
+        static GameObject SpawnStopwatch(Vector3 worldPos)
+        {
+            // Real MEASURE tool: wall-clock timer for magnet sweeps / experiment runs.
+            var go = SpawnPrimitiveProxy("Stopwatch", worldPos, new Color(0.22f, 0.2f, 0.12f));
+            go.name = ExperimentStopwatch.RootName;
+            go.transform.localScale = new Vector3(0.1f, 0.04f, 0.1f);
+            var sw = go.GetComponent<ExperimentStopwatch>();
+            if (sw == null)
+                sw = go.AddComponent<ExperimentStopwatch>();
+            sw.EnsureBuilt();
+            return go;
+        }
+
         static GameObject SpawnPrimitiveProxy(string name, Vector3 worldPos, Color color)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -436,7 +451,7 @@ namespace RealityEngine.Player
 
     /// <summary>
     /// Handheld Field Lens proxy: while held (or near camera), steps FieldLens layers with [ ] / N P.
-    /// Does not replace the scene FieldLens host ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â drives the existing one.
+    /// Does not replace the scene FieldLens host ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â drives the existing one.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensHandheld : MonoBehaviour
