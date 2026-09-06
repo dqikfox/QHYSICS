@@ -19,7 +19,7 @@ On **desktop** (Editor Ctrl+P, no Quest Link / no running XR display):
 - Hand proxies sit in front of the view; **E / LMB grab** attaches held props to the right-hand attach point.
 - Bottom **hotbar 1-8** is the desktop inventory (VR toolbelt still works via M / Tab).
 
-On **Quest Link**: desktop body hides; XR locomotion + controller hands take over. If the headset shows nothing, fix Link - you are not missing a character mesh.
+On **Quest Link**: desktop body hides; XR locomotion + Left/Right Hand Direct/Ray interactors take over. Light `XrControllerProxy` grips show on each controller (Hand Presence still used when OpenXR devices match). Grab attach is on each hand's `Attach` — desktop HandAttach does not fight XR grabs. If the headset shows nothing, fix Link — you are not missing a character mesh.
 
 ## Play steps â€” Meta Quest Link (Quest 3S)
 

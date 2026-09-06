@@ -472,7 +472,7 @@ namespace RealityEngine.Player
                 Transform c = playerRoot.GetChild(i);
                 if (c == null)
                     continue;
-                if (c.name == CameraOffsetName || c.name == "QhysicsDesktopPlayer")
+                if (c.name == CameraOffsetName || c.name == "QhysicsDesktopPlayer" || c.name == "DesktopBody")
                     continue;
                 if (!IsMonumentName(c.name))
                     continue;

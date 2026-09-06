@@ -309,6 +309,7 @@ namespace RealityEngine.Player
 
         public void Refresh()
         {
+            // Force-hide when Link/OpenXR display is running (desktop WASD body must not remain visible in HMD).
             bool show = !DesktopPlayerController.IsXrDisplayRunning();
             if (_renderers == null || _renderers.Length == 0)
                 _renderers = GetComponentsInChildren<Renderer>(true);
