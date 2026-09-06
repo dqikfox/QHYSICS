@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,11 +21,14 @@ public class PegMgr : MonoBehaviour, IPeg
     GameObject original = null;
     CircuitComponent originalScript = null;
 
-	void Start () {
-        clickSound.GetComponent<AudioSource>();
-    }
+	// Null-safe lookup for the circuit lab (it may not exist yet, or may be named differently)
+	static ICircuitLab FindLab()
+	{
+	    var lab = GameObject.Find("CircuitLab");
+	    return (lab != null) ? lab.GetComponent<ICircuitLab>() : null;
+	}
 
-    IEnumerator PlaySound(AudioSource source, float delay)
+	IEnumerator PlaySound(AudioSource source, float delay)
     {
         yield return new WaitForSeconds(delay);
 
@@ -74,8 +77,7 @@ public class PegMgr : MonoBehaviour, IPeg
 
             // Add the component to our breadboard. This will also trigger a circuit simulation and
             // activate any newly completed circuits.
-            var lab = GameObject.Find("CircuitLab").gameObject;
-            var script = lab.GetComponent<ICircuitLab>();
+            var script = FindLab();
             if (script != null)
             {
                 script.AddComponent(original, start, end);
@@ -133,15 +135,14 @@ public class PegMgr : MonoBehaviour, IPeg
         Point ptWest = new Point(coords.x - pegOffset, coords.y);
 
         // Find out if any of these are blocked and should be ignored
-        var lab = GameObject.Find("CircuitLab").gameObject;
-        var script = lab.GetComponent<ICircuitLab>();
+        var script = FindLab();
         Point start = GetCoordinates();
         List<string> freeNeighbors = new List<string>();
         Point[] neighbors = { ptNorth, ptSouth, ptEast, ptWest };
         string[] neighborNames = { north, south, east, west };
         for (int i = 0; i < 4; i++)
         {
-            if (script.IsSlotFree(start, neighbors[i], pegOffset))
+            if (script == null || script.IsSlotFree(start, neighbors[i], pegOffset))
             {
                 freeNeighbors.Add(neighborNames[i]);
             }
@@ -219,10 +220,22 @@ public class PegMgr : MonoBehaviour, IPeg
 
     string GetClosestNeighbor(GameObject clone, List<string> names)
     {
+        if (names.Count == 0)
+        {
+            // No free neighbors (slots may have been taken since the trigger check);
+            // return empty so the caller falls back to a default orientation
+            return string.Empty;
+        }
+
         string closest = names[0];
         GameObject closestNeighbor = null;
         float min = 999;
         var endpoint = clone.transform.Find("WireEnd2");
+        if (endpoint == null)
+        {
+            // Component has no second endpoint marker; keep the first candidate
+            return closest;
+        }
 
         foreach (string name in names)
         {
@@ -278,8 +291,7 @@ public class PegMgr : MonoBehaviour, IPeg
             }
 
             // Figure out if this peg has any free slots
-            var lab = GameObject.Find("CircuitLab").gameObject;
-            var script = lab.GetComponent<ICircuitLab>();
+            var script = FindLab();
             if (script == null)
             {
                 return;
@@ -296,6 +308,12 @@ public class PegMgr : MonoBehaviour, IPeg
             // Remember which object we are cloning
             original = other.gameObject;
             originalScript = original.GetComponent<CircuitComponent>();
+            if (originalScript == null)
+            {
+                // Not actually a circuit component; ignore it
+                original = null;
+                return;
+            }
 
             // Create a clone of the object
             clone = Instantiate(other.gameObject);

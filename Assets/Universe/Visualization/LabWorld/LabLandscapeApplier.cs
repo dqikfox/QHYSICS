@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -38,7 +38,6 @@ namespace RealityEngine.Visualization
         };
 
         readonly HashSet<Transform> _hidden = new HashSet<Transform>();
-        bool _built;
         float _nextPass;
 
         [SerializeField]
@@ -143,7 +142,6 @@ namespace RealityEngine.Visualization
                 GizaField.ForceRebuildAll();
                 if (rootXf != null)
                     SafeDestroy(rootXf.gameObject);
-                _built = false;
                 rootXf = null;
             }
 
@@ -156,12 +154,10 @@ namespace RealityEngine.Visualization
                 GizaBuild.ReapplyMaterials(rootXf);
                 GizaBuild.SitExisting(pose);
                 AddTeleports(rootXf.gameObject);
-                _built = true;
                 return;
             }
 
             BuildWorld(GizaComplex.Spawn.All);
-            _built = true;
         }
 
         void HideBrokenEnvironment()
@@ -322,7 +318,6 @@ namespace RealityEngine.Visualization
             if (root == null)
             {
                 BuildWorld(which);
-                _built = true;
                 return;
             }
             GizaComplex.Pose pose = ReadPose(root);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,12 +36,15 @@ public class Solar : CircuitComponent, ISolar, IDynamic
         SolarWattage = 0;
     }
 
-    ~Solar()
+    void OnDestroy()
     {
-        if (registered)
+        // Remove ourselves from the circuit lab's list of dynamic objects.
+        // (Previously done in a finalizer, but finalizers run on the GC thread
+        // where touching Unity objects is unsafe.)
+        if (registered && Lab != null)
         {
-            // Remove ourselves from the circuit lab's list of dynamic objects
             Lab.UnregisterDynamicComponent(this);
+            registered = false;
         }
     }
 
@@ -54,6 +57,13 @@ public class Solar : CircuitComponent, ISolar, IDynamic
 
     protected override void Update ()
     {
+        EnsureLabReference();
+        if (Lab == null)
+        {
+            // Nothing works without a circuit lab; wait until one exists
+            return;
+        }
+
         if (!registered)
         {
             // Register as a dynamic component so we'll get coordinated UpdateState calls
@@ -102,8 +112,17 @@ public class Solar : CircuitComponent, ISolar, IDynamic
             //    then calculate a resistance that will give us that effective current using R = V / I)
             float pctVoltage = Math.Min(1f, (90f - angle) / 10f);
             SolarVoltage = MaxVoltage * pctVoltage;
-            float current = SolarWattage / SolarVoltage;
-            SolarResistance = SolarVoltage / current;
+            if (SolarVoltage > 1e-6f)
+            {
+                float current = SolarWattage / SolarVoltage;
+                SolarResistance = (current > 1e-6f) ? (SolarVoltage / current) : 0f;
+            }
+            else
+            {
+                // Panel is effectively dark; report no output instead of dividing by ~0
+                SolarVoltage = 0f;
+                SolarResistance = 0f;
+            }
         }
 
         // Update label text

@@ -8,12 +8,10 @@ public class AudioTrigger : MonoBehaviour
 
     void Start()
     {
-        clip = audioGameObject.GetComponent<AudioSource>();
-    }
-
-    void Update()
-    {
-        
+        if (audioGameObject != null)
+        {
+            clip = audioGameObject.GetComponent<AudioSource>();
+        }
     }
 
     void OnTriggerEnter(Collider other)

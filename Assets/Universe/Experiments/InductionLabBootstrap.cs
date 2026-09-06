@@ -96,7 +96,6 @@ namespace RealityEngine.Experiments
         CubitRod _cubitRod;
         Renderer _loadRenderer;
         Material _loadMaterial;
-        bool _built;
         bool _thinStand;
 
         public InductionCoil Coil => _coil;
@@ -328,7 +327,6 @@ namespace RealityEngine.Experiments
                 EnsureThermo();
                 EnsureLedger();
                 EnsureCosmos();
-                _built = true;
                 return;
             }
 
@@ -377,7 +375,6 @@ namespace RealityEngine.Experiments
             EnsureThermo();
             EnsureLedger();
             EnsureCosmos();
-            _built = true;
         }
 
         void CacheChildren()

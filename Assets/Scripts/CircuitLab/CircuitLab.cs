@@ -115,27 +115,37 @@ public class CircuitLab : MonoBehaviour, ICircuitLab
 
     public void CreatePegs()
     {
+        // Get bounds of breadboard once, rather than re-finding it for every peg
+        var boardObject = GameObject.Find("Breadboard");
+        if (boardObject == null)
+        {
+            Debug.LogError("CircuitLab: no GameObject named 'Breadboard' found; cannot create pegs.");
+            return;
+        }
+        var meshFilter = boardObject.GetComponent<MeshFilter>();
+        if (meshFilter == null || meshFilter.sharedMesh == null)
+        {
+            Debug.LogError("CircuitLab: 'Breadboard' has no MeshFilter/mesh; cannot create pegs.");
+            return;
+        }
+        var size = meshFilter.sharedMesh.bounds.size;
+        float boardWidth = size.x * boardObject.transform.localScale.x;
+        float boardHeight = size.z * boardObject.transform.localScale.z;
+        //Debug.Log("Board Dimensions = " + boardWidth.ToString() + " x " + boardHeight.ToString());
+
         // Create a matrix of pegs
         for (int i = 0; i < numRows; i++)
         {
             for (int j = 0; j < numCols; j++)
             {
-                CreatePeg(i, j);
+                CreatePeg(boardObject, boardWidth, boardHeight, i, j);
             }
         }
     }
 
-    private void CreatePeg(int row, int col)
+    private void CreatePeg(GameObject boardObject, float boardWidth, float boardHeight, int row, int col)
     {
         string name = "Peg_" + row.ToString() + "_" + col.ToString();
-
-        // Get bounds of breadboard
-        var boardObject = GameObject.Find("Breadboard").gameObject;
-        var mesh = boardObject.GetComponent<MeshFilter>().mesh;
-        var size = mesh.bounds.size;
-        var boardWidth = size.x * boardObject.transform.localScale.x;
-        var boardHeight = size.z * boardObject.transform.localScale.z;
-        //Debug.Log("Board Dimensions = " + boardWidth.ToString() + " x " + boardHeight.ToString());
 
         // Create a new peg
         var position = new Vector3(-(boardWidth / 2.0f) + ((col + 1) * pegInterval), pegHeight, -(boardHeight / 2.0f) + ((row + 1) * pegInterval));
@@ -224,7 +234,7 @@ public class CircuitLab : MonoBehaviour, ICircuitLab
         }
 
         // Check south
-        if ((start.y + length >= 0) && (IsSlotFree(start, new Point(start.x, start.y - length), length)))
+        if ((start.y - length >= 0) && (IsSlotFree(start, new Point(start.x, start.y - length), length)))
         {
             freeSlots++;
         }
@@ -772,7 +782,9 @@ public class CircuitLab : MonoBehaviour, ICircuitLab
 
             // Also add a resistor to simulate the way current changes with the
             // angle to the sun even though voltage may be the same.
-            entities.Add(new Resistor("R" + name, mid2, end, solar.SolarResistance));
+            // Clamp to a small minimum: a dark panel reports 0 ohms, which fails
+            // SpiceSharp validation and would otherwise be misreported as a short circuit.
+            entities.Add(new Resistor("R" + name, mid2, end, Mathf.Max(solar.SolarResistance, 0.001f)));
         }
         else if (component is IResistor resistor)
         {

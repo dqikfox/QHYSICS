@@ -196,13 +196,10 @@ namespace RealityEngine.UI
 
         static void TryCircuitLabHint(string label)
         {
+            // Extension point: only meaningful when a CircuitLab exists in the scene
             var lab = UnityEngine.Object.FindAnyObjectByType<CircuitLab>(FindObjectsInactive.Include);
             if (lab == null)
                 return;
-            string lower = label.ToLowerInvariant();
-            if (lower.Contains("wire") || lower.Contains("battery") || lower.Contains("switch")
-                || lower.Contains("bulb") || lower.Contains("magnet") || lower.Contains("coil"))
-                ; // CircuitLab present
         }
 
         bool WasTogglePressed()
@@ -223,9 +220,11 @@ namespace RealityEngine.UI
                     return true;
             }
 #endif
+#if ENABLE_LEGACY_INPUT_MANAGER
             if (Input.GetKeyDown(KeyCode.M) || Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.JoystickButton6)
                 || Input.GetKeyDown(KeyCode.JoystickButton2))
                 return true;
+#endif
             return false;
         }
 
