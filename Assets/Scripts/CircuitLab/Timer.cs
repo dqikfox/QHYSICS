@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,17 +31,27 @@ public class Timer : CircuitComponent, IConductor, IDynamic
         lastTimeoutSeconds = timeoutSeconds;
     }
 
-    ~Timer()
+    void OnDestroy()
     {
-        if (registered)
+        // Remove ourselves from the circuit lab's list of dynamic objects.
+        // (Previously done in a finalizer, but finalizers run on the GC thread
+        // where touching Unity objects is unsafe.)
+        if (registered && Lab != null)
         {
-            // Remove ourselves from the circuit lab's list of dynamic objects
             Lab.UnregisterDynamicComponent(this);
+            registered = false;
         }
     }
 
     protected override void Update ()
     {
+        EnsureLabReference();
+        if (Lab == null)
+        {
+            // Nothing works without a circuit lab; wait until one exists
+            return;
+        }
+
         if (!registered)
         {
             // Register as a dynamic component so we'll get coordinated UpdateState calls

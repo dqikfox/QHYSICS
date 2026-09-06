@@ -75,8 +75,18 @@ namespace RealityEngine.UI
 
         void Update()
         {
+#if ENABLE_INPUT_SYSTEM
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb != null && (kb.escapeKey.wasPressedThisFrame || kb.pKey.wasPressedThisFrame))
+            {
+                Toggle();
+                return;
+            }
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
                 Toggle();
+#endif
         }
 
         void LateUpdate()
@@ -98,7 +108,13 @@ namespace RealityEngine.UI
             QhysicsUiBuilder.WireEventCamera(_canvas);
         }
 
-        public void Toggle() => SetOpen(!_open);
+        public void Toggle()
+        {
+            // Closing via hotkey must unpause, same as the Resume button does
+            if (_open)
+                Time.timeScale = 1f;
+            SetOpen(!_open);
+        }
 
         public void SetOpen(bool on)
         {
