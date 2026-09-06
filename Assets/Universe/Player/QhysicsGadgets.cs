@@ -9,6 +9,7 @@ using RealityEngine.Experiments;
 using RealityEngine.Core;
 using RealityEngine.UI;
 using RealityEngine.XR;
+using RealityEngine.Physics.Electromagnetism;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -52,8 +53,10 @@ namespace RealityEngine.Player
                 return SpawnMultimeterStub(worldPos);
             if (key == "resistor")
                 return SpawnPrimitiveProxy("Resistor", worldPos, new Color(0.75f, 0.45f, 0.2f));
-            if (key == "magnet" || key == "dipole")
-                return SpawnMagnetOrDipole(worldPos);
+            if (key == "magnet")
+                return SpawnHandheldMagnet(worldPos, pureDipole: false);
+            if (key == "dipole")
+                return SpawnHandheldMagnet(worldPos, pureDipole: true);
             if (key == "coil")
                 return SpawnNamedCloneOrProxy("Coil", worldPos, new Color(0.85f, 0.65f, 0.2f));
             if (key == "stopwatch")
@@ -225,7 +228,7 @@ namespace RealityEngine.Player
                     var runner = Object.FindAnyObjectByType<ExperimentRunner>(FindObjectsInactive.Include);
                     if (runner == null)
                     {
-                        Debug.LogWarning("QhysicsGadgets: Save ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ExperimentRunner missing after Induction ensure.");
+                        Debug.LogWarning("QhysicsGadgets: Save - ExperimentRunner missing after Induction ensure.");
                         return true;
                     }
                     string path = runner.Save();
@@ -241,7 +244,7 @@ namespace RealityEngine.Player
                     var runner = Object.FindAnyObjectByType<ExperimentRunner>(FindObjectsInactive.Include);
                     if (runner == null)
                     {
-                        Debug.LogWarning("QhysicsGadgets: Load ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ExperimentRunner missing after Induction ensure.");
+                        Debug.LogWarning("QhysicsGadgets: Load - ExperimentRunner missing after Induction ensure.");
                         return true;
                     }
                     bool ok = runner.LoadLatest();
@@ -329,15 +332,16 @@ namespace RealityEngine.Player
             return go;
         }
 
-        static GameObject SpawnMagnetOrDipole(Vector3 worldPos)
+        static GameObject SpawnHandheldMagnet(Vector3 worldPos, bool pureDipole)
         {
-            GameObject clone = FindNamedLoose("Dipole");
+            // Prefer cloning a live lab magnet that already carries MagneticDipole.
+            GameObject clone = FindNamedLoose(pureDipole ? "Dipole" : "Magnet");
             if (clone == null)
-                clone = FindNamedLoose("Magnet");
-            if (clone != null)
+                clone = FindNamedLoose(pureDipole ? "Magnet" : "Dipole");
+            if (clone != null && clone.GetComponent<MagneticDipole>() != null)
             {
                 GameObject go = Object.Instantiate(clone);
-                go.name = "Gadget_Magnet";
+                go.name = pureDipole ? HandheldMagnet.DipoleRootName : HandheldMagnet.MagnetRootName;
                 go.SetActive(true);
                 go.transform.SetParent(null, true);
                 go.transform.position = worldPos;
@@ -345,7 +349,15 @@ namespace RealityEngine.Player
                 EnsureGrabPhysics(go, 0.25f);
                 return go;
             }
-            return SpawnPrimitiveProxy("Magnet", worldPos, new Color(0.7f, 0.15f, 0.15f));
+
+            // Fallback: build a real classical dipole gadget (never a dead cube proxy).
+            var root = new GameObject(pureDipole ? HandheldMagnet.DipoleRootName : HandheldMagnet.MagnetRootName);
+            root.transform.position = worldPos;
+            var hm = root.AddComponent<HandheldMagnet>();
+            hm.Configure(pureDipole);
+            hm.EnsureBuilt();
+            EnsureGrabPhysics(root, 0.2f);
+            return root;
         }
 
         static GameObject SpawnNamedCloneOrProxy(string name, Vector3 worldPos, Color color)
