@@ -67,6 +67,8 @@ namespace RealityEngine.Player
                 return SpawnFieldProbe(worldPos);
             if (key == "switch")
                 return SpawnLoadSwitch(worldPos);
+            if (key == "battery" || key == "cell" || key == "emf")
+                return SpawnLoadBattery(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -448,6 +450,19 @@ namespace RealityEngine.Player
             if (sw == null)
                 sw = go.AddComponent<LoadSwitchGadget>();
             sw.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadBattery(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: classical series EMF on nearest InductionCoil.
+            var go = SpawnPrimitiveProxy("Battery", worldPos, new Color(0.85f, 0.65f, 0.2f));
+            go.name = LoadBatteryGadget.RootName;
+            go.transform.localScale = new Vector3(0.08f, 0.08f, 0.16f);
+            var bat = go.GetComponent<LoadBatteryGadget>();
+            if (bat == null)
+                bat = go.AddComponent<LoadBatteryGadget>();
+            bat.EnsureBuilt();
             return go;
         }
 
