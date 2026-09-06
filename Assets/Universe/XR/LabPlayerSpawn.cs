@@ -125,8 +125,15 @@ namespace RealityEngine.XR
                 return;
             _nextTrackCheck = Time.unscaledTime + 0.25f;
             ApplyTrackingPause();
-            if (_origin != null && !float.IsNaN(_plazaY) && _origin.transform.position.y < _plazaY - SinkResetM)
-                ApplyNow(true);
+            if (_origin != null)
+            {
+                if (_origin.transform.parent != null && IsMonumentAncestor(_origin.transform.parent))
+                    ApplyNow(true);
+                else if (!float.IsNaN(_plazaY) && _origin.transform.position.y < _plazaY - SinkResetM)
+                    ApplyNow(true);
+                else
+                    StripMonumentChildrenFromPlayer(_origin.transform);
+            }
         }
 
         public void ApplyNow(bool force)
@@ -183,9 +190,73 @@ namespace RealityEngine.XR
 
         static void UnparentKeepingWorld(Transform originXf)
         {
-            if (originXf.parent == null)
+            if (originXf == null)
                 return;
-            originXf.SetParent(null, true);
+            // Hard guard: never leave XR Origin under Giza / pyramids / MountainScene.
+            if (originXf.parent != null)
+            {
+                string pname = originXf.parent.name ?? "";
+                bool monumentParent = IsMonumentAncestor(originXf.parent);
+                if (monumentParent || originXf.parent != null)
+                {
+                    if (monumentParent)
+                        Debug.LogWarning("LabPlayerSpawn: XR Origin was under '" + pname + "' — unparenting to scene root.");
+                    originXf.SetParent(null, true);
+                }
+            }
+            StripMonumentChildrenFromPlayer(originXf);
+        }
+
+        static readonly string[] MonumentTokens =
+        {
+            "pyramid", "khufu", "khafre", "menkaure", "giza", "mastaba",
+            "mountainscene", "lablandscape", "sphinx"
+        };
+
+        static bool IsMonumentName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return false;
+            string n = name.ToLowerInvariant();
+            if (n == "xr origin" || n == "camera offset" || n == "main camera" || n == "qhysicsdesktopplayer")
+                return false;
+            for (int i = 0; i < MonumentTokens.Length; i++)
+            {
+                if (n.IndexOf(MonumentTokens[i], System.StringComparison.Ordinal) >= 0)
+                    return true;
+            }
+            return false;
+        }
+
+        static bool IsMonumentAncestor(Transform t)
+        {
+            Transform p = t;
+            int guard = 0;
+            while (p != null && guard++ < 64)
+            {
+                if (IsMonumentName(p.name))
+                    return true;
+                p = p.parent;
+            }
+            return false;
+        }
+
+        static void StripMonumentChildrenFromPlayer(Transform originXf)
+        {
+            if (originXf == null)
+                return;
+            for (int i = originXf.childCount - 1; i >= 0; i--)
+            {
+                Transform c = originXf.GetChild(i);
+                if (c == null)
+                    continue;
+                if (c.name == CameraOffsetName || c.name == "QhysicsDesktopPlayer")
+                    continue;
+                if (!IsMonumentName(c.name))
+                    continue;
+                Debug.LogWarning("LabPlayerSpawn: monument '" + c.name + "' was parented under XR Origin — moved to scene root.");
+                c.SetParent(null, true);
+            }
         }
 
         static void PreserveCameraRig(Transform originXf)
@@ -249,14 +320,14 @@ namespace RealityEngine.XR
                 Debug.LogWarning("LabPlayerSpawn: CharacterController missing on XR Origin; not adding a Rigidbody.");
                 return;
             }
-            bool ccOn = _cc.enabled;
             _cc.enabled = false;
             _cc.height = CcHeight;
             _cc.skinWidth = CcSkin;
             if (_cc.radius > CcRadius)
                 _cc.radius = CcRadius;
             _cc.center = new Vector3(0f, CcHeight * 0.5f, 0f);
-            _cc.enabled = ccOn;
+            // Always leave CC enabled for desktop + XR locomotion (was briefly off for resize).
+            _cc.enabled = true;
         }
 
         bool ParkOnLabPlaza(Transform originXf, bool snapPose)

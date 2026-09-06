@@ -58,9 +58,19 @@ namespace RealityEngine.Player
                 return;
             }
 
-            // Prefer host under Origin for local body visuals.
+            if (LabPlayerSpawnCompat.IsMonumentTransform(origin))
+            {
+                Debug.LogError("QhysicsDesktopBootstrap: FindOrigin returned monument '" + origin.name + "'; abort bind.");
+                return;
+            }
+
+            LabPlayerSpawnCompat.EnsurePlayerNotUnderMonument(origin);
+            LabPlayerSpawnCompat.StripMonumentChildren(origin);
+
+            // Prefer host under Origin for local body visuals — never under a pyramid.
             if (transform.parent != origin)
                 transform.SetParent(origin, false);
+            LabPlayerSpawnCompat.EnsurePlayerNotUnderMonument(transform);
 
             var controller = GetComponent<DesktopPlayerController>();
             if (controller == null)
@@ -72,6 +82,7 @@ namespace RealityEngine.Player
 
             QhysicsInventory.Ensure(transform);
             EnsureDesktopBody(origin);
+            LabPlayerSpawnCompat.EnsureDesktopViewAuthority(origin, controller.MainCamera);
         }
 
         static Transform FindOrigin()

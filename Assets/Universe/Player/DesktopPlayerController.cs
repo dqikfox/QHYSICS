@@ -49,6 +49,8 @@ namespace RealityEngine.Player
 
         public static bool IsXrDisplayRunning()
         {
+            // Only a RUNNING XR display counts. OpenXR often stays "loaded"/isDeviceActive
+            // with no headset — that must NOT disable desktop WASD.
             var displays = new List<XRDisplaySubsystem>();
             SubsystemManager.GetSubsystems(displays);
             for (int i = 0; i < displays.Count; i++)
@@ -56,15 +58,6 @@ namespace RealityEngine.Player
                 if (displays[i] != null && displays[i].running)
                     return true;
             }
-#pragma warning disable CS0618
-            try
-            {
-                if (XRSettings.isDeviceActive && !string.IsNullOrEmpty(XRSettings.loadedDeviceName)
-                    && XRSettings.loadedDeviceName != "None")
-                    return true;
-            }
-            catch { /* XRSettings may be unavailable */ }
-#pragma warning restore CS0618
             return false;
         }
 
@@ -73,9 +66,26 @@ namespace RealityEngine.Player
             _origin = origin;
             if (_origin == null)
                 return;
+
+            // Never locomote a monument / Giza child if a bad reference was passed.
+            if (LabPlayerSpawnCompat.IsMonumentTransform(_origin))
+            {
+                Debug.LogError("DesktopPlayerController: refused to Bind monument '" + _origin.name + "'; re-finding XR Origin.");
+                _origin = FindOrigin();
+                if (_origin == null || LabPlayerSpawnCompat.IsMonumentTransform(_origin))
+                    return;
+            }
+
+            LabPlayerSpawnCompat.EnsurePlayerNotUnderMonument(_origin);
+            LabPlayerSpawnCompat.StripMonumentChildren(_origin);
+
             _cc = _origin.GetComponent<CharacterController>();
+            if (_cc == null)
+                _cc = _origin.gameObject.AddComponent<CharacterController>();
             if (_cc != null)
             {
+                if (!_cc.enabled)
+                    _cc.enabled = true;
                 _baseCcHeight = _cc.height > 0.1f ? _cc.height : standHeight;
                 _baseCcCenter = _cc.center;
             }
@@ -99,8 +109,21 @@ namespace RealityEngine.Player
                         _mainCamera = cam.transform;
                 }
             }
-            if (_mainCamera == null && Camera.main != null)
-                _mainCamera = Camera.main.transform;
+            // Never fall back to BuildingBlock/OVR CenterEyeAnchor via Camera.main.
+            if (_mainCamera == null)
+            {
+                var cams = Object.FindObjectsByType<Camera>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+                for (int i = 0; i < cams.Length; i++)
+                {
+                    if (cams[i] == null)
+                        continue;
+                    if (cams[i].transform.IsChildOf(_origin))
+                    {
+                        _mainCamera = cams[i].transform;
+                        break;
+                    }
+                }
+            }
 
             if (_origin != null)
                 _yaw = _origin.eulerAngles.y;
@@ -139,6 +162,17 @@ namespace RealityEngine.Player
                 ReleaseCursor();
                 return;
             }
+
+            // Re-assert every frame: origin must stay the XR Origin, never a pyramid.
+            if (_origin == null || LabPlayerSpawnCompat.IsMonumentTransform(_origin)
+                || (_origin.parent != null && LabPlayerSpawnCompat.IsMonumentTransform(_origin.parent)))
+            {
+                Bind(FindOrigin());
+                if (_origin == null)
+                    return;
+            }
+            LabPlayerSpawnCompat.EnsurePlayerNotUnderMonument(_origin);
+            LabPlayerSpawnCompat.EnsureDesktopViewAuthority(_origin, _mainCamera);
 
             bool pauseOpen = IsPauseOpen();
             if (pauseOpen)
@@ -217,10 +251,14 @@ namespace RealityEngine.Player
 
         void ApplyMove()
         {
-            if (_cc == null)
-                _cc = _origin.GetComponent<CharacterController>();
-            if (_cc == null || !_cc.enabled)
+            if (_origin == null || LabPlayerSpawnCompat.IsMonumentTransform(_origin))
                 return;
+            if (_cc == null || _cc.transform != _origin)
+                _cc = _origin.GetComponent<CharacterController>();
+            if (_cc == null)
+                return;
+            if (!_cc.enabled)
+                _cc.enabled = true;
 
             Vector2 stick = ReadMoveAxes();
             bool sprint = ReadSprint();
@@ -342,10 +380,187 @@ namespace RealityEngine.Player
     }
 
     /// <summary>String constants shared with LabPlayerSpawn without a hard XR assembly cycle.</summary>
-    static class LabPlayerSpawnCompat
+    public static class LabPlayerSpawnCompat
     {
         public const string OriginName = "XR Origin";
         public const string CameraOffsetName = "Camera Offset";
         public const string MainCameraName = "Main Camera";
+
+        static readonly string[] MonumentTokens =
+        {
+            "pyramid", "khufu", "khafre", "menkaure", "giza", "mastaba",
+            "mountainscene", "lablandscape", "sphinx", "g1a", "g1b", "g1c", "g1d", "g2", "g3"
+        };
+
+        public static bool IsMonumentName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return false;
+            string n = name.ToLowerInvariant();
+            // Exact player / camera names are never monuments.
+            if (n == "xr origin" || n == "camera offset" || n == "main camera"
+                || n == "qhysicsdesktopplayer" || n.StartsWith("[buildingblock]"))
+                return false;
+            for (int i = 0; i < MonumentTokens.Length; i++)
+            {
+                if (n.IndexOf(MonumentTokens[i], System.StringComparison.Ordinal) >= 0)
+                    return true;
+            }
+            return false;
+        }
+
+        public static bool IsMonumentTransform(Transform t)
+        {
+            if (t == null)
+                return false;
+            if (IsMonumentName(t.name))
+                return true;
+            // Ancestor check (player accidentally parented under Giza).
+            Transform p = t.parent;
+            int guard = 0;
+            while (p != null && guard++ < 64)
+            {
+                if (IsMonumentName(p.name))
+                    return true;
+                p = p.parent;
+            }
+            return false;
+        }
+
+        public static void EnsurePlayerNotUnderMonument(Transform playerRoot)
+        {
+            if (playerRoot == null)
+                return;
+            if (playerRoot.parent == null)
+                return;
+            if (!IsMonumentTransform(playerRoot.parent) && !IsMonumentName(playerRoot.parent.name))
+            {
+                // Still unparent if any ancestor is a monument.
+                Transform p = playerRoot.parent;
+                bool under = false;
+                int guard = 0;
+                while (p != null && guard++ < 64)
+                {
+                    if (IsMonumentName(p.name))
+                    {
+                        under = true;
+                        break;
+                    }
+                    p = p.parent;
+                }
+                if (!under)
+                    return;
+            }
+            Debug.LogWarning("DesktopPlayer: unparenting '" + playerRoot.name + "' from monument hierarchy '" +
+                             (playerRoot.parent != null ? playerRoot.parent.name : "?") + "' to scene root.");
+            playerRoot.SetParent(null, true);
+        }
+
+        public static void StripMonumentChildren(Transform playerRoot)
+        {
+            if (playerRoot == null)
+                return;
+            for (int i = playerRoot.childCount - 1; i >= 0; i--)
+            {
+                Transform c = playerRoot.GetChild(i);
+                if (c == null)
+                    continue;
+                if (c.name == CameraOffsetName || c.name == "QhysicsDesktopPlayer")
+                    continue;
+                if (!IsMonumentName(c.name))
+                    continue;
+                Debug.LogWarning("DesktopPlayer: stripping monument child '" + c.name + "' from player root to scene root.");
+                c.SetParent(null, true);
+            }
+        }
+
+        public static void EnsureDesktopViewAuthority(Transform origin, Transform xrMainCamera)
+        {
+            if (origin == null)
+                return;
+
+            // Disable leftover OVR / BuildingBlock cameras so WASD moves the view the user sees.
+            var cams = Object.FindObjectsByType<Camera>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            Camera keep = null;
+            if (xrMainCamera != null)
+                keep = xrMainCamera.GetComponent<Camera>();
+            if (keep == null)
+            {
+                for (int i = 0; i < cams.Length; i++)
+                {
+                    if (cams[i] != null && cams[i].transform.IsChildOf(origin))
+                    {
+                        keep = cams[i];
+                        break;
+                    }
+                }
+            }
+
+            for (int i = 0; i < cams.Length; i++)
+            {
+                Camera c = cams[i];
+                if (c == null)
+                    continue;
+                bool underOrigin = c.transform.IsChildOf(origin);
+                string n = c.gameObject.name ?? "";
+                bool rival = !underOrigin && (
+                    n.IndexOf("CenterEye", System.StringComparison.OrdinalIgnoreCase) >= 0
+                    || n.IndexOf("LeftEye", System.StringComparison.OrdinalIgnoreCase) >= 0
+                    || n.IndexOf("RightEye", System.StringComparison.OrdinalIgnoreCase) >= 0
+                    || n.IndexOf("BuildingBlock", System.StringComparison.OrdinalIgnoreCase) >= 0
+                    || IsUnderBuildingBlock(c.transform));
+                if (rival)
+                {
+                    if (c.enabled)
+                        c.enabled = false;
+                    if (c.CompareTag("MainCamera"))
+                        c.tag = "Untagged";
+                    var al = c.GetComponent<AudioListener>();
+                    if (al != null && al.enabled)
+                        al.enabled = false;
+                }
+            }
+
+            if (keep != null)
+            {
+                if (!keep.enabled)
+                    keep.enabled = true;
+                if (!keep.CompareTag("MainCamera"))
+                    keep.tag = "MainCamera";
+                var listener = keep.GetComponent<AudioListener>();
+                if (listener != null && !listener.enabled)
+                    listener.enabled = true;
+
+                // TrackedPoseDriver fights mouse-look / makes desktop feel "stuck".
+                var behaviours = keep.GetComponents<Behaviour>();
+                for (int i = 0; i < behaviours.Length; i++)
+                {
+                    Behaviour b = behaviours[i];
+                    if (b == null || !b.enabled)
+                        continue;
+                    string tn = b.GetType().Name;
+                    if (tn.IndexOf("TrackedPoseDriver", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                        b.enabled = false;
+                }
+            }
+
+            // Soft-disable empty BuildingBlock camera rig so it cannot steal focus.
+            GameObject bb = GameObject.Find("[BuildingBlock] Camera Rig");
+            if (bb != null && bb.activeSelf)
+                bb.SetActive(false);
+        }
+
+        static bool IsUnderBuildingBlock(Transform t)
+        {
+            Transform p = t;
+            int guard = 0;
+            while (p != null && guard++ < 64)
+            {
+                if (p.name != null && p.name.IndexOf("BuildingBlock", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    return true;
+                p = p.parent;
+            }
+            return false;
+        }
     }
 }

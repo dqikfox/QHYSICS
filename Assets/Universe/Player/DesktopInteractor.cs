@@ -184,6 +184,10 @@ namespace RealityEngine.Player
                 }
             }
 
+            // Never grab Giza / pyramids / mastabas (would look like "a pyramid moves").
+            if (LabPlayerSpawnCompat.IsMonumentTransform(root))
+                return;
+
             // Do not steal dispenser shelf template still parented under Dispenser
             if (root.parent != null && root.parent.GetComponent<Dispenser>() != null)
                 return;
