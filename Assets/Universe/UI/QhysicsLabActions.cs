@@ -1,4 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
+using RealityEngine.Player;
 
 namespace RealityEngine.UI
 {
@@ -27,16 +28,68 @@ namespace RealityEngine.UI
 
         public static bool ResetCircuitLab()
         {
+            ClearSpawnedExperimentProps();
+
             var lab = UnityEngine.Object.FindAnyObjectByType<CircuitLab>(FindObjectsInactive.Include);
             if (lab == null)
             {
-                Debug.LogWarning("QHYSICS: CircuitLab not found — cannot reset experiment.");
+                Debug.LogWarning("QHYSICS: CircuitLab not found — cannot reset table (spawned gadgets still cleared).");
+                Time.timeScale = 1f;
                 return false;
             }
             lab.Reset();
             Time.timeScale = 1f;
             Debug.Log("QHYSICS: CircuitLab.Reset() done.");
             return true;
+        }
+
+        /// <summary>
+        /// Destroys toolbelt/hotbar-spawned experiment props (Gadget_* and *_Desktop roots).
+        /// Never touches Dispenser templates or scene lab content under a Dispenser.
+        /// </summary>
+        public static int ClearSpawnedExperimentProps()
+        {
+            var desktop = Object.FindFirstObjectByType<DesktopInteractor>(FindObjectsInactive.Include);
+            if (desktop != null)
+                desktop.ReleaseHeld();
+
+            var transforms = Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var doomed = new System.Collections.Generic.List<GameObject>(32);
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                Transform t = transforms[i];
+                if (t == null)
+                    continue;
+                GameObject go = t.gameObject;
+                string n = go.name;
+                if (string.IsNullOrEmpty(n))
+                    continue;
+
+                bool gadget = n.StartsWith("Gadget_", System.StringComparison.Ordinal);
+                bool desktopSpawn = n.EndsWith("_Desktop", System.StringComparison.Ordinal);
+                if (!gadget && !desktopSpawn)
+                    continue;
+
+                // Leave Dispenser template children alone (CircuitLab.Reset handles those).
+                if (go.GetComponentInParent<Dispenser>() != null)
+                    continue;
+
+                doomed.Add(go);
+            }
+
+            int cleared = 0;
+            for (int i = 0; i < doomed.Count; i++)
+            {
+                GameObject go = doomed[i];
+                if (go == null)
+                    continue;
+                Object.Destroy(go);
+                cleared++;
+            }
+
+            if (cleared > 0)
+                Debug.Log("QHYSICS: New Run cleared " + cleared + " spawned gadget(s).");
+            return cleared;
         }
 
         /// <summary>

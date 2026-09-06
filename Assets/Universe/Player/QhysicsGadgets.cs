@@ -179,7 +179,7 @@ namespace RealityEngine.Player
                 case "new run":
                 case "reset":
                     QhysicsLabActions.ResetCircuitLab();
-                    Debug.Log("QhysicsGadgets: New Run -> CircuitLab.Reset()");
+                    Debug.Log("QhysicsGadgets: New Run -> CircuitLab.Reset() + clear spawned gadgets");
                     return true;
                 case "reset pose":
                 {
