@@ -5,6 +5,7 @@ using UnityEditor;
 using RealityEngine.Survey;
 using RealityEngine.Visualization;
 using RealityEngine.Experiments;
+using RealityEngine.Core;
 using RealityEngine.UI;
 using RealityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -55,7 +56,7 @@ namespace RealityEngine.Player
                 return SpawnPrimitiveProxy(label.Trim(), worldPos, new Color(0.35f, 0.55f, 0.75f));
 
 
-            // World / experiment chips — real actions (not spawns)
+            // World / experiment chips Ã¢â‚¬â€ real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
                 return null;
 
@@ -193,8 +194,23 @@ namespace RealityEngine.Player
                     Debug.Log("QhysicsGadgets: Induction lab ensured");
                     return true;
                 }
-                case "teleport":
                 case "scale":
+                {
+                    var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+                    var lab = InductionLabBootstrap.EnsureLabInScene(scene);
+                    if (lab != null)
+                        lab.BuildLab();
+                    var scale = Object.FindAnyObjectByType<ScaleEngine>(FindObjectsInactive.Include);
+                    if (scale == null)
+                    {
+                        Debug.LogWarning("QhysicsGadgets: Scale Engine missing after Induction ensure.");
+                        return true;
+                    }
+                    scale.StepIn();
+                    Debug.Log("QhysicsGadgets: Scale -> " + scale.CurrentScaleName);
+                    return true;
+                }
+                case "teleport":
                 case "sky":
                 case "save":
                 case "load":
@@ -369,7 +385,7 @@ namespace RealityEngine.Player
 
     /// <summary>
     /// Handheld Field Lens proxy: while held (or near camera), steps FieldLens layers with [ ] / N P.
-    /// Does not replace the scene FieldLens host â€” drives the existing one.
+    /// Does not replace the scene FieldLens host ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â drives the existing one.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensHandheld : MonoBehaviour
