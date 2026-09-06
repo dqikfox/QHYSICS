@@ -16,8 +16,8 @@ namespace RealityEngine.UI
         static readonly string[] Tips =
         {
             "Welcome to QHYSICS\nCircuit lab on the table. Giza outside.",
-            "Grab components from dispensers.\nGrip / trigger to pick up and place.",
-            "Try a loop: Battery → Wire → Bulb → Switch.\nMenu / Esc pauses. SimChip sets speed."
+            "Desktop: WASD move, mouse look, E/LMB grab, F drop, R throw.\nVR: grip / trigger. Hotbar 1-8 / scroll.",
+            "Try a loop: Battery -> Wire -> Bulb -> Switch.\nEsc/P pause. Toolbelt New Run resets the table."
         };
 
         Canvas _canvas;

@@ -5,6 +5,8 @@ using UnityEditor;
 using RealityEngine.Survey;
 using RealityEngine.Visualization;
 using RealityEngine.Experiments;
+using RealityEngine.UI;
+using RealityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace RealityEngine.Player
@@ -52,13 +54,11 @@ namespace RealityEngine.Player
             if (key == "probe" || key == "stopwatch")
                 return SpawnPrimitiveProxy(label.Trim(), worldPos, new Color(0.35f, 0.55f, 0.75f));
 
-            // World / experiment chips â€” soft no-ops that still give feedback
-            if (key == "teleport" || key == "scale" || key == "sky" || key == "reset pose"
-                || key == "induction" || key == "new run" || key == "save" || key == "load")
-            {
-                Debug.Log("QhysicsGadgets: '" + label + "' is a world/experiment action â€” use menu/SimChip (no spawn).");
+
+            // World / experiment chips — real actions (not spawns)
+            if (TryWorldOrExperimentAction(key, label))
                 return null;
-            }
+
 
             Dispenser.ComponentTag tag;
             if (!TryMapTag(key, out tag))
@@ -159,6 +159,51 @@ namespace RealityEngine.Player
 #else
             return null;
 #endif
+        }
+
+
+        static bool TryWorldOrExperimentAction(string key, string label)
+        {
+            switch (key)
+            {
+                case "new run":
+                case "reset":
+                    QhysicsLabActions.ResetCircuitLab();
+                    Debug.Log("QhysicsGadgets: New Run -> CircuitLab.Reset()");
+                    return true;
+                case "reset pose":
+                {
+                    LabPlayerSpawn.EnsureApplied();
+                    var desktop = DesktopPlayerController.Instance;
+                    if (desktop != null)
+                    {
+                        var origin = GameObject.Find(LabPlayerSpawn.OriginName);
+                        if (origin != null)
+                            desktop.Bind(origin.transform);
+                    }
+                    Debug.Log("QhysicsGadgets: Reset Pose -> plaza spawn");
+                    return true;
+                }
+                case "induction":
+                {
+                    var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+                    var lab = InductionLabBootstrap.EnsureLabInScene(scene);
+                    if (lab != null)
+                        lab.BuildLab();
+                    Debug.Log("QhysicsGadgets: Induction lab ensured");
+                    return true;
+                }
+                case "teleport":
+                case "scale":
+                case "sky":
+                case "save":
+                case "load":
+                    // Keep unfinished chips available but non-destructive.
+                    Debug.Log("QhysicsGadgets: '" + label + "' parked (use locomotion / Scale Engine / pause menu).");
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         static GameObject SpawnCubitRod(Vector3 worldPos)
