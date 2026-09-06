@@ -1,5 +1,7 @@
 using UnityEngine;
 using TMPro;
+using RealityEngine.XR;
+using RealityEngine.Experiments;
 
 namespace RealityEngine.UI
 {
@@ -68,7 +70,7 @@ namespace RealityEngine.UI
             QhysicsUiBuilder.ChipButton(face.transform, "Enter", "Enter Sandbox", new Vector2(560f, 96f), EnterSandbox);
             QhysicsUiBuilder.ChipButton(face.transform, "Settings", "Settings", new Vector2(560f, 80f), OpenSettings);
 #if UNITY_EDITOR
-            // no Exit here — pause panel has Exit Play
+            // no Exit here â€” pause panel has Exit Play
 #endif
 
             // Show on first Play; if already entered once, stay hidden (lab is ready immediately).
@@ -100,10 +102,11 @@ namespace RealityEngine.UI
             PlayerPrefs.Save();
             Time.timeScale = 1f;
             SetVisible(false);
-            // Ensure player parked at lab
-            var spawn = UnityEngine.Object.FindAnyObjectByType<RealityEngine.XR.LabPlayerSpawn>(FindObjectsInactive.Include);
-            if (spawn != null)
-                spawn.ApplyNow(true);
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            var lab = InductionLabBootstrap.EnsureLabInScene(scene);
+            if (lab != null)
+                lab.BuildLab();
+            LabPlayerSpawn.EnsureApplied();
         }
 
         void OpenSettings()
