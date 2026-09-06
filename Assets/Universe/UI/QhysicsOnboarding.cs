@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 
 namespace RealityEngine.UI
@@ -17,11 +17,13 @@ namespace RealityEngine.UI
         {
             "Welcome to QHYSICS\nCircuit lab on the table. Giza outside.",
             "Desktop: WASD move, mouse look, E/LMB grab, F drop, R throw.\nVR: grip / trigger. Hotbar 1-8 / scroll.",
+            "You are the XR Origin (and desktop body when no headset). Controllers / DesktopBody are your hands — not a separate avatar." ,
             "Try a loop: Battery -> Wire -> Bulb -> Switch.\nEsc/P pause. Toolbelt New Run resets the table.",
             "PHYSICS Field Lens: grab it, N/P or VR trigger peels layers (honesty tags on readout).",
             "PHYSICS Magnet/Dipole: grab a live classical MagneticDipole (Probe reads B).",
             "PHYSICS Coil: grab a live classical InductionCoil; move a Magnet through it (Multimeter reads Emf/I).",
             "MEASURE Multimeter: binds nearest InductionCircuit (lab or PHYSICS Coil); tip shows target + distance.",
+            "VR hands: slim controller proxies + DirectInteractor attach when headset is running (desktop body stays separate).",
         };
 
         Canvas _canvas;

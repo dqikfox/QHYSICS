@@ -91,7 +91,7 @@ namespace RealityEngine.XR
             if (!existing.isActiveAndEnabled && existing.gameObject.activeInHierarchy)
                 existing.enabled = true;
 
-            // Always force â€” Origin may already be in scene at a bad MountainScene-local pose.
+            // Always force - Origin may already be in scene at a bad MountainScene-local pose.
             existing.ApplyNow(true);
             return existing;
         }
@@ -200,7 +200,7 @@ namespace RealityEngine.XR
                 if (monumentParent || originXf.parent != null)
                 {
                     if (monumentParent)
-                        Debug.LogWarning("LabPlayerSpawn: XR Origin was under '" + pname + "' — unparenting to scene root.");
+                        Debug.LogWarning("LabPlayerSpawn: XR Origin was under '" + pname + "' - unparenting to scene root.");
                     originXf.SetParent(null, true);
                 }
             }
@@ -250,11 +250,11 @@ namespace RealityEngine.XR
                 Transform c = originXf.GetChild(i);
                 if (c == null)
                     continue;
-                if (c.name == CameraOffsetName || c.name == "QhysicsDesktopPlayer")
+                if (c.name == CameraOffsetName || c.name == "QhysicsDesktopPlayer" || c.name == "DesktopBody")
                     continue;
                 if (!IsMonumentName(c.name))
                     continue;
-                Debug.LogWarning("LabPlayerSpawn: monument '" + c.name + "' was parented under XR Origin — moved to scene root.");
+                Debug.LogWarning("LabPlayerSpawn: monument '" + c.name + "' was parented under XR Origin - moved to scene root.");
                 c.SetParent(null, true);
             }
         }
@@ -500,7 +500,7 @@ namespace RealityEngine.XR
                 _snap.controllers = list;
             }
 
-            // Legacy LocomotionSystem.m_XROrigin is often fileID 0 in Faraday â€” wire it.
+            // Legacy LocomotionSystem.m_XROrigin is often fileID 0 in Faraday - wire it.
             _locoSystem = originXf.GetComponent<LocomotionSystem>();
             if (_locoSystem == null)
                 _locoSystem = originXf.GetComponentInChildren<LocomotionSystem>(true);
@@ -648,6 +648,9 @@ namespace RealityEngine.XR
 
             SetDirectHand(left, InteractorHandedness.Left);
             SetDirectHand(right, InteractorHandedness.Right);
+
+            // Attach points + light controller proxies (Hand Presence may miss OpenXR device names).
+            XrHandVisuals.Ensure(originXf);
 
             bool leftRay = HasRay(offset, left);
             bool rightRay = HasRay(offset, right);

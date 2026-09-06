@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using RealityEngine.UI;
 #if ENABLE_INPUT_SYSTEM
@@ -46,6 +46,8 @@ namespace RealityEngine.Player
             var desktop = DesktopPlayerController.Instance;
             if (desktop == null || !desktop.IsDesktopActive)
             {
+                if (_held != null)
+                    Drop(false);
                 ClearHover();
                 return;
             }
