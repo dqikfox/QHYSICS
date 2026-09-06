@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 #if ENABLE_INPUT_SYSTEM
@@ -9,11 +9,12 @@ namespace RealityEngine.Player
 {
     /// <summary>
     /// Grabbable MEASURE stopwatch: wall-clock timer for timing magnet sweeps / runs.
-    /// Honesty: Editor/player Time.unscaledTime â€” not a sim clock or atomic standard.
-    /// Desktop: T toggle, Y reset (when near/held). VR: activate (trigger) toggles while selected.
+    /// Honesty: Editor/player Time.unscaledTime - not a sim clock or atomic standard.
+    /// Desktop: T toggle, Y reset (when near/held); LMB/scroll while held (IDesktopActivatable).
+    /// VR: activate (trigger) toggles while selected; scroll-down / negative delta resets.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class ExperimentStopwatch : MonoBehaviour
+    public sealed class ExperimentStopwatch : MonoBehaviour, IDesktopActivatable
     {
         public const string RootName = "Gadget_Stopwatch";
         public const string Honesty = "Wall-clock unscaled time for experiment timing. Not a sim clock.";
@@ -97,6 +98,18 @@ namespace RealityEngine.Player
                 return;
             _inputCooldown = Time.unscaledTime + 0.2f;
             Toggle();
+        }
+
+        /// <summary>Desktop LMB/scroll while held: + toggles, - resets.</summary>
+        public void DesktopActivate(int delta)
+        {
+            if (Time.unscaledTime < _inputCooldown)
+                return;
+            _inputCooldown = Time.unscaledTime + 0.2f;
+            if (delta < 0)
+                ResetTimer();
+            else
+                Toggle();
         }
 
         bool IsActiveContext()
@@ -183,7 +196,7 @@ namespace RealityEngine.Player
             _readout.color = new Color(0.95f, 0.85f, 0.35f, 1f);
             _readout.textWrappingMode = TextWrappingModes.Normal;
             _readout.rectTransform.sizeDelta = new Vector2(28f, 14f);
-            _readout.text = "STOPWATCH\n00:00.00\nT toggle / Y reset";
+            _readout.text = "STOPWATCH\n00:00.00\nLMB/T toggle";
         }
 
         void RefreshText()
@@ -194,7 +207,7 @@ namespace RealityEngine.Player
             _readout.text =
                 "STOPWATCH " + state + "\n"
                 + Format(_elapsed) + "\n"
-                + "T toggle / Y reset\n"
+                + "LMB/T toggle  scroll-/Y reset\n"
                 + "[wall-clock]";
         }
 
@@ -208,4 +221,3 @@ namespace RealityEngine.Player
         }
     }
 }
-
