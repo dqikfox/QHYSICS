@@ -15,7 +15,7 @@ namespace RealityEngine.Player
     /// XR activate / N cycles presets; P steps backward.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class LoadResistorGadget : MonoBehaviour
+    public sealed class LoadResistorGadget : MonoBehaviour, IDesktopActivatable
     {
         public const string RootName = "Gadget_Resistor";
         public const string Honesty = "Classical series R_load on InductionCoil. Lumped ohmic model.";
@@ -156,6 +156,8 @@ namespace RealityEngine.Player
                 _appliedCoil.SetLoadResistance(ActiveOhms);
             RefreshText();
         }
+
+        public void DesktopActivate(int delta) => CyclePreset(delta);
 
         void EnsureCoils(bool force)
         {

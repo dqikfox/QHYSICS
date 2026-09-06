@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Player
 {
     /// <summary>
-    /// Center-screen ray grab for desktop: LMB/E grab XR grabables or CircuitLab parts; F soft-drop / R throw.
+    /// Center-screen ray grab for desktop: LMB/E grab XR grabables or CircuitLab parts; while held LMB/scroll activate; F soft-drop / R throw.
     /// Held props parent to HandAttach; colliders disabled while held to avoid yanking through geometry.
     /// </summary>
     [DisallowMultipleComponent]
@@ -42,6 +42,10 @@ namespace RealityEngine.Player
 
         public Transform Held => _held;
         public Transform HoverTarget { get; private set; }
+
+        /// <summary>True when held prop exposes desktop LMB/scroll activate (hotbar scroll yields).</summary>
+        public bool HoldsActivatable =>
+            _held != null && _held.GetComponentInParent<IDesktopActivatable>() != null;
 
         /// <summary>Drop without throw — used by New Run before clearing spawned gadgets.</summary>
         public void ReleaseHeld()
@@ -98,6 +102,9 @@ namespace RealityEngine.Player
             else
             {
                 ClearHover();
+                int activateDelta = ReadActivateDelta();
+                if (activateDelta != 0)
+                    TryActivateHeld(activateDelta);
                 if (WasDropPressed())
                     Drop(false);
                 else if (WasThrowPressed())
@@ -444,6 +451,63 @@ namespace RealityEngine.Player
                 }
             }
             _hoverRenderer = null;
+        }
+
+        void TryActivateHeld(int delta)
+        {
+            if (_held == null || delta == 0)
+                return;
+            var act = _held.GetComponentInParent<IDesktopActivatable>();
+            if (act != null)
+                act.DesktopActivate(delta);
+        }
+
+        static int ReadActivateDelta()
+        {
+            // LMB = +1 while holding (desktop "trigger"); scroll = +/-1.
+#if ENABLE_INPUT_SYSTEM
+            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+                return 1;
+            if (Mouse.current != null)
+            {
+                float y = Mouse.current.scroll.ReadValue().y;
+                if (y > 0.1f) return 1;
+                if (y < -0.1f) return -1;
+            }
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.GetMouseButtonDown(0))
+                return 1;
+            float s = Input.mouseScrollDelta.y;
+            if (s > 0.1f) return 1;
+            if (s < -0.1f) return -1;
+#endif
+            return 0;
+        }
+
+        void OnGUI()
+        {
+            var desktop = DesktopPlayerController.Instance;
+            if (desktop == null || !desktop.IsDesktopActive)
+                return;
+            // Simple center reticle ? grab cyan / hold amber / idle white.
+            float cx = Screen.width * 0.5f;
+            float cy = Screen.height * 0.5f;
+            Color c = Color.white;
+            if (_held != null)
+                c = new Color(1f, 0.75f, 0.25f, 0.9f);
+            else if (HoverTarget != null)
+                c = new Color(0.35f, 0.9f, 1f, 0.95f);
+            var prev = GUI.color;
+            GUI.color = c;
+            const float arm = 7f;
+            const float gap = 3f;
+            const float thick = 2f;
+            GUI.DrawTexture(new Rect(cx - arm, cy - thick * 0.5f, arm - gap, thick), Texture2D.whiteTexture);
+            GUI.DrawTexture(new Rect(cx + gap, cy - thick * 0.5f, arm - gap, thick), Texture2D.whiteTexture);
+            GUI.DrawTexture(new Rect(cx - thick * 0.5f, cy - arm, thick, arm - gap), Texture2D.whiteTexture);
+            GUI.DrawTexture(new Rect(cx - thick * 0.5f, cy + gap, thick, arm - gap), Texture2D.whiteTexture);
+            GUI.color = prev;
         }
 
         static bool WasGrabPressed()

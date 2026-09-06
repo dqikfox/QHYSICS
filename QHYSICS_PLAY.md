@@ -65,6 +65,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
+| **LMB** / **Scroll** while holding CIRCUIT gadget | Activate / cycle (desktop trigger) |
 | **F** / **RMB** | Drop |
 | **R** | Throw |
 | **Esc** / **P** | Pause (releases cursor) - Resume re-locks |
