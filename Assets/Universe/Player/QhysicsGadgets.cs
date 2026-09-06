@@ -436,6 +436,19 @@ namespace RealityEngine.Player
             return go;
         }
 
+        static GameObject SpawnLoadBulb(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: classical |I| glow on nearest InductionCircuit (Resistor owns R_load).
+            var go = SpawnPrimitiveProxy("Lamp", worldPos, new Color(0.55f, 0.45f, 0.2f));
+            go.name = LoadBulbGadget.RootName;
+            go.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
+            var lb = go.GetComponent<LoadBulbGadget>();
+            if (lb == null)
+                lb = go.AddComponent<LoadBulbGadget>();
+            lb.EnsureBuilt();
+            return go;
+        }
+
         static GameObject SpawnMultimeterStub(Vector3 worldPos)
         {
             // Real MEASURE tool: live InductionCircuit EMF/I/Phi (classical Faraday).
