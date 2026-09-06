@@ -85,14 +85,14 @@ namespace RealityEngine.Player
 
         static void EnsureDesktopBody(Transform origin)
         {
-            Transform offset = origin.Find(LabPlayerSpawn.CameraOffsetName);
+            Transform offset = origin.Find(LabPlayerSpawnCompat.CameraOffsetName);
             if (offset == null)
             {
                 var xr = origin.GetComponent<XROrigin>();
                 if (xr != null && xr.CameraFloorOffsetObject != null)
                     offset = xr.CameraFloorOffsetObject.transform;
             }
-            Transform cam = offset != null ? offset.Find(LabPlayerSpawn.MainCameraName) : null;
+            Transform cam = offset != null ? offset.Find(LabPlayerSpawnCompat.MainCameraName) : null;
             if (cam == null && offset != null)
             {
                 var c = offset.GetComponentInChildren<Camera>(true);

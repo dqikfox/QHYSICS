@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using RealityEngine.Player;
+using RealityEngine.UI;
 using RealityEngine.XR;
 
 namespace RealityEngine.EditorTools
@@ -16,13 +17,17 @@ namespace RealityEngine.EditorTools
         {
             LabPlayerSpawn.EnsureApplied();
             var boot = QhysicsDesktopBootstrap.Ensure();
+            QhysicsUiBootstrap.EnsurePlaced();
             if (boot != null && boot.gameObject.scene.IsValid() && !Application.isPlaying)
+            {
+                EditorUtility.SetDirty(boot.gameObject);
                 EditorSceneManager.MarkSceneDirty(boot.gameObject.scene);
+            }
 
             Selection.activeGameObject = boot != null ? boot.gameObject : null;
             Debug.Log(
                 "Reality Engine: Place Desktop Player. Keyboard WASD + mouse look when no XR headset. " +
-                "Hotbar 1-8 / Q / scroll. E grab, F/R drop. Ctrl+S then Ctrl+P without Link to test.");
+                "Hotbar 1-8 / Q / scroll. E grab, F/R drop. LMB spawn. Ctrl+S then Ctrl+P without Link to test.");
         }
 
         [MenuItem(Path, true)]

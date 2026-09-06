@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Player
 {
     /// <summary>
-    /// Desktop hotbar slots 1–8 + screen overlay. VR toolbelt remains separate.
+    /// Desktop hotbar slots 1â€“8 + screen overlay. VR toolbelt remains separate.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(132)]
@@ -23,15 +23,15 @@ namespace RealityEngine.Player
             Battery = 1,
             Switch = 2,
             Bulb = 3,
-            Resistor = 4,
-            Magnet = 5,
-            Multimeter = 6,
+            Magnet = 4,
+            FieldLens = 5,
+            CubitRod = 6,
             Empty = 7
         }
 
         public static readonly string[] SlotLabels =
         {
-            "Wire", "Battery", "Switch", "Bulb", "Resistor", "Magnet", "Multimeter", "Delete"
+            "Wire", "Battery", "Switch", "Bulb", "Magnet", "Field Lens", "Cubit Rod", "Delete"
         };
 
         public static QhysicsInventory Instance { get; private set; }
@@ -161,7 +161,7 @@ namespace RealityEngine.Player
             }
 
             _hint = QhysicsUiBuilder.Label(canvasGo.transform, "Hint",
-                "WASD move · Mouse look · 1-8 tools · E grab · F/R drop · Esc pause",
+                "WASD move Â· Mouse look Â· 1-8 tools Â· E grab Â· F/R drop Â· Esc pause",
                 QhysicsUiStyle.FontSmall, QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
             _hint.rectTransform.anchorMin = new Vector2(0.5f, 0f);
             _hint.rectTransform.anchorMax = new Vector2(0.5f, 0f);
@@ -190,7 +190,7 @@ namespace RealityEngine.Player
         {
             ClearGhost();
             var slot = SelectedSlot;
-            if (slot == SlotId.Empty || slot == SlotId.Multimeter)
+            if (slot == SlotId.Empty)
                 return;
 
             _ghost = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -298,3 +298,4 @@ namespace RealityEngine.Player
         }
     }
 }
+

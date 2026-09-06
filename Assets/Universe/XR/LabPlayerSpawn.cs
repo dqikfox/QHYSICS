@@ -24,7 +24,7 @@ namespace RealityEngine.XR
         public const string OriginName = "XR Origin";
         public const string CameraOffsetName = "Camera Offset";
         const string HostName = "RealityEngine";
-        const string MainCameraName = "Main Camera";
+        public const string MainCameraName = "Main Camera";
         const float StandNorthOfTableM = 2.0f;
         const float CcHeight = 1.8f;
         const float CcSkin = 0.08f;
@@ -91,7 +91,7 @@ namespace RealityEngine.XR
             if (!existing.isActiveAndEnabled && existing.gameObject.activeInHierarchy)
                 existing.enabled = true;
 
-            // Always force — Origin may already be in scene at a bad MountainScene-local pose.
+            // Always force â€” Origin may already be in scene at a bad MountainScene-local pose.
             existing.ApplyNow(true);
             return existing;
         }
@@ -426,7 +426,7 @@ namespace RealityEngine.XR
                 _snap.controllers = list;
             }
 
-            // Legacy LocomotionSystem.m_XROrigin is often fileID 0 in Faraday — wire it.
+            // Legacy LocomotionSystem.m_XROrigin is often fileID 0 in Faraday â€” wire it.
             _locoSystem = originXf.GetComponent<LocomotionSystem>();
             if (_locoSystem == null)
                 _locoSystem = originXf.GetComponentInChildren<LocomotionSystem>(true);

@@ -65,7 +65,7 @@ namespace RealityEngine.Player
                 KeepHeldInFront();
 
             Ray ray = _cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-            bool hitSomething = Physics.Raycast(ray, out RaycastHit hit, maxDistance, rayMask, QueryTriggerInteraction.Ignore);
+            bool hitSomething = UnityEngine.Physics.Raycast(ray, out RaycastHit hit, maxDistance, rayMask, QueryTriggerInteraction.Ignore);
 
             bool deleteMode = QhysicsInventory.Instance != null
                 && QhysicsInventory.Instance.SelectedSlot == QhysicsInventory.SlotId.Empty;
@@ -149,10 +149,18 @@ namespace RealityEngine.Player
                 return true;
             if (t.GetComponentInParent<CircuitComponent>() != null)
                 return true;
+            if (t.GetComponentInParent<RealityEngine.Survey.CubitRod>() != null)
+                return true;
+            if (t.GetComponentInParent<FieldLensHandheld>() != null)
+                return true;
             if (t.GetComponentInParent<Rigidbody>() != null && t.CompareTag("Untagged") == false)
                 return true;
             string n = t.name;
-            return n != null && n.IndexOf("Component", System.StringComparison.OrdinalIgnoreCase) >= 0;
+            if (n == null)
+                return false;
+            return n.IndexOf("Component", System.StringComparison.OrdinalIgnoreCase) >= 0
+                || n.IndexOf("Gadget_", System.StringComparison.OrdinalIgnoreCase) >= 0
+                || n.IndexOf("CubitRod", System.StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         void TryGrab(Collider col)
@@ -327,7 +335,7 @@ namespace RealityEngine.Player
 
         static bool WasThrowPressed()
         {
-            // Same as drop with momentum — F/R already throws when held; treat R as throw preference.
+            // Same as drop with momentum Ã¢â‚¬â€ F/R already throws when held; treat R as throw preference.
 #if ENABLE_INPUT_SYSTEM
             if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
                 return true;
@@ -340,3 +348,4 @@ namespace RealityEngine.Player
         }
     }
 }
+
