@@ -33,6 +33,13 @@ public class SmoothMovementController : MonoBehaviour
         if (origin == null)
             origin = GetComponent<XROrigin>();
 
+        if (!RealityEngine.Player.DesktopPlayerController.IsXrDisplayRunning())
+        {
+            locomotionPaused = true;
+            inputAxis = Vector2.zero;
+            return;
+        }
+
         locomotionPaused = IsHeadsetLost();
         if (locomotionPaused)
         {
@@ -48,6 +55,9 @@ public class SmoothMovementController : MonoBehaviour
     void FixedUpdate()
     {
         if (locomotionPaused)
+            return;
+        // Desktop WASD owns CharacterController when no XR display is running.
+        if (!RealityEngine.Player.DesktopPlayerController.IsXrDisplayRunning())
             return;
         if (character == null || !character.enabled)
             return;

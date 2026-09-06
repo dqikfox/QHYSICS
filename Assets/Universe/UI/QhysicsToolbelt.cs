@@ -33,11 +33,15 @@ namespace RealityEngine.UI
         };
 
         [SerializeField] bool visible;
+        [SerializeField] float hipFollowLag = 10f;
+        [SerializeField] float beltForwardM = 0.35f;
+        [SerializeField] float beltUpM = 0.12f;
         Category _category = Category.Build;
         Canvas _canvas;
         RectTransform _chipRow;
         Image[] _tabImages;
         Camera _cam;
+        Transform _hip;
         float _spawnCooldown;
 
         public bool IsVisible => visible;
@@ -129,16 +133,41 @@ namespace RealityEngine.UI
                 return;
             if (_cam == null)
                 _cam = QhysicsUiBuilder.ResolveXrCamera();
+            if (_hip == null)
+                _hip = ResolveHipAnchor();
             if (_cam == null)
                 return;
-            Vector3 fwd = Flatten(_cam.transform.forward);
-            Vector3 pos = _cam.transform.position + fwd * QhysicsUiStyle.ToolbeltDistanceM
-                + Vector3.up * (QhysicsUiStyle.ComfortHeightM - _cam.transform.position.y) * 0.15f
-                + Vector3.up * -0.05f;
-            pos.y = Mathf.Lerp(_cam.transform.position.y - 0.15f, QhysicsUiStyle.ComfortHeightM, 0.65f);
-            transform.position = Vector3.Lerp(transform.position, pos, 1f - Mathf.Exp(-8f * Time.unscaledDeltaTime));
+
+            // Worn at hip/chest of DesktopBody / XR Origin — lag follow, not glued to HMD.
+            Vector3 anchorPos;
+            Vector3 flatFwd;
+            if (_hip != null)
+            {
+                flatFwd = Flatten(_hip.forward);
+                if (flatFwd.sqrMagnitude < 1e-6f)
+                    flatFwd = Flatten(_cam.transform.forward);
+                anchorPos = _hip.position + flatFwd * beltForwardM + Vector3.up * beltUpM;
+            }
+            else
+            {
+                flatFwd = Flatten(_cam.transform.forward);
+                // Fallback: chest height in front of body yaw, not raw HMD pitch.
+                float y = _cam.transform.position.y - 0.55f;
+                anchorPos = new Vector3(_cam.transform.position.x, y, _cam.transform.position.z)
+                    + flatFwd * beltForwardM;
+            }
+
+            float k = 1f - Mathf.Exp(-hipFollowLag * Time.unscaledDeltaTime);
+            transform.position = Vector3.Lerp(transform.position, anchorPos, k);
             QhysicsUiBuilder.FaceCamera(transform, _cam);
             QhysicsUiBuilder.WireEventCamera(_canvas);
+        }
+
+        static Transform ResolveHipAnchor()
+        {
+            GameObject originGo = GameObject.Find(LabPlayerSpawnCompat.OriginName);
+            Transform origin = originGo != null ? originGo.transform : null;
+            return QhysicsDesktopBootstrap.FindHipAnchor(origin);
         }
 
         static Vector3 Flatten(Vector3 v)
@@ -154,6 +183,18 @@ namespace RealityEngine.UI
             visible = on;
             if (_canvas != null)
                 _canvas.gameObject.SetActive(on);
+            if (on)
+            {
+                if (_hip == null)
+                    _hip = ResolveHipAnchor();
+                if (_cam == null)
+                    _cam = QhysicsUiBuilder.ResolveXrCamera();
+                if (_hip != null)
+                {
+                    Vector3 flatFwd = Flatten(_hip.forward);
+                    transform.position = _hip.position + flatFwd * beltForwardM + Vector3.up * beltUpM;
+                }
+            }
         }
 
         public void SelectCategory(Category cat)

@@ -110,6 +110,7 @@ namespace RealityEngine.UI
             // Plaza spawn + desktop character stack (body, WASD, hotbar, BuildingBlock cam strip).
             LabPlayerSpawn.EnsureApplied();
             QhysicsDesktopBootstrap.Ensure();
+            LabPlayerSpawn.RecalibratePlayerHeight(force: true);
         }
 
         void OpenSettings()

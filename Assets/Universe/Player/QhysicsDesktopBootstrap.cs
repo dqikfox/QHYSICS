@@ -18,6 +18,8 @@ namespace RealityEngine.Player
         public const string LeftHandName = "LeftHandProxy";
         public const string RightHandName = "RightHandProxy";
         public const string HandAttachName = "HandAttach";
+        public const string HipAnchorName = "HipAnchor";
+        public const float BodyEyeHeightM = 1.65f;
         /// <summary>Layer used to hide head mesh from the player's own camera (FP).</summary>
         public const int PlayerSelfLayer = 31;
 
@@ -160,7 +162,7 @@ namespace RealityEngine.Player
                 var head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 head.name = "Head";
                 head.transform.SetParent(body, false);
-                head.transform.localPosition = new Vector3(0f, 1.55f, 0f);
+                head.transform.localPosition = new Vector3(0f, BodyEyeHeightM, 0f);
                 head.transform.localScale = Vector3.one * 0.22f;
                 Object.Destroy(head.GetComponent<Collider>());
                 Tint(head, new Color(0.85f, 0.72f, 0.58f));
@@ -197,6 +199,26 @@ namespace RealityEngine.Player
                 var attach = new GameObject(HandAttachName);
                 attach.transform.SetParent(rh, false);
                 attach.transform.localPosition = new Vector3(0f, 0f, 0.06f);
+            }
+
+            // Hip / belt anchor for worn toolbelt (chest-ish, not glued to HMD).
+            Transform hip = body.Find(HipAnchorName);
+            if (hip == null)
+            {
+                var hipGo = new GameObject(HipAnchorName);
+                hipGo.transform.SetParent(body, false);
+                hip = hipGo.transform;
+            }
+            hip.localPosition = new Vector3(0f, 1.05f, 0.12f);
+            hip.localRotation = Quaternion.identity;
+
+            // Keep head mesh aligned with desktop eye height.
+            Transform headTf = body.Find("Head");
+            if (headTf != null)
+            {
+                Vector3 hp = headTf.localPosition;
+                hp.y = BodyEyeHeightM;
+                headTf.localPosition = hp;
             }
 
             var gate = body.GetComponent<DesktopBodyVisibility>();
@@ -239,6 +261,33 @@ namespace RealityEngine.Player
             Transform t = go.transform;
             for (int i = 0; i < t.childCount; i++)
                 SetLayerRecursive(t.GetChild(i).gameObject, layer);
+        }
+
+        /// <summary>Hip/chest anchor for worn toolbelt (DesktopBody or Origin fallback).</summary>
+        public static Transform FindHipAnchor(Transform origin = null)
+        {
+            if (origin == null)
+            {
+                GameObject go = GameObject.Find(LabPlayerSpawn.OriginName);
+                origin = go != null ? go.transform : null;
+            }
+            if (origin == null)
+                return null;
+            Transform body = origin.Find(BodyName);
+            if (body != null)
+            {
+                Transform hip = body.Find(HipAnchorName);
+                if (hip != null)
+                    return hip;
+            }
+            // XR without desktop body: soft chest anchor under Origin.
+            Transform existing = origin.Find(HipAnchorName);
+            if (existing != null)
+                return existing;
+            var hipGo = new GameObject(HipAnchorName);
+            hipGo.transform.SetParent(origin, false);
+            hipGo.transform.localPosition = new Vector3(0f, 1.05f, 0.12f);
+            return hipGo.transform;
         }
 
         /// <summary>Right-hand attach used by DesktopInteractor for held props.</summary>
