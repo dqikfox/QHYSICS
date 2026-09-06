@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace RealityEngine.Physics.Electromagnetism
@@ -51,12 +51,21 @@ namespace RealityEngine.Physics.Electromagnetism
         [Tooltip("If true, dΦ/dt uses unscaled time so handheld XR motion matches Faraday's law. Pause (timeScale 0) still freezes derivatives.")]
         bool useUnscaledTimeForDerivative = true;
 
+        [SerializeField]
+        [Tooltip("If true, periodically rebind to every active MagneticDipole in the scene (lab + gadget magnets).")]
+        bool autoBindAllSceneDipoles = false;
+
+        [SerializeField]
+        [Tooltip("Seconds between auto-bind scans when autoBindAllSceneDipoles is on.")]
+        float autoBindIntervalSeconds = 1.0f;
+
         float _flux;
         float _dFluxDt;
         float _emf;
         float _previousFlux;
         bool _hasPreviousFlux;
         MagneticDipole[] _sources;
+        float _autoBindAt;
 
         public MagneticDipole Magnet
         {
@@ -76,6 +85,11 @@ namespace RealityEngine.Physics.Electromagnetism
         public float FluxRate => _dFluxDt;
         public float Emf => _emf;
         public Vector3 AreaNormal => transform.up;
+        public bool AutoBindAllSceneDipoles
+        {
+            get => autoBindAllSceneDipoles;
+            set => autoBindAllSceneDipoles = value;
+        }
 
         public void SetMagnets(MagneticDipole primary, MagneticDipole[] extras)
         {
@@ -92,6 +106,49 @@ namespace RealityEngine.Physics.Electromagnetism
             loadResistance = Mathf.Max(0f, loadOhms);
         }
 
+        /// <summary>
+        /// Wire this coil to every MagneticDipole currently in the scene (lab + PHYSICS gadgets).
+        /// Skips inactive/destroyed sources. Safe to call every second.
+        /// </summary>
+        public void BindAllSceneDipoles()
+        {
+            MagneticDipole[] dips = Object.FindObjectsByType<MagneticDipole>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            MagneticDipole primary = null;
+            int extraCount = 0;
+            for (int i = 0; i < dips.Length; i++)
+            {
+                MagneticDipole d = dips[i];
+                if (d == null || !d.isActiveAndEnabled)
+                    continue;
+                if (primary == null)
+                    primary = d;
+                else
+                    extraCount++;
+            }
+
+            if (primary == null)
+            {
+                SetMagnets(null, null);
+                return;
+            }
+
+            MagneticDipole[] extras = null;
+            if (extraCount > 0)
+            {
+                extras = new MagneticDipole[extraCount];
+                int e = 0;
+                for (int i = 0; i < dips.Length; i++)
+                {
+                    MagneticDipole d = dips[i];
+                    if (d == null || !d.isActiveAndEnabled || d == primary)
+                        continue;
+                    extras[e++] = d;
+                }
+            }
+
+            SetMagnets(primary, extras);
+        }
+
         void Awake()
         {
             CacheSources();
@@ -103,6 +160,8 @@ namespace RealityEngine.Physics.Electromagnetism
             _hasPreviousFlux = false;
             _dFluxDt = 0f;
             _emf = 0f;
+            if (autoBindAllSceneDipoles)
+                BindAllSceneDipoles();
         }
 
         void CacheSources()
@@ -130,6 +189,12 @@ namespace RealityEngine.Physics.Electromagnetism
 
         void LateUpdate()
         {
+            if (autoBindAllSceneDipoles && Time.unscaledTime >= _autoBindAt)
+            {
+                _autoBindAt = Time.unscaledTime + Mathf.Max(0.25f, autoBindIntervalSeconds);
+                BindAllSceneDipoles();
+            }
+
             _flux = IntegrateFlux();
 
             float dt = useUnscaledTimeForDerivative ? Time.unscaledDeltaTime : Time.deltaTime;

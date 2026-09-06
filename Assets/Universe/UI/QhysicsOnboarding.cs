@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// Short dismissible world-space tips: Welcome Ã¢â€ â€™ Grab Ã¢â€ â€™ Try table. Not a trap.
+    /// Short dismissible world-space tips: Welcome ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Grab ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Try table. Not a trap.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(205)]
@@ -23,6 +23,7 @@ namespace RealityEngine.UI
             "PHYSICS Magnet/Dipole: grab a live classical MagneticDipole (Probe reads B).",
             "PHYSICS Coil: grab a live classical InductionCoil; move a Magnet through it (Multimeter reads Emf/I).",
             "MEASURE Multimeter: binds nearest InductionCircuit (lab or PHYSICS Coil); tip shows target + distance.",
+            "Lab + PHYSICS coils auto-bind every MagneticDipole — gadget Magnet through lab Coil still drives Emf/I.",
         };
 
         Canvas _canvas;

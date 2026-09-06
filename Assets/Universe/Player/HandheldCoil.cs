@@ -75,40 +75,8 @@ namespace RealityEngine.Player
         {
             if (coil == null)
                 return;
-
-            MagneticDipole[] dips = Object.FindObjectsByType<MagneticDipole>(FindObjectsInactive.Include);
-            MagneticDipole primary = null;
-            int extraCount = 0;
-            for (int i = 0; i < dips.Length; i++)
-            {
-                if (dips[i] == null)
-                    continue;
-                if (primary == null)
-                    primary = dips[i];
-                else
-                    extraCount++;
-            }
-
-            if (primary == null)
-            {
-                coil.SetMagnets(null, null);
-                return;
-            }
-
-            MagneticDipole[] extras = null;
-            if (extraCount > 0)
-            {
-                extras = new MagneticDipole[extraCount];
-                int e = 0;
-                for (int i = 0; i < dips.Length; i++)
-                {
-                    if (dips[i] == null || dips[i] == primary)
-                        continue;
-                    extras[e++] = dips[i];
-                }
-            }
-
-            coil.SetMagnets(primary, extras);
+            coil.AutoBindAllSceneDipoles = true;
+            coil.BindAllSceneDipoles();
         }
 
         void EnsurePhysics()
@@ -117,6 +85,7 @@ namespace RealityEngine.Player
             if (_coil == null)
                 _coil = gameObject.AddComponent<InductionCoil>();
             _coil.Configure(turns, radius, windingOhms, loadOhms);
+            _coil.AutoBindAllSceneDipoles = true;
 
             _circuit = GetComponent<InductionCircuit>();
             if (_circuit == null)
