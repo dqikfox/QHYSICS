@@ -20,7 +20,7 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Experiments
 {
     /// <summary>
-    /// Reality Engine v1.0 â€” Persistent lab + gradient ledger (coil + cell + toy heat path).
+    /// Reality Engine v1.0 Ã¢â‚¬â€ Persistent lab + gradient ledger (coil + cell + toy heat path).
     /// Spawns a grabable bar magnet, copper coil, resistive load, sampled B overlay,
     /// Field Lens peels, and a TMP readout beside Faraday's breadboard. Does not touch SpiceSharp.
     /// </summary>
@@ -357,6 +357,8 @@ namespace RealityEngine.Experiments
             _loadMaterial = _loadRenderer.material;
 
             _coil.SetMagnets(_dipole, null);
+            _coil.AutoBindAllSceneDipoles = true;
+            _coil.BindAllSceneDipoles();
             _circuit.SetCoil(_coil);
             _fieldViz.Magnet = _dipole;
             _readout.SetCircuit(_circuit);
@@ -391,6 +393,11 @@ namespace RealityEngine.Experiments
             {
                 _coil = coil.GetComponent<InductionCoil>();
                 _circuit = coil.GetComponent<InductionCircuit>();
+                if (_coil != null)
+                {
+                    _coil.AutoBindAllSceneDipoles = true;
+                    _coil.BindAllSceneDipoles();
+                }
             }
             if (viz != null)
                 _fieldViz = viz.GetComponent<MagneticFieldViz>();
