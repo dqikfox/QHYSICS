@@ -4,7 +4,7 @@ using TMPro;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// Short dismissible world-space tips: Welcome ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Grab ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Try table. Not a trap.
+    /// Short dismissible world-space tips: Welcome ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Grab ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Try table. Not a trap.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(205)]
@@ -22,14 +22,14 @@ namespace RealityEngine.UI
             "PHYSICS Field Lens: grab it, N/P or VR trigger peels layers (honesty tags on readout).",
             "PHYSICS Magnet/Dipole: grab a live classical MagneticDipole (Probe reads B).",
             "PHYSICS Coil: grab a live classical InductionCoil; move a Magnet through it (Multimeter reads Emf/I).",
-            "MEASURE Multimeter: binds nearest InductionCircuit (lab or PHYSICS Coil); tip shows target + distance.",
-            "Lab + PHYSICS coils auto-bind every MagneticDipole — gadget Magnet through lab Coil still drives Emf/I.",
+            "MEASURE Multimeter: binds nearest InductionCircuit; N/P, VR trigger, or desktop LMB/scroll cycles ALL/EMF/I/LOAD pages.",
+            "Lab + PHYSICS coils auto-bind every MagneticDipole â€” gadget Magnet through lab Coil still drives Emf/I.",
             "CIRCUIT Resistor: hold near a Coil to apply classical R_load (N/P or VR trigger cycles 2/8/50/OPEN); Multimeter I changes.",
-            "CIRCUIT Lamp: hold near a Coil — glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
-            "CIRCUIT Switch: hold near a Coil — N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
-            "CIRCUIT Battery: hold near a Coil — N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
-            "CIRCUIT Wire: hold near a Coil — classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
-            "Desktop: while holding Battery/Resistor/Switch/Wire, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
+            "CIRCUIT Lamp: hold near a Coil â€” glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
+            "CIRCUIT Switch: hold near a Coil â€” N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
+            "CIRCUIT Battery: hold near a Coil â€” N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
+            "CIRCUIT Wire: hold near a Coil â€” classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
+            "Desktop: while holding Battery/Resistor/Switch/Wire/Multimeter, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
         };
 
         Canvas _canvas;
