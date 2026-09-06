@@ -25,7 +25,7 @@ namespace RealityEngine.UI
         static readonly string[] TabNames = { "BUILD", "PHYSICS", "MEASURE", "WORLD", "EXPERIMENTS" };
         static readonly string[][] ChipSets =
         {
-            new[] { "Wire", "Battery", "Switch", "Bulb", "Resistor" },
+            new[] { "Wire", "Battery", "Switch", "Bulb", "Resistor", "Lamp" },
             new[] { "Magnet", "Coil", "Field Lens", "Dipole" },
             new[] { "Multimeter", "Cubit Rod", "Probe", "Stopwatch" },
             new[] { "Teleport", "Scale", "Sky", "Reset Pose" },
@@ -138,7 +138,7 @@ namespace RealityEngine.UI
             if (_cam == null)
                 return;
 
-            // Worn at hip/chest of DesktopBody / XR Origin — lag follow, not glued to HMD.
+            // Worn at hip/chest of DesktopBody / XR Origin â€” lag follow, not glued to HMD.
             Vector3 anchorPos;
             Vector3 flatFwd;
             if (_hip != null)
@@ -232,7 +232,7 @@ namespace RealityEngine.UI
             if (Time.unscaledTime < _spawnCooldown)
                 return;
             _spawnCooldown = Time.unscaledTime + 0.2f;
-            // chip selected — use table dispensers to spawn
+            // chip selected â€” use table dispensers to spawn
             TryCircuitLabHint(label);
         }
 
@@ -292,3 +292,4 @@ namespace RealityEngine.UI
 #endif
     }
 }
+
