@@ -19,6 +19,8 @@ namespace RealityEngine.UI
         Camera _cam;
         bool _open;
 
+        public bool IsOpen => _open;
+
         public static QhysicsPausePanel Ensure(Transform parent)
         {
             Transform existing = parent != null ? parent.Find(RootName) : null;

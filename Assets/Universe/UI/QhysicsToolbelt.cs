@@ -1,4 +1,5 @@
 using System;
+using RealityEngine.Player;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -196,7 +197,13 @@ namespace RealityEngine.UI
 
         static void TryCircuitLabHint(string label)
         {
-            // Extension point: only meaningful when a CircuitLab exists in the scene
+            // Spawn via shared gadget API (desktop hotbar + VR toolbelt Build chips)
+            Camera cam = QhysicsUiBuilder.ResolveXrCamera();
+            Vector3 pos = cam != null
+                ? cam.transform.position + cam.transform.forward * 1.1f + Vector3.up * 0.1f
+                : Vector3.zero;
+            if (QhysicsGadgets.SpawnByLabel(label, pos) != null)
+                return;
             var lab = UnityEngine.Object.FindAnyObjectByType<CircuitLab>(FindObjectsInactive.Include);
             if (lab == null)
                 return;

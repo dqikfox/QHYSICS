@@ -11,7 +11,7 @@
 
 ## Who is the player?
 
-**XR Origin IS the player** (camera + hands under Camera Offset). There is no separate humanoid avatar. If the headset shows nothing, you are not linked / not simulating — not missing a character mesh.
+**XR Origin IS the player** (camera + hands under Camera Offset). There is no separate humanoid avatar. On desktop (no headset), a simple capsule + hand proxies appear under the camera for reference. If the headset shows nothing, you are not linked / not simulating — not missing a character mesh.
 
 ## Play steps — Meta Quest Link (Quest 3S)
 
@@ -32,6 +32,36 @@ If Play works in Editor Game view but the headset stays on the Quest home / blac
    - Asset: `Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset` — set simulator prefab after sample import; `Automatically Instantiate Simulator Prefab` can be on for Editor-only.
 3. Open Faraday → **Ctrl+P**. Use keyboard/mouse per simulator HUD (move/look/grip).
 4. Optional: **Reality Engine → Fix Player Spawn** before Play if Origin pose looks wrong in Hierarchy.
+
+
+## Play steps - Desktop keyboard (no headset, no Device Simulator)
+
+Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest Link).
+
+1. Open `Assets/Scenes/Faraday.unity`.
+2. Optional once: **Reality Engine -> Place Desktop Player** (also auto-ensures on Play via bootstrap), then **Ctrl+S**.
+3. Press **Ctrl+P**. Do **not** need Oculus Link or XR Device Simulator.
+4. You should see a simple capsule/hands under the camera and a bottom hotbar.
+
+### Keyboard map (desktop)
+
+| Key | Action |
+|-----|--------|
+| **W A S D** | Move (CharacterController on XR Origin) |
+| **Mouse** | Look (yaw Origin, pitch Main Camera) |
+| **Shift** | Sprint |
+| **Space** | Jump |
+| **Ctrl** | Crouch |
+| **1-8** | Hotbar: Wire, Battery, Switch, Bulb, Resistor, Magnet, Multimeter, Delete |
+| **Q** / **Scroll** | Cycle hotbar |
+| **LMB** | Spawn selected part (or Delete when slot 8) |
+| **E** / **LMB** on part | Grab |
+| **F** / **RMB** | Drop |
+| **R** | Throw |
+| **Esc** / **P** | Pause (releases cursor) - Resume re-locks |
+| **M** / **Tab** | VR Toolbelt (still available) |
+
+When a Quest Link headset is connected / XR display running, desktop locomotion disables and XR locomotion is preferred. Giza + QHYSICS UI are unchanged.
 
 ## Play steps — checklist
 
