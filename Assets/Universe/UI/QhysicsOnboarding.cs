@@ -4,7 +4,7 @@ using TMPro;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// Short dismissible world-space tips: Welcome → Grab → Try table. Not a trap.
+    /// Short dismissible world-space tips: Welcome â†’ Grab â†’ Try table. Not a trap.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(205)]
@@ -18,8 +18,9 @@ namespace RealityEngine.UI
             "Welcome to QHYSICS\nCircuit lab on the table. Giza outside.",
             "Desktop: WASD move, mouse look, E/LMB grab, F drop, R throw.\nVR: grip / trigger. Hotbar 1-8 / scroll.",
             "Try a loop: Battery -> Wire -> Bulb -> Switch.\nEsc/P pause. Toolbelt New Run resets the table.",
-            "PHYSICS Field Lens: grab it, N/P or VR trigger peels layers (honesty tags on readout)."
-            "PHYSICS Magnet/Dipole: grab a live classical MagneticDipole (Probe reads B)."
+            "PHYSICS Field Lens: grab it, N/P or VR trigger peels layers (honesty tags on readout).",
+            "PHYSICS Magnet/Dipole: grab a live classical MagneticDipole (Probe reads B).",
+            "PHYSICS Coil: grab a live classical InductionCoil; move a Magnet through it (Multimeter reads Emf/I).",
         };
 
         Canvas _canvas;
