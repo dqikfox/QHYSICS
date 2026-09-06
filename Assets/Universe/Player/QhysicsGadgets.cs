@@ -52,7 +52,7 @@ namespace RealityEngine.Player
             if (key == "multimeter")
                 return SpawnMultimeterStub(worldPos);
             if (key == "resistor")
-                return SpawnPrimitiveProxy("Resistor", worldPos, new Color(0.75f, 0.45f, 0.2f));
+                return SpawnLoadResistor(worldPos);
             if (key == "magnet")
                 return SpawnHandheldMagnet(worldPos, pureDipole: false);
             if (key == "dipole")
@@ -420,6 +420,19 @@ namespace RealityEngine.Player
             return null;
         }
 
+
+        static GameObject SpawnLoadResistor(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: classical series R_load on nearest InductionCoil.
+            var go = SpawnPrimitiveProxy("Resistor", worldPos, new Color(0.75f, 0.45f, 0.2f));
+            go.name = LoadResistorGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.04f, 0.06f);
+            var lr = go.GetComponent<LoadResistorGadget>();
+            if (lr == null)
+                lr = go.AddComponent<LoadResistorGadget>();
+            lr.EnsureBuilt();
+            return go;
+        }
 
         static GameObject SpawnMultimeterStub(Vector3 worldPos)
         {
