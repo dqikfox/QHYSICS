@@ -27,9 +27,7 @@ namespace RealityEngine.XR
         const string HostName = "RealityEngine";
         public const string MainCameraName = "Main Camera";
         const float StandNorthOfTableM = 2.0f;
-        const float CcHeight = 1.8f;
-        const float CcSkin = 0.08f;
-        const float CcRadius = 0.15f;
+        // Body collision: LabPlayerSpawnCompat.ApplyCharacterControllerProfile (matches DesktopBody).
         const float SinkResetM = 4f;
         const float BadOriginY = -10f;
         /// <summary>Desktop eye height on Camera Offset (XR Floor keeps offset at 0).</summary>
@@ -394,16 +392,10 @@ namespace RealityEngine.XR
                 _cc = originXf.gameObject.AddComponent<CharacterController>();
                 Debug.Log("LabPlayerSpawn: added CharacterController on XR Origin for plaza locomotion.");
             }
-            _cc.enabled = false;
-            _cc.height = CcHeight;
-            _cc.skinWidth = CcSkin;
-            if (_cc.radius > CcRadius || _cc.radius < 0.05f)
-                _cc.radius = CcRadius;
-            _cc.center = new Vector3(0f, CcHeight * 0.5f, 0f);
-            _cc.slopeLimit = 45f;
-            _cc.stepOffset = 0.35f;
-            // Always leave CC enabled for desktop + XR locomotion (was briefly off for resize).
-            _cc.enabled = true;
+            // Shared profile: height/radius match DesktopBody; modest step so table lips do not snag.
+            LabPlayerSpawnCompat.ApplyCharacterControllerProfile(_cc);
+            if (!_cc.enabled)
+                _cc.enabled = true;
         }
 
         bool ParkOnLabPlaza(Transform originXf, bool snapPose)

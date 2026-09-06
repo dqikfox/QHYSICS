@@ -153,8 +153,9 @@ namespace RealityEngine.Player
                 var capsule = GameObject.CreatePrimitive(PrimitiveType.Capsule);
                 capsule.name = "Torso";
                 capsule.transform.SetParent(body, false);
-                capsule.transform.localPosition = new Vector3(0f, 0.9f, 0f);
-                capsule.transform.localScale = new Vector3(0.32f, 0.45f, 0.24f);
+                capsule.transform.localPosition = new Vector3(0f, 0.86f, 0f);
+                // Half-width ~0.20 matches CharacterController radius 0.22 (no snag / no fall-through).
+                capsule.transform.localScale = new Vector3(0.40f, 0.42f, 0.28f);
                 Object.Destroy(capsule.GetComponent<Collider>());
                 Tint(capsule, new Color(0.18f, 0.22f, 0.28f));
 
@@ -192,7 +193,8 @@ namespace RealityEngine.Player
                 body.localRotation = Quaternion.identity;
             }
 
-            // Ensure hand attach exists on rebuild.
+            // Ensure FP arm proxies + hand attach on rebuild / prior DesktopBody.
+            EnsureFpArmVisuals(body);
             Transform rh = body.Find(RightHandName);
             if (rh != null && rh.Find(HandAttachName) == null)
             {
@@ -226,6 +228,77 @@ namespace RealityEngine.Player
                 gate = body.gameObject.AddComponent<DesktopBodyVisibility>();
             gate.Bind(mainCamera);
             gate.Refresh();
+        }
+
+        /// <summary>Upgrade or create clearer desktop arm/hand proxies (cylinder + sphere).</summary>
+        static void EnsureFpArmVisuals(Transform body)
+        {
+            if (body == null)
+                return;
+            EnsureOneArm(body, LeftHandName, new Vector3(-0.28f, 1.05f, 0.28f), left: true);
+            EnsureOneArm(body, RightHandName, new Vector3(0.28f, 1.05f, 0.28f), left: false);
+        }
+
+        static Transform EnsureOneArm(Transform body, string handName, Vector3 restPos, bool left)
+        {
+            Transform hand = body.Find(handName);
+            if (hand == null)
+                hand = MakeHand(body, handName, restPos);
+            else
+                hand.localPosition = restPos;
+
+            // Arm bone: upper-arm cylinder from shoulder toward hand rest.
+            Transform arm = hand.Find("Arm");
+            if (arm == null)
+            {
+                var armGo = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                armGo.name = "Arm";
+                armGo.transform.SetParent(hand, false);
+                Object.Destroy(armGo.GetComponent<Collider>());
+                Tint(armGo, new Color(0.20f, 0.24f, 0.30f));
+                arm = armGo.transform;
+            }
+            // Local: arm sits behind the hand sphere (toward shoulder).
+            float side = left ? 1f : -1f;
+            arm.localPosition = new Vector3(side * 0.12f, 0.02f, -0.18f);
+            arm.localRotation = Quaternion.Euler(0f, 0f, side * 55f);
+            arm.localScale = new Vector3(0.045f, 0.16f, 0.045f);
+
+            Transform forearm = hand.Find("Forearm");
+            if (forearm == null)
+            {
+                var fa = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                fa.name = "Forearm";
+                fa.transform.SetParent(hand, false);
+                Object.Destroy(fa.GetComponent<Collider>());
+                Tint(fa, new Color(0.22f, 0.26f, 0.32f));
+                forearm = fa.transform;
+            }
+            forearm.localPosition = new Vector3(side * 0.04f, 0f, -0.06f);
+            forearm.localRotation = Quaternion.Euler(80f, 0f, side * 10f);
+            forearm.localScale = new Vector3(0.035f, 0.10f, 0.035f);
+
+            // Palm cue (flat cube) — clearer than bare sphere alone.
+            Transform palm = hand.Find("Palm");
+            if (palm == null)
+            {
+                var palmGo = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                palmGo.name = "Palm";
+                palmGo.transform.SetParent(hand, false);
+                Object.Destroy(palmGo.GetComponent<Collider>());
+                Tint(palmGo, new Color(0.85f, 0.72f, 0.58f));
+                palm = palmGo.transform;
+            }
+            palm.localPosition = new Vector3(0f, 0f, 0.02f);
+            palm.localRotation = Quaternion.identity;
+            palm.localScale = new Vector3(0.7f, 0.25f, 0.9f);
+
+            if (hand.GetComponent<Collider>() != null)
+                Object.Destroy(hand.GetComponent<Collider>());
+            // Hand root stays a small sphere.
+            if (hand.localScale.sqrMagnitude < 0.001f || Mathf.Abs(hand.localScale.x - 0.08f) > 0.05f)
+                hand.localScale = Vector3.one * 0.08f;
+            return hand;
         }
 
         static Transform MakeHand(Transform parent, string name, Vector3 localPos)
@@ -415,10 +488,15 @@ namespace RealityEngine.Player
             if (_mainCamera == null)
                 return;
 
-            // World-space FP hands in front of camera (character "holds" them).
-            PlaceHandWorld(_leftHand, new Vector3(-0.22f, -0.18f, 0.42f));
+            // Pitch sway: look down lowers hands slightly, look up raises — follows look a bit.
+            float pitch = _mainCamera.localEulerAngles.x;
+            if (pitch > 180f) pitch -= 360f;
+            float swayY = Mathf.Clamp(pitch, -80f, 80f) * -0.0018f;
+            float swayZ = Mathf.Clamp(pitch, -80f, 80f) * 0.0006f;
+
+            PlaceHandWorld(_leftHand, new Vector3(-0.22f, -0.18f + swayY, 0.42f + swayZ));
             if (!holding)
-                PlaceHandWorld(_rightHand, new Vector3(0.22f, -0.18f, 0.42f));
+                PlaceHandWorld(_rightHand, new Vector3(0.22f, -0.18f + swayY, 0.42f + swayZ));
         }
 
         void PlaceHandWorld(Transform hand, Vector3 camLocal)
@@ -426,8 +504,11 @@ namespace RealityEngine.Player
             if (hand == null || _mainCamera == null)
                 return;
             Vector3 world = _mainCamera.TransformPoint(camLocal);
-            hand.position = world;
-            hand.rotation = _mainCamera.rotation;
+            Quaternion rot = _mainCamera.rotation;
+            // Soft follow so arms do not lock 1:1 to every mouse twitch.
+            float k = 1f - Mathf.Exp(-14f * Time.deltaTime);
+            hand.position = Vector3.Lerp(hand.position, world, k);
+            hand.rotation = Quaternion.Slerp(hand.rotation, rot, k);
         }
     }
 }

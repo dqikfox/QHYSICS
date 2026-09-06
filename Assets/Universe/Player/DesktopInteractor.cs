@@ -8,7 +8,8 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Player
 {
     /// <summary>
-    /// Center-screen ray grab for desktop: LMB/E grab XR grabables or CircuitLab parts; F/R drop/throw.
+    /// Center-screen ray grab for desktop: LMB/E grab XR grabables or CircuitLab parts; F soft-drop / R throw.
+    /// Held props parent to HandAttach; colliders disabled while held to avoid yanking through geometry.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(131)]
@@ -16,7 +17,8 @@ namespace RealityEngine.Player
     {
         [SerializeField] float maxDistance = 4.5f;
         [SerializeField] float holdDistance = 1.15f;
-        [SerializeField] float throwForce = 4.5f;
+        [SerializeField] float throwForce = 6.5f;
+        [SerializeField] float softDropDownSpeed = 0.35f;
         [SerializeField] LayerMask rayMask = ~0;
 
         Camera _cam;
@@ -24,13 +26,19 @@ namespace RealityEngine.Player
         Rigidbody _heldRb;
         Transform _held;
         XRGrabInteractable _heldGrab;
-        Collider _heldCol;
+        Collider[] _heldCols;
+        bool[] _heldColWasEnabled;
         bool _heldWasKinematic;
         bool _heldUsedGravity;
         Renderer _hoverRenderer;
         Color _hoverBaseEmission;
         bool _hoverHadEmission;
         MaterialPropertyBlock _mpb;
+        Vector3 _holdLocalPos;
+        Quaternion _holdLocalRot = Quaternion.identity;
+        Vector3 _prevHoldWorld;
+        Vector3 _holdVelocity;
+        bool _haveHoldSample;
 
         public Transform Held => _held;
         public Transform HoverTarget { get; private set; }
@@ -44,6 +52,8 @@ namespace RealityEngine.Player
         void Awake()
         {
             _mpb = new MaterialPropertyBlock();
+            // Never raycast own head/self layer (PlayerSelf = 31).
+            rayMask &= ~(1 << QhysicsDesktopBootstrap.PlayerSelfLayer);
             EnsureHoldPoint();
         }
 
@@ -143,16 +153,43 @@ namespace RealityEngine.Player
             if (_holdPoint == null)
                 return;
 
-            // Held props sit at holdDistance; drive the character right hand so the grip looks attached.
-            Vector3 target = _cam.transform.position + _cam.transform.forward * holdDistance;
+            // Drive right-hand proxy to hold pose; prop sticks via parenting to HandAttach.
+            Vector3 target = _cam.transform.position + _cam.transform.forward * holdDistance
+                             + _cam.transform.right * 0.08f
+                             + _cam.transform.up * -0.06f;
             Quaternion rot = _cam.transform.rotation;
+
             Transform hand = _holdPoint;
             if (_holdPoint.parent != null && _holdPoint.parent.name == QhysicsDesktopBootstrap.RightHandName)
                 hand = _holdPoint.parent;
             hand.position = target;
             hand.rotation = rot;
 
-            if (_heldRb != null && !_heldRb.isKinematic)
+            // Track hold velocity for throw (camera/hand sweep), not yank through walls.
+            if (_haveHoldSample)
+            {
+                float dt = Time.deltaTime;
+                if (dt > 1e-5f)
+                {
+                    Vector3 raw = (target - _prevHoldWorld) / dt;
+                    _holdVelocity = Vector3.Lerp(_holdVelocity, raw, 1f - Mathf.Exp(-18f * dt));
+                }
+            }
+            _prevHoldWorld = target;
+            _haveHoldSample = true;
+
+            // Stick cleanly: keep local grip pose; kinematic RB does not need MovePosition.
+            if (_held.parent == _holdPoint)
+            {
+                _held.localPosition = _holdLocalPos;
+                _held.localRotation = _holdLocalRot;
+                if (_heldRb != null)
+                {
+                    _heldRb.linearVelocity = Vector3.zero;
+                    _heldRb.angularVelocity = Vector3.zero;
+                }
+            }
+            else if (_heldRb != null && !_heldRb.isKinematic)
             {
                 _heldRb.linearVelocity = Vector3.zero;
                 _heldRb.angularVelocity = Vector3.zero;
@@ -171,6 +208,8 @@ namespace RealityEngine.Player
             if (col == null)
                 return false;
             Transform t = col.transform;
+            if (LabPlayerSpawnCompat.IsMonumentTransform(t))
+                return false;
             if (t.GetComponentInParent<XRGrabInteractable>() != null)
                 return true;
             if (t.GetComponentInParent<CircuitComponent>() != null)
@@ -214,6 +253,8 @@ namespace RealityEngine.Player
             if (LabPlayerSpawnCompat.IsMonumentTransform(root))
                 return;
             EnsureHoldPoint();
+            if (_holdPoint == null)
+                return;
 
             // Do not steal dispenser shelf template still parented under Dispenser
             if (root.parent != null && root.parent.GetComponent<Dispenser>() != null)
@@ -222,15 +263,59 @@ namespace RealityEngine.Player
             _held = root;
             _heldGrab = grab;
             _heldRb = root.GetComponent<Rigidbody>();
-            _heldCol = col;
+            CacheAndDisableColliders(root);
             if (_heldRb != null)
             {
                 _heldWasKinematic = _heldRb.isKinematic;
                 _heldUsedGravity = _heldRb.useGravity;
                 _heldRb.isKinematic = true;
                 _heldRb.useGravity = false;
+                _heldRb.linearVelocity = Vector3.zero;
+                _heldRb.angularVelocity = Vector3.zero;
             }
-            root.SetParent(_holdPoint, true);
+
+            // Parent to HandAttach and zero grip so the prop sticks to the hand (no world yank offset).
+            root.SetParent(_holdPoint, false);
+            _holdLocalPos = Vector3.zero;
+            _holdLocalRot = Quaternion.identity;
+            root.localPosition = _holdLocalPos;
+            root.localRotation = _holdLocalRot;
+            _haveHoldSample = false;
+            _holdVelocity = Vector3.zero;
+        }
+
+        void CacheAndDisableColliders(Transform root)
+        {
+            _heldCols = root.GetComponentsInChildren<Collider>(true);
+            _heldColWasEnabled = new bool[_heldCols.Length];
+            for (int i = 0; i < _heldCols.Length; i++)
+            {
+                Collider c = _heldCols[i];
+                if (c == null)
+                {
+                    _heldColWasEnabled[i] = false;
+                    continue;
+                }
+                _heldColWasEnabled[i] = c.enabled;
+                // Disable solid colliders so hold cannot yank/push through plaza / table / player CC.
+                if (!c.isTrigger)
+                    c.enabled = false;
+            }
+        }
+
+        void RestoreColliders()
+        {
+            if (_heldCols == null)
+                return;
+            for (int i = 0; i < _heldCols.Length; i++)
+            {
+                Collider c = _heldCols[i];
+                if (c == null)
+                    continue;
+                c.enabled = _heldColWasEnabled != null && i < _heldColWasEnabled.Length && _heldColWasEnabled[i];
+            }
+            _heldCols = null;
+            _heldColWasEnabled = null;
         }
 
         void Drop(bool throwIt)
@@ -238,27 +323,62 @@ namespace RealityEngine.Player
             if (_held == null)
                 return;
             Transform t = _held;
+            Vector3 releasePos = t.position;
+            Quaternion releaseRot = t.rotation;
+            Vector3 throwVel = Vector3.zero;
+
+            if (throwIt && _cam != null)
+            {
+                throwVel = _cam.transform.forward * throwForce;
+                // Blend recent hand sweep so a flick throws harder.
+                throwVel += Vector3.ClampMagnitude(_holdVelocity, throwForce * 1.25f) * 0.45f;
+                var desktop = DesktopPlayerController.Instance;
+                if (desktop != null && desktop.Origin != null)
+                {
+                    var cc = desktop.Origin.GetComponent<CharacterController>();
+                    if (cc != null)
+                        throwVel += cc.velocity;
+                }
+            }
+
             t.SetParent(null, true);
+            t.position = releasePos;
+            t.rotation = releaseRot;
+            RestoreColliders();
+
             if (_heldRb != null)
             {
-                _heldRb.isKinematic = throwIt ? false : _heldWasKinematic;
-                _heldRb.useGravity = throwIt ? true : _heldUsedGravity;
-                if (throwIt && _cam != null)
+                if (throwIt)
                 {
                     _heldRb.isKinematic = false;
                     _heldRb.useGravity = true;
-                    _heldRb.linearVelocity = _cam.transform.forward * throwForce;
+                    _heldRb.linearVelocity = throwVel;
+                    _heldRb.angularVelocity = _cam != null
+                        ? _cam.transform.right * (throwForce * 0.15f)
+                        : Vector3.zero;
+                }
+                else
+                {
+                    // Soft drop: restore gravity, gentle settle — no launch.
+                    _heldRb.isKinematic = false;
+                    _heldRb.useGravity = true;
+                    _heldRb.linearVelocity = Vector3.down * softDropDownSpeed;
+                    _heldRb.angularVelocity = Vector3.zero;
                 }
             }
+
             _held = null;
             _heldGrab = null;
             _heldRb = null;
-            _heldCol = null;
+            _haveHoldSample = false;
+            _holdVelocity = Vector3.zero;
         }
 
         void TryDelete(Collider col)
         {
             if (col == null)
+                return;
+            if (LabPlayerSpawnCompat.IsMonumentTransform(col.transform))
                 return;
             var cc = col.GetComponentInParent<CircuitComponent>();
             if (cc == null)
@@ -371,7 +491,6 @@ namespace RealityEngine.Player
 
         static bool WasThrowPressed()
         {
-            // Same as drop with momentum ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â F/R already throws when held; treat R as throw preference.
 #if ENABLE_INPUT_SYSTEM
             if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
                 return true;
@@ -384,7 +503,3 @@ namespace RealityEngine.Player
         }
     }
 }
-
-
-
-
