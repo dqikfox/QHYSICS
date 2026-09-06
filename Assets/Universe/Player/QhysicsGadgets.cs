@@ -58,7 +58,7 @@ namespace RealityEngine.Player
             if (key == "dipole")
                 return SpawnHandheldMagnet(worldPos, pureDipole: true);
             if (key == "coil")
-                return SpawnNamedCloneOrProxy("Coil", worldPos, new Color(0.85f, 0.65f, 0.2f));
+                return SpawnHandheldCoil(worldPos);
             if (key == "stopwatch")
                 return SpawnStopwatch(worldPos);
             if (key == "probe" || key == "field probe" || key == "bprobe" || key == "b-probe")
@@ -360,6 +360,33 @@ namespace RealityEngine.Player
             return root;
         }
 
+        static GameObject SpawnHandheldCoil(Vector3 worldPos)
+        {
+            // Prefer cloning a live lab Coil that already carries InductionCoil - never steal the original.
+            GameObject clone = FindNamedLoose("Coil");
+            if (clone != null && clone.GetComponent<InductionCoil>() != null)
+            {
+                GameObject go = Object.Instantiate(clone);
+                go.name = HandheldCoil.RootName;
+                go.SetActive(true);
+                go.transform.SetParent(null, true);
+                go.transform.position = worldPos;
+                EnableColliders(go);
+                EnsureGrabPhysics(go, 0.25f);
+                var coil = go.GetComponent<InductionCoil>();
+                HandheldCoil.BindMagnetsTo(coil);
+                return go;
+            }
+
+            // Fallback: build a real classical InductionCoil + InductionCircuit gadget (never a dead cube).
+            var root = new GameObject(HandheldCoil.RootName);
+            root.transform.position = worldPos;
+            var hc = root.AddComponent<HandheldCoil>();
+            hc.EnsureBuilt();
+            EnsureGrabPhysics(root, 0.25f);
+            return root;
+        }
+
         static GameObject SpawnNamedCloneOrProxy(string name, Vector3 worldPos, Color color)
         {
             GameObject src = FindNamedLoose(name);
@@ -480,7 +507,7 @@ namespace RealityEngine.Player
 
     /// <summary>
     /// Handheld Field Lens proxy: while held (or near camera), XR activate / N steps next layer, P steps previous.
-    /// Drives the existing scene FieldLens host — does not spawn a second lens.
+    /// Drives the existing scene FieldLens host Ã¢â‚¬â€ does not spawn a second lens.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensHandheld : MonoBehaviour
