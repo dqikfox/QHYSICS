@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using RealityEngine.Player;
+
 namespace RealityEngine.UI
 {
     /// <summary>
@@ -38,6 +40,7 @@ namespace RealityEngine.UI
             }
 
             existing.BuildChildren();
+            QhysicsDesktopBootstrap.Ensure();
             return existing;
         }
 
