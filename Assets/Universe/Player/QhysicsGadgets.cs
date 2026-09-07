@@ -579,11 +579,11 @@ namespace RealityEngine.Player
     }
 
     /// <summary>
-    /// Handheld Field Lens proxy: while held (or near camera), XR activate / N steps next layer, P steps previous.
+    /// Handheld Field Lens proxy: while held (or near camera), XR activate / N/P, or desktop LMB/scroll steps FieldLens layers.
     /// Drives the existing scene FieldLens host ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â does not spawn a second lens.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class FieldLensHandheld : MonoBehaviour
+    public sealed class FieldLensHandheld : MonoBehaviour, IDesktopActivatable
     {
         public const string Honesty = "Classical / conceptual layer peel. Not a microscope.";
 
@@ -678,6 +678,19 @@ namespace RealityEngine.Player
             StepNext();
         }
 
+        public void DesktopActivate(int delta)
+        {
+            if (delta == 0)
+                return;
+            if (Time.unscaledTime < _inputCooldown)
+                return;
+            _inputCooldown = Time.unscaledTime + 0.15f;
+            if (delta > 0)
+                StepNext();
+            else
+                StepPrev();
+        }
+
         void StepNext()
         {
             if (_lens == null)
@@ -757,7 +770,7 @@ namespace RealityEngine.Player
             _readout.color = new Color(0.35f, 0.9f, 1f, 1f);
             _readout.textWrappingMode = TextWrappingModes.Normal;
             _readout.rectTransform.sizeDelta = new Vector2(36f, 18f);
-            _readout.text = "FIELD LENS\nNormal\nN/P or trigger";
+            _readout.text = "FIELD LENS\nNormal\nN/P LMB/scroll";
         }
 
         void RefreshText()
@@ -773,7 +786,7 @@ namespace RealityEngine.Player
                 "FIELD LENS\n"
                 + _lens.CurrentLayerName + "\n"
                 + "[" + _lens.CurrentHonestyTag + "]\n"
-                + "N/P or trigger";
+                + "N/P LMB/scroll";
         }
     }
 }

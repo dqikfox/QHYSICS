@@ -65,7 +65,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
-| **LMB** / **Scroll** while holding CIRCUIT gadget, Multimeter, Probe, or Stopwatch | Activate / cycle (desktop trigger; Multimeter pages; Probe NEAREST/ALL/COMP; Stopwatch LMB toggle / scroll-reset) |
+| **LMB** / **Scroll** while holding CIRCUIT gadget, Multimeter, Probe, Stopwatch, or Field Lens | Activate / cycle (desktop trigger; Multimeter pages; Probe NEAREST/ALL/COMP; Stopwatch LMB toggle / scroll-reset; Field Lens layer peel) |
 | **F** / **RMB** | Drop |
 | **R** | Throw |
 | **Esc** / **P** | Pause (releases cursor) - Resume re-locks |
