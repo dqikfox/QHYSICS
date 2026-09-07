@@ -27,7 +27,7 @@ namespace RealityEngine.UI
         {
             new[] { "Wire", "Battery", "Switch", "Bulb", "Resistor", "Lamp", "Motor", "Solar", "Capacitor", "Inductor", "Diode", "Fuse", "LED", "Speaker", "Potentiometer", "Transformer" },
             new[] { "Magnet", "Coil", "Field Lens", "Dipole" },
-            new[] { "Multimeter", "Galvanometer", "Cubit Rod", "Probe", "Stopwatch" },
+            new[] { "Multimeter", "Galvanometer", "Oscilloscope", "Cubit Rod", "Probe", "Stopwatch" },
             new[] { "Teleport", "Scale", "Sky", "Reset Pose" },
             new[] { "Induction", "New Run", "Save", "Load" }
         };
