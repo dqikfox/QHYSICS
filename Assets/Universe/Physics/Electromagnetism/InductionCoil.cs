@@ -48,6 +48,10 @@ namespace RealityEngine.Physics.Electromagnetism
         float seriesCapacitance;
 
         [SerializeField]
+        [Tooltip("Optional classical series inductance (henries). <=0 bypasses L (algebraic I). Used by CIRCUIT Inductor gadget.")]
+        float seriesInductance;
+
+        [SerializeField]
         [Tooltip("Number of concentric sample rings on the coil disk (plus a center sample). Keep small for Quest 3S.")]
         int radialSamples = 4;
 
@@ -91,6 +95,7 @@ namespace RealityEngine.Physics.Electromagnetism
         public float LoadResistance => Mathf.Max(0f, loadResistance);
         public float ExternalSeriesEmf => externalSeriesEmf;
         public float SeriesCapacitance => Mathf.Max(0f, seriesCapacitance);
+        public float SeriesInductance => Mathf.Max(0f, seriesInductance);
         public float Flux => _flux;
         public float FluxRate => _dFluxDt;
         public float Emf => _emf;
@@ -132,6 +137,12 @@ namespace RealityEngine.Physics.Electromagnetism
         public void SetSeriesCapacitance(float farads)
         {
             seriesCapacitance = Mathf.Max(0f, farads);
+        }
+
+        /// <summary>Set classical series L (henries). 0 or less bypasses inductor (algebraic I). Used by CIRCUIT Inductor.</summary>
+        public void SetSeriesInductance(float henries)
+        {
+            seriesInductance = Mathf.Max(0f, henries);
         }
 
         /// <summary>

@@ -30,7 +30,7 @@ namespace RealityEngine.UI
         public static bool ResetCircuitLab()
         {
             ClearSpawnedExperimentProps();
-            ResetInductionCapacitors();
+            ResetInductionEnergyStorage();
 
             var lab = UnityEngine.Object.FindAnyObjectByType<CircuitLab>(FindObjectsInactive.Include);
             if (lab == null)
@@ -95,7 +95,7 @@ namespace RealityEngine.UI
         }
 
 
-        static void ResetInductionCapacitors()
+        static void ResetInductionEnergyStorage()
         {
             var circuits = Object.FindObjectsByType<InductionCircuit>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             int n = 0;
@@ -103,11 +103,11 @@ namespace RealityEngine.UI
             {
                 if (circuits[i] == null)
                     continue;
-                circuits[i].ResetCapacitorVoltage();
+                circuits[i].ResetEnergyStorage();
                 n++;
             }
             if (n > 0)
-                Debug.Log("QHYSICS: New Run cleared Vc on " + n + " InductionCircuit(s).");
+                Debug.Log("QHYSICS: New Run cleared Vc/I_L on " + n + " InductionCircuit(s).");
         }
 
         /// <summary>
