@@ -67,7 +67,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
-| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse), Multimeter, Probe, Stopwatch, or Field Lens |
+| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse), Multimeter, Galvanometer, Oscilloscope, Probe, Stopwatch, or Field Lens |
 
 ### MEASURE Multimeter (CircuitLab fallback)
 When no InductionCircuit is bound, Multimeter also reads the nearest placed CircuitLab component V/I (`GetVoltage` / `GetCurrentValue`) with honesty tag `[CircuitLab component]`. InductionCircuit still wins when present.
@@ -150,6 +150,13 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 2. Toolbelt **MEASURE -> Galvanometer**; grab it.
 3. Hold near Coil; needle deflects from classical signed I (pair with Magnet sweep or Battery + Resistor; Multimeter I for cross-check).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 1mA / 5mA / 20mA / 100mA full-scale (default 5mA). Honesty: ideal signed needle from InductionCircuit I - NOT coil torque dynamics, not damping, not shunt burden.
+
+
+### MEASURE Oscilloscope (toolbelt MEASURE)
+1. Enter Sandbox / Induction.
+2. Toolbelt **MEASURE -> Oscilloscope**; grab it.
+3. Hold near Coil; strip chart samples classical Emf / I / Phi (pair with Magnet sweep or Battery + Resistor; Multimeter for cross-check).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles EMF0.5 / EMF1 / EMF2 / I0.5 / I1 / I2 / Phi1 / Phi2 (default EMF1 = EMF 1s). Honesty: ideal rolling strip from classical InductionCircuit Emf/I/Phi samples — NOT real ADC, not triggered scope, not FFT, not probe capacitance.
 
 
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â checklist

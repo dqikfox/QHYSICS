@@ -93,6 +93,8 @@ namespace RealityEngine.Player
                 return SpawnLoadTransformer(worldPos);
             if (key == "galvanometer" || key == "galvo" || key == "galv" || key == "ammeter needle" || key == "needle meter")
                 return SpawnLoadGalvanometer(worldPos);
+            if (key == "oscilloscope" || key == "scope" || key == "oscilo" || key == "o-scope" || key == "waveform")
+                return SpawnLoadOscilloscope(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -647,6 +649,19 @@ namespace RealityEngine.Player
             return go;
         }
 
+        static GameObject SpawnLoadOscilloscope(Vector3 worldPos)
+        {
+            // Real MEASURE tool: classical strip chart of InductionCircuit Emf/I/Phi.
+            var go = SpawnPrimitiveProxy("Oscilloscope", worldPos, new Color(0.1f, 0.35f, 0.55f));
+            go.name = LoadOscilloscopeGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.06f, 0.1f);
+            var sc = go.GetComponent<LoadOscilloscopeGadget>();
+            if (sc == null)
+                sc = go.AddComponent<LoadOscilloscopeGadget>();
+            sc.EnsureBuilt();
+            return go;
+        }
+
         static GameObject SpawnLoadBulb(Vector3 worldPos)
         {
             // Real CIRCUIT tool: classical |I| glow on nearest InductionCircuit (Resistor owns R_load).
@@ -746,7 +761,7 @@ namespace RealityEngine.Player
 
     /// <summary>
     /// Handheld Field Lens proxy: while held (or near camera), XR activate / N/P, or desktop LMB/scroll steps FieldLens layers.
-    /// Drives the existing scene FieldLens host ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â does not spawn a second lens.
+    /// Drives the existing scene FieldLens host ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â does not spawn a second lens.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensHandheld : MonoBehaviour, IDesktopActivatable
