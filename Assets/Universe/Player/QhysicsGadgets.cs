@@ -101,6 +101,8 @@ namespace RealityEngine.Player
                 return SpawnLoadFrequencyCounter(worldPos);
             if (key == "power meter" || key == "powermeter" || key == "wattmeter" || key == "watt meter" || key == "power" || key == "watts" || key == "joulemeter" || key == "joule meter")
                 return SpawnLoadPowerMeter(worldPos);
+            if (key == "flux meter" || key == "fluxmeter" || key == "weber meter" || key == "webermeter" || key == "flux" || key == "phi meter" || key == "phimeter" || key == "dphi")
+                return SpawnLoadFluxMeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -692,6 +694,19 @@ namespace RealityEngine.Player
             if (pm == null)
                 pm = go.AddComponent<LoadPowerMeterGadget>();
             pm.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadFluxMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal lumped fluxmeter from classical InductionCircuit Phi / dPhi/dt.
+            var go = SpawnPrimitiveProxy("FluxMeter", worldPos, new Color(0.12f, 0.42f, 0.48f));
+            go.name = LoadFluxMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var fm = go.GetComponent<LoadFluxMeterGadget>();
+            if (fm == null)
+                fm = go.AddComponent<LoadFluxMeterGadget>();
+            fm.EnsureBuilt();
             return go;
         }
 
