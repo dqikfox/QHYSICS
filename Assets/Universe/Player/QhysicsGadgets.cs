@@ -51,7 +51,9 @@ namespace RealityEngine.Player
                 return SpawnCubitRod(worldPos);
             if (key == "multimeter")
                 return SpawnMultimeterStub(worldPos);
-            if (key == "lamp" || key == "led" || key == "glow" || key == "bulb")
+            if (key == "led" || key == "light-emitting diode" || key == "lightemittingdiode")
+                return SpawnLoadLed(worldPos);
+            if (key == "lamp" || key == "glow" || key == "bulb")
                 return SpawnLoadBulb(worldPos);
             if (key == "magnet")
                 return SpawnHandheldMagnet(worldPos, pureDipole: false);
@@ -571,6 +573,19 @@ namespace RealityEngine.Player
             if (fuse == null)
                 fuse = go.AddComponent<LoadFuseGadget>();
             fuse.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadLed(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: ideal series diode + colored |I| glow on nearest InductionCoil.
+            var go = SpawnPrimitiveProxy("LED", worldPos, new Color(0.2f, 0.55f, 0.95f));
+            go.name = LoadLedGadget.RootName;
+            go.transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
+            var led = go.GetComponent<LoadLedGadget>();
+            if (led == null)
+                led = go.AddComponent<LoadLedGadget>();
+            led.EnsureBuilt();
             return go;
         }
 
