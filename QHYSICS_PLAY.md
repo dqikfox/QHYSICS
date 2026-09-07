@@ -44,7 +44,6 @@ If Play works in Editor Game view but the headset stays on the Quest home / blac
 4. Optional: **Reality Engine ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Fix Player Spawn** before Play if Origin pose looks wrong in Hierarchy.
 
 
-
 ## Play steps - Desktop keyboard (no headset, no Device Simulator)
 
 Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest Link).
@@ -91,20 +90,17 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Hold near Coil; rotor spins from classical |I| (pair with Battery and/or Magnet sweep + Resistor).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles gear 0.5x / 1x / 2x / REV. Honesty: kinematic spin proxy, not torque/back-EMF.
 
-
 ### CIRCUIT Solar (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Solar**; grab it.
 3. Hold near Coil; classical series EMF from irradiance preset (pair with Lamp/Motor/Resistor/Multimeter).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / Dawn / Noon / Bright (0 / 1.5 / 3 / 6 V). Honesty: lumped photocurrent/irradiance EMF proxy — NOT a real PV I-V curve, not quantum, not MPPT.
 
-
 ### CIRCUIT Capacitor (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Capacitor**; grab it.
 3. Hold near Coil; classical series C (pair with Battery + Resistor/Lamp; Multimeter I falls as Vc rises).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / 1mF / 10mF / 100mF. Honesty: lumped RC only — NOT dielectric physics, not ESR/ESL. **New Run** clears Vc.
-
 
 ### CIRCUIT Inductor (toolbelt BUILD)
 1. Enter Sandbox / Induction.
@@ -118,23 +114,17 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Hold near Coil; ideal series diode clamp (pair with Magnet sweep + Multimeter **I** / Lamp; I one-sided).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / FWD / REV. Honesty: ideal half-wave only — NOT Shockley equation, not recovery, not avalanche; inductive kick not snubbered.
 
-
 ### CIRCUIT Fuse (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Fuse**; grab it.
 3. Hold near Coil; ideal |I| trip open (pair with Magnet sweep + Multimeter **I** / Lamp; hard sweep blows fuse and I collapses).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 5mA / 20mA / 50mA / BYPASS. While **BLOWN**, activate / **N** rearms. Honesty: ideal |I| threshold only — NOT I2t, not arc, not thermal model.
 
-
-
-
 ### CIRCUIT LED (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> LED**; grab it.
 3. Hold near Coil; ideal series diode + colored glow (pair with Magnet sweep or Battery + Resistor; Multimeter **I** one-sided on color presets).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles RED / GREEN / BLUE / SHORT. Honesty: ideal diode + emission proxy � NOT bandgap photons, not real LED I-V, not thermal.
-
-
 
 ### CIRCUIT Speaker (toolbelt BUILD)
 1. Enter Sandbox / Induction.
@@ -147,6 +137,13 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 2. Toolbelt **BUILD -> Potentiometer**; grab it.
 3. Hold near Coil; applies classical series R_load via discrete wiper presets (pair with Battery + Lamp/Motor/Multimeter).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 1Ω / 5Ω / 10Ω / 25Ω / 100Ω / 1kΩ (default 10Ω). Honesty: discrete lumped R_load wiper steps — NOT a real potentiometer, not 3-terminal divider, not taper curve. Overrides Resistor when both near; Switch OPEN still wins.
+
+### CIRCUIT Transformer (toolbelt BUILD)
+1. Enter Sandbox / Induction.
+2. Toolbelt **BUILD -> Transformer**; grab it.
+3. Hold near Coil; applies discrete lumped turns N (pair with Magnet sweep + Multimeter V/I).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 1:4 / 1:2 / 1:1 / 2:1 / 4:1 (N=20/40/80/160/320, default 1:1). Honesty: lumped turns tap (EMF=-N dPhi/dt) - NOT mutual inductance, not dual-winding transformer, not core hysteresis.
+
 
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â checklist
 
