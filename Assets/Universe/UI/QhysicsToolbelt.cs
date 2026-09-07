@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using RealityEngine.Player;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,7 +27,7 @@ namespace RealityEngine.UI
         {
             new[] { "Wire", "Battery", "Switch", "Bulb", "Resistor", "Lamp", "Motor", "Solar", "Capacitor", "Inductor", "Diode", "Fuse", "LED", "Speaker", "Potentiometer", "Transformer", "Function Generator" },
             new[] { "Magnet", "Coil", "Field Lens", "Dipole" },
-            new[] { "Multimeter", "Galvanometer", "Oscilloscope", "Frequency Counter", "Power Meter", "Flux Meter", "Charge Meter", "Voltmeter", "Ammeter", "Ohmmeter", "Capacitance Meter", "Cubit Rod", "Probe", "Stopwatch" },
+            new[] { "Multimeter", "Galvanometer", "Oscilloscope", "Frequency Counter", "Power Meter", "Flux Meter", "Charge Meter", "Voltmeter", "Ammeter", "Ohmmeter", "Capacitance Meter", "Inductance Meter", "Cubit Rod", "Probe", "Stopwatch" },
             new[] { "Teleport", "Scale", "Sky", "Reset Pose" },
             new[] { "Induction", "New Run", "Save", "Load" }
         };
