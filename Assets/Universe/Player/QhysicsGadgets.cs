@@ -113,6 +113,8 @@ namespace RealityEngine.Player
                 return SpawnLoadOhmmeter(worldPos);
             if (key == "capacitance meter" || key == "capacitancemeter" || key == "cap meter" || key == "capmeter" || key == "c meter" || key == "cmeter" || key == "farad meter" || key == "faradmeter" || key == "capacitor meter" || key == "capacitormeter")
                 return SpawnLoadCapacitanceMeter(worldPos);
+            if (key == "inductance meter" || key == "inductancemeter" || key == "l meter" || key == "lmeter" || key == "henry meter" || key == "henrymeter" || key == "inductor meter" || key == "inductormeter")
+                return SpawnLoadInductanceMeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -782,6 +784,19 @@ namespace RealityEngine.Player
             if (cm == null)
                 cm = go.AddComponent<LoadCapacitanceMeterGadget>();
             cm.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadInductanceMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal series L / I_L / 0.5LI^2 from classical InductionCircuit.
+            var go = SpawnPrimitiveProxy("InductanceMeter", worldPos, new Color(0.45f, 0.28f, 0.72f));
+            go.name = LoadInductanceMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var im = go.GetComponent<LoadInductanceMeterGadget>();
+            if (im == null)
+                im = go.AddComponent<LoadInductanceMeterGadget>();
+            im.EnsureBuilt();
             return go;
         }
 
