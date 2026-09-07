@@ -89,6 +89,8 @@ namespace RealityEngine.Player
                 return SpawnLoadSpeaker(worldPos);
             if (key == "potentiometer" || key == "pot" || key == "rheostat")
                 return SpawnLoadPotentiometer(worldPos);
+            if (key == "transformer" || key == "xfmr" || key == "xformer" || key == "turns" || key == "tap")
+                return SpawnLoadTransformer(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -616,6 +618,17 @@ namespace RealityEngine.Player
             if (pot == null)
                 pot = go.AddComponent<LoadPotentiometerGadget>();
             pot.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadTransformer(Vector3 worldPos)
+        {
+            var go = SpawnPrimitiveProxy("Transformer", worldPos, new Color(0.42f, 0.38f, 0.34f));
+            go.name = LoadTransformerGadget.RootName;
+            var xf = go.GetComponent<LoadTransformerGadget>();
+            if (xf == null)
+                xf = go.AddComponent<LoadTransformerGadget>();
+            xf.EnsureBuilt();
             return go;
         }
 

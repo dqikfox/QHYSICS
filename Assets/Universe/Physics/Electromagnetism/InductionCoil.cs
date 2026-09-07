@@ -132,6 +132,13 @@ namespace RealityEngine.Physics.Electromagnetism
             loadResistance = Mathf.Max(0f, loadOhms);
         }
 
+        /// <summary>Set lumped turns N (EMF = -N dPhi/dt). Used by CIRCUIT Transformer gadget.</summary>
+        public void SetTurns(int turnCount)
+        {
+            turns = Mathf.Max(1, turnCount);
+        }
+
+
         /// <summary>Set classical series EMF (volts) added to Faraday EMF. Used by CIRCUIT Battery.</summary>
         public void SetExternalSeriesEmf(float volts)
         {
