@@ -124,6 +124,13 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 
 
 
+
+### CIRCUIT LED (toolbelt BUILD)
+1. Enter Sandbox / Induction.
+2. Toolbelt **BUILD -> LED**; grab it.
+3. Hold near Coil; ideal series diode + colored glow (pair with Magnet sweep or Battery + Resistor; Multimeter **I** one-sided on color presets).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles RED / GREEN / BLUE / SHORT. Honesty: ideal diode + emission proxy � NOT bandgap photons, not real LED I-V, not thermal.
+
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â checklist
 
 1. Open `Assets/Scenes/Faraday.unity` (Build Settings already has Faraday enabled).
