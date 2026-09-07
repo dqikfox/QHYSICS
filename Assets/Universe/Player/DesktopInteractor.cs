@@ -99,6 +99,12 @@ namespace RealityEngine.Player
                 if (!deleteMode && WasGrabPressed() && hitSomething)
                     TryGrab(hit.collider);
             }
+            else if (HoldsActivatable)
+            {
+                // Better desktop activation while holding activatable gadgets
+                if (WasActivatePressed())
+                    ActivateHeld();
+            }
             else
             {
                 ClearHover();

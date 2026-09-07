@@ -157,7 +157,7 @@ namespace RealityEngine.Player
                 // Half-width ~0.20 matches CharacterController radius 0.22 (no snag / no fall-through).
                 capsule.transform.localScale = new Vector3(0.40f, 0.42f, 0.28f);
                 Object.Destroy(capsule.GetComponent<Collider>());
-                Tint(capsule, new Color(0.18f, 0.22f, 0.28f));
+                Tint(capsule, new Color(0.22f, 0.25f, 0.32f)); // nicer torso
 
                 // Head — hidden from own camera via PlayerSelf layer.
                 var head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -166,7 +166,7 @@ namespace RealityEngine.Player
                 head.transform.localPosition = new Vector3(0f, BodyEyeHeightM, 0f);
                 head.transform.localScale = Vector3.one * 0.22f;
                 Object.Destroy(head.GetComponent<Collider>());
-                Tint(head, new Color(0.85f, 0.72f, 0.58f));
+                Tint(head, new Color(0.82f, 0.68f, 0.55f));
                 SetLayerRecursive(head, PlayerSelfLayer);
 
                 MakeHand(body, LeftHandName, new Vector3(-0.28f, 1.05f, 0.28f));
@@ -237,6 +237,8 @@ namespace RealityEngine.Player
         /// <summary>Upgrade or create clearer desktop arm/hand proxies (cylinder + sphere).</summary>
         static void EnsureFpArmVisuals(Transform body)
         {
+            // (existing)
+
             if (body == null)
                 return;
             EnsureOneArm(body, LeftHandName, new Vector3(-0.28f, 1.05f, 0.28f), left: true);

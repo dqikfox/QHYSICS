@@ -33,7 +33,7 @@ namespace RealityEngine.UI
         };
 
         [SerializeField] bool visible;
-        [SerializeField] float hipFollowLag = 10f;
+        [SerializeField] float hipFollowLag = 14f;  // snappier follow for polish
         [SerializeField] float beltForwardM = 0.35f;
         [SerializeField] float beltUpM = 0.12f;
         Category _category = Category.Build;

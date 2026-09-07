@@ -26,10 +26,12 @@ namespace RealityEngine.Player
         [SerializeField] float jumpSpeed = 5.2f;
         [SerializeField] float crouchHeight = 1.0f;
         [SerializeField] float standHeight = 1.72f;
-        [SerializeField] float gravity = -20f;
+        [SerializeField] float gravity = -22f;
         [SerializeField] float desktopEyeHeight = 1.65f;
         [SerializeField] float minPitch = -80f;
         [SerializeField] float maxPitch = 80f;
+        [SerializeField] float acceleration = 12f;          // polished acceleration
+        [SerializeField] float deceleration = 18f;
         const float MinLookSensitivity = 0.35f;
         const float MaxLookSensitivity = 3.5f;
         const float DesktopFovDefault = 75f;
@@ -43,6 +45,7 @@ namespace RealityEngine.Player
         float _vertVel;
         bool _crouching;
         bool _desktopActive;
+        Vector3 _currentVelocity;   // for acceleration polish
         bool _cursorOwned;
         float _baseCcHeight = 1.72f;
         Vector3 _baseCcCenter;
@@ -360,45 +363,49 @@ namespace RealityEngine.Player
             bool jump = ReadJump();
             bool crouch = ReadCrouch();
 
+            // Smooth crouch
             if (crouch != _crouching)
             {
                 _crouching = crouch;
-                float h = _crouching ? crouchHeight : _baseCcHeight;
-                bool was = _cc.enabled;
-                _cc.enabled = false;
-                _cc.height = h;
-                _cc.center = new Vector3(_baseCcCenter.x, h * 0.5f, _baseCcCenter.z);
-                _cc.enabled = was;
             }
+            float targetH = _crouching ? crouchHeight : _baseCcHeight;
+            _cc.height = Mathf.Lerp(_cc.height, targetH, Time.deltaTime * 12f);
+            _cc.center = new Vector3(_baseCcCenter.x, _cc.height * 0.5f, _baseCcCenter.z);
 
-            float speed = sprint ? sprintSpeed : walkSpeed;
+            float targetSpeed = sprint ? sprintSpeed : walkSpeed;
             Vector3 forward = _origin.forward;
             Vector3 right = _origin.right;
             forward.y = 0f;
             right.y = 0f;
             if (forward.sqrMagnitude > 1e-6f) forward.Normalize();
             if (right.sqrMagnitude > 1e-6f) right.Normalize();
-            Vector3 wish = (forward * stick.y + right * stick.x);
-            if (wish.sqrMagnitude > 1f)
-                wish.Normalize();
 
-            // Stick to plaza ground; avoid floaty hops from residual upward velocity.
+            Vector3 wishDir = (forward * stick.y + right * stick.x);
+            if (wishDir.sqrMagnitude > 1f) wishDir.Normalize();
+
+            // Acceleration / deceleration for nicer feel
+            float accel = (wishDir.sqrMagnitude > 0.01f) ? acceleration : deceleration;
+            _currentVelocity = Vector3.Lerp(_currentVelocity, wishDir * targetSpeed, Time.deltaTime * accel);
+
+            // Grounding & jump
             bool grounded = _cc.isGrounded;
             if (grounded)
             {
-                if (_vertVel < 0f)
-                    _vertVel = -2f;
-                if (jump)
-                    _vertVel = jumpSpeed;
+                if (_vertVel < 0f) _vertVel = -2f;
+                if (jump) _vertVel = jumpSpeed;
             }
             else
+            {
                 _vertVel += gravity * Time.deltaTime;
+            }
 
-            Vector3 motion = wish * speed;
+            Vector3 motion = _currentVelocity;
             motion.y = _vertVel;
+
             CollisionFlags flags = _cc.Move(motion * Time.deltaTime);
             if ((flags & CollisionFlags.Below) != 0 && _vertVel < 0f)
                 _vertVel = -2f;
+
         }
 
         static Vector2 ReadMouseDelta()

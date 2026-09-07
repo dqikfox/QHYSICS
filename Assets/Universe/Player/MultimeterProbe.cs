@@ -31,6 +31,31 @@ namespace RealityEngine.Player
         TextMeshPro _readout;
         InductionCircuit _circuit;
         InductionCircuit[] _circuits;
+
+        CircuitComponent _legacyComponent;
+
+        void BindLegacyCircuitComponent()
+        {
+            _legacyComponent = null;
+            var lab = Object.FindFirstObjectByType<CircuitLab>(FindObjectsInactive.Include);
+            if (lab == null) return;
+
+            // Find nearest placed CircuitComponent
+            CircuitComponent best = null;
+            float bestDist = 999f;
+            foreach (var cc in Object.FindObjectsByType<CircuitComponent>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (cc == null || !cc.IsPlaced) continue;
+                float d = (cc.transform.position - TipWorld).sqrMagnitude;
+                if (d < bestDist && d < 1.8f)
+                {
+                    bestDist = d;
+                    best = cc;
+                }
+            }
+            _legacyComponent = best;
+        }
+
         XRGrabInteractable _grab;
         float _refreshAt;
         float _cacheAt;
@@ -52,6 +77,8 @@ namespace RealityEngine.Player
             BindNearest();
             if (_circuit == null)
                 EnsureLabCircuit();
+            if (_circuit == null)
+                BindLegacyCircuitComponent();
             RefreshText();
         }
 
@@ -85,6 +112,10 @@ namespace RealityEngine.Player
             BindNearest();
             if (_circuit == null)
                 EnsureLabCircuit();
+            if (_circuit == null)
+                BindLegacyCircuitComponent();
+            else
+                _legacyComponent = null;
             PollDesktopCycle();
             RefreshText();
         }
@@ -234,6 +265,23 @@ namespace RealityEngine.Player
                 return;
             if (_circuit == null)
             {
+                if (_legacyComponent != null)
+                {
+                    float distL = Vector3.Distance(TipWorld, _legacyComponent.transform.position);
+                    string name = _legacyComponent.name;
+                    if (name.Length > 18)
+                        name = name.Substring(0, 16) + "..";
+                    double v = _legacyComponent.GetVoltage();
+                    double iAmp = _legacyComponent.GetCurrentValue();
+                    _readout.text =
+                        "MULTIMETER " + ActiveModeName + "\n"
+                        + "V " + v.ToString("0.###") + " V\n"
+                        + "I " + iAmp.ToString("0.####") + " A\n"
+                        + name + " " + distL.ToString("0.00") + "m\n"
+                        + "[" + ActiveModeName + "]\n"
+                        + "[CircuitLab component]";
+                    return;
+                }
                 _readout.text =
                     "MULTIMETER " + ActiveModeName + "\n"
                     + "no InductionCircuit\n"
