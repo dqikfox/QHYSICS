@@ -214,6 +214,9 @@ namespace RealityEngine.Player
             hip.localPosition = new Vector3(0f, 1.05f, 0.12f);
             hip.localRotation = Quaternion.identity;
 
+            // Worn inventory pouch (belt + bag + selected-slot icon). XR-safe via body visibility gate.
+            InventoryHipPouch.Ensure(hip);
+
             // Keep head mesh aligned with desktop eye height.
             Transform headTf = body.Find("Head");
             if (headTf != null)
@@ -226,6 +229,7 @@ namespace RealityEngine.Player
             var gate = body.GetComponent<DesktopBodyVisibility>();
             if (gate == null)
                 gate = body.gameObject.AddComponent<DesktopBodyVisibility>();
+            // Re-bind after pouch meshes so XR hide / FP culling includes new renderers.
             gate.Bind(mainCamera);
             gate.Refresh();
         }
