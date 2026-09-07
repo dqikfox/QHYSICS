@@ -87,6 +87,8 @@ namespace RealityEngine.Player
                 return SpawnLoadFuse(worldPos);
             if (key == "speaker" || key == "buzzer" || key == "horn" || key == "sounder")
                 return SpawnLoadSpeaker(worldPos);
+            if (key == "potentiometer" || key == "pot" || key == "rheostat")
+                return SpawnLoadPotentiometer(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -601,6 +603,19 @@ namespace RealityEngine.Player
             if (sp == null)
                 sp = go.AddComponent<LoadSpeakerGadget>();
             sp.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadPotentiometer(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: discrete R_load wiper presets on nearest InductionCoil (not a 3-terminal pot).
+            var go = SpawnPrimitiveProxy("Potentiometer", worldPos, new Color(0.78f, 0.52f, 0.22f));
+            go.name = LoadPotentiometerGadget.RootName;
+            go.transform.localScale = new Vector3(0.08f, 0.05f, 0.08f);
+            var pot = go.GetComponent<LoadPotentiometerGadget>();
+            if (pot == null)
+                pot = go.AddComponent<LoadPotentiometerGadget>();
+            pot.EnsureBuilt();
             return go;
         }
 

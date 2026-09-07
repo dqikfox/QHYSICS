@@ -142,6 +142,12 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Hold near Coil; hear classical |I| as a procedural sine (pair with Magnet sweep or Battery + Resistor; Multimeter **I**).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles MUTE / LO / MID / HI gain. Honesty: sine |I| proxy - NOT a real voice coil, not Lorentz force audio, not AC spectrum.
 
+### CIRCUIT Potentiometer (toolbelt BUILD)
+1. Enter Sandbox / Induction.
+2. Toolbelt **BUILD -> Potentiometer**; grab it.
+3. Hold near Coil; applies classical series R_load via discrete wiper presets (pair with Battery + Lamp/Motor/Multimeter).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 1Ω / 5Ω / 10Ω / 25Ω / 100Ω / 1kΩ (default 10Ω). Honesty: discrete lumped R_load wiper steps — NOT a real potentiometer, not 3-terminal divider, not taper curve. Overrides Resistor when both near; Switch OPEN still wins.
+
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â checklist
 
 1. Open `Assets/Scenes/Faraday.unity` (Build Settings already has Faraday enabled).
