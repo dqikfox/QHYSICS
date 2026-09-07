@@ -145,6 +145,13 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 1:4 / 1:2 / 1:1 / 2:1 / 4:1 (N=20/40/80/160/320, default 1:1). Honesty: lumped turns tap (EMF=-N dPhi/dt) - NOT mutual inductance, not dual-winding transformer, not core hysteresis.
 
 
+### MEASURE Galvanometer (toolbelt MEASURE)
+1. Enter Sandbox / Induction.
+2. Toolbelt **MEASURE -> Galvanometer**; grab it.
+3. Hold near Coil; needle deflects from classical signed I (pair with Magnet sweep or Battery + Resistor; Multimeter I for cross-check).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 1mA / 5mA / 20mA / 100mA full-scale (default 5mA). Honesty: ideal signed needle from InductionCircuit I - NOT coil torque dynamics, not damping, not shunt burden.
+
+
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â checklist
 
 1. Open `Assets/Scenes/Faraday.unity` (Build Settings already has Faraday enabled).
