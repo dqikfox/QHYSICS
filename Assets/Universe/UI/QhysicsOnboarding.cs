@@ -49,13 +49,14 @@ namespace RealityEngine.UI
             "MEASURE Inductance Meter: hold near a Coil - classical series L (H), I_L, or 0.5*L*I^2 (N/P or VR trigger cycles L/IL/ENERGY/CLR; CLR resets I_L; pair with Inductor / Function Generator / Magnet; NOT real LCR / Q-meter / impedance analyzer / mutual inductance).",
             "MEASURE Resonance Meter: hold near a Coil - classical LC f0=1/(2pi sqrt(LC)), omega0, or L/C (N/P or VR trigger cycles F0/OMEGA/LC/CLR; CLR resets Vc+I_L; pair with Inductor / Capacitor / Function Generator; NOT real VNA / network analyzer / Q-bandwidth / impedance analyzer).",
             "MEASURE Impedance Meter: hold near a Coil - classical series RLC |Z|, X, phase, or Emf/I (N/P or VR trigger cycles Z/X/PHI/EFF/CLR; CLR zeros peak |Zeff| + resets Vc+I_L; pair with Inductor / Capacitor / Function Generator / Frequency Counter; NOT real VNA / impedance analyzer / LCR bridge / Kelvin / FFT Z).",
+            "MEASURE Power Factor Meter: hold near a Coil - classical series RLC PF=R/|Z|, phase, VAR=I^2*X, or VA (N/P or VR trigger cycles PF/PHI/VAR/VA/CLR; CLR zeros peak |VAR| + resets Vc+I_L; pair with Inductor / Capacitor / Function Generator / Impedance Meter; NOT real PF meter / wattmeter-VAR transducer / true-RMS / PLL / FFT).",
             "CIRCUIT Bulb/Lamp: hold near a Coil â€” glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
             "CIRCUIT Switch: hold near a Coil ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
             "CIRCUIT Battery: hold near a Coil ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
             "CIRCUIT Wire: hold near a Coil ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
             "MEASURE Probe: binds nearest MagneticDipole by tip; N/P, VR trigger, or desktop LMB/scroll cycles NEAREST/ALL/COMP pages.",
             "MEASURE Stopwatch: T/Y or VR trigger; desktop LMB toggles, scroll-down resets (wall-clock).",
-            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Speaker/Potentiometer/Transformer/Function Generator/Galvanometer/Oscilloscope/Frequency Counter/Power Meter/Flux Meter/Charge Meter/Voltmeter/Ammeter/Ohmmeter/Capacitance Meter/Inductance Meter/Resonance Meter/Impedance Meter/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
+            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Speaker/Potentiometer/Transformer/Function Generator/Galvanometer/Oscilloscope/Frequency Counter/Power Meter/Flux Meter/Charge Meter/Voltmeter/Ammeter/Ohmmeter/Capacitance Meter/Inductance Meter/Resonance Meter/Impedance Meter/Power Factor Meter/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
         };
 
         Canvas _canvas;
