@@ -119,6 +119,8 @@ namespace RealityEngine.Player
                 return SpawnLoadResonanceMeter(worldPos);
             if (key == "impedance meter" || key == "impedancemeter" || key == "z meter" || key == "zmeter" || key == "impedance" || key == "reactance meter" || key == "reactancemeter")
                 return SpawnLoadImpedanceMeter(worldPos);
+            if (key == "power factor meter" || key == "powerfactormeter" || key == "pf meter" || key == "pfmeter" || key == "power factor" || key == "powerfactor" || key == "var meter" || key == "varmeter")
+                return SpawnLoadPowerFactorMeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -827,6 +829,19 @@ namespace RealityEngine.Player
             if (zm == null)
                 zm = go.AddComponent<LoadImpedanceMeterGadget>();
             zm.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadPowerFactorMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal series RLC PF / PHI / VAR / VA from classical InductionCircuit.
+            var go = SpawnPrimitiveProxy("PowerFactorMeter", worldPos, new Color(0.15f, 0.45f, 0.42f));
+            go.name = LoadPowerFactorMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var pf = go.GetComponent<LoadPowerFactorMeterGadget>();
+            if (pf == null)
+                pf = go.AddComponent<LoadPowerFactorMeterGadget>();
+            pf.EnsureBuilt();
             return go;
         }
 
