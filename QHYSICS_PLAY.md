@@ -65,7 +65,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
-| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor), Multimeter, Probe, Stopwatch, or Field Lens |
+| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar), Multimeter, Probe, Stopwatch, or Field Lens |
 
 ### MEASURE Multimeter (CircuitLab fallback)
 When no InductionCircuit is bound, Multimeter also reads the nearest placed CircuitLab component V/I (`GetVoltage` / `GetCurrentValue`) with honesty tag `[CircuitLab component]`. InductionCircuit still wins when present.
@@ -87,6 +87,13 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 2. Toolbelt **BUILD â†’ Motor**; grab it.
 3. Hold near Coil; rotor spins from classical |I| (pair with Battery and/or Magnet sweep + Resistor).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles gear 0.5x / 1x / 2x / REV. Honesty: kinematic spin proxy, not torque/back-EMF.
+
+
+### CIRCUIT Solar (toolbelt BUILD)
+1. Enter Sandbox / Induction.
+2. Toolbelt **BUILD -> Solar**; grab it.
+3. Hold near Coil; classical series EMF from irradiance preset (pair with Lamp/Motor/Resistor/Multimeter).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / Dawn / Noon / Bright (0 / 1.5 / 3 / 6 V). Honesty: lumped photocurrent/irradiance EMF proxy — NOT a real PV I-V curve, not quantum, not MPPT.
 
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â checklist
 
