@@ -71,6 +71,8 @@ namespace RealityEngine.Player
                 return SpawnLoadWire(worldPos);
             if (key == "resistor")
                 return SpawnLoadResistor(worldPos);
+            if (key == "motor" || key == "dc motor" || key == "dcmotor")
+                return SpawnLoadMotor(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -479,6 +481,20 @@ namespace RealityEngine.Player
             if (w == null)
                 w = go.AddComponent<LoadWireGadget>();
             w.EnsureBuilt();
+            return go;
+        }
+
+
+        static GameObject SpawnLoadMotor(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: classical |I| spin on nearest InductionCircuit (Resistor owns R_load).
+            var go = SpawnPrimitiveProxy("Motor", worldPos, new Color(0.35f, 0.55f, 0.85f));
+            go.name = LoadMotorGadget.RootName;
+            go.transform.localScale = new Vector3(0.1f, 0.08f, 0.12f);
+            var m = go.GetComponent<LoadMotorGadget>();
+            if (m == null)
+                m = go.AddComponent<LoadMotorGadget>();
+            m.EnsureBuilt();
             return go;
         }
 
