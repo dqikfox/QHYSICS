@@ -65,7 +65,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
-| **LMB** / **Scroll** while holding CIRCUIT gadget, Multimeter, Probe, Stopwatch, or Field Lens |
+| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor), Multimeter, Probe, Stopwatch, or Field Lens |
 
 ### CIRCUIT Resistor (hotbar 5)
 1. Enter Sandbox / Induction.
@@ -79,6 +79,12 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **M** / **Tab** | Toolbelt (worn at hip/chest with lag â€” not glued to camera) |
 
 When a Quest Link headset is connected / XR display running, desktop locomotion disables and XR continuous-move + snap turn own the CharacterController (no fight with WASD). Toolbelt follows HipAnchor on DesktopBody / XR Origin. Enter Sandbox / Fix Player Spawn recalibrates Floor + eye height.
+
+### CIRCUIT Motor (toolbelt BUILD)
+1. Enter Sandbox / Induction.
+2. Toolbelt **BUILD → Motor**; grab it.
+3. Hold near Coil; rotor spins from classical |I| (pair with Battery and/or Magnet sweep + Resistor).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles gear 0.5x / 1x / 2x / REV. Honesty: kinematic spin proxy, not torque/back-EMF.
 
 ## Play steps Ã¢â‚¬â€ checklist
 

@@ -237,6 +237,7 @@ namespace RealityEngine.Player
                 case "Switch": return new Color(0.95f, 0.82f, 0.25f);
                 case "Bulb": return new Color(0.95f, 0.92f, 0.75f);
                 case "Resistor": return new Color(0.75f, 0.35f, 0.18f);
+                case "Motor": return new Color(0.35f, 0.55f, 0.85f);
                 case "Magnet": return new Color(0.85f, 0.22f, 0.28f);
                 case "Field Lens": return new Color(0.25f, 0.85f, 0.95f);
                 case "Cubit Rod": return new Color(0.55f, 0.35f, 0.90f);
