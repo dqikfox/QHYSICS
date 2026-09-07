@@ -21,6 +21,7 @@ On **desktop** (Editor Ctrl+P, no Quest Link / no running XR display):
 
 On **Quest Link**: desktop body hides; XR locomotion + Left/Right Hand Direct/Ray interactors take over. Light `XrControllerProxy` grips show on each controller (Hand Presence still used when OpenXR devices match). Grab attach is on each hand's `Attach` Ã¢â‚¬â€ desktop HandAttach does not fight XR grabs. If the headset shows nothing, fix Link Ã¢â‚¬â€ you are not missing a character mesh.
 
+
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Meta Quest Link (Quest 3S)
 
 1. On PC: install/open **Meta Quest Link** (Air Link or cable). Quest in Developer Mode, same account, PC allowed.
@@ -33,6 +34,7 @@ On **Quest Link**: desktop body hides; XR locomotion + Left/Right Hand Direct/Ra
 
 If Play works in Editor Game view but the headset stays on the Quest home / black: Link is not active ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â fix Link first. Do not build APK for daily testing.
 
+
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â XR Device Simulator (desktop, no headset)
 
 1. Package Manager ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **XR Interaction Toolkit** ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Samples ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ import **XR Device Simulator** (once).
@@ -40,6 +42,7 @@ If Play works in Editor Game view but the headset stays on the Quest home / blac
    - Asset: `Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â set simulator prefab after sample import; `Automatically Instantiate Simulator Prefab` can be on for Editor-only.
 3. Open Faraday ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **Ctrl+P**. Use keyboard/mouse per simulator HUD (move/look/grip).
 4. Optional: **Reality Engine ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Fix Player Spawn** before Play if Origin pose looks wrong in Hierarchy.
+
 
 
 ## Play steps - Desktop keyboard (no headset, no Device Simulator)
@@ -129,7 +132,15 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> LED**; grab it.
 3. Hold near Coil; ideal series diode + colored glow (pair with Magnet sweep or Battery + Resistor; Multimeter **I** one-sided on color presets).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles RED / GREEN / BLUE / SHORT. Honesty: ideal diode + emission proxy � NOT bandgap photons, not real LED I-V, not thermal.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles RED / GREEN / BLUE / SHORT. Honesty: ideal diode + emission proxy � NOT bandgap photons, not real LED I-V, not thermal.
+
+
+
+### CIRCUIT Speaker (toolbelt BUILD)
+1. Enter Sandbox / Induction.
+2. Toolbelt **BUILD -> Speaker**; grab it.
+3. Hold near Coil; hear classical |I| as a procedural sine (pair with Magnet sweep or Battery + Resistor; Multimeter **I**).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles MUTE / LO / MID / HI gain. Honesty: sine |I| proxy - NOT a real voice coil, not Lorentz force audio, not AC spectrum.
 
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â checklist
 
