@@ -77,6 +77,11 @@ public class CircuitComponent : MonoBehaviour
         return Voltage;
     }
 
+    public double GetCurrentValue()
+    {
+        return Current;
+    }
+
     public virtual void SetVoltage(double voltage)
     {
         Voltage = voltage;

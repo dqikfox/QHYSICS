@@ -4,7 +4,7 @@ using TMPro;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// Short dismissible world-space tips: Welcome ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Grab ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Try table. Not a trap.
+    /// Short dismissible world-space tips: Welcome ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Grab ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Try table. Not a trap.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(205)]
@@ -22,14 +22,14 @@ namespace RealityEngine.UI
             "PHYSICS Field Lens: grab it; N/P, VR trigger, or desktop LMB/scroll peels layers (honesty tags on readout).",
             "PHYSICS Magnet/Dipole: grab a live classical MagneticDipole (Probe reads B).",
             "PHYSICS Coil: grab a live classical InductionCoil; move a Magnet through it (Multimeter reads Emf/I).",
-            "MEASURE Multimeter: binds nearest InductionCircuit; N/P, VR trigger, or desktop LMB/scroll cycles ALL/EMF/I/LOAD pages.",
-            "Lab + PHYSICS coils auto-bind every MagneticDipole â€” gadget Magnet through lab Coil still drives Emf/I.",
+            "MEASURE Multimeter: binds nearest InductionCircuit (or nearest CircuitLab component V/I if none); N/P, VR trigger, or desktop LMB/scroll cycles ALL/EMF/I/LOAD pages.",
+            "Lab + PHYSICS coils auto-bind every MagneticDipole Ã¢â‚¬â€ gadget Magnet through lab Coil still drives Emf/I.",
             "CIRCUIT Resistor: hold near a Coil to apply classical R_load (N/P or VR trigger cycles 2/8/50/OPEN); Multimeter I changes.",
-            "CIRCUIT Motor: hold near a Coil — spins from classical |I| (N/P or VR trigger cycles gear 0.5x/1x/2x/REV; pair with Battery/Resistor/Magnet).",
-            "CIRCUIT Lamp: hold near a Coil â€” glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
-            "CIRCUIT Switch: hold near a Coil â€” N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
-            "CIRCUIT Battery: hold near a Coil â€” N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
-            "CIRCUIT Wire: hold near a Coil â€” classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
+            "CIRCUIT Motor: hold near a Coil â€” spins from classical |I| (N/P or VR trigger cycles gear 0.5x/1x/2x/REV; pair with Battery/Resistor/Magnet).",
+            "CIRCUIT Lamp: hold near a Coil Ã¢â‚¬â€ glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
+            "CIRCUIT Switch: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
+            "CIRCUIT Battery: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
+            "CIRCUIT Wire: hold near a Coil Ã¢â‚¬â€ classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
             "MEASURE Probe: binds nearest MagneticDipole by tip; N/P, VR trigger, or desktop LMB/scroll cycles NEAREST/ALL/COMP pages.",
             "MEASURE Stopwatch: T/Y or VR trigger; desktop LMB toggles, scroll-down resets (wall-clock).",
             "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",

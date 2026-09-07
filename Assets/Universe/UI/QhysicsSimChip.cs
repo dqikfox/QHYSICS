@@ -71,7 +71,6 @@ namespace RealityEngine.UI
             _expandRow.anchoredPosition = new Vector2(0f, -90f);
             _expandRow.sizeDelta = new Vector2(680f, 80f);
             QhysicsUiBuilder.LayoutHorizontal(_expandRow, 8f);
-
             for (int i = 0; i < Speeds.Length; i++)
             {
                 float s = Speeds[i];
@@ -187,3 +186,4 @@ namespace RealityEngine.UI
         }
     }
 }
+
