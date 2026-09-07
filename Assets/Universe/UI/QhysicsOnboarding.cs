@@ -16,7 +16,7 @@ namespace RealityEngine.UI
         static readonly string[] Tips =
         {
             "Welcome to QHYSICS\nCircuit lab on the table. Giza outside.",
-            "Desktop: WASD move, mouse look, E/LMB grab, F drop, R throw.\nVR: grip / trigger. Hotbar 1-8 / scroll.",
+            "Desktop: WASD move, mouse look, E/LMB grab, F drop, R throw.\nVR: grip / trigger. Hotbar 1-9 / scroll (slot 5 = CIRCUIT Resistor).",
             "You are the XR Origin (and desktop body when no headset). Controllers / DesktopBody are your hands - not a separate avatar.",
             "Try a loop: Battery -> Wire -> Bulb -> Switch.\nEsc/P pause. Toolbelt New Run resets the table and clears spawned gadgets.",
             "PHYSICS Field Lens: grab it; N/P, VR trigger, or desktop LMB/scroll peels layers (honesty tags on readout).",

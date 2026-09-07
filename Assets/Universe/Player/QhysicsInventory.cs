@@ -23,15 +23,16 @@ namespace RealityEngine.Player
             Battery = 1,
             Switch = 2,
             Bulb = 3,
-            Magnet = 4,
-            FieldLens = 5,
-            CubitRod = 6,
-            Empty = 7
+            Resistor = 4,
+            Magnet = 5,
+            FieldLens = 6,
+            CubitRod = 7,
+            Empty = 8
         }
 
         public static readonly string[] SlotLabels =
         {
-            "Wire", "Battery", "Switch", "Bulb", "Magnet", "Field Lens", "Cubit Rod", "Delete"
+            "Wire", "Battery", "Switch", "Bulb", "Resistor", "Magnet", "Field Lens", "Cubit Rod", "Delete"
         };
 
         public static QhysicsInventory Instance { get; private set; }
@@ -92,7 +93,7 @@ namespace RealityEngine.Player
         void HandleHotkeys()
         {
             int digit = ReadDigitPressed();
-            if (digit >= 1 && digit <= 8)
+            if (digit >= 1 && digit <= 9)
                 Select(digit - 1);
 
             int scroll = ReadScrollCycle();
@@ -140,11 +141,11 @@ namespace RealityEngine.Player
             barRt.pivot = new Vector2(0.5f, 0f);
             barRt.anchoredPosition = new Vector2(0f, 28f);
 
-            _slotImages = new Image[8];
-            _slotLabels = new TextMeshProUGUI[8];
+            _slotImages = new Image[SlotLabels.Length];
+            _slotLabels = new TextMeshProUGUI[SlotLabels.Length];
             float slotW = 100f;
-            float startX = -((8 - 1) * (slotW + 8f)) * 0.5f;
-            for (int i = 0; i < 8; i++)
+            float startX = -((SlotLabels.Length - 1) * (slotW + 8f)) * 0.5f;
+            for (int i = 0; i < SlotLabels.Length; i++)
             {
                 var slot = QhysicsUiBuilder.Panel(bar.transform, "Slot_" + (i + 1), QhysicsUiStyle.ChipBg, new Vector2(slotW, 78f));
                 slot.rectTransform.anchoredPosition = new Vector2(startX + i * (slotW + 8f), 0f);
@@ -166,7 +167,7 @@ namespace RealityEngine.Player
             }
 
             _hint = QhysicsUiBuilder.Label(canvasGo.transform, "Hint",
-                "WASD move Â· Mouse look Â· 1-8 tools Â· E grab Â· F/R drop Â· Esc pause",
+                "WASD move Â· Mouse look Â· 1-9 tools Â· E grab Â· F/R drop Â· Esc pause",
                 QhysicsUiStyle.FontSmall, QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
             _hint.rectTransform.anchorMin = new Vector2(0.5f, 0f);
             _hint.rectTransform.anchorMax = new Vector2(0.5f, 0f);
@@ -256,6 +257,7 @@ namespace RealityEngine.Player
                 if (kb.digit6Key.wasPressedThisFrame || kb.numpad6Key.wasPressedThisFrame) return 6;
                 if (kb.digit7Key.wasPressedThisFrame || kb.numpad7Key.wasPressedThisFrame) return 7;
                 if (kb.digit8Key.wasPressedThisFrame || kb.numpad8Key.wasPressedThisFrame) return 8;
+                if (kb.digit9Key.wasPressedThisFrame || kb.numpad9Key.wasPressedThisFrame) return 9;
             }
 #endif
 #if ENABLE_LEGACY_INPUT_MANAGER

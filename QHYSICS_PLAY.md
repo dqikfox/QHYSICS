@@ -17,7 +17,7 @@ On **desktop** (Editor Ctrl+P, no Quest Link / no running XR display):
 - A simple **DesktopBody** (torso + head + hand proxies) stands under XR Origin - not parented to Main Camera / never under Giza pyramids.
 - Head uses layer 31 so your own camera does not draw it (first-person).
 - Hand proxies sit in front of the view; **E / LMB grab** attaches held props to the right-hand attach point.
-- Bottom **hotbar 1-8** is the desktop inventory (VR toolbelt still works via M / Tab).
+- Bottom **hotbar 1-9** is the desktop inventory (VR toolbelt still works via M / Tab).
 
 On **Quest Link**: desktop body hides; XR locomotion + Left/Right Hand Direct/Ray interactors take over. Light `XrControllerProxy` grips show on each controller (Hand Presence still used when OpenXR devices match). Grab attach is on each hand's `Attach` â€” desktop HandAttach does not fight XR grabs. If the headset shows nothing, fix Link â€” you are not missing a character mesh.
 
@@ -49,7 +49,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 1. Open `Assets/Scenes/Faraday.unity`.
 2. Optional once: **Reality Engine -> Ensure Player Character** (or Place Desktop Player; also auto-ensures on Play / Enter Sandbox).
 3. Press **Ctrl+P**. Do **not** need Oculus Link or XR Device Simulator.
-4. You should spawn on **LabPlaza**, see a simple standing body + FP hands, and a bottom hotbar 1-8.
+4. You should spawn on **LabPlaza**, see a simple standing body + FP hands, and a bottom hotbar 1-9.
 
 ### Keyboard map (desktop)
 
@@ -61,11 +61,18 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Space** | Jump |
 | **Ctrl** | Crouch |
 | **H** | Recalibrate eye height (~1.65m Camera Offset / Floor) |
-| **1-8** | Hotbar: Wire, Battery, Switch, Bulb, Magnet, Field Lens, Cubit Rod, Delete |
+| **1-9** | Hotbar: Wire, Battery, Switch, Bulb, Resistor, Magnet, Field Lens, Cubit Rod, Delete |
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
-| **LMB** / **Scroll** while holding CIRCUIT gadget, Multimeter, Probe, Stopwatch, or Field Lens | Activate / cycle (desktop trigger; Multimeter pages; Probe NEAREST/ALL/COMP; Stopwatch LMB toggle / scroll-reset; Field Lens layer peel) |
+| **LMB** / **Scroll** while holding CIRCUIT gadget, Multimeter, Probe, Stopwatch, or Field Lens |
+
+### CIRCUIT Resistor (hotbar 5)
+1. Enter Sandbox / Induction.
+2. Hotbar **5** (or toolbelt) spawn **Resistor**; grab it.
+3. Hold near Coil; **N/P**, VR trigger, or desktop **LMB/scroll** cycles 2 / 8 / 50 / OPEN Ohm classical R_load.
+4. Pair with Magnet sweep + Multimeter **I** / Lamp glow.
+ Activate / cycle (desktop trigger; Multimeter pages; Probe NEAREST/ALL/COMP; Stopwatch LMB toggle / scroll-reset; Field Lens layer peel) |
 | **F** / **RMB** | Drop |
 | **R** | Throw |
 | **Esc** / **P** | Pause (releases cursor) - Resume re-locks |
