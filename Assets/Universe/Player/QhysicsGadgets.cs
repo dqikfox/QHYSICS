@@ -121,6 +121,8 @@ namespace RealityEngine.Player
                 return SpawnLoadImpedanceMeter(worldPos);
             if (key == "power factor meter" || key == "powerfactormeter" || key == "pf meter" || key == "pfmeter" || key == "power factor" || key == "powerfactor" || key == "var meter" || key == "varmeter")
                 return SpawnLoadPowerFactorMeter(worldPos);
+            if (key == "q factor meter" || key == "qfactormeter" || key == "quality factor meter" || key == "qualityfactormeter" || key == "quality factor" || key == "qf meter" || key == "qfmeter" || key == "bandwidth meter" || key == "bandwidthmeter")
+                return SpawnLoadQFactorMeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -842,6 +844,19 @@ namespace RealityEngine.Player
             if (pf == null)
                 pf = go.AddComponent<LoadPowerFactorMeterGadget>();
             pf.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadQFactorMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal series RLC Q0 / BW / zeta / ENERGY from classical InductionCircuit.
+            var go = SpawnPrimitiveProxy("QFactorMeter", worldPos, new Color(0.42f, 0.22f, 0.55f));
+            go.name = LoadQFactorMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var qf = go.GetComponent<LoadQFactorMeterGadget>();
+            if (qf == null)
+                qf = go.AddComponent<LoadQFactorMeterGadget>();
+            qf.EnsureBuilt();
             return go;
         }
 
