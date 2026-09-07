@@ -73,6 +73,8 @@ namespace RealityEngine.Player
                 return SpawnLoadResistor(worldPos);
             if (key == "motor" || key == "dc motor" || key == "dcmotor")
                 return SpawnLoadMotor(worldPos);
+            if (key == "solar" || key == "solar panel" || key == "solarpanel" || key == "pv" || key == "photocell")
+                return SpawnLoadSolar(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -495,6 +497,19 @@ namespace RealityEngine.Player
             if (m == null)
                 m = go.AddComponent<LoadMotorGadget>();
             m.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadSolar(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: classical irradiance/photocurrent series EMF on nearest InductionCoil.
+            var go = SpawnPrimitiveProxy("Solar", worldPos, new Color(0.25f, 0.75f, 0.9f));
+            go.name = LoadSolarGadget.RootName;
+            go.transform.localScale = new Vector3(0.2f, 0.02f, 0.14f);
+            var s = go.GetComponent<LoadSolarGadget>();
+            if (s == null)
+                s = go.AddComponent<LoadSolarGadget>();
+            s.EnsureBuilt();
             return go;
         }
 
