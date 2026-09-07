@@ -211,6 +211,11 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 2. Toolbelt **MEASURE -> Inductance Meter**; grab it.
 3. Hold near Coil; classical series L (H), inductor I_L, or energy 0.5*L*I^2 (pair with BUILD Inductor / Function Generator / PHYSICS Magnet; Ammeter / Capacitance Meter for cross-check).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles L / IL / ENERGY / CLR (default L; CLR resets I_L then snaps to L). Honesty: ideal SeriesInductance / InductorCurrentAmperes / 0.5LI^2 from InductionCircuit - NOT real LCR meter, not Q-meter, not impedance analyzer, not mutual inductance meter.
+### MEASURE Resonance Meter (toolbelt MEASURE)
+1. Enter Sandbox / Induction.
+2. Toolbelt **MEASURE -> Resonance Meter**; grab it.
+3. Hold near Coil; classical LC resonant f0=1/(2pi sqrt(LC)), omega0, or L/C (pair with BUILD Inductor + Capacitor / Function Generator; Inductance Meter / Capacitance Meter / Frequency Counter for cross-check).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles F0 / OMEGA / LC / CLR (default F0; CLR resets energy storage Vc+I_L then snaps to F0). Honesty: ideal SeriesInductance / SeriesCapacitance from InductionCoil - NOT real network analyzer, not swept VNA, not Q from -3dB bandwidth, not impedance analyzer.
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
@@ -219,7 +224,7 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 ### CIRCUIT Function Generator (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Function Generator**; grab it.
-3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Frequency Counter / Power Meter / Flux Meter / Charge Meter / Voltmeter / Ammeter / Ohmmeter / Capacitance Meter / Inductance Meter / Multimeter / Galvanometer / Lamp).
+3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Frequency Counter / Power Meter / Flux Meter / Charge Meter / Voltmeter / Ammeter / Ohmmeter / Capacitance Meter / Inductance Meter / Resonance Meter / Multimeter / Galvanometer / Lamp).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / SIN1 / SIN5 / SIN10 / SQR5 / SQR10 / TRI5 / TRI10 (default SIN5 = 5 Hz @ 1.5 Vpk). Honesty: ideal AWG series EMF on InductionCoil - NOT real DDS, not output impedance, not coil frequency response, not sync/trigger.
 ## Play steps ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â checklist
 

@@ -115,6 +115,8 @@ namespace RealityEngine.Player
                 return SpawnLoadCapacitanceMeter(worldPos);
             if (key == "inductance meter" || key == "inductancemeter" || key == "l meter" || key == "lmeter" || key == "henry meter" || key == "henrymeter" || key == "inductor meter" || key == "inductormeter")
                 return SpawnLoadInductanceMeter(worldPos);
+            if (key == "resonance meter" || key == "resonancemeter" || key == "lc meter" || key == "lcmeter" || key == "resonant meter" || key == "resonantmeter" || key == "f0 meter" || key == "f0meter" || key == "resonance" || key == "lc resonance")
+                return SpawnLoadResonanceMeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -724,7 +726,7 @@ namespace RealityEngine.Player
 
         static GameObject SpawnLoadChargeMeter(Vector3 worldPos)
         {
-            // Real MEASURE tool: ideal coulomb integrator from classical InductionCircuit I (Q=Ã¢Ë†Â«I dt).
+            // Real MEASURE tool: ideal coulomb integrator from classical InductionCircuit I (Q=ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã¢â‚¬Â Ãƒâ€šÃ‚Â«I dt).
             var go = SpawnPrimitiveProxy("ChargeMeter", worldPos, new Color(0.48f, 0.22f, 0.58f));
             go.name = LoadChargeMeterGadget.RootName;
             go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
@@ -797,6 +799,19 @@ namespace RealityEngine.Player
             if (im == null)
                 im = go.AddComponent<LoadInductanceMeterGadget>();
             im.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadResonanceMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal LC f0 / omega0 from classical SeriesInductance / SeriesCapacitance.
+            var go = SpawnPrimitiveProxy("ResonanceMeter", worldPos, new Color(0.12f, 0.62f, 0.55f));
+            go.name = LoadResonanceMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var rm = go.GetComponent<LoadResonanceMeterGadget>();
+            if (rm == null)
+                rm = go.AddComponent<LoadResonanceMeterGadget>();
+            rm.EnsureBuilt();
             return go;
         }
 
@@ -911,7 +926,7 @@ namespace RealityEngine.Player
 
     /// <summary>
     /// Handheld Field Lens proxy: while held (or near camera), XR activate / N/P, or desktop LMB/scroll steps FieldLens layers.
-    /// Drives the existing scene FieldLens host ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â does not spawn a second lens.
+    /// Drives the existing scene FieldLens host ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â does not spawn a second lens.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensHandheld : MonoBehaviour, IDesktopActivatable
