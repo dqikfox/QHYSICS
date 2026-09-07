@@ -35,13 +35,14 @@ namespace RealityEngine.UI
             "CIRCUIT Speaker: hold near a Coil - hears classical |I| as procedural sine (N/P or VR trigger cycles MUTE/LO/MID/HI gain; not a real voice coil).",
             "CIRCUIT Potentiometer: hold near a Coil — N/P or VR trigger cycles 1/5/10/25/100/1k ohm discrete R_load wiper (NOT a real 3-terminal pot; overrides Resistor when both near; Switch OPEN still wins).",
             "CIRCUIT Transformer: hold near a Coil - N/P or VR trigger cycles 1:4/1:2/1:1/2:1/4:1 lumped turns tap (N=20/40/80/160/320; EMF=-N dPhi/dt; NOT mutual inductance / dual winding / core hysteresis).",
+            "MEASURE Galvanometer: hold near a Coil - needle deflects from classical signed I (N/P or VR trigger cycles 1/5/20/100mA full-scale; ideal needle NOT coil torque / damping / shunt).",
             "CIRCUIT Bulb/Lamp: hold near a Coil — glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
             "CIRCUIT Switch: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
             "CIRCUIT Battery: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
             "CIRCUIT Wire: hold near a Coil Ã¢â‚¬â€ classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
             "MEASURE Probe: binds nearest MagneticDipole by tip; N/P, VR trigger, or desktop LMB/scroll cycles NEAREST/ALL/COMP pages.",
             "MEASURE Stopwatch: T/Y or VR trigger; desktop LMB toggles, scroll-down resets (wall-clock).",
-            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Speaker/Potentiometer/Transformer/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
+            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Speaker/Potentiometer/Transformer/Galvanometer/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
         };
 
         Canvas _canvas;

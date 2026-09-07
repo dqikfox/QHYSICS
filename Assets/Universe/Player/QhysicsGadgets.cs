@@ -91,6 +91,8 @@ namespace RealityEngine.Player
                 return SpawnLoadPotentiometer(worldPos);
             if (key == "transformer" || key == "xfmr" || key == "xformer" || key == "turns" || key == "tap")
                 return SpawnLoadTransformer(worldPos);
+            if (key == "galvanometer" || key == "galvo" || key == "galv" || key == "ammeter needle" || key == "needle meter")
+                return SpawnLoadGalvanometer(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -629,6 +631,19 @@ namespace RealityEngine.Player
             if (xf == null)
                 xf = go.AddComponent<LoadTransformerGadget>();
             xf.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadGalvanometer(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal signed needle from classical InductionCircuit I.
+            var go = SpawnPrimitiveProxy("Galvanometer", worldPos, new Color(0.12f, 0.45f, 0.38f));
+            go.name = LoadGalvanometerGadget.RootName;
+            go.transform.localScale = new Vector3(0.1f, 0.06f, 0.08f);
+            var gv = go.GetComponent<LoadGalvanometerGadget>();
+            if (gv == null)
+                gv = go.AddComponent<LoadGalvanometerGadget>();
+            gv.EnsureBuilt();
             return go;
         }
 
