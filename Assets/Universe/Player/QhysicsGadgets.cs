@@ -81,6 +81,8 @@ namespace RealityEngine.Player
                 return SpawnLoadInductor(worldPos);
             if (key == "diode" || key == "rectifier" || key == "halfwave" || key == "half-wave")
                 return SpawnLoadDiode(worldPos);
+            if (key == "fuse" || key == "breaker" || key == "circuit breaker" || key == "circuitbreaker")
+                return SpawnLoadFuse(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -555,6 +557,20 @@ namespace RealityEngine.Player
             if (dio == null)
                 dio = go.AddComponent<LoadDiodeGadget>();
             dio.EnsureBuilt();
+            return go;
+        }
+
+
+        static GameObject SpawnLoadFuse(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: ideal |I| trip open on nearest InductionCoil.
+            var go = SpawnPrimitiveProxy("Fuse", worldPos, new Color(0.75f, 0.55f, 0.2f));
+            go.name = LoadFuseGadget.RootName;
+            go.transform.localScale = new Vector3(0.1f, 0.04f, 0.06f);
+            var fuse = go.GetComponent<LoadFuseGadget>();
+            if (fuse == null)
+                fuse = go.AddComponent<LoadFuseGadget>();
+            fuse.EnsureBuilt();
             return go;
         }
 
