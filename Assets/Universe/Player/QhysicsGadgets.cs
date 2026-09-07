@@ -79,6 +79,8 @@ namespace RealityEngine.Player
                 return SpawnLoadCapacitor(worldPos);
             if (key == "inductor" || key == "inductance" || key == "choke" || key == "coil-l" || key == "series-l")
                 return SpawnLoadInductor(worldPos);
+            if (key == "diode" || key == "rectifier" || key == "halfwave" || key == "half-wave")
+                return SpawnLoadDiode(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -540,6 +542,19 @@ namespace RealityEngine.Player
             if (indG == null)
                 indG = go.AddComponent<LoadInductorGadget>();
             indG.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadDiode(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: ideal series diode half-wave clamp on nearest InductionCoil.
+            var go = SpawnPrimitiveProxy("Diode", worldPos, new Color(0.85f, 0.45f, 0.15f));
+            go.name = LoadDiodeGadget.RootName;
+            go.transform.localScale = new Vector3(0.08f, 0.05f, 0.1f);
+            var dio = go.GetComponent<LoadDiodeGadget>();
+            if (dio == null)
+                dio = go.AddComponent<LoadDiodeGadget>();
+            dio.EnsureBuilt();
             return go;
         }
 

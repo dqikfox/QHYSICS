@@ -3,11 +3,13 @@ using UnityEngine;
 namespace RealityEngine.Physics.Electromagnetism
 {
     /// <summary>
-    /// Resistive (optional series-C / series-L) loop attached to <see cref="InductionCoil"/>.
+    /// Resistive (optional series-C / series-L / series-diode) loop attached to <see cref="InductionCoil"/>.
     /// Without L/C: I = EMF / R_total, P = I² R_load.
     /// With series C (CIRCUIT Capacitor): I = (EMF − V_c) / R_total, dV_c/dt = I/C.
     /// With series L (CIRCUIT Inductor): L dI/dt = EMF − R I − V_c (V_c=0 if no C).
-    /// With L+C: classical series RLC. Honesty: lumped only — not skin effect, not core saturation, not parasitics.
+    /// With L+C: classical series RLC. Optional ideal series diode (CIRCUIT Diode) clamps I one-sided (half-wave).
+    /// Honesty: lumped only — not skin effect, not core saturation, not parasitics.
+    /// Diode honesty: ideal series diode / half-wave — NOT Shockley equation, not recovery, not avalanche; inductive kick not snubbered.
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(InductionCoil))]
@@ -117,15 +119,9 @@ namespace RealityEngine.Physics.Electromagnetism
             {
                 // Algebraic I (resistive or RC) — inductor bypassed.
                 if (!hasC)
-                {
                     CurrentAmperes = EmfVolts / TotalResistanceOhms;
-                }
                 else
-                {
                     CurrentAmperes = (EmfVolts - _capacitorVolts) / TotalResistanceOhms;
-                    if (dt > 1e-6f)
-                        _capacitorVolts += CurrentAmperes * dt / C;
-                }
                 _inductorCurrent = CurrentAmperes;
             }
             else
@@ -136,11 +132,27 @@ namespace RealityEngine.Physics.Electromagnetism
                 if (dt > 1e-6f)
                     _inductorCurrent += dIdt * dt;
                 CurrentAmperes = _inductorCurrent;
-                if (hasC && dt > 1e-6f)
-                    _capacitorVolts += CurrentAmperes * dt / C;
             }
+
+            // Ideal series diode clamp (half-wave). Honesty: NOT Shockley, not recovery, not avalanche; kick not snubbered.
+            int pol = _coil.SeriesDiodePolarity;
+            if (pol > 0 && CurrentAmperes < 0f)
+            {
+                CurrentAmperes = 0f;
+                _inductorCurrent = 0f;
+            }
+            else if (pol < 0 && CurrentAmperes > 0f)
+            {
+                CurrentAmperes = 0f;
+                _inductorCurrent = 0f;
+            }
+
+            // Capacitor integrates clamped current (so half-wave charges/discharges correctly).
+            if (hasC && dt > 1e-6f)
+                _capacitorVolts += CurrentAmperes * dt / C;
 
             LoadPowerWatts = CurrentAmperes * CurrentAmperes * rLoad;
         }
     }
 }
+
