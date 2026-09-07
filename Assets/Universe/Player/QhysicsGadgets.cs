@@ -117,6 +117,8 @@ namespace RealityEngine.Player
                 return SpawnLoadInductanceMeter(worldPos);
             if (key == "resonance meter" || key == "resonancemeter" || key == "lc meter" || key == "lcmeter" || key == "resonant meter" || key == "resonantmeter" || key == "f0 meter" || key == "f0meter" || key == "resonance" || key == "lc resonance")
                 return SpawnLoadResonanceMeter(worldPos);
+            if (key == "impedance meter" || key == "impedancemeter" || key == "z meter" || key == "zmeter" || key == "impedance" || key == "reactance meter" || key == "reactancemeter")
+                return SpawnLoadImpedanceMeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -812,6 +814,19 @@ namespace RealityEngine.Player
             if (rm == null)
                 rm = go.AddComponent<LoadResonanceMeterGadget>();
             rm.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadImpedanceMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal series RLC |Z| / X / phase / Emf/I from classical InductionCircuit.
+            var go = SpawnPrimitiveProxy("ImpedanceMeter", worldPos, new Color(0.55f, 0.35f, 0.15f));
+            go.name = LoadImpedanceMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var zm = go.GetComponent<LoadImpedanceMeterGadget>();
+            if (zm == null)
+                zm = go.AddComponent<LoadImpedanceMeterGadget>();
+            zm.EnsureBuilt();
             return go;
         }
 
