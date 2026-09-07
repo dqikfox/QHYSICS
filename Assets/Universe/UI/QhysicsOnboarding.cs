@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// Short dismissible world-space tips: Welcome ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Grab ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Try table. Not a trap.
+    /// Short dismissible world-space tips: Welcome ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ Grab ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ Try table. Not a trap.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(205)]
@@ -23,35 +23,36 @@ namespace RealityEngine.UI
             "PHYSICS Magnet/Dipole: grab a live classical MagneticDipole (Probe reads B).",
             "PHYSICS Coil: grab a live classical InductionCoil; move a Magnet through it (Multimeter reads Emf/I).",
             "MEASURE Multimeter: binds nearest InductionCircuit (or nearest CircuitLab component V/I if none); N/P, VR trigger, or desktop LMB/scroll cycles ALL/EMF/I/LOAD pages.",
-            "Lab + PHYSICS coils auto-bind every MagneticDipole Ã¢â‚¬â€ gadget Magnet through lab Coil still drives Emf/I.",
+            "Lab + PHYSICS coils auto-bind every MagneticDipole ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â gadget Magnet through lab Coil still drives Emf/I.",
             "CIRCUIT Resistor: hold near a Coil to apply classical R_load (N/P or VR trigger cycles 2/8/50/OPEN); Multimeter I changes.",
-            "CIRCUIT Motor: hold near a Coil â€” spins from classical |I| (N/P or VR trigger cycles gear 0.5x/1x/2x/REV; pair with Battery/Resistor/Magnet).",
-            "CIRCUIT Solar: hold near a Coil — N/P or VR trigger cycles OFF/Dawn/Noon/Bright irradiance EMF (classical photocurrent proxy; not PV I-V/MPPT).",
-            "CIRCUIT Capacitor: hold near a Coil — N/P or VR trigger cycles SHORT/1mF/10mF/100mF (lumped RC; Vc charges from Battery/EMF; New Run clears Vc).",
-            "CIRCUIT Inductor: hold near a Coil — N/P or VR trigger cycles SHORT/1mH/10mH/100mH (lumped RL/RLC; I ramps; New Run clears I_L).",
-            "CIRCUIT Diode: hold near a Coil — N/P or VR trigger cycles SHORT/FWD/REV (ideal half-wave of magnet-sweep EMF; Multimeter I one-sided).",
-            "CIRCUIT Fuse: hold near a Coil — trips open when |I| exceeds 5/20/50mA (N/P cycle trip; activate while BLOWN rearms; ideal |I| trip not I2t).",
-            "CIRCUIT LED: hold near a Coil � N/P or VR trigger cycles RED/GREEN/BLUE/SHORT (ideal diode + colored |I| glow; not bandgap photons).",
+            "CIRCUIT Motor: hold near a Coil Ã¢â‚¬â€ spins from classical |I| (N/P or VR trigger cycles gear 0.5x/1x/2x/REV; pair with Battery/Resistor/Magnet).",
+            "CIRCUIT Solar: hold near a Coil â€” N/P or VR trigger cycles OFF/Dawn/Noon/Bright irradiance EMF (classical photocurrent proxy; not PV I-V/MPPT).",
+            "CIRCUIT Capacitor: hold near a Coil â€” N/P or VR trigger cycles SHORT/1mF/10mF/100mF (lumped RC; Vc charges from Battery/EMF; New Run clears Vc).",
+            "CIRCUIT Inductor: hold near a Coil â€” N/P or VR trigger cycles SHORT/1mH/10mH/100mH (lumped RL/RLC; I ramps; New Run clears I_L).",
+            "CIRCUIT Diode: hold near a Coil â€” N/P or VR trigger cycles SHORT/FWD/REV (ideal half-wave of magnet-sweep EMF; Multimeter I one-sided).",
+            "CIRCUIT Fuse: hold near a Coil â€” trips open when |I| exceeds 5/20/50mA (N/P cycle trip; activate while BLOWN rearms; ideal |I| trip not I2t).",
+            "CIRCUIT LED: hold near a Coil ï¿½ N/P or VR trigger cycles RED/GREEN/BLUE/SHORT (ideal diode + colored |I| glow; not bandgap photons).",
             "CIRCUIT Speaker: hold near a Coil - hears classical |I| as procedural sine (N/P or VR trigger cycles MUTE/LO/MID/HI gain; not a real voice coil).",
-            "CIRCUIT Potentiometer: hold near a Coil — N/P or VR trigger cycles 1/5/10/25/100/1k ohm discrete R_load wiper (NOT a real 3-terminal pot; overrides Resistor when both near; Switch OPEN still wins).",
+            "CIRCUIT Potentiometer: hold near a Coil â€” N/P or VR trigger cycles 1/5/10/25/100/1k ohm discrete R_load wiper (NOT a real 3-terminal pot; overrides Resistor when both near; Switch OPEN still wins).",
             "CIRCUIT Transformer: hold near a Coil - N/P or VR trigger cycles 1:4/1:2/1:1/2:1/4:1 lumped turns tap (N=20/40/80/160/320; EMF=-N dPhi/dt; NOT mutual inductance / dual winding / core hysteresis).",
             "MEASURE Galvanometer: hold near a Coil - needle deflects from classical signed I (N/P or VR trigger cycles 1/5/20/100mA full-scale; ideal needle NOT coil torque / damping / shunt).",
             "MEASURE Oscilloscope: hold near a Coil - rolling strip of classical Emf/I/Phi (N/P or VR trigger cycles EMF0.5/EMF1/EMF2/I0.5/I1/I2/Phi1/Phi2; ideal strip NOT ADC / triggered scope / FFT / probe C).",
             "CIRCUIT Function Generator: hold near a Coil - drives classical ideal series EMF waveforms (N/P or VR trigger cycles OFF/SIN1/SIN5/SIN10/SQR5/SQR10/TRI5/TRI10; pair with Oscilloscope; NOT real DDS/AWG/Zout/sync).",
             "MEASURE Frequency Counter: hold near a Coil - gate Hz from rising zero-cross of classical Emf/I (N/P or VR trigger cycles EMF0.5/EMF1/EMF2/I0.5/I1/I2; pair with Function Generator; NOT real counter/PLL/FFT).",
             "MEASURE Power Meter: hold near a Coil - classical P_load (I^2 R_load), Emf*I, |P|, or energy integral (N/P or VR trigger cycles LOAD/EI/ABS/ENERGY/CLR; CLR zeros joules; NOT real thermocouple/Hall/true-RMS/PF meter).",
-            "MEASURE Flux Meter: hold near a Coil - classical Phi (Wb), dPhi/dt, or peak |Phi| (N/P or VR trigger cycles PHI/DPHI/PEAK/CLR; CLR zeros peak; pair with Magnet sweep; NOT real integrating fluxmeter / search-coil / Hall B·A).",
+            "MEASURE Flux Meter: hold near a Coil - classical Phi (Wb), dPhi/dt, or peak |Phi| (N/P or VR trigger cycles PHI/DPHI/PEAK/CLR; CLR zeros peak; pair with Magnet sweep; NOT real integrating fluxmeter / search-coil / Hall BÂ·A).",
             "MEASURE Charge Meter: hold near a Coil - classical Q=integral(I) dt, peak |Q|, or Iavg (N/P or VR trigger cycles Q/PEAK/AVG/CLR; CLR zeros Q; pair with Capacitor / Function Generator; NOT real electrometer / Faraday cup / Keithley).",
             "MEASURE Voltmeter: hold near a Coil - classical Emf (V), peak |Emf|, or Vrms window (N/P or VR trigger cycles V/PEAK/RMS/CLR; CLR zeros peak/RMS; pair with Function Generator / Magnet; NOT real DMM / true-RMS ADC / high-Z probe).",
             "MEASURE Ammeter: hold near a Coil - classical I (A), peak |I|, or Irms window (N/P or VR trigger cycles I/PEAK/RMS/CLR; CLR zeros peak/RMS; pair with Function Generator / Magnet / Galvanometer; NOT real DMM ammeter / shunt / Hall clamp / true-RMS ADC).",
             "MEASURE Ohmmeter: hold near a Coil - classical Rtot (ohm), Rload, or Emf/I (N/P or VR trigger cycles R/LOAD/EFF/CLR; CLR zeros peak |Reff|; pair with Resistor / Function Generator / Magnet; NOT real DMM ohms / Kelvin 4-wire / wheatstone / megger).",
-            "CIRCUIT Bulb/Lamp: hold near a Coil — glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
-            "CIRCUIT Switch: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
-            "CIRCUIT Battery: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
-            "CIRCUIT Wire: hold near a Coil Ã¢â‚¬â€ classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
+            "MEASURE Capacitance Meter: hold near a Coil - classical series C (F), Vc, or 0.5*C*V^2 (N/P or VR trigger cycles C/VC/ENERGY/CLR; CLR resets Vc; pair with Capacitor / Battery / Function Generator; NOT real LCR / ESR bridge / dielectric absorption / impedance analyzer).",
+            "CIRCUIT Bulb/Lamp: hold near a Coil â€” glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
+            "CIRCUIT Switch: hold near a Coil ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
+            "CIRCUIT Battery: hold near a Coil ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
+            "CIRCUIT Wire: hold near a Coil ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
             "MEASURE Probe: binds nearest MagneticDipole by tip; N/P, VR trigger, or desktop LMB/scroll cycles NEAREST/ALL/COMP pages.",
             "MEASURE Stopwatch: T/Y or VR trigger; desktop LMB toggles, scroll-down resets (wall-clock).",
-            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Speaker/Potentiometer/Transformer/Function Generator/Galvanometer/Oscilloscope/Frequency Counter/Power Meter/Flux Meter/Charge Meter/Voltmeter/Ammeter/Ohmmeter/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
+            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Speaker/Potentiometer/Transformer/Function Generator/Galvanometer/Oscilloscope/Frequency Counter/Power Meter/Flux Meter/Charge Meter/Voltmeter/Ammeter/Ohmmeter/Capacitance Meter/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
         };
 
         Canvas _canvas;

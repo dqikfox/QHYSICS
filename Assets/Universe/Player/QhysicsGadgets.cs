@@ -111,6 +111,8 @@ namespace RealityEngine.Player
                 return SpawnLoadAmmeter(worldPos);
             if (key == "ohmmeter" || key == "ohm meter" || key == "ohmmeter gadget" || key == "resistance meter" || key == "resistancemeter" || key == "dmm ohm" || key == "r meter" || key == "rmeter" || key == "ohm")
                 return SpawnLoadOhmmeter(worldPos);
+            if (key == "capacitance meter" || key == "capacitancemeter" || key == "cap meter" || key == "capmeter" || key == "c meter" || key == "cmeter" || key == "farad meter" || key == "faradmeter" || key == "capacitor meter" || key == "capacitormeter")
+                return SpawnLoadCapacitanceMeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -720,7 +722,7 @@ namespace RealityEngine.Player
 
         static GameObject SpawnLoadChargeMeter(Vector3 worldPos)
         {
-            // Real MEASURE tool: ideal coulomb integrator from classical InductionCircuit I (Q=∫I dt).
+            // Real MEASURE tool: ideal coulomb integrator from classical InductionCircuit I (Q=Ã¢Ë†Â«I dt).
             var go = SpawnPrimitiveProxy("ChargeMeter", worldPos, new Color(0.48f, 0.22f, 0.58f));
             go.name = LoadChargeMeterGadget.RootName;
             go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
@@ -767,6 +769,19 @@ namespace RealityEngine.Player
             if (om == null)
                 om = go.AddComponent<LoadOhmmeterGadget>();
             om.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadCapacitanceMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal series C / Vc / 0.5CV^2 from classical InductionCircuit.
+            var go = SpawnPrimitiveProxy("CapacitanceMeter", worldPos, new Color(0.2f, 0.55f, 0.65f));
+            go.name = LoadCapacitanceMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var cm = go.GetComponent<LoadCapacitanceMeterGadget>();
+            if (cm == null)
+                cm = go.AddComponent<LoadCapacitanceMeterGadget>();
+            cm.EnsureBuilt();
             return go;
         }
 
@@ -881,7 +896,7 @@ namespace RealityEngine.Player
 
     /// <summary>
     /// Handheld Field Lens proxy: while held (or near camera), XR activate / N/P, or desktop LMB/scroll steps FieldLens layers.
-    /// Drives the existing scene FieldLens host ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â does not spawn a second lens.
+    /// Drives the existing scene FieldLens host ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â does not spawn a second lens.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensHandheld : MonoBehaviour, IDesktopActivatable
