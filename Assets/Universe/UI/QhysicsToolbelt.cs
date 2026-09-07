@@ -25,7 +25,7 @@ namespace RealityEngine.UI
         static readonly string[] TabNames = { "BUILD", "PHYSICS", "MEASURE", "WORLD", "EXPERIMENTS" };
         static readonly string[][] ChipSets =
         {
-            new[] { "Wire", "Battery", "Switch", "Bulb", "Resistor", "Lamp", "Motor", "Solar", "Capacitor", "Inductor", "Diode", "Fuse", "LED" },
+            new[] { "Wire", "Battery", "Switch", "Bulb", "Resistor", "Lamp", "Motor", "Solar", "Capacitor", "Inductor", "Diode", "Fuse", "LED", "Speaker" },
             new[] { "Magnet", "Coil", "Field Lens", "Dipole" },
             new[] { "Multimeter", "Cubit Rod", "Probe", "Stopwatch" },
             new[] { "Teleport", "Scale", "Sky", "Reset Pose" },

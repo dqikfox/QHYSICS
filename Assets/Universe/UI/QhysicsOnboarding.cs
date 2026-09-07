@@ -31,14 +31,15 @@ namespace RealityEngine.UI
             "CIRCUIT Inductor: hold near a Coil — N/P or VR trigger cycles SHORT/1mH/10mH/100mH (lumped RL/RLC; I ramps; New Run clears I_L).",
             "CIRCUIT Diode: hold near a Coil — N/P or VR trigger cycles SHORT/FWD/REV (ideal half-wave of magnet-sweep EMF; Multimeter I one-sided).",
             "CIRCUIT Fuse: hold near a Coil — trips open when |I| exceeds 5/20/50mA (N/P cycle trip; activate while BLOWN rearms; ideal |I| trip not I2t).",
-            "CIRCUIT LED: hold near a Coil � N/P or VR trigger cycles RED/GREEN/BLUE/SHORT (ideal diode + colored |I| glow; not bandgap photons).",
+            "CIRCUIT LED: hold near a Coil � N/P or VR trigger cycles RED/GREEN/BLUE/SHORT (ideal diode + colored |I| glow; not bandgap photons).",
+            "CIRCUIT Speaker: hold near a Coil - hears classical |I| as procedural sine (N/P or VR trigger cycles MUTE/LO/MID/HI gain; not a real voice coil).",
             "CIRCUIT Bulb/Lamp: hold near a Coil — glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
             "CIRCUIT Switch: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
             "CIRCUIT Battery: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
             "CIRCUIT Wire: hold near a Coil Ã¢â‚¬â€ classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
             "MEASURE Probe: binds nearest MagneticDipole by tip; N/P, VR trigger, or desktop LMB/scroll cycles NEAREST/ALL/COMP pages.",
             "MEASURE Stopwatch: T/Y or VR trigger; desktop LMB toggles, scroll-down resets (wall-clock).",
-            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
+            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Speaker/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
         };
 
         Canvas _canvas;

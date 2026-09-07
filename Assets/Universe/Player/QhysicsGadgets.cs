@@ -85,6 +85,8 @@ namespace RealityEngine.Player
                 return SpawnLoadDiode(worldPos);
             if (key == "fuse" || key == "breaker" || key == "circuit breaker" || key == "circuitbreaker")
                 return SpawnLoadFuse(worldPos);
+            if (key == "speaker" || key == "buzzer" || key == "horn" || key == "sounder")
+                return SpawnLoadSpeaker(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -586,6 +588,19 @@ namespace RealityEngine.Player
             if (led == null)
                 led = go.AddComponent<LoadLedGadget>();
             led.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadSpeaker(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: procedural sine from classical |I| on nearest InductionCircuit.
+            var go = SpawnPrimitiveProxy("Speaker", worldPos, new Color(0.22f, 0.26f, 0.32f));
+            go.name = LoadSpeakerGadget.RootName;
+            go.transform.localScale = new Vector3(0.1f, 0.06f, 0.1f);
+            var sp = go.GetComponent<LoadSpeakerGadget>();
+            if (sp == null)
+                sp = go.AddComponent<LoadSpeakerGadget>();
+            sp.EnsureBuilt();
             return go;
         }
 
