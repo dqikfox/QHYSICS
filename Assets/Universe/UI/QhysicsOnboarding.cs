@@ -42,13 +42,14 @@ namespace RealityEngine.UI
             "MEASURE Power Meter: hold near a Coil - classical P_load (I^2 R_load), Emf*I, |P|, or energy integral (N/P or VR trigger cycles LOAD/EI/ABS/ENERGY/CLR; CLR zeros joules; NOT real thermocouple/Hall/true-RMS/PF meter).",
             "MEASURE Flux Meter: hold near a Coil - classical Phi (Wb), dPhi/dt, or peak |Phi| (N/P or VR trigger cycles PHI/DPHI/PEAK/CLR; CLR zeros peak; pair with Magnet sweep; NOT real integrating fluxmeter / search-coil / Hall B·A).",
             "MEASURE Charge Meter: hold near a Coil - classical Q=integral(I) dt, peak |Q|, or Iavg (N/P or VR trigger cycles Q/PEAK/AVG/CLR; CLR zeros Q; pair with Capacitor / Function Generator; NOT real electrometer / Faraday cup / Keithley).",
+            "MEASURE Voltmeter: hold near a Coil - classical Emf (V), peak |Emf|, or Vrms window (N/P or VR trigger cycles V/PEAK/RMS/CLR; CLR zeros peak/RMS; pair with Function Generator / Magnet; NOT real DMM / true-RMS ADC / high-Z probe).",
             "CIRCUIT Bulb/Lamp: hold near a Coil — glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
             "CIRCUIT Switch: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
             "CIRCUIT Battery: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
             "CIRCUIT Wire: hold near a Coil Ã¢â‚¬â€ classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
             "MEASURE Probe: binds nearest MagneticDipole by tip; N/P, VR trigger, or desktop LMB/scroll cycles NEAREST/ALL/COMP pages.",
             "MEASURE Stopwatch: T/Y or VR trigger; desktop LMB toggles, scroll-down resets (wall-clock).",
-            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Speaker/Potentiometer/Transformer/Function Generator/Galvanometer/Oscilloscope/Frequency Counter/Power Meter/Flux Meter/Charge Meter/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
+            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Speaker/Potentiometer/Transformer/Function Generator/Galvanometer/Oscilloscope/Frequency Counter/Power Meter/Flux Meter/Charge Meter/Voltmeter/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
         };
 
         Canvas _canvas;

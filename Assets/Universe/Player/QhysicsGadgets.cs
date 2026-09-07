@@ -105,6 +105,8 @@ namespace RealityEngine.Player
                 return SpawnLoadFluxMeter(worldPos);
             if (key == "charge meter" || key == "chargemeter" || key == "coulomb meter" || key == "coulombmeter" || key == "charge" || key == "coulomb" || key == "q meter" || key == "qmeter")
                 return SpawnLoadChargeMeter(worldPos);
+            if (key == "voltmeter" || key == "volt meter" || key == "voltage meter" || key == "voltmeter gadget" || key == "emf meter" || key == "emfmeter" || key == "dmm volt" || key == "v meter" || key == "vmeter")
+                return SpawnLoadVoltmeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -722,6 +724,19 @@ namespace RealityEngine.Player
             if (cm == null)
                 cm = go.AddComponent<LoadChargeMeterGadget>();
             cm.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadVoltmeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal Emf / peak / RMS from classical InductionCircuit EmfVolts.
+            var go = SpawnPrimitiveProxy("Voltmeter", worldPos, new Color(0.62f, 0.48f, 0.12f));
+            go.name = LoadVoltmeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var vm = go.GetComponent<LoadVoltmeterGadget>();
+            if (vm == null)
+                vm = go.AddComponent<LoadVoltmeterGadget>();
+            vm.EnsureBuilt();
             return go;
         }
 
