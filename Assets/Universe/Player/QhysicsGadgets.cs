@@ -97,6 +97,8 @@ namespace RealityEngine.Player
                 return SpawnLoadOscilloscope(worldPos);
             if (key == "function generator" || key == "functiongenerator" || key == "fgen" || key == "func gen" || key == "awg" || key == "signal generator" || key == "siggen")
                 return SpawnLoadFunctionGenerator(worldPos);
+            if (key == "frequency counter" || key == "frequencycounter" || key == "freq counter" || key == "freqcounter" || key == "freq meter" || key == "freqmeter" || key == "hz meter" || key == "hzmeter")
+                return SpawnLoadFrequencyCounter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -675,6 +677,19 @@ namespace RealityEngine.Player
             if (fg == null)
                 fg = go.AddComponent<LoadFunctionGeneratorGadget>();
             fg.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadFrequencyCounter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal rising zero-cross gate Hz from classical InductionCircuit Emf/I.
+            var go = SpawnPrimitiveProxy("FrequencyCounter", worldPos, new Color(0.18f, 0.28f, 0.55f));
+            go.name = LoadFrequencyCounterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var fc = go.GetComponent<LoadFrequencyCounterGadget>();
+            if (fc == null)
+                fc = go.AddComponent<LoadFrequencyCounterGadget>();
+            fc.EnsureBuilt();
             return go;
         }
         static GameObject SpawnLoadBulb(Vector3 worldPos)
