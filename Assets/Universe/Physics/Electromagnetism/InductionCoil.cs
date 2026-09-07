@@ -44,6 +44,10 @@ namespace RealityEngine.Physics.Electromagnetism
         float externalSeriesEmf;
 
         [SerializeField]
+        [Tooltip("Optional classical series capacitance (farads). <=0 bypasses C (resistive loop only). Used by CIRCUIT Capacitor gadget.")]
+        float seriesCapacitance;
+
+        [SerializeField]
         [Tooltip("Number of concentric sample rings on the coil disk (plus a center sample). Keep small for Quest 3S.")]
         int radialSamples = 4;
 
@@ -86,6 +90,7 @@ namespace RealityEngine.Physics.Electromagnetism
         public float Resistance => Mathf.Max(0f, resistance);
         public float LoadResistance => Mathf.Max(0f, loadResistance);
         public float ExternalSeriesEmf => externalSeriesEmf;
+        public float SeriesCapacitance => Mathf.Max(0f, seriesCapacitance);
         public float Flux => _flux;
         public float FluxRate => _dFluxDt;
         public float Emf => _emf;
@@ -121,6 +126,12 @@ namespace RealityEngine.Physics.Electromagnetism
         public void SetExternalSeriesEmf(float volts)
         {
             externalSeriesEmf = volts;
+        }
+
+        /// <summary>Set classical series C (farads). 0 or less bypasses capacitor (resistive loop only). Used by CIRCUIT Capacitor.</summary>
+        public void SetSeriesCapacitance(float farads)
+        {
+            seriesCapacitance = Mathf.Max(0f, farads);
         }
 
         /// <summary>

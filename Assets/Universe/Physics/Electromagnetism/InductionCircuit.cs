@@ -3,9 +3,10 @@ using UnityEngine;
 namespace RealityEngine.Physics.Electromagnetism
 {
     /// <summary>
-    /// Resistive loop attached to <see cref="InductionCoil"/>.
-    /// I = EMF / R_total, P = I² R_load.
-    /// v0.3 neglects inductance and the coil's self-flux (no RL lag, no L di/dt).
+    /// Resistive (optional series-C) loop attached to <see cref="InductionCoil"/>.
+    /// Without C: I = EMF / R_total, P = I² R_load (v0.3 — no L).
+    /// With series C (CIRCUIT Capacitor): I = (EMF − V_c) / R_total, dV_c/dt = I/C.
+    /// Honesty: lumped RC only — not dielectric physics, not parasitic ESR/ESL.
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(InductionCoil))]
@@ -21,6 +22,7 @@ namespace RealityEngine.Physics.Electromagnetism
         float visualCurrentReference = 0.05f;
 
         InductionCoil _coil;
+        float _capacitorVolts;
 
         public InductionCoil Coil => _coil != null ? _coil : coil;
         public float EmfVolts { get; private set; }
@@ -29,6 +31,7 @@ namespace RealityEngine.Physics.Electromagnetism
         public float TotalResistanceOhms { get; private set; }
         public float FluxWebers { get; private set; }
         public float FluxRateWebersPerSecond { get; private set; }
+        public float CapacitorVolts => _capacitorVolts;
 
         public float VisualCurrentReference => Mathf.Max(1e-6f, visualCurrentReference);
 
@@ -45,6 +48,12 @@ namespace RealityEngine.Physics.Electromagnetism
         {
             coil = value;
             _coil = value;
+        }
+
+        /// <summary>Clear stored capacitor voltage (New Run / experiment reset).</summary>
+        public void ResetCapacitorVoltage()
+        {
+            _capacitorVolts = 0f;
         }
 
         void Awake()
@@ -68,8 +77,6 @@ namespace RealityEngine.Physics.Electromagnetism
             FluxRateWebersPerSecond = _coil.FluxRate;
             EmfVolts = _coil.Emf;
 
-            // Resistive loop only. Self-inductance L and the coil's own B are omitted in v0.3,
-            // so there is no RL time constant: I = EMF / (R_winding + R_load) instantaneously.
             float rWinding = _coil.Resistance;
             float rLoad = _coil.LoadResistance;
             TotalResistanceOhms = rWinding + rLoad;
@@ -80,7 +87,22 @@ namespace RealityEngine.Physics.Electromagnetism
                 return;
             }
 
-            CurrentAmperes = EmfVolts / TotalResistanceOhms;
+            float C = _coil.SeriesCapacitance;
+            if (C < 1e-9f)
+            {
+                // Resistive loop only — bypass C.
+                _capacitorVolts = 0f;
+                CurrentAmperes = EmfVolts / TotalResistanceOhms;
+            }
+            else
+            {
+                // Lumped series RC: I = (EMF − Vc) / R; dVc/dt = I/C.
+                CurrentAmperes = (EmfVolts - _capacitorVolts) / TotalResistanceOhms;
+                float dt = Time.timeScale <= 0f ? 0f : Time.unscaledDeltaTime;
+                if (dt > 1e-6f)
+                    _capacitorVolts += CurrentAmperes * dt / C;
+            }
+
             LoadPowerWatts = CurrentAmperes * CurrentAmperes * rLoad;
         }
     }

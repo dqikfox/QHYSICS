@@ -27,13 +27,14 @@ namespace RealityEngine.UI
             "CIRCUIT Resistor: hold near a Coil to apply classical R_load (N/P or VR trigger cycles 2/8/50/OPEN); Multimeter I changes.",
             "CIRCUIT Motor: hold near a Coil â€” spins from classical |I| (N/P or VR trigger cycles gear 0.5x/1x/2x/REV; pair with Battery/Resistor/Magnet).",
             "CIRCUIT Solar: hold near a Coil — N/P or VR trigger cycles OFF/Dawn/Noon/Bright irradiance EMF (classical photocurrent proxy; not PV I-V/MPPT).",
-            "CIRCUIT Lamp: hold near a Coil Ã¢â‚¬â€ glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
+            "CIRCUIT Capacitor: hold near a Coil — N/P or VR trigger cycles SHORT/1mF/10mF/100mF (lumped RC; Vc charges from Battery/EMF; New Run clears Vc).",
+            "CIRCUIT Bulb/Lamp: hold near a Coil — glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
             "CIRCUIT Switch: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
             "CIRCUIT Battery: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
             "CIRCUIT Wire: hold near a Coil Ã¢â‚¬â€ classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
             "MEASURE Probe: binds nearest MagneticDipole by tip; N/P, VR trigger, or desktop LMB/scroll cycles NEAREST/ALL/COMP pages.",
             "MEASURE Stopwatch: T/Y or VR trigger; desktop LMB toggles, scroll-down resets (wall-clock).",
-            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
+            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
         };
 
         Canvas _canvas;

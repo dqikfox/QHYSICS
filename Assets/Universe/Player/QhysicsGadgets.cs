@@ -51,7 +51,7 @@ namespace RealityEngine.Player
                 return SpawnCubitRod(worldPos);
             if (key == "multimeter")
                 return SpawnMultimeterStub(worldPos);
-            if (key == "lamp" || key == "led" || key == "glow")
+            if (key == "lamp" || key == "led" || key == "glow" || key == "bulb")
                 return SpawnLoadBulb(worldPos);
             if (key == "magnet")
                 return SpawnHandheldMagnet(worldPos, pureDipole: false);
@@ -75,6 +75,8 @@ namespace RealityEngine.Player
                 return SpawnLoadMotor(worldPos);
             if (key == "solar" || key == "solar panel" || key == "solarpanel" || key == "pv" || key == "photocell")
                 return SpawnLoadSolar(worldPos);
+            if (key == "capacitor" || key == "cap" || key == "condenser")
+                return SpawnLoadCapacitor(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -510,6 +512,19 @@ namespace RealityEngine.Player
             if (s == null)
                 s = go.AddComponent<LoadSolarGadget>();
             s.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadCapacitor(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: classical series C on nearest InductionCoil (RC with Battery/Resistor).
+            var go = SpawnPrimitiveProxy("Capacitor", worldPos, new Color(0.55f, 0.5f, 0.25f));
+            go.name = LoadCapacitorGadget.RootName;
+            go.transform.localScale = new Vector3(0.1f, 0.08f, 0.06f);
+            var c = go.GetComponent<LoadCapacitorGadget>();
+            if (c == null)
+                c = go.AddComponent<LoadCapacitorGadget>();
+            c.EnsureBuilt();
             return go;
         }
 
