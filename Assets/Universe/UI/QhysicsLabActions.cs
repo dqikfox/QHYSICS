@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using RealityEngine.Player;
+using RealityEngine.Physics.Electromagnetism;
 
 namespace RealityEngine.UI
 {
@@ -29,6 +30,7 @@ namespace RealityEngine.UI
         public static bool ResetCircuitLab()
         {
             ClearSpawnedExperimentProps();
+            ResetInductionCapacitors();
 
             var lab = UnityEngine.Object.FindAnyObjectByType<CircuitLab>(FindObjectsInactive.Include);
             if (lab == null)
@@ -90,6 +92,22 @@ namespace RealityEngine.UI
             if (cleared > 0)
                 Debug.Log("QHYSICS: New Run cleared " + cleared + " spawned gadget(s).");
             return cleared;
+        }
+
+
+        static void ResetInductionCapacitors()
+        {
+            var circuits = Object.FindObjectsByType<InductionCircuit>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            int n = 0;
+            for (int i = 0; i < circuits.Length; i++)
+            {
+                if (circuits[i] == null)
+                    continue;
+                circuits[i].ResetCapacitorVoltage();
+                n++;
+            }
+            if (n > 0)
+                Debug.Log("QHYSICS: New Run cleared Vc on " + n + " InductionCircuit(s).");
         }
 
         /// <summary>
