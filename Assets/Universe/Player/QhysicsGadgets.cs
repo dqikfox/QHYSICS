@@ -99,6 +99,8 @@ namespace RealityEngine.Player
                 return SpawnLoadFunctionGenerator(worldPos);
             if (key == "frequency counter" || key == "frequencycounter" || key == "freq counter" || key == "freqcounter" || key == "freq meter" || key == "freqmeter" || key == "hz meter" || key == "hzmeter")
                 return SpawnLoadFrequencyCounter(worldPos);
+            if (key == "power meter" || key == "powermeter" || key == "wattmeter" || key == "watt meter" || key == "power" || key == "watts" || key == "joulemeter" || key == "joule meter")
+                return SpawnLoadPowerMeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -677,6 +679,19 @@ namespace RealityEngine.Player
             if (fg == null)
                 fg = go.AddComponent<LoadFunctionGeneratorGadget>();
             fg.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadPowerMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal lumped wattmeter from classical InductionCircuit LoadPower / Emf*I / energy.
+            var go = SpawnPrimitiveProxy("PowerMeter", worldPos, new Color(0.55f, 0.22f, 0.12f));
+            go.name = LoadPowerMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var pm = go.GetComponent<LoadPowerMeterGadget>();
+            if (pm == null)
+                pm = go.AddComponent<LoadPowerMeterGadget>();
+            pm.EnsureBuilt();
             return go;
         }
 
