@@ -19,7 +19,7 @@ namespace RealityEngine.UI
             "Desktop: WASD move, mouse look, E/LMB grab, F drop, R throw.\nVR: grip / trigger. Hotbar 1-8 / scroll.",
             "You are the XR Origin (and desktop body when no headset). Controllers / DesktopBody are your hands - not a separate avatar.",
             "Try a loop: Battery -> Wire -> Bulb -> Switch.\nEsc/P pause. Toolbelt New Run resets the table and clears spawned gadgets.",
-            "PHYSICS Field Lens: grab it, N/P or VR trigger peels layers (honesty tags on readout).",
+            "PHYSICS Field Lens: grab it; N/P, VR trigger, or desktop LMB/scroll peels layers (honesty tags on readout).",
             "PHYSICS Magnet/Dipole: grab a live classical MagneticDipole (Probe reads B).",
             "PHYSICS Coil: grab a live classical InductionCoil; move a Magnet through it (Multimeter reads Emf/I).",
             "MEASURE Multimeter: binds nearest InductionCircuit; N/P, VR trigger, or desktop LMB/scroll cycles ALL/EMF/I/LOAD pages.",
@@ -31,7 +31,7 @@ namespace RealityEngine.UI
             "CIRCUIT Wire: hold near a Coil â€” classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
             "MEASURE Probe: binds nearest MagneticDipole by tip; N/P, VR trigger, or desktop LMB/scroll cycles NEAREST/ALL/COMP pages.",
             "MEASURE Stopwatch: T/Y or VR trigger; desktop LMB toggles, scroll-down resets (wall-clock).",
-            "Desktop: while holding Battery/Resistor/Switch/Wire/Multimeter/Probe/Stopwatch, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
+            "Desktop: while holding Battery/Resistor/Switch/Wire/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
         };
 
         Canvas _canvas;
