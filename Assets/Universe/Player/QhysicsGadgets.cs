@@ -51,8 +51,6 @@ namespace RealityEngine.Player
                 return SpawnCubitRod(worldPos);
             if (key == "multimeter")
                 return SpawnMultimeterStub(worldPos);
-            if (key == "resistor")
-                return SpawnLoadResistor(worldPos);
             if (key == "lamp" || key == "led" || key == "glow")
                 return SpawnLoadBulb(worldPos);
             if (key == "magnet")
@@ -71,6 +69,8 @@ namespace RealityEngine.Player
                 return SpawnLoadBattery(worldPos);
             if (key == "wire" || key == "long wire" || key == "longwire" || key == "jumper")
                 return SpawnLoadWire(worldPos);
+            if (key == "resistor")
+                return SpawnLoadResistor(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -123,6 +123,7 @@ namespace RealityEngine.Player
                 case "battery": tag = Dispenser.ComponentTag.Battery; return true;
                 case "switch": tag = Dispenser.ComponentTag.Switch; return true;
                 case "bulb": tag = Dispenser.ComponentTag.Bulb; return true;
+                case "resistor": tag = Dispenser.ComponentTag.Resistor; return true;
                 case "motor": tag = Dispenser.ComponentTag.Motor; return true;
                 case "solar": tag = Dispenser.ComponentTag.Solar; return true;
                 case "timer": tag = Dispenser.ComponentTag.Timer; return true;
