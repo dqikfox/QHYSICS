@@ -77,6 +77,8 @@ namespace RealityEngine.Player
                 return SpawnLoadSolar(worldPos);
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
+            if (key == "inductor" || key == "inductance" || key == "choke" || key == "coil-l" || key == "series-l")
+                return SpawnLoadInductor(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -525,6 +527,19 @@ namespace RealityEngine.Player
             if (c == null)
                 c = go.AddComponent<LoadCapacitorGadget>();
             c.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadInductor(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: classical series L on nearest InductionCoil (RL/RLC with Battery/Resistor/Cap).
+            var go = SpawnPrimitiveProxy("Inductor", worldPos, new Color(0.25f, 0.5f, 0.85f));
+            go.name = LoadInductorGadget.RootName;
+            go.transform.localScale = new Vector3(0.1f, 0.08f, 0.1f);
+            var indG = go.GetComponent<LoadInductorGadget>();
+            if (indG == null)
+                indG = go.AddComponent<LoadInductorGadget>();
+            indG.EnsureBuilt();
             return go;
         }
 

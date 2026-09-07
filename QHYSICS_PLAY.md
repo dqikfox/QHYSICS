@@ -102,6 +102,13 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Hold near Coil; classical series C (pair with Battery + Resistor/Lamp; Multimeter I falls as Vc rises).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / 1mF / 10mF / 100mF. Honesty: lumped RC only — NOT dielectric physics, not ESR/ESL. **New Run** clears Vc.
 
+
+### CIRCUIT Inductor (toolbelt BUILD)
+1. Enter Sandbox / Induction.
+2. Toolbelt **BUILD -> Inductor**; grab it.
+3. Hold near Coil; classical series L (pair with Battery + Resistor/Lamp; Multimeter I ramps; with Capacitor = RLC).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / 1mH / 10mH / 100mH. Honesty: lumped RL/RLC only — NOT core saturation, not skin effect, not mutual M. **New Run** clears I_L (and Vc).
+
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â checklist
 
 1. Open `Assets/Scenes/Faraday.unity` (Build Settings already has Faraday enabled).
