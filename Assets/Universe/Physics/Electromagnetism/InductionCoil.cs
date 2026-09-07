@@ -52,6 +52,10 @@ namespace RealityEngine.Physics.Electromagnetism
         float seriesInductance;
 
         [SerializeField]
+        [Tooltip("0=bypass, +1=forward (I>=0 only), -1=reverse (I<=0 only). Used by CIRCUIT Diode gadget.")]
+        int seriesDiodePolarity;
+
+        [SerializeField]
         [Tooltip("Number of concentric sample rings on the coil disk (plus a center sample). Keep small for Quest 3S.")]
         int radialSamples = 4;
 
@@ -96,6 +100,7 @@ namespace RealityEngine.Physics.Electromagnetism
         public float ExternalSeriesEmf => externalSeriesEmf;
         public float SeriesCapacitance => Mathf.Max(0f, seriesCapacitance);
         public float SeriesInductance => Mathf.Max(0f, seriesInductance);
+        public int SeriesDiodePolarity => seriesDiodePolarity > 0 ? 1 : (seriesDiodePolarity < 0 ? -1 : 0);
         public float Flux => _flux;
         public float FluxRate => _dFluxDt;
         public float Emf => _emf;
@@ -143,6 +148,14 @@ namespace RealityEngine.Physics.Electromagnetism
         public void SetSeriesInductance(float henries)
         {
             seriesInductance = Mathf.Max(0f, henries);
+        }
+
+        /// <summary>Set ideal series diode polarity. 0=bypass, +1=forward (I>=0 only), -1=reverse (I<=0 only). Used by CIRCUIT Diode.</summary>
+        public void SetSeriesDiodePolarity(int polarity)
+        {
+            if (polarity > 0) seriesDiodePolarity = 1;
+            else if (polarity < 0) seriesDiodePolarity = -1;
+            else seriesDiodePolarity = 0;
         }
 
         /// <summary>
