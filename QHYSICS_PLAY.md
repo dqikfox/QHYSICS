@@ -67,7 +67,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
-| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse/Function Generator), Multimeter, Galvanometer, Oscilloscope, Frequency Counter, Power Meter, Flux Meter, Probe, Stopwatch, or Field Lens |
+| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse/Function Generator), Multimeter, Galvanometer, Oscilloscope, Frequency Counter, Power Meter, Flux Meter, Charge Meter, Probe, Stopwatch, or Field Lens |
 
 ### MEASURE Multimeter (CircuitLab fallback)
 When no InductionCircuit is bound, Multimeter also reads the nearest placed CircuitLab component V/I (`GetVoltage` / `GetCurrentValue`) with honesty tag `[CircuitLab component]`. InductionCircuit still wins when present.
@@ -180,11 +180,17 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Hold near Coil; classical Phi (Wb), dPhi/dt (Wb/s), or peak |Phi| hold (pair with PHYSICS Magnet sweep; Oscilloscope Phi / Multimeter for cross-check).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles PHI / DPHI / PEAK / CLR (default PHI; CLR zeros peak then snaps to PHI). Honesty: ideal lumped fluxmeter from InductionCircuit - NOT real integrating fluxmeter, not search-coil ballistic galvo, not Hall B·A, not hysteresis tracer.
 
+### MEASURE Charge Meter (toolbelt MEASURE)
+1. Enter Sandbox / Induction.
+2. Toolbelt **MEASURE -> Charge Meter**; grab it.
+3. Hold near Coil; classical Q=∫I dt (C), peak |Q|, or Iavg (=Q/t since CLR) (pair with BUILD Capacitor / Function Generator / Magnet; Multimeter I / Power Meter for cross-check).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles Q / PEAK / AVG / CLR (default Q; CLR zeros Q/peak/timer then snaps to Q). Honesty: ideal coulomb integrator from InductionCircuit I - NOT real electrometer, not Faraday cup, not Keithley charge amp, not dielectric absorption.
+
 
 ### CIRCUIT Function Generator (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Function Generator**; grab it.
-3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Frequency Counter / Power Meter / Flux Meter / Multimeter / Galvanometer / Lamp).
+3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Frequency Counter / Power Meter / Flux Meter / Charge Meter / Multimeter / Galvanometer / Lamp).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / SIN1 / SIN5 / SIN10 / SQR5 / SQR10 / TRI5 / TRI10 (default SIN5 = 5 Hz @ 1.5 Vpk). Honesty: ideal AWG series EMF on InductionCoil - NOT real DDS, not output impedance, not coil frequency response, not sync/trigger.
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â checklist
 

@@ -103,6 +103,8 @@ namespace RealityEngine.Player
                 return SpawnLoadPowerMeter(worldPos);
             if (key == "flux meter" || key == "fluxmeter" || key == "weber meter" || key == "webermeter" || key == "flux" || key == "phi meter" || key == "phimeter" || key == "dphi")
                 return SpawnLoadFluxMeter(worldPos);
+            if (key == "charge meter" || key == "chargemeter" || key == "coulomb meter" || key == "coulombmeter" || key == "charge" || key == "coulomb" || key == "q meter" || key == "qmeter")
+                return SpawnLoadChargeMeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -707,6 +709,19 @@ namespace RealityEngine.Player
             if (fm == null)
                 fm = go.AddComponent<LoadFluxMeterGadget>();
             fm.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadChargeMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal coulomb integrator from classical InductionCircuit I (Q=∫I dt).
+            var go = SpawnPrimitiveProxy("ChargeMeter", worldPos, new Color(0.48f, 0.22f, 0.58f));
+            go.name = LoadChargeMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var cm = go.GetComponent<LoadChargeMeterGadget>();
+            if (cm == null)
+                cm = go.AddComponent<LoadChargeMeterGadget>();
+            cm.EnsureBuilt();
             return go;
         }
 
