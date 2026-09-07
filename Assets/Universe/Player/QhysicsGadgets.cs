@@ -95,6 +95,8 @@ namespace RealityEngine.Player
                 return SpawnLoadGalvanometer(worldPos);
             if (key == "oscilloscope" || key == "scope" || key == "oscilo" || key == "o-scope" || key == "waveform")
                 return SpawnLoadOscilloscope(worldPos);
+            if (key == "function generator" || key == "functiongenerator" || key == "fgen" || key == "func gen" || key == "awg" || key == "signal generator" || key == "siggen")
+                return SpawnLoadFunctionGenerator(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -662,6 +664,19 @@ namespace RealityEngine.Player
             return go;
         }
 
+
+        static GameObject SpawnLoadFunctionGenerator(Vector3 worldPos)
+        {
+            // Real CIRCUIT tool: classical ideal AWG series EMF waveforms on nearest InductionCoil.
+            var go = SpawnPrimitiveProxy("FunctionGenerator", worldPos, new Color(0.15f, 0.75f, 0.65f));
+            go.name = LoadFunctionGeneratorGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.05f, 0.1f);
+            var fg = go.GetComponent<LoadFunctionGeneratorGadget>();
+            if (fg == null)
+                fg = go.AddComponent<LoadFunctionGeneratorGadget>();
+            fg.EnsureBuilt();
+            return go;
+        }
         static GameObject SpawnLoadBulb(Vector3 worldPos)
         {
             // Real CIRCUIT tool: classical |I| glow on nearest InductionCircuit (Resistor owns R_load).
