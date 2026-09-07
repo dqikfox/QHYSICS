@@ -67,7 +67,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
-| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse/Function Generator), Multimeter, Galvanometer, Oscilloscope, Function Generator, Probe, Stopwatch, or Field Lens |
+| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse/Function Generator), Multimeter, Galvanometer, Oscilloscope, Frequency Counter, Probe, Stopwatch, or Field Lens |
 
 ### MEASURE Multimeter (CircuitLab fallback)
 When no InductionCircuit is bound, Multimeter also reads the nearest placed CircuitLab component V/I (`GetVoltage` / `GetCurrentValue`) with honesty tag `[CircuitLab component]`. InductionCircuit still wins when present.
@@ -160,10 +160,18 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 
 
 
+
+
+### MEASURE Frequency Counter (toolbelt MEASURE)
+1. Enter Sandbox / Induction.
+2. Toolbelt **MEASURE -> Frequency Counter**; grab it.
+3. Hold near Coil; gate Hz from rising zero-cross of classical Emf / I (pair with BUILD Function Generator or Magnet sweep; Oscilloscope for cross-check).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles EMF0.5 / EMF1 / EMF2 / I0.5 / I1 / I2 (default EMF1 = EMF 1s gate). Honesty: ideal rising zero-cross gate from InductionCircuit Emf/I - NOT real counter/timer, not PLL, not FFT, not Schmitt hysteresis.
+
 ### CIRCUIT Function Generator (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Function Generator**; grab it.
-3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Multimeter / Galvanometer / Lamp).
+3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Frequency Counter / Multimeter / Galvanometer / Lamp).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / SIN1 / SIN5 / SIN10 / SQR5 / SQR10 / TRI5 / TRI10 (default SIN5 = 5 Hz @ 1.5 Vpk). Honesty: ideal AWG series EMF on InductionCoil - NOT real DDS, not output impedance, not coil frequency response, not sync/trigger.
 ## Play steps ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â checklist
 

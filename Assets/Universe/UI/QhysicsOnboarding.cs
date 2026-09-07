@@ -38,13 +38,14 @@ namespace RealityEngine.UI
             "MEASURE Galvanometer: hold near a Coil - needle deflects from classical signed I (N/P or VR trigger cycles 1/5/20/100mA full-scale; ideal needle NOT coil torque / damping / shunt).",
             "MEASURE Oscilloscope: hold near a Coil - rolling strip of classical Emf/I/Phi (N/P or VR trigger cycles EMF0.5/EMF1/EMF2/I0.5/I1/I2/Phi1/Phi2; ideal strip NOT ADC / triggered scope / FFT / probe C).",
             "CIRCUIT Function Generator: hold near a Coil - drives classical ideal series EMF waveforms (N/P or VR trigger cycles OFF/SIN1/SIN5/SIN10/SQR5/SQR10/TRI5/TRI10; pair with Oscilloscope; NOT real DDS/AWG/Zout/sync).",
+            "MEASURE Frequency Counter: hold near a Coil - gate Hz from rising zero-cross of classical Emf/I (N/P or VR trigger cycles EMF0.5/EMF1/EMF2/I0.5/I1/I2; pair with Function Generator; NOT real counter/PLL/FFT).",
             "CIRCUIT Bulb/Lamp: hold near a Coil — glows from classical |I| (pair with Magnet sweep + Resistor); Multimeter still reads Emf/I.",
             "CIRCUIT Switch: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger toggles CLOSED/OPEN (OPEN = classical open circuit; kills Lamp |I|).",
             "CIRCUIT Battery: hold near a Coil Ã¢â‚¬â€ N/P or VR trigger cycles 1.5/3/6/9/OFF V (classical series EMF; Lamp glows without magnet sweep).",
             "CIRCUIT Wire: hold near a Coil Ã¢â‚¬â€ classical series jumper R (N/P or VR trigger cycles 0.05/0.2/1 ohm; Resistor/Switch OPEN override).",
             "MEASURE Probe: binds nearest MagneticDipole by tip; N/P, VR trigger, or desktop LMB/scroll cycles NEAREST/ALL/COMP pages.",
             "MEASURE Stopwatch: T/Y or VR trigger; desktop LMB toggles, scroll-down resets (wall-clock).",
-            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Speaker/Potentiometer/Transformer/Function Generator/Galvanometer/Oscilloscope/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
+            "Desktop: while holding Battery/Resistor/Switch/Wire/Motor/Solar/Capacitor/Inductor/Diode/Fuse/LED/Speaker/Potentiometer/Transformer/Function Generator/Galvanometer/Oscilloscope/Frequency Counter/Multimeter/Probe/Stopwatch/Field Lens, LMB or scroll activates (VR trigger). Crosshair turns amber when held.",
         };
 
         Canvas _canvas;
