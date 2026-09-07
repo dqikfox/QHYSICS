@@ -109,6 +109,8 @@ namespace RealityEngine.Player
                 return SpawnLoadVoltmeter(worldPos);
             if (key == "ammeter" || key == "amp meter" || key == "ampmeter" || key == "current meter" || key == "currentmeter" || key == "dmm amp" || key == "i meter" || key == "imeter" || key == "ammeter gadget")
                 return SpawnLoadAmmeter(worldPos);
+            if (key == "ohmmeter" || key == "ohm meter" || key == "ohmmeter gadget" || key == "resistance meter" || key == "resistancemeter" || key == "dmm ohm" || key == "r meter" || key == "rmeter" || key == "ohm")
+                return SpawnLoadOhmmeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -752,6 +754,19 @@ namespace RealityEngine.Player
             if (am == null)
                 am = go.AddComponent<LoadAmmeterGadget>();
             am.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadOhmmeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal Rtot / Rload / Emf/I from classical InductionCircuit.
+            var go = SpawnPrimitiveProxy("Ohmmeter", worldPos, new Color(0.55f, 0.35f, 0.18f));
+            go.name = LoadOhmmeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var om = go.GetComponent<LoadOhmmeterGadget>();
+            if (om == null)
+                om = go.AddComponent<LoadOhmmeterGadget>();
+            om.EnsureBuilt();
             return go;
         }
 
