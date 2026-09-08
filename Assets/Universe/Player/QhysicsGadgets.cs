@@ -141,6 +141,9 @@ namespace RealityEngine.Player
             if (key == "slew rate meter" || key == "slewratemeter" || key == "slew meter" || key == "slewmeter" || key == "slew" || key == "dvdt meter" || key == "dvdtmeter" || key == "didt meter" || key == "didtmeter" || key == "slew rate")
                 return SpawnLoadSlewRateMeter(worldPos);
 
+            if (key == "rise fall meter" || key == "risefallmeter" || key == "rise/fall meter" || key == "rise-fall meter" || key == "risetime meter" || key == "risetimemeter" || key == "rise time meter" || key == "fall time meter" || key == "falltimemeter" || key == "tr tf meter" || key == "trtfmeter" || key == "edge time meter" || key == "edgetimemeter" || key == "rise fall")
+                return SpawnLoadRiseFallMeter(worldPos);
+
 
             // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
@@ -952,6 +955,19 @@ namespace RealityEngine.Player
             if (sr == null)
                 sr = go.AddComponent<LoadSlewRateMeterGadget>();
             sr.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadRiseFallMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal 10-90% Emf rise / 90-10% fall times from classical InductionCircuit.
+            var go = SpawnPrimitiveProxy("RiseFallMeter", worldPos, new Color(0.48f, 0.22f, 0.55f));
+            go.name = LoadRiseFallMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var rf = go.GetComponent<LoadRiseFallMeterGadget>();
+            if (rf == null)
+                rf = go.AddComponent<LoadRiseFallMeterGadget>();
+            rf.EnsureBuilt();
             return go;
         }
 
