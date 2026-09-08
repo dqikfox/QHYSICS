@@ -129,6 +129,9 @@ namespace RealityEngine.Player
             if (key == "decibel meter" || key == "decibelmeter" || key == "db meter" || key == "dbmeter" || key == "dbv meter" || key == "dbvmeter" || key == "dbm meter" || key == "dbmmeter" || key == "decibel" || key == "db")
                 return SpawnLoadDecibelMeter(worldPos);
 
+            if (key == "crest factor meter" || key == "crestfactormeter" || key == "crest meter" || key == "crestmeter" || key == "cf meter" || key == "cfmeter" || key == "crest factor" || key == "form factor meter" || key == "formfactormeter" || key == "form factor")
+                return SpawnLoadCrestFactorMeter(worldPos);
+
 
             // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
@@ -888,6 +891,19 @@ namespace RealityEngine.Player
             if (db == null)
                 db = go.AddComponent<LoadDecibelMeterGadget>();
             db.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadCrestFactorMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal windowed crest / form factor from classical InductionCircuit Emf / I.
+            var go = SpawnPrimitiveProxy("CrestFactorMeter", worldPos, new Color(0.55f, 0.28f, 0.18f));
+            go.name = LoadCrestFactorMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var cf = go.GetComponent<LoadCrestFactorMeterGadget>();
+            if (cf == null)
+                cf = go.AddComponent<LoadCrestFactorMeterGadget>();
+            cf.EnsureBuilt();
             return go;
         }
 
