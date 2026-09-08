@@ -144,6 +144,9 @@ namespace RealityEngine.Player
             if (key == "rise fall meter" || key == "risefallmeter" || key == "rise/fall meter" || key == "rise-fall meter" || key == "risetime meter" || key == "risetimemeter" || key == "rise time meter" || key == "fall time meter" || key == "falltimemeter" || key == "tr tf meter" || key == "trtfmeter" || key == "edge time meter" || key == "edgetimemeter" || key == "rise fall")
                 return SpawnLoadRiseFallMeter(worldPos);
 
+            if (key == "overshoot meter" || key == "overshootmeter" || key == "overshoot" || key == "os meter" || key == "osmeter" || key == "undershoot meter" || key == "undershootmeter" || key == "peak overshoot" || key == "peakovershoot")
+                return SpawnLoadOvershootMeter(worldPos);
+
 
             // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
@@ -968,6 +971,19 @@ namespace RealityEngine.Player
             if (rf == null)
                 rf = go.AddComponent<LoadRiseFallMeterGadget>();
             rf.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadOvershootMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal Emf/I overshoot % and peak |Emf| from classical InductionCircuit edges.
+            var go = SpawnPrimitiveProxy("OvershootMeter", worldPos, new Color(0.55f, 0.28f, 0.42f));
+            go.name = LoadOvershootMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var os = go.GetComponent<LoadOvershootMeterGadget>();
+            if (os == null)
+                os = go.AddComponent<LoadOvershootMeterGadget>();
+            os.EnsureBuilt();
             return go;
         }
 
