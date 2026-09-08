@@ -156,6 +156,9 @@ namespace RealityEngine.Player
             if (key == "ripple meter" || key == "ripplemeter" || key == "ripple" || key == "ac ripple meter" || key == "acripplemeter" || key == "ripple factor meter" || key == "ripplefactormeter" || key == "ripple factor" || key == "vac meter" || key == "vacmeter")
                 return SpawnLoadRippleMeter(worldPos);
 
+            if (key == "thd meter" || key == "thdmeter" || key == "thd" || key == "total harmonic distortion" || key == "totalharmonicdistortion" || key == "harmonic distortion meter" || key == "harmonicdistortionmeter" || key == "distortion meter" || key == "distortionmeter" || key == "thdv meter" || key == "thdvmeter")
+                return SpawnLoadThdMeter(worldPos);
+
 
             // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
@@ -1032,6 +1035,19 @@ namespace RealityEngine.Player
             if (rm == null)
                 rm = go.AddComponent<LoadRippleMeterGadget>();
             rm.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadThdMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal windowed harmonic residual THD from classical InductionCircuit samples.
+            var go = SpawnPrimitiveProxy("ThdMeter", worldPos, new Color(0.42f, 0.28f, 0.58f));
+            go.name = LoadThdMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var tm = go.GetComponent<LoadThdMeterGadget>();
+            if (tm == null)
+                tm = go.AddComponent<LoadThdMeterGadget>();
+            tm.EnsureBuilt();
             return go;
         }
 
