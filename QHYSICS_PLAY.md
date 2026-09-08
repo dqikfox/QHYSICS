@@ -67,7 +67,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
-| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse/Function Generator), Multimeter, Galvanometer, Oscilloscope, Frequency Counter, Power Meter, Flux Meter, Charge Meter, Voltmeter, Ammeter, Ohmmeter, Capacitance Meter, Inductance Meter, Resonance Meter, Impedance Meter, Power Factor Meter, Q Factor Meter, Admittance Meter, Decibel Meter, Crest Factor Meter, Energy Meter, Duty Cycle Meter, Slew Rate Meter, Rise/Fall Meter, Overshoot Meter, Peak-to-Peak Meter, Mean Meter, Ripple Meter, Probe, Stopwatch, or Field Lens |
+| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse/Function Generator), Multimeter, Galvanometer, Oscilloscope, Frequency Counter, Power Meter, Flux Meter, Charge Meter, Voltmeter, Ammeter, Ohmmeter, Capacitance Meter, Inductance Meter, Resonance Meter, Impedance Meter, Power Factor Meter, Q Factor Meter, Admittance Meter, Decibel Meter, Crest Factor Meter, Energy Meter, Duty Cycle Meter, Slew Rate Meter, Rise/Fall Meter, Overshoot Meter, Peak-to-Peak Meter, Mean Meter, Ripple Meter, THD Meter, Probe, Stopwatch, or Field Lens |
 
 ### MEASURE Multimeter (CircuitLab fallback)
 When no InductionCircuit is bound, Multimeter also reads the nearest placed CircuitLab component V/I (`GetVoltage` / `GetCurrentValue`) with honesty tag `[CircuitLab component]`. InductionCircuit still wins when present.
@@ -299,6 +299,12 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Hold near Coil; classical Vac/|Vdc| (RPV), Iac/|Idc| (RPI), and AC Emf Vac (VAC) (pair with BUILD Function Generator; Mean Meter / Peak-to-Peak Meter / Crest Factor Meter for cross-check). A pure AC swing with near-zero DCV should drive high RPV; a DC offset lowers it.
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles RPV / RPI / VAC / CLR (default RPV; CLR zeros accumulators, then snaps to RPV). Honesty: ideal windowed AC residual Vac=sqrt(max(0,Vrms^2-Vdc^2)) from classical InductionCircuit samples - NOT real ripple meter, not AC-coupled DMM, not scope math, not calibrated ripple hardware.
 
+### MEASURE THD Meter (toolbelt MEASURE)
+1. Enter Sandbox / Induction.
+2. Toolbelt **MEASURE -> THD Meter**; grab it.
+3. Hold near Coil; classical windowed harmonic residual THD for Emf (THDV), I (THDI), and sine-assumed fund Emf (FUND) (pair with BUILD Function Generator; Ripple Meter / Crest Factor Meter / Mean Meter for cross-check). A pure sine should drive low THDV; a square/triangle raises it.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles THDV / THDI / FUND / CLR (default THDV; CLR zeros window, then snaps to THDV). Honesty: ideal windowed harmonic residual from classical InductionCircuit Emf/I samples - NOT real THD analyzer, not FFT spectrum analyzer, not IEC distortion meter, not calibrated audio THD hardware.
+
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
@@ -307,7 +313,7 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 ### CIRCUIT Function Generator (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Function Generator**; grab it.
-3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Frequency Counter / Power Meter / Flux Meter / Charge Meter / Voltmeter / Ammeter / Ohmmeter / Capacitance Meter / Inductance Meter / Resonance Meter / Impedance Meter / Power Factor Meter / Q Factor Meter / Admittance Meter / Decibel Meter / Crest Factor Meter / Energy Meter / Duty Cycle Meter / Slew Rate Meter / Rise/Fall Meter / Overshoot Meter / Peak-to-Peak Meter / Mean Meter / Ripple Meter / Multimeter / Galvanometer / Lamp).
+3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Frequency Counter / Power Meter / Flux Meter / Charge Meter / Voltmeter / Ammeter / Ohmmeter / Capacitance Meter / Inductance Meter / Resonance Meter / Impedance Meter / Power Factor Meter / Q Factor Meter / Admittance Meter / Decibel Meter / Crest Factor Meter / Energy Meter / Duty Cycle Meter / Slew Rate Meter / Rise/Fall Meter / Overshoot Meter / Peak-to-Peak Meter / Mean Meter / Ripple Meter / THD Meter / Multimeter / Galvanometer / Lamp).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / SIN1 / SIN5 / SIN10 / SQR5 / SQR10 / TRI5 / TRI10 (default SIN5 = 5 Hz @ 1.5 Vpk). Honesty: ideal AWG series EMF on InductionCoil - NOT real DDS, not output impedance, not coil frequency response, not sync/trigger.
 ## Play steps ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â checklist
 
