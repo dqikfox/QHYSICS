@@ -67,7 +67,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
-| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse/Function Generator), Multimeter, Galvanometer, Oscilloscope, Frequency Counter, Power Meter, Flux Meter, Charge Meter, Voltmeter, Ammeter, Ohmmeter, Capacitance Meter, Inductance Meter, Resonance Meter, Impedance Meter, Power Factor Meter, Q Factor Meter, Admittance Meter, Decibel Meter, Crest Factor Meter, Probe, Stopwatch, or Field Lens |
+| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse/Function Generator), Multimeter, Galvanometer, Oscilloscope, Frequency Counter, Power Meter, Flux Meter, Charge Meter, Voltmeter, Ammeter, Ohmmeter, Capacitance Meter, Inductance Meter, Resonance Meter, Impedance Meter, Power Factor Meter, Q Factor Meter, Admittance Meter, Decibel Meter, Crest Factor Meter, Energy Meter, Probe, Stopwatch, or Field Lens |
 
 ### MEASURE Multimeter (CircuitLab fallback)
 When no InductionCircuit is bound, Multimeter also reads the nearest placed CircuitLab component V/I (`GetVoltage` / `GetCurrentValue`) with honesty tag `[CircuitLab component]`. InductionCircuit still wins when present.
@@ -251,6 +251,12 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Hold near Coil; classical windowed peak/RMS crest for Emf (CFV) and I (CFI), plus Emf form factor FF=RMS/mean|Emf| (pair with BUILD Function Generator SIN/SQR/TRI; Voltmeter / Ammeter / Decibel Meter for cross-check). Expect ~1.414 sine CF, ~1 square CF, ~1.732 triangle CF once the window fills.
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles CFV / CFI / FF / CLR (default CFV; CLR zeros the peak/RMS/mean window, then snaps to CFV). Honesty: ideal windowed peak and RMS from classical InductionCircuit Emf / I - NOT true-RMS ADC, not IEC crest-factor meter, not THD, not scope math, not calibrated waveform analyzer.
 
+### MEASURE Energy Meter (toolbelt MEASURE)
+1. Enter Sandbox / Induction.
+2. Toolbelt **MEASURE -> Energy Meter**; grab it.
+3. Hold near Coil; classical energy integrator E=∫P dt from LoadPowerWatts, plus live P and window AVG=E/t (pair with BUILD Function Generator / Battery; Power Meter / Decibel Meter for cross-check). Energy accumulates while linked and within tip range.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles E / P / AVG / CLR (default E; CLR zeros the integrator and window, then snaps to E). Honesty: ideal time integral of lumped InductionCircuit LoadPowerWatts - NOT a real watt-hour meter, not calibrated energy logger, not four-quadrant / true-RMS joule hardware.
+
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
@@ -259,7 +265,7 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 ### CIRCUIT Function Generator (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Function Generator**; grab it.
-3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Frequency Counter / Power Meter / Flux Meter / Charge Meter / Voltmeter / Ammeter / Ohmmeter / Capacitance Meter / Inductance Meter / Resonance Meter / Impedance Meter / Power Factor Meter / Q Factor Meter / Admittance Meter / Decibel Meter / Crest Factor Meter / Multimeter / Galvanometer / Lamp).
+3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Frequency Counter / Power Meter / Flux Meter / Charge Meter / Voltmeter / Ammeter / Ohmmeter / Capacitance Meter / Inductance Meter / Resonance Meter / Impedance Meter / Power Factor Meter / Q Factor Meter / Admittance Meter / Decibel Meter / Crest Factor Meter / Energy Meter / Multimeter / Galvanometer / Lamp).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / SIN1 / SIN5 / SIN10 / SQR5 / SQR10 / TRI5 / TRI10 (default SIN5 = 5 Hz @ 1.5 Vpk). Honesty: ideal AWG series EMF on InductionCoil - NOT real DDS, not output impedance, not coil frequency response, not sync/trigger.
 ## Play steps ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â checklist
 
