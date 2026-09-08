@@ -147,6 +147,9 @@ namespace RealityEngine.Player
             if (key == "overshoot meter" || key == "overshootmeter" || key == "overshoot" || key == "os meter" || key == "osmeter" || key == "undershoot meter" || key == "undershootmeter" || key == "peak overshoot" || key == "peakovershoot")
                 return SpawnLoadOvershootMeter(worldPos);
 
+            if (key == "peak to peak meter" || key == "peaktopeakmeter" || key == "peak-to-peak meter" || key == "peak-to-peak" || key == "peak to peak" || key == "vpp meter" || key == "vppmeter" || key == "pp meter" || key == "ppmeter" || key == "ptp meter" || key == "ptpmeter")
+                return SpawnLoadPeakToPeakMeter(worldPos);
+
 
             // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
@@ -984,6 +987,19 @@ namespace RealityEngine.Player
             if (os == null)
                 os = go.AddComponent<LoadOvershootMeterGadget>();
             os.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadPeakToPeakMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal Emf Vpp / I Ipp from classical InductionCircuit soft-window min/max.
+            var go = SpawnPrimitiveProxy("PeakToPeakMeter", worldPos, new Color(0.42f, 0.32f, 0.58f));
+            go.name = LoadPeakToPeakMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var pp = go.GetComponent<LoadPeakToPeakMeterGadget>();
+            if (pp == null)
+                pp = go.AddComponent<LoadPeakToPeakMeterGadget>();
+            pp.EnsureBuilt();
             return go;
         }
 
