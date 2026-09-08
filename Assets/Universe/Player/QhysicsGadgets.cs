@@ -135,6 +135,9 @@ namespace RealityEngine.Player
             if (key == "energy meter" || key == "energymeter" || key == "energy" || key == "e meter" || key == "emeter" || key == "watt second meter" || key == "wattsecondmeter" || key == "ws meter" || key == "wsmeter" || key == "energy integrator" || key == "energyintegrator")
                 return SpawnLoadEnergyMeter(worldPos);
 
+            if (key == "duty cycle meter" || key == "dutycyclemeter" || key == "duty meter" || key == "dutymeter" || key == "duty" || key == "pwm meter" || key == "pwmmeter" || key == "pulse width meter" || key == "pulsewidthmeter" || key == "duty cycle")
+                return SpawnLoadDutyCycleMeter(worldPos);
+
 
             // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
@@ -920,6 +923,19 @@ namespace RealityEngine.Player
             if (em == null)
                 em = go.AddComponent<LoadEnergyMeterGadget>();
             em.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadDutyCycleMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal windowed positive duty + Emf period from classical InductionCircuit.
+            var go = SpawnPrimitiveProxy("DutyCycleMeter", worldPos, new Color(0.62f, 0.48f, 0.16f));
+            go.name = LoadDutyCycleMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var dc = go.GetComponent<LoadDutyCycleMeterGadget>();
+            if (dc == null)
+                dc = go.AddComponent<LoadDutyCycleMeterGadget>();
+            dc.EnsureBuilt();
             return go;
         }
 
