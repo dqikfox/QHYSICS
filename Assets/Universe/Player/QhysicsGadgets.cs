@@ -126,6 +126,9 @@ namespace RealityEngine.Player
             if (key == "admittance meter" || key == "admitancemeter" || key == "admittancemeter" || key == "y meter" || key == "ymeter" || key == "admittance" || key == "conductance meter" || key == "conductancemeter" || key == "susceptance meter" || key == "susceptancemeter")
                 return SpawnLoadAdmittanceMeter(worldPos);
 
+            if (key == "decibel meter" || key == "decibelmeter" || key == "db meter" || key == "dbmeter" || key == "dbv meter" || key == "dbvmeter" || key == "dbm meter" || key == "dbmmeter" || key == "decibel" || key == "db")
+                return SpawnLoadDecibelMeter(worldPos);
+
 
             // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
@@ -872,6 +875,19 @@ namespace RealityEngine.Player
             if (ym == null)
                 ym = go.AddComponent<LoadAdmittanceMeterGadget>();
             ym.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadDecibelMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal lumped dBV / dBI / dBW / dBm from classical InductionCircuit.
+            var go = SpawnPrimitiveProxy("DecibelMeter", worldPos, new Color(0.42f, 0.22f, 0.55f));
+            go.name = LoadDecibelMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var db = go.GetComponent<LoadDecibelMeterGadget>();
+            if (db == null)
+                db = go.AddComponent<LoadDecibelMeterGadget>();
+            db.EnsureBuilt();
             return go;
         }
 
