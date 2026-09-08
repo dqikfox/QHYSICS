@@ -153,6 +153,9 @@ namespace RealityEngine.Player
             if (key == "mean meter" || key == "meanmeter" || key == "mean" || key == "dc meter" || key == "dcmeter" || key == "dc offset meter" || key == "dcoffsetmeter" || key == "average meter" || key == "averagemeter" || key == "avg meter" || key == "avgmeter")
                 return SpawnLoadMeanMeter(worldPos);
 
+            if (key == "ripple meter" || key == "ripplemeter" || key == "ripple" || key == "ac ripple meter" || key == "acripplemeter" || key == "ripple factor meter" || key == "ripplefactormeter" || key == "ripple factor" || key == "vac meter" || key == "vacmeter")
+                return SpawnLoadRippleMeter(worldPos);
+
 
             // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
@@ -1016,6 +1019,19 @@ namespace RealityEngine.Player
             if (mm == null)
                 mm = go.AddComponent<LoadMeanMeterGadget>();
             mm.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadRippleMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal windowed Vac/|Vdc| ripple from classical InductionCircuit samples.
+            var go = SpawnPrimitiveProxy("RippleMeter", worldPos, new Color(0.55f, 0.38f, 0.18f));
+            go.name = LoadRippleMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var rm = go.GetComponent<LoadRippleMeterGadget>();
+            if (rm == null)
+                rm = go.AddComponent<LoadRippleMeterGadget>();
+            rm.EnsureBuilt();
             return go;
         }
 
