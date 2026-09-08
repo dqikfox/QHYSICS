@@ -138,6 +138,9 @@ namespace RealityEngine.Player
             if (key == "duty cycle meter" || key == "dutycyclemeter" || key == "duty meter" || key == "dutymeter" || key == "duty" || key == "pwm meter" || key == "pwmmeter" || key == "pulse width meter" || key == "pulsewidthmeter" || key == "duty cycle")
                 return SpawnLoadDutyCycleMeter(worldPos);
 
+            if (key == "slew rate meter" || key == "slewratemeter" || key == "slew meter" || key == "slewmeter" || key == "slew" || key == "dvdt meter" || key == "dvdtmeter" || key == "didt meter" || key == "didtmeter" || key == "slew rate")
+                return SpawnLoadSlewRateMeter(worldPos);
+
 
             // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
@@ -936,6 +939,19 @@ namespace RealityEngine.Player
             if (dc == null)
                 dc = go.AddComponent<LoadDutyCycleMeterGadget>();
             dc.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadSlewRateMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal finite-diff |dEmf/dt| / |dI/dt| peaks from classical InductionCircuit.
+            var go = SpawnPrimitiveProxy("SlewRateMeter", worldPos, new Color(0.16f, 0.52f, 0.50f));
+            go.name = LoadSlewRateMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var sr = go.GetComponent<LoadSlewRateMeterGadget>();
+            if (sr == null)
+                sr = go.AddComponent<LoadSlewRateMeterGadget>();
+            sr.EnsureBuilt();
             return go;
         }
 
