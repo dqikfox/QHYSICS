@@ -123,6 +123,8 @@ namespace RealityEngine.Player
                 return SpawnLoadPowerFactorMeter(worldPos);
             if (key == "q factor meter" || key == "qfactormeter" || key == "quality factor meter" || key == "qualityfactormeter" || key == "quality factor" || key == "qf meter" || key == "qfmeter" || key == "bandwidth meter" || key == "bandwidthmeter")
                 return SpawnLoadQFactorMeter(worldPos);
+            if (key == "admittance meter" || key == "admitancemeter" || key == "admittancemeter" || key == "y meter" || key == "ymeter" || key == "admittance" || key == "conductance meter" || key == "conductancemeter" || key == "susceptance meter" || key == "susceptancemeter")
+                return SpawnLoadAdmittanceMeter(worldPos);
 
 
             // World / experiment chips - real actions (not spawns)
@@ -857,6 +859,19 @@ namespace RealityEngine.Player
             if (qf == null)
                 qf = go.AddComponent<LoadQFactorMeterGadget>();
             qf.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadAdmittanceMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal series RLC |Y| / G / B / PHI from classical InductionCircuit.
+            var go = SpawnPrimitiveProxy("AdmittanceMeter", worldPos, new Color(0.18f, 0.55f, 0.62f));
+            go.name = LoadAdmittanceMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var ym = go.GetComponent<LoadAdmittanceMeterGadget>();
+            if (ym == null)
+                ym = go.AddComponent<LoadAdmittanceMeterGadget>();
+            ym.EnsureBuilt();
             return go;
         }
 
