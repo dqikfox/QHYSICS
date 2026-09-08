@@ -132,6 +132,9 @@ namespace RealityEngine.Player
             if (key == "crest factor meter" || key == "crestfactormeter" || key == "crest meter" || key == "crestmeter" || key == "cf meter" || key == "cfmeter" || key == "crest factor" || key == "form factor meter" || key == "formfactormeter" || key == "form factor")
                 return SpawnLoadCrestFactorMeter(worldPos);
 
+            if (key == "energy meter" || key == "energymeter" || key == "energy" || key == "e meter" || key == "emeter" || key == "watt second meter" || key == "wattsecondmeter" || key == "ws meter" || key == "wsmeter" || key == "energy integrator" || key == "energyintegrator")
+                return SpawnLoadEnergyMeter(worldPos);
+
 
             // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
@@ -904,6 +907,19 @@ namespace RealityEngine.Player
             if (cf == null)
                 cf = go.AddComponent<LoadCrestFactorMeterGadget>();
             cf.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadEnergyMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal energy integral of classical InductionCircuit LoadPowerWatts.
+            var go = SpawnPrimitiveProxy("EnergyMeter", worldPos, new Color(0.22f, 0.58f, 0.32f));
+            go.name = LoadEnergyMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var em = go.GetComponent<LoadEnergyMeterGadget>();
+            if (em == null)
+                em = go.AddComponent<LoadEnergyMeterGadget>();
+            em.EnsureBuilt();
             return go;
         }
 
