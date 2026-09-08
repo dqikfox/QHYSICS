@@ -150,6 +150,9 @@ namespace RealityEngine.Player
             if (key == "peak to peak meter" || key == "peaktopeakmeter" || key == "peak-to-peak meter" || key == "peak-to-peak" || key == "peak to peak" || key == "vpp meter" || key == "vppmeter" || key == "pp meter" || key == "ppmeter" || key == "ptp meter" || key == "ptpmeter")
                 return SpawnLoadPeakToPeakMeter(worldPos);
 
+            if (key == "mean meter" || key == "meanmeter" || key == "mean" || key == "dc meter" || key == "dcmeter" || key == "dc offset meter" || key == "dcoffsetmeter" || key == "average meter" || key == "averagemeter" || key == "avg meter" || key == "avgmeter")
+                return SpawnLoadMeanMeter(worldPos);
+
 
             // World / experiment chips - real actions (not spawns)
             if (TryWorldOrExperimentAction(key, label))
@@ -1000,6 +1003,19 @@ namespace RealityEngine.Player
             if (pp == null)
                 pp = go.AddComponent<LoadPeakToPeakMeterGadget>();
             pp.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnLoadMeanMeter(Vector3 worldPos)
+        {
+            // Real MEASURE tool: ideal windowed mean Emf/I from classical InductionCircuit samples.
+            var go = SpawnPrimitiveProxy("MeanMeter", worldPos, new Color(0.22f, 0.48f, 0.52f));
+            go.name = LoadMeanMeterGadget.RootName;
+            go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
+            var mm = go.GetComponent<LoadMeanMeterGadget>();
+            if (mm == null)
+                mm = go.AddComponent<LoadMeanMeterGadget>();
+            mm.EnsureBuilt();
             return go;
         }
 
