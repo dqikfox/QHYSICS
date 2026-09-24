@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using RealityEngine.Player;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,7 +26,7 @@ namespace RealityEngine.UI
         static readonly string[][] ChipSets =
         {
             new[] { "Wire", "Battery", "Switch", "Bulb", "Resistor", "Lamp", "Motor", "Solar", "Capacitor", "Inductor", "Diode", "Fuse", "LED", "Speaker", "Potentiometer", "Transformer", "Function Generator" },
-            new[] { "Magnet", "Coil", "Field Lens", "Dipole" },
+            new[] { "Magnet", "Coil", "Field Lens", "Dipole", "Crank Generator" },
             new[] { "Multimeter", "Galvanometer", "Oscilloscope", "Frequency Counter", "Power Meter", "Flux Meter", "Charge Meter", "Voltmeter", "Ammeter", "Ohmmeter", "Capacitance Meter", "Inductance Meter", "Resonance Meter", "Impedance Meter", "Power Factor Meter", "Q Factor Meter", "Admittance Meter", "Decibel Meter", "Crest Factor Meter", "Energy Meter", "Duty Cycle Meter", "Slew Rate Meter", "Rise/Fall Meter", "Overshoot Meter", "Peak-to-Peak Meter", "Mean Meter", "Ripple Meter", "THD Meter", "Cubit Rod", "Probe", "Compass", "Stopwatch" },
             new[] { "Teleport", "Scale", "Sky", "Reset Pose" },
             new[] { "Induction", "New Run", "Save", "Load" }

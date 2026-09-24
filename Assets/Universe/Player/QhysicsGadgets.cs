@@ -67,6 +67,8 @@ namespace RealityEngine.Player
                 return SpawnFieldProbe(worldPos);
             if (key == "compass" || key == "magnetic compass" || key == "magcompass")
                 return SpawnCompass(worldPos);
+            if (key == "crank" || key == "crank generator" || key == "hand crank" || key == "generator" || key == "dynamo" || key == "hand crank generator")
+                return SpawnCrankGenerator(worldPos);
             if (key == "switch")
                 return SpawnLoadSwitch(worldPos);
             if (key == "battery" || key == "cell" || key == "emf")
@@ -1127,6 +1129,19 @@ namespace RealityEngine.Player
             if (compass == null)
                 compass = go.AddComponent<LoadCompassGadget>();
             compass.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnCrankGenerator(Vector3 worldPos)
+        {
+            // PHYSICS hand crank: rotating MagneticDipole armature induces EMF in nearby InductionCoil.
+            var go = SpawnPrimitiveProxy("CrankGenerator", worldPos, new Color(0.12f, 0.55f, 0.58f));
+            go.name = LoadCrankGeneratorGadget.RootName;
+            go.transform.localScale = new Vector3(0.16f, 0.08f, 0.16f);
+            var crank = go.GetComponent<LoadCrankGeneratorGadget>();
+            if (crank == null)
+                crank = go.AddComponent<LoadCrankGeneratorGadget>();
+            crank.EnsureBuilt();
             return go;
         }
         static GameObject SpawnPrimitiveProxy(string name, Vector3 worldPos, Color color)

@@ -415,6 +415,12 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles ALL / NEAREST / LAB (default ALL = dipoles + Earth; LAB = dipoles only). Honesty: classical MagneticDipole B + ambient Earth field - NOT a fluxgate, not a gyroscope.
 5. Ctrl+P test: WASD near magnet; M/Tab toolbelt -> MEASURE -> Compass; watch |Bh| / heading readout.
 
+### Hand Crank Generator (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Crank Generator** (or spawn key `crank` / `generator` / `dynamo`).
+2. Place near Induction Lab coil; grab; **hold activate / LMB** to crank (release coasts). **N/P** or scroll cycles SLOW / MED / FAST / TURBO RPM.
+3. Watch coil EMF / Flux Meter / Galvanometer as the rotating MagneticDipole sweeps flux (Faraday). Honesty: rotating dipole near coil - NOT a commutated dynamo / brushes / commercial alternator.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
+
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
