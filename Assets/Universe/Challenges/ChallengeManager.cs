@@ -326,15 +326,16 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_power",
                     title = "Sun Power",
-                    description = "Use a solar panel to power a bulb or motor. Angle the panel toward the sun for maximum wattage.",
-                    mentorHint = "Solar panels convert light to electricity. The closer the panel faces the sun, the more voltage and current it produces.",
+                    description = "Grab a Solar from Dispenser11, wire it to a bulb or motor (no battery). Rotate the panel toward the MiniatureSun until wattage rises and the load runs.",
+                    mentorHint = "Desktop: hold Solar + LMB/scroll to rotate. VR: pinch the panel. Face the sun (live W meter); close a Solar+Wire+Bulb/Motor loop - battery not required.",
                     prerequisiteId = "double_trouble",
                     objectives = new[]
                     {
                         new ChallengeObjective
                         {
                             type = ObjectiveType.SolarPoweringLoad,
-                            displayText = "Power a load using a solar panel"
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
                         }
                     },
                     starThresholds = new StarThresholds
@@ -578,7 +579,7 @@ namespace RealityEngine.Challenges
                     return CountActiveBulbs() >= obj.targetCount;
 
                 case ObjectiveType.SolarPoweringLoad:
-                    return IsSolarPoweringLoad();
+                    return IsSolarPoweringLoad(obj.targetValue > 0f ? obj.targetValue : 0.05f);
 
                 case ObjectiveType.InducedEmfThreshold:
                     return GetInducedEmf() >= obj.targetValue;
@@ -637,15 +638,53 @@ namespace RealityEngine.Challenges
             return maxRpm;
         }
 
-        bool IsSolarPoweringLoad()
+        float GetMaxSolarWattage()
+        {
+            if (_solars == null)
+                return 0f;
+            float maxW = 0f;
+            for (int i = 0; i < _solars.Length; i++)
+            {
+                Solar solar = _solars[i];
+                if (solar == null || !solar.IsPlaced || !solar.IsClone)
+                    continue;
+                if (solar.SolarWattage > maxW)
+                    maxW = solar.SolarWattage;
+            }
+            return maxW;
+        }
+
+        bool HasActiveLoad()
+        {
+            if (CountActiveBulbs() >= 1)
+                return true;
+            if (_motors == null)
+                return false;
+            for (int i = 0; i < _motors.Length; i++)
+            {
+                Motor motor = _motors[i];
+                if (motor == null || !motor.IsPlaced || !motor.IsClone)
+                    continue;
+                if (CircuitReader.GetIsActive(motor) && CircuitReader.IsCurrentSignificant(motor))
+                    return true;
+            }
+            return false;
+        }
+
+        bool IsSolarPoweringLoad(float minWattage = 0.05f)
         {
             if (_solars == null)
                 return false;
+            if (GetMaxSolarWattage() < minWattage)
+                return false;
+
             bool solarActive = false;
             for (int i = 0; i < _solars.Length; i++)
             {
                 Solar solar = _solars[i];
                 if (solar == null || !solar.IsPlaced || !solar.IsClone)
+                    continue;
+                if (solar.SolarWattage < minWattage)
                     continue;
                 if (CircuitReader.GetIsActive(solar) && CircuitReader.IsCurrentSignificant(solar))
                 {
@@ -656,21 +695,7 @@ namespace RealityEngine.Challenges
             if (!solarActive)
                 return false;
 
-            // Check that a load (bulb or motor) is also active
-            if (CountActiveBulbs() >= 1)
-                return true;
-            if (_motors != null)
-            {
-                for (int i = 0; i < _motors.Length; i++)
-                {
-                    Motor motor = _motors[i];
-                    if (motor == null || !motor.IsPlaced || !motor.IsClone)
-                        continue;
-                    if (CircuitReader.GetIsActive(motor) && CircuitReader.IsCurrentSignificant(motor))
-                        return true;
-                }
-            }
-            return false;
+            return HasActiveLoad();
         }
 
         float GetInducedEmf()
@@ -717,7 +742,12 @@ namespace RealityEngine.Challenges
                     return rpm.ToString("0") + "/" + obj.targetValue.ToString("0") + " RPM";
                 }
                 case ObjectiveType.SolarPoweringLoad:
-                    return IsSolarPoweringLoad() ? "load powered" : "awaiting solar+load";
+                {
+                    float w = GetMaxSolarWattage();
+                    float need = obj.targetValue > 0f ? obj.targetValue : 0.05f;
+                    string load = HasActiveLoad() ? "load=1" : "load=0";
+                    return w.ToString("0.00") + "/" + need.ToString("0.00") + " W " + load;
+                }
                 case ObjectiveType.InducedEmfThreshold:
                 {
                     float emf = GetInducedEmf();
