@@ -119,7 +119,7 @@ namespace RealityEngine.Player
             if (_rotor != null && _linked && Mathf.Abs(spin01) > 1e-5f)
             {
                 float deg = spin01 * ActiveGear * baseSpinDegPerSec * dt;
-                _rotor.Rotate(0f, 0f, deg, SpaceRelatives.Self);
+                _rotor.Rotate(0f, 0f, deg, Space.Self);
             }
 
             PollDesktopCycle();

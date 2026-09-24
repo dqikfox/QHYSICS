@@ -6,6 +6,7 @@ using RealityEngine.Biology;
 using RealityEngine.Physics.Thermo;
 using RealityEngine.Survey;
 using RealityEngine.Visualization;
+using RealityEngine.Challenges;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -169,6 +170,17 @@ namespace RealityEngine.AI
             else if (_coil != null)
             {
                 _state.totalResistanceOhms = _coil.Resistance + _coil.LoadResistance;
+            }
+
+            // Additive mentor hook: append challenge context to modelNotes so the AI
+            // scientist can give relevant hints when a challenge is active.
+            // Graceful no-op when ChallengeManager is absent or no challenge is active.
+            ChallengeManager cm = ChallengeManager.Instance;
+            if (cm != null && cm.IsChallengeActive)
+            {
+                string ctx = cm.ChallengeContext;
+                if (!string.IsNullOrEmpty(ctx))
+                    _state.modelNotes = _state.modelNotes + " | " + ctx;
             }
 
             return _state;

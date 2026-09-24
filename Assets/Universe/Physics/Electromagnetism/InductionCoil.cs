@@ -171,7 +171,7 @@ namespace RealityEngine.Physics.Electromagnetism
         /// </summary>
         public void BindAllSceneDipoles()
         {
-            MagneticDipole[] dips = Object.FindObjectsByType<MagneticDipole>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            MagneticDipole[] dips = UnityEngine.Object.FindObjectsByType<MagneticDipole>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             MagneticDipole primary = null;
             int extraCount = 0;
             for (int i = 0; i < dips.Length; i++)

@@ -36,6 +36,12 @@ public class CircuitLab : MonoBehaviour, ICircuitLab
     List<IDynamic> dynamicComponents = new List<IDynamic>();
     int numActiveCircuits = 0;
 
+    // Throttling for the SPICE solver. Direct calls from AddComponent/RemoveComponent
+    // still solve immediately; this only throttles the periodic dynamic-component solve.
+    public float solveRate = 30f;
+    float solveAccumulator;
+    bool simulateRequested;
+
     void Start()
     {
         // Record the initial height of the handle so we can move the whole board when the handle moves
@@ -57,8 +63,8 @@ public class CircuitLab : MonoBehaviour, ICircuitLab
         // This avoids a multi-second lag when connecting our first circuit on the breadboard.
         var ckt = new Circuit(
             new VoltageSource("V1", "in", "0", 1.0),
-            new Resistor("R1", "in", "out", 1.0e4),
-            new Resistor("R2", "out", "0", 2.0e4)
+            new SpiceSharp.Components.Resistor("R1", "in", "out", 1.0e4),
+            new SpiceSharp.Components.Resistor("R2", "out", "0", 2.0e4)
             );
         var dc = new OP("DC 1");
         dc.Run(ckt);
@@ -80,9 +86,27 @@ public class CircuitLab : MonoBehaviour, ICircuitLab
                     simulate = true;
             }
 
-            // If any of the dynamic components requested a new simulation, trigger it once
+            // If any of the dynamic components requested a new simulation, defer it to the
+            // throttled tick below instead of solving every frame.
             if (simulate)
-                SimulateCircuit();
+                simulateRequested = true;
+        }
+
+        // Throttle the SPICE solver to a fixed tick rate instead of solving every frame.
+        // Direct calls from AddComponent/RemoveComponent still solve immediately for responsiveness.
+        if (simulateRequested)
+        {
+            solveAccumulator += Time.deltaTime;
+            float interval = solveRate > 0f ? 1f / solveRate : 0f;
+            if (interval <= 0f || solveAccumulator >= interval)
+            {
+                solveAccumulator = 0f;
+                simulateRequested = false;
+
+                // Skip the solve entirely when there are no placed components on the board
+                if (board != null && board.Components.Count > 0)
+                    SimulateCircuit();
+            }
         }
     }
 
@@ -784,12 +808,12 @@ public class CircuitLab : MonoBehaviour, ICircuitLab
             // angle to the sun even though voltage may be the same.
             // Clamp to a small minimum: a dark panel reports 0 ohms, which fails
             // SpiceSharp validation and would otherwise be misreported as a short circuit.
-            entities.Add(new Resistor("R" + name, mid2, end, Mathf.Max(solar.SolarResistance, 0.001f)));
+            entities.Add(new SpiceSharp.Components.Resistor("R" + name, mid2, end, Mathf.Max(solar.SolarResistance, 0.001f)));
         }
         else if (component is IResistor resistor)
         {
             entities.Add(new VoltageSource("V" + name, mid, start, 0f));
-            entities.Add(new Resistor(name, mid, end, resistor.Resistance));
+            entities.Add(new SpiceSharp.Components.Resistor(name, mid, end, resistor.Resistance));
         }
         else if (component is IConductor)
         {
