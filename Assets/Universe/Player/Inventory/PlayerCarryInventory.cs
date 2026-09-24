@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.XR;
 
 namespace RealityEngine.Player
 {
@@ -19,6 +20,7 @@ namespace RealityEngine.Player
         int _selected;
         int _equippedSlot = -1;
         GameObject _equippedVisual;
+        bool _xrTrackedEquip;
 
         public int SlotCount => _slots.Length;
         public int SelectedIndex => _selected;
@@ -57,6 +59,20 @@ namespace RealityEngine.Player
         {
             if (_slots == null || _slots.Length == 0)
                 Resize(6);
+        }
+
+        void LateUpdate()
+        {
+            if (_equippedVisual == null || !_xrTrackedEquip)
+                return;
+            if (!DesktopPlayerController.IsXrDisplayRunning())
+                return;
+            if (!TryControllerPose(XRNode.RightHand, out Vector3 pos, out Quaternion rot)
+                && !TryControllerPose(XRNode.LeftHand, out pos, out rot))
+                return;
+            _equippedVisual.transform.SetPositionAndRotation(
+                pos + rot * new Vector3(0f, 0f, 0.12f),
+                rot * Quaternion.Euler(90f, 0f, 0f));
         }
 
         public void Resize(int slots)
@@ -153,7 +169,7 @@ namespace RealityEngine.Player
             if (!CarryItemCatalog.TryGet(id, out var def))
                 return false;
 
-            var vitals = PlayerVitality.Instance;
+            var vitals = global::RealityEngine.Player.PlayerVitality.Instance;
             if (def.IsConsumable)
             {
                 if (def.HealAmount > 0f && vitals != null)
@@ -196,6 +212,7 @@ namespace RealityEngine.Player
         public void ClearEquip()
         {
             _equippedSlot = -1;
+            _xrTrackedEquip = false;
             if (_equippedVisual != null)
             {
                 if (Application.isPlaying) Destroy(_equippedVisual);
@@ -210,15 +227,29 @@ namespace RealityEngine.Player
             {
                 if (Application.isPlaying) Destroy(_equippedVisual);
                 else DestroyImmediate(_equippedVisual);
+                _equippedVisual = null;
             }
-            Transform attach = QhysicsDesktopBootstrap.FindHandAttach();
-            if (attach == null)
-                return;
+
+            bool xr = DesktopPlayerController.IsXrDisplayRunning();
+            Transform attach = null;
+            if (!xr)
+                attach = QhysicsDesktopBootstrap.FindHandAttach();
+
             var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             go.name = "Equipped_Baton";
-            go.transform.SetParent(attach, false);
-            go.transform.localPosition = new Vector3(0f, 0f, 0.12f);
-            go.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            if (attach != null)
+            {
+                go.transform.SetParent(attach, false);
+                go.transform.localPosition = new Vector3(0f, 0f, 0.12f);
+                go.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                _xrTrackedEquip = false;
+            }
+            else
+            {
+                // XR: unparented; LateUpdate tracks controller pose.
+                go.transform.SetParent(null, true);
+                _xrTrackedEquip = true;
+            }
             go.transform.localScale = new Vector3(0.03f, 0.18f, 0.03f);
             var col = go.GetComponent<Collider>();
             if (col != null)
@@ -232,6 +263,20 @@ namespace RealityEngine.Player
             Destroy(tip.GetComponent<Collider>());
             Tint(tip, new Color(1f, 0.85f, 0.35f));
             _equippedVisual = go;
+        }
+
+        static bool TryControllerPose(XRNode node, out Vector3 pos, out Quaternion rot)
+        {
+            pos = Vector3.zero;
+            rot = Quaternion.identity;
+            InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+            if (!device.isValid)
+                return false;
+            if (!device.TryGetFeatureValue(CommonUsages.devicePosition, out pos))
+                return false;
+            if (!device.TryGetFeatureValue(CommonUsages.deviceRotation, out rot))
+                return false;
+            return true;
         }
 
         static Vector3 ResolveDropPose()

@@ -38,7 +38,7 @@ namespace RealityEngine.Player
         {
             if (Instance != null)
                 return Instance;
-            var found = Object.FindFirstObjectByType<TrainingCombatController>(FindObjectsInactive.Include);
+            var found = UnityEngine.Object.FindFirstObjectByType<TrainingCombatController>(FindObjectsInactive.Include);
             if (found != null)
             {
                 Instance = found;
@@ -96,7 +96,7 @@ namespace RealityEngine.Player
             if (_pauseCached == null && Time.unscaledTime >= _nextPauseScan)
             {
                 _nextPauseScan = Time.unscaledTime + 0.5f;
-                _pauseCached = Object.FindFirstObjectByType<QhysicsPausePanel>(FindObjectsInactive.Include);
+                _pauseCached = UnityEngine.Object.FindFirstObjectByType<QhysicsPausePanel>(FindObjectsInactive.Include);
             }
             return _pauseCached != null && _pauseCached.IsOpen;
         }
@@ -106,7 +106,7 @@ namespace RealityEngine.Player
             if (!TryResolveAim(out Vector3 origin, out Vector3 dir))
                 return;
 
-            int n = Physics.OverlapSphereNonAlloc(origin + dir * (range * 0.45f), radius + range * 0.25f, _hits,
+            int n = UnityEngine.Physics.OverlapSphereNonAlloc(origin + dir * (range * 0.45f), radius + range * 0.25f, _hits,
                 ~0, QueryTriggerInteraction.Ignore);
 
             float best = float.MaxValue;
@@ -178,12 +178,12 @@ namespace RealityEngine.Player
         {
             origin = Vector3.zero;
             dir = Vector3.forward;
-            InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+            UnityEngine.XR.InputDevice device = InputDevices.GetDeviceAtXRNode(node);
             if (!device.isValid)
                 return false;
-            if (!device.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 pos))
+            if (!device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.devicePosition, out Vector3 pos))
                 return false;
-            if (!device.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion rot))
+            if (!device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.deviceRotation, out Quaternion rot))
                 return false;
             origin = pos;
             dir = rot * Vector3.forward;
@@ -218,14 +218,14 @@ namespace RealityEngine.Player
         static bool WasXrTriggerPressed(XRNode node, ref bool prevDown)
         {
             bool down = false;
-            InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+            UnityEngine.XR.InputDevice device = InputDevices.GetDeviceAtXRNode(node);
             if (device.isValid)
             {
-                if (device.TryGetFeatureValue(CommonUsages.triggerButton, out bool btn) && btn)
+                if (device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.triggerButton, out bool btn) && btn)
                     down = true;
-                else if (device.TryGetFeatureValue(CommonUsages.trigger, out float axis) && axis > 0.72f)
+                else if (device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.trigger, out float axis) && axis > 0.72f)
                     down = true;
-                // Some OpenXR profiles expose activate as primaryButton on grip-side — keep soft.
+                // Some OpenXR profiles expose activate as primaryButton on grip-side â€” keep soft.
             }
             bool pressed = down && !prevDown;
             prevDown = down;

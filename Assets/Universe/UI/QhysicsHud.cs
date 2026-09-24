@@ -138,7 +138,7 @@ namespace RealityEngine.UI
                 return left ? _cachedLeftHand : _cachedRightHand;
             _nextHandScan = Time.unscaledTime + 1.5f;
             string token = left ? "left" : "right";
-            var all = Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude);
+            var all = UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude);
             Transform found = null;
             for (int i = 0; i < all.Length; i++)
             {
@@ -161,7 +161,7 @@ namespace RealityEngine.UI
         void RefreshLabels()
         {
             if (_runner == null)
-                _runner = Object.FindFirstObjectByType<ExperimentRunner>(FindObjectsInactive.Include);
+                _runner = UnityEngine.Object.FindFirstObjectByType<ExperimentRunner>(FindObjectsInactive.Include);
             string name = "Faraday Induction";
             bool running = Application.isPlaying && Time.timeScale > 0.01f;
             if (_runner != null && _runner.Definition != null)

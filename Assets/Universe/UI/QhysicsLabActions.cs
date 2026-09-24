@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using RealityEngine.Player;
 using RealityEngine.Physics.Electromagnetism;
 
@@ -35,7 +35,7 @@ namespace RealityEngine.UI
             var lab = UnityEngine.Object.FindAnyObjectByType<CircuitLab>(FindObjectsInactive.Include);
             if (lab == null)
             {
-                Debug.LogWarning("QHYSICS: CircuitLab not found — cannot reset table (spawned gadgets still cleared).");
+                Debug.LogWarning("QHYSICS: CircuitLab not found � cannot reset table (spawned gadgets still cleared).");
                 Time.timeScale = 1f;
                 return false;
             }
@@ -51,11 +51,11 @@ namespace RealityEngine.UI
         /// </summary>
         public static int ClearSpawnedExperimentProps()
         {
-            var desktop = Object.FindFirstObjectByType<DesktopInteractor>(FindObjectsInactive.Include);
+            var desktop = UnityEngine.Object.FindFirstObjectByType<DesktopInteractor>(FindObjectsInactive.Include);
             if (desktop != null)
                 desktop.ReleaseHeld();
 
-            var transforms = Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var transforms = UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             var doomed = new System.Collections.Generic.List<GameObject>(32);
             for (int i = 0; i < transforms.Length; i++)
             {
@@ -85,7 +85,7 @@ namespace RealityEngine.UI
                 GameObject go = doomed[i];
                 if (go == null)
                     continue;
-                Object.Destroy(go);
+                UnityEngine.Object.Destroy(go);
                 cleared++;
             }
 
@@ -97,7 +97,7 @@ namespace RealityEngine.UI
 
         static void ResetInductionEnergyStorage()
         {
-            var circuits = Object.FindObjectsByType<InductionCircuit>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var circuits = UnityEngine.Object.FindObjectsByType<InductionCircuit>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             int n = 0;
             for (int i = 0; i < circuits.Length; i++)
             {
@@ -138,7 +138,7 @@ namespace RealityEngine.UI
 
         static Light FindMainDirectional()
         {
-            var lights = Object.FindObjectsByType<Light>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var lights = UnityEngine.Object.FindObjectsByType<Light>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             Light best = null;
             for (int i = 0; i < lights.Length; i++)
             {

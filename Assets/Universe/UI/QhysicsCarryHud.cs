@@ -127,7 +127,7 @@ namespace RealityEngine.UI
                 var slot = QhysicsUiBuilder.Panel(strip.transform, "C" + i, QhysicsUiStyle.ChipBg, new Vector2(slotW, 62f));
                 slot.rectTransform.anchoredPosition = new Vector2(startX + i * (slotW + 6f), 0f);
                 _slotImages[i] = slot;
-                var lab = QhysicsUiBuilder.Label(slot.transform, "L", "—", QhysicsUiStyle.FontSmall,
+                var lab = QhysicsUiBuilder.Label(slot.transform, "L", "â€”", QhysicsUiStyle.FontSmall,
                     QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
                 lab.rectTransform.sizeDelta = new Vector2(74f, 50f);
                 lab.enableAutoSizing = true;
@@ -137,7 +137,7 @@ namespace RealityEngine.UI
             }
 
             _hint = QhysicsUiBuilder.Label(canvasGo.transform, "CarryHint",
-                "Carry [ ]  U use/equip  X drop  O operator  LMB / XR trigger baton",
+                "Carry [ ] / stick L-R  U/stick-click use  X/stick-down drop  O operator  LMB/trigger baton",
                 QhysicsUiStyle.FontSmall, QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
             _hint.rectTransform.anchorMin = new Vector2(0.5f, 0f);
             _hint.rectTransform.anchorMax = new Vector2(0.5f, 0f);
@@ -229,7 +229,7 @@ namespace RealityEngine.UI
                     _hint.rectTransform.anchorMin = _hint.rectTransform.anchorMax = new Vector2(0.5f, 0.08f);
                     _hint.rectTransform.pivot = new Vector2(0.5f, 0.5f);
                     _hint.rectTransform.anchoredPosition = Vector2.zero;
-                    _hint.text = "XR trigger = baton · Esc/P Operator Select · [ ] U X on companion keyboard";
+                    _hint.text = "XR trigger = baton Â· Esc/P Operator Select Â· [ ] U X on companion keyboard";
                 }
                 QhysicsUiBuilder.WireEventCamera(_canvas);
             }
@@ -254,7 +254,7 @@ namespace RealityEngine.UI
                     _hint.rectTransform.anchorMin = _hint.rectTransform.anchorMax = new Vector2(0.5f, 0f);
                     _hint.rectTransform.pivot = new Vector2(0.5f, 0f);
                     _hint.rectTransform.anchoredPosition = new Vector2(0f, 222f);
-                    _hint.text = "Carry [ ]  U use/equip  X drop  O operator  LMB / XR trigger baton";
+                    _hint.text = "Carry [ ] / stick L-R  U/stick-click use  X/stick-down drop  O operator  LMB/trigger baton";
                 }
             }
         }
@@ -297,10 +297,10 @@ namespace RealityEngine.UI
         {
             if (_carry == null)
                 return;
-            var pause = Object.FindFirstObjectByType<QhysicsPausePanel>(FindObjectsInactive.Include);
+            var pause = UnityEngine.Object.FindFirstObjectByType<QhysicsPausePanel>(FindObjectsInactive.Include);
             if (pause != null && pause.IsOpen)
                 return;
-            var opPanel = Object.FindFirstObjectByType<QhysicsOperatorSelectPanel>(FindObjectsInactive.Include);
+            var opPanel = UnityEngine.Object.FindFirstObjectByType<QhysicsOperatorSelectPanel>(FindObjectsInactive.Include);
             if (opPanel != null && opPanel.IsOpen)
                 return;
 
@@ -338,7 +338,7 @@ namespace RealityEngine.UI
             {
                 _op = PlayerOperatorController.Instance;
                 string name = _op != null ? _op.Current.DisplayName : "Operator";
-                _opLabel.text = "TRAINING SYSTEM · " + name;
+                _opLabel.text = "TRAINING SYSTEM Â· " + name;
             }
         }
 
@@ -363,7 +363,7 @@ namespace RealityEngine.UI
                     : (selected ? QhysicsUiStyle.ChipBgActive : QhysicsUiStyle.ChipBg);
                 if (_slotLabels[i] != null)
                 {
-                    _slotLabels[i].text = id == CarryItemId.None ? "—" : Short(CarryItemCatalog.LabelOf(id));
+                    _slotLabels[i].text = id == CarryItemId.None ? "â€”" : Short(CarryItemCatalog.LabelOf(id));
                     _slotLabels[i].color = id == CarryItemId.None ? QhysicsUiStyle.TextMuted
                         : (selected ? QhysicsUiStyle.AccentInfo : QhysicsUiStyle.TextPrimary);
                 }
@@ -373,10 +373,10 @@ namespace RealityEngine.UI
         static string Short(string s)
         {
             if (string.IsNullOrEmpty(s))
-                return "—";
+                return "â€”";
             if (s.Length <= 10)
                 return s;
-            return s.Substring(0, 9) + "…";
+            return s.Substring(0, 9) + "â€¦";
         }
 
         static bool WasPrev()

@@ -130,7 +130,7 @@ namespace RealityEngine.UI
             else if (Time.timeScale < 0.01f)
             {
                 // Don't unpause if pause panel still open
-                var pause = Object.FindFirstObjectByType<QhysicsPausePanel>(FindObjectsInactive.Include);
+                var pause = UnityEngine.Object.FindFirstObjectByType<QhysicsPausePanel>(FindObjectsInactive.Include);
                 if (pause == null || !pause.IsOpen)
                     Time.timeScale = 1f;
             }

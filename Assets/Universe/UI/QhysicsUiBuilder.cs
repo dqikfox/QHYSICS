@@ -40,7 +40,7 @@ namespace RealityEngine.UI
             Camera main = Camera.main;
             if (main != null)
                 return main;
-            var cams = Object.FindObjectsByType<Camera>(FindObjectsInactive.Exclude);
+            var cams = UnityEngine.Object.FindObjectsByType<Camera>(FindObjectsInactive.Exclude);
             for (int i = 0; i < cams.Length; i++)
             {
                 if (cams[i] != null && cams[i].CompareTag("MainCamera"))
@@ -73,7 +73,7 @@ namespace RealityEngine.UI
 
         public static void EnsureXrUiInputModule()
         {
-            EventSystem es = Object.FindAnyObjectByType<EventSystem>();
+            EventSystem es = UnityEngine.Object.FindAnyObjectByType<EventSystem>();
             if (es == null)
             {
                 var go = new GameObject("EventSystem");
@@ -84,8 +84,8 @@ namespace RealityEngine.UI
                 var legacy = es.GetComponent<StandaloneInputModule>();
                 if (legacy != null)
                 {
-                    if (Application.isPlaying) Object.Destroy(legacy);
-                    else Object.DestroyImmediate(legacy);
+                    if (Application.isPlaying) UnityEngine.Object.Destroy(legacy);
+                    else UnityEngine.Object.DestroyImmediate(legacy);
                 }
                 es.gameObject.AddComponent<XRUIInputModule>();
             }

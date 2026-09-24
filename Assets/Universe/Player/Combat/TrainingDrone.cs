@@ -87,11 +87,11 @@ namespace RealityEngine.Player
             go.name = "TrainingPulse";
             go.transform.position = transform.position + transform.forward * 0.4f;
             go.transform.localScale = Vector3.one * 0.12f;
-            Object.Destroy(go.GetComponent<Collider>());
+            UnityEngine.Object.Destroy(go.GetComponent<Collider>());
             Tint(go, new Color(1f, 0.45f, 0.25f));
             var pulse = go.AddComponent<TrainingSoftProjectile>();
             pulse.Init(target, softDamage, 6.5f);
-            Object.Destroy(go, 4f);
+            UnityEngine.Object.Destroy(go, 4f);
         }
 
         public void ApplyDamage(float amount, Vector3 hitPoint, Vector3 hitNormal)
@@ -151,7 +151,7 @@ namespace RealityEngine.Player
             tmp.color = new Color(1f, 0.85f, 0.3f);
             tmp.alignment = TextAlignmentOptions.Center;
             go.AddComponent<TrainingHitChip>();
-            Object.Destroy(go, 1.05f);
+            UnityEngine.Object.Destroy(go, 1.05f);
         }
 
         void EnsureLabels()
@@ -197,7 +197,7 @@ namespace RealityEngine.Player
             eye.transform.SetParent(body.transform, false);
             eye.transform.localPosition = new Vector3(0f, 0.1f, 0.4f);
             eye.transform.localScale = Vector3.one * 0.35f;
-            Object.Destroy(eye.GetComponent<Collider>());
+            UnityEngine.Object.Destroy(eye.GetComponent<Collider>());
             Tint(eye, new Color(0f, 0.9f, 1f));
 
             var rb = root.AddComponent<Rigidbody>();

@@ -5,8 +5,8 @@ using RealityEngine.XR;
 namespace RealityEngine.Player
 {
     /// <summary>
-    /// Runtime Ensure for operator / carry inventory / training combat / XR grip pickup / plaza pickups + drones.
-    /// Composes on existing desktop + UI bootstrap — no Faraday scene rewrite.
+    /// Runtime Ensure for operator / carry inventory / training combat / XR grip pickup / XR pouch stick / plaza pickups + drones.
+    /// Composes on existing desktop + UI bootstrap â€” no Faraday scene rewrite.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(136)]
@@ -26,7 +26,7 @@ namespace RealityEngine.Player
         public static QhysicsPlayerSystemsBootstrap Ensure()
         {
             QhysicsPlayerSystemsBootstrap existing =
-                Object.FindFirstObjectByType<QhysicsPlayerSystemsBootstrap>(FindObjectsInactive.Include);
+                UnityEngine.Object.FindFirstObjectByType<QhysicsPlayerSystemsBootstrap>(FindObjectsInactive.Include);
             if (existing == null)
             {
                 GameObject host = GameObject.Find(RootName);
@@ -48,6 +48,7 @@ namespace RealityEngine.Player
             PlayerOperatorController.Ensure(transform);
             TrainingCombatController.Ensure(transform);
             XrWorldInteractController.Ensure(transform);
+            XrCarryPouchController.Ensure(transform);
 
             // UI pieces (parent under QhysicsUI if present)
             Transform uiRoot = null;
@@ -96,7 +97,7 @@ namespace RealityEngine.Player
 
         static Transform FindNamedContains(string token)
         {
-            var all = Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var all = UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             string t = token.ToLowerInvariant();
             for (int i = 0; i < all.Length; i++)
             {

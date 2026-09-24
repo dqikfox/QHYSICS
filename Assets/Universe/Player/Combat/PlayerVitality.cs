@@ -37,7 +37,7 @@ namespace RealityEngine.Player
         {
             if (Instance != null)
                 return Instance;
-            var found = Object.FindFirstObjectByType<PlayerVitality>(FindObjectsInactive.Include);
+            var found = UnityEngine.Object.FindFirstObjectByType<PlayerVitality>(FindObjectsInactive.Include);
             if (found != null)
             {
                 Instance = found;
