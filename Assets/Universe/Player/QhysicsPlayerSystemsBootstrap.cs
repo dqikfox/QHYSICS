@@ -5,7 +5,7 @@ using RealityEngine.XR;
 namespace RealityEngine.Player
 {
     /// <summary>
-    /// Runtime Ensure for operator / carry inventory / training combat / plaza pickups + drones.
+    /// Runtime Ensure for operator / carry inventory / training combat / XR grip pickup / plaza pickups + drones.
     /// Composes on existing desktop + UI bootstrap — no Faraday scene rewrite.
     /// </summary>
     [DisallowMultipleComponent]
@@ -47,6 +47,7 @@ namespace RealityEngine.Player
             PlayerVitality.Ensure(transform);
             PlayerOperatorController.Ensure(transform);
             TrainingCombatController.Ensure(transform);
+            XrWorldInteractController.Ensure(transform);
 
             // UI pieces (parent under QhysicsUI if present)
             Transform uiRoot = null;

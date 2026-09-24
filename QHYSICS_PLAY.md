@@ -56,7 +56,7 @@ Runtime auto-ensures via `QhysicsPlayerSystemsBootstrap` (also from `QhysicsUiBo
 
 ### Carry inventory (alongside BUILD hotbar 1–9)
 
-World pickups implement `IQhysicsInteractable` → **E** / LMB interact adds to carry slots (hip-pouch story; BUILD hotbar unchanged).
+World pickups implement `IQhysicsInteractable` → **E** / LMB interact adds to carry slots (hip-pouch story; BUILD hotbar unchanged). **XR:** grip near plaza kits picks up into carry (trigger still baton swing).
 
 | Key | Action |
 |-----|--------|
@@ -103,7 +103,7 @@ Under runtime root `QhysicsTrainingWorld` (relative to XR Origin / LabPlaza):
 
 1. Link connected → Faraday → Ctrl+P → Enter Sandbox.
 2. **O** or Pause → Operator Select (world panel, laser/ray clickable) → pick Survey Ranger.
-3. Look at plaza pickups → grab / interact into carry (or companion **E**).
+3. Point controller at plaza pickups → **grip** to bag (companion **E** still works).
 4. Equip baton (**U** or use slot) → aim at Training Drone → **trigger** to swing.
 5. Take a drone pulse → TRAINING SYSTEM HP chip flashes → use ampoule.
 6. Confirm Carry HUD floats in world-space (not missing in HMD).
