@@ -6,6 +6,8 @@ namespace RealityEngine.Player
     /// <summary>
     /// Floating plaza training drone — soft HP, optional soft projectile, hit flash + chip.
     /// Labelled as Training System (not fantasy combat).
+    /// Soft-disable on defeat keeps this behaviour active so timed respawn works
+    /// (Unity Invoke does not fire on inactive GameObjects).
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class TrainingDrone : MonoBehaviour, IDamageable
@@ -17,18 +19,23 @@ namespace RealityEngine.Player
         [SerializeField] float softDamage = 8f;
         [SerializeField] float fireInterval = 2.4f;
         [SerializeField] bool canFire = true;
+        [SerializeField] float respawnDelay = 6f;
 
         Vector3 _home;
         float _phase;
         float _nextFire;
         float _flashUntil;
+        float _respawnAt = -1f;
+        bool _softDisabled;
         Renderer _bodyRenderer;
+        Collider[] _colliders;
+        Renderer[] _renderers;
         MaterialPropertyBlock _mpb;
         TextMeshPro _label;
         TextMeshPro _hpChip;
         Color _baseColor = new Color(0.85f, 0.35f, 0.25f);
 
-        public bool IsAlive => hp > 0.01f && isActiveAndEnabled;
+        public bool IsAlive => !_softDisabled && hp > 0.01f && isActiveAndEnabled;
 
         void Awake()
         {
@@ -36,11 +43,27 @@ namespace RealityEngine.Player
             _phase = Random.Range(0f, Mathf.PI * 2f);
             _mpb = new MaterialPropertyBlock();
             _bodyRenderer = GetComponentInChildren<Renderer>();
+            CacheParts();
             EnsureLabels();
+        }
+
+        void CacheParts()
+        {
+            _colliders = GetComponentsInChildren<Collider>(true);
+            _renderers = GetComponentsInChildren<Renderer>(true);
         }
 
         void Update()
         {
+            if (_softDisabled)
+            {
+                if (_respawnAt > 0f && Time.time >= _respawnAt)
+                    Respawn();
+                else
+                    RefreshDownHud();
+                return;
+            }
+
             if (!IsAlive)
                 return;
 
@@ -73,6 +96,17 @@ namespace RealityEngine.Player
 
             if (_hpChip != null)
                 _hpChip.text = Mathf.CeilToInt(hp) + "/" + Mathf.CeilToInt(maxHp);
+            if (_label != null)
+                _label.text = "TRAINING DRONE";
+        }
+
+        void RefreshDownHud()
+        {
+            float left = _respawnAt > 0f ? Mathf.Max(0f, _respawnAt - Time.time) : 0f;
+            if (_label != null)
+                _label.text = "TRAINING DRONE - DOWN";
+            if (_hpChip != null)
+                _hpChip.text = "RESPAWN " + left.ToString("0.0") + "s";
         }
 
         void TryFireSoft(Transform target)
@@ -103,22 +137,81 @@ namespace RealityEngine.Player
             ApplyFlash(true);
             SpawnHitChip(hitPoint, amount);
             if (hp <= 0.01f)
-                OnDisabled();
+                EnterSoftDisable();
         }
 
-        void OnDisabled()
+        void EnterSoftDisable()
         {
-            // Soft disable — respawn after delay (training lane).
-            gameObject.SetActive(false);
-            Invoke(nameof(Respawn), 6f);
+            // Keep GameObject active so Update can count down — Invoke dies on inactive GOs.
+            _softDisabled = true;
+            _respawnAt = Time.time + Mathf.Max(1f, respawnDelay);
+            ApplyFlash(false);
+            SetPartsEnabled(false);
+            RefreshDownHud();
+            Debug.Log("Training System: drone down — respawn in " + respawnDelay.ToString("0.0") + "s");
         }
 
         void Respawn()
         {
             hp = maxHp;
             transform.position = _home;
-            gameObject.SetActive(true);
+            _softDisabled = false;
+            _respawnAt = -1f;
+            _nextFire = Time.time + fireInterval * 0.5f;
+            SetPartsEnabled(true);
             ApplyFlash(false);
+            if (_label != null)
+                _label.text = "TRAINING DRONE";
+            if (_hpChip != null)
+                _hpChip.text = Mathf.CeilToInt(hp) + "/" + Mathf.CeilToInt(maxHp);
+        }
+
+        void SetPartsEnabled(bool on)
+        {
+            if (_colliders == null || _renderers == null)
+                CacheParts();
+            if (_colliders != null)
+            {
+                for (int i = 0; i < _colliders.Length; i++)
+                {
+                    if (_colliders[i] != null)
+                        _colliders[i].enabled = on;
+                }
+            }
+            if (_renderers != null)
+            {
+                for (int i = 0; i < _renderers.Length; i++)
+                {
+                    if (_renderers[i] == null)
+                        continue;
+                    // Dim rather than fully hide so the lane still reads as "down"
+                    if (_renderers[i] == _bodyRenderer || _renderers[i].name == "Body")
+                        ApplyRendererTint(_renderers[i], on ? _baseColor : new Color(0.28f, 0.18f, 0.16f));
+                    else if (_renderers[i].name == "Eye")
+                        ApplyRendererTint(_renderers[i], on ? new Color(0f, 0.9f, 1f) : new Color(0.2f, 0.25f, 0.3f));
+                    else
+                        _renderers[i].enabled = on || _renderers[i].GetComponent<TextMeshPro>() != null;
+                }
+            }
+            // Keep TMP chips visible during down state
+            if (_label != null) _label.enabled = true;
+            if (_hpChip != null) _hpChip.enabled = true;
+        }
+
+        static void ApplyRendererTint(Renderer r, Color c)
+        {
+            if (r == null) return;
+            r.enabled = true;
+            var sh = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+            var mat = new Material(sh);
+            if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", c);
+            mat.color = c;
+            if (mat.HasProperty("_EmissionColor"))
+            {
+                mat.EnableKeyword("_EMISSION");
+                mat.SetColor("_EmissionColor", c * (c.a > 0.8f ? 0.4f : 0.05f));
+            }
+            r.sharedMaterial = mat;
         }
 
         void ApplyFlash(bool on)
@@ -207,6 +300,7 @@ namespace RealityEngine.Player
             var drone = root.AddComponent<TrainingDrone>();
             drone._home = pos;
             drone._bodyRenderer = body.GetComponent<Renderer>();
+            drone.CacheParts();
             return drone;
         }
 
@@ -291,3 +385,4 @@ namespace RealityEngine.Player
         }
     }
 }
+
