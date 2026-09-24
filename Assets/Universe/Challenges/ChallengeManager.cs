@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // Ã¢â€â‚¬Ã¢â€â‚¬ Campaign Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         /// <summary>
-        /// Build the starter campaign of 34 challenges with real, detectable conditions.
+        /// Build the starter campaign of 35 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -1358,6 +1358,49 @@ namespace RealityEngine.Challenges
                         twoStarTimeSeconds = 260f,
                         threeStarTimeSeconds = 130f,
                         threeStarMaxComponents = 40
+                    }
+                },
+                // 35. Sun Faraday Deca - solar load + Faraday peak EMF + ten bulbs lit
+                // NOTE: Solar+EMF+MultipleBulbsLit(9) is sun_faraday_nona ch34; Solar+EMF+MultipleBulbsLit(8) is sun_faraday_oct ch33;
+                // Solar+EMF+MultipleBulbsLit(7) is sun_faraday_hept ch32; Solar+EMF+MultipleBulbsLit(6) is sun_faraday_hex ch31;
+                // Solar+EMF+MultipleBulbsLit(5) is sun_faraday_penta ch30; Solar+EMF+MultipleBulbsLit(4) is sun_faraday_quad ch29;
+                // Solar+EMF+MultipleBulbsLit(3) is sun_faraday_trio ch27; Solar+EMF+MultipleBulbsLit(2) is sun_faraday_twin ch26;
+                // Solar+EMF+MotorRpm is sun_faraday_spin ch28; Solar+EMF+SwitchMotor is sun_induction ch22;
+                // Solar+EMF+SwitchBulb is sun_faraday_gate ch25; Solar+EMF+Resistor is sun_faraday_drive ch24;
+                // Solar+EMF+CircuitPower is sun_faraday_lab ch23.
+                new ChallengeDefinition
+                {
+                    id = "sun_faraday_deca",
+                    title = "Sun Faraday Deca",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light ten bulbs at once from the panel alone - no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), ten Bulbs, Wire(s). No battery. Face MiniatureSun; parallel keeps all ten bright; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + N/10 lit. RESET retries cleanly.",
+                    prerequisiteId = "sun_faraday_nona",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.InducedEmfThreshold,
+                            displayText = "Peak |EMF| >= 0.05 V through the coil",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MultipleBulbsLit,
+                            displayText = "Light up 10 bulbs from the solar panel simultaneously",
+                            targetCount = 10
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 280f,
+                        threeStarTimeSeconds = 140f,
+                        threeStarMaxComponents = 44
                     }
                 }
 
