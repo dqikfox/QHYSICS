@@ -56,9 +56,9 @@ namespace RealityEngine.UI
                 else DestroyImmediate(c.gameObject);
             }
 
-            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(720f, 520f));
+            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(720f, 620f));
             QhysicsUiBuilder.WireEventCamera(_canvas);
-            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(680f, 480f));
+            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(680f, 580f));
             QhysicsUiBuilder.LayoutVertical(face.rectTransform, 18f);
 
             var title = QhysicsUiBuilder.Label(face.transform, "Title", "PAUSED", QhysicsUiStyle.FontTitle,
@@ -68,6 +68,7 @@ namespace RealityEngine.UI
             QhysicsUiBuilder.ChipButton(face.transform, "Resume", "Resume", new Vector2(520f, 96f), Resume);
             QhysicsUiBuilder.ChipButton(face.transform, "NewExperiment", "Reset Experiment", new Vector2(520f, 96f), NewExperiment);
             QhysicsUiBuilder.ChipButton(face.transform, "Settings", "Settings", new Vector2(520f, 96f), OpenSettings);
+            QhysicsUiBuilder.ChipButton(face.transform, "OperatorSelect", "Operator Select", new Vector2(520f, 96f), OpenOperatorSelect);
 
 #if UNITY_EDITOR
             QhysicsUiBuilder.ChipButton(face.transform, "ExitPlay", "Exit Play", new Vector2(520f, 96f), ExitPlay);
@@ -147,6 +148,18 @@ namespace RealityEngine.UI
             var settings = UnityEngine.Object.FindAnyObjectByType<QhysicsSettingsPanel>(FindObjectsInactive.Include);
             if (settings != null)
                 settings.SetOpen(true);
+        }
+
+
+        void OpenOperatorSelect()
+        {
+            Time.timeScale = 1f;
+            SetOpen(false);
+            var panel = Object.FindFirstObjectByType<QhysicsOperatorSelectPanel>(FindObjectsInactive.Include);
+            if (panel == null)
+                panel = QhysicsOperatorSelectPanel.Ensure(transform.parent != null ? transform.parent : null);
+            if (panel != null)
+                panel.SetOpen(true);
         }
 
 #if UNITY_EDITOR

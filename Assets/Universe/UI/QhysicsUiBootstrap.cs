@@ -41,6 +41,7 @@ namespace RealityEngine.UI
 
             existing.BuildChildren();
             QhysicsDesktopBootstrap.Ensure();
+            QhysicsPlayerSystemsBootstrap.Ensure();
             return existing;
         }
 
@@ -67,6 +68,8 @@ namespace RealityEngine.UI
             QhysicsSettingsPanel.Ensure(root);
             QhysicsOnboarding.Ensure(root);
             QhysicsMainMenu.Ensure(root);
+            QhysicsOperatorSelectPanel.Ensure(root);
+            QhysicsCarryHud.Ensure(root);
 
             var canvases = root.GetComponentsInChildren<Canvas>(true);
             for (int i = 0; i < canvases.Length; i++)
