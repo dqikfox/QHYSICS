@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 19 challenges with real, detectable conditions.
+        /// Build the starter campaign of 20 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -761,6 +761,42 @@ namespace RealityEngine.Challenges
                             type = ObjectiveType.MultipleBulbsLit,
                             displayText = "Light up 2 bulbs from the solar panel simultaneously",
                             targetCount = 2
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SwitchClosedMotorSpinning,
+                            displayText = "Close a switch and spin a motor to 120+ RPM from the solar panel",
+                            targetValue = 120f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 16
+                    }
+                },
+
+                // 20. Sun Throttle - solar + resistor (with lit bulb) + knife-switch gated motor (mirrors Throttle Up on renewable)
+                new ChallengeDefinition
+                {
+                    id = "sun_throttle",
+                    title = "Sun Throttle",
+                    description = "Throttle solar current with a resistor while keeping a bulb lit, and gate a motor to 120+ RPM with a knife switch — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Resistor (Resistor shelf), Switch (Dispenser3), Bulb, Motor (Dispenser2), Wire(s). No battery. Series resistor throttles current; face MiniatureSun; close switch so motor spins. Overlay shows solar W/load + R/lit + sw/RPM. RESET retries cleanly.",
+                    prerequisiteId = "sun_twin_lab",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.ResistorInCircuit,
+                            displayText = "Add a resistor while keeping a bulb lit from the solar panel"
                         },
                         new ChallengeObjective
                         {
