@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 15 challenges with real, detectable conditions.
+        /// Build the starter campaign of 16 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -627,6 +627,37 @@ namespace RealityEngine.Challenges
                         {
                             type = ObjectiveType.SwitchClosedBulbLit,
                             displayText = "Close a switch and light a bulb from the solar panel"
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 12
+                    }
+                },
+
+                // 16. Sun Switch Drive - solar + knife switch gates a spinning motor (renewable + control)
+                new ChallengeDefinition
+                {
+                    id = "sun_switch_drive",
+                    title = "Sun Switch Drive",
+                    description = "Gate solar power with a knife switch: face the sun, close the switch, and spin a motor to 120+ RPM from the panel alone — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), Motor (Dispenser2), Wire(s). No battery. Open switch first (no spin), face MiniatureSun, then close switch so motor spins. Overlay shows solar W/load + sw/RPM. RESET retries cleanly.",
+                    prerequisiteId = "sun_gate",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SwitchClosedMotorSpinning,
+                            displayText = "Close a switch and spin a motor to 120+ RPM from the solar panel",
+                            targetValue = 120f
                         }
                     },
                     starThresholds = new StarThresholds
