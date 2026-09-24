@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // Ã¢â€â‚¬Ã¢â€â‚¬ Campaign Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         /// <summary>
-        /// Build the starter campaign of 42 challenges with real, detectable conditions.
+        /// Build the starter campaign of 43 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -1686,6 +1686,47 @@ namespace RealityEngine.Challenges
                     {
                         twoStarTimeSeconds = 320f,
                         threeStarTimeSeconds = 160f,
+                        threeStarMaxComponents = 18
+                    }
+                },
+                // 43. Sun Faraday Magnetar - solar load + Faraday peak EMF + magnetar circuit power threshold (energy axis)
+                // NOTE: Solar+EMF+CircuitPower(16.0 W) is sun_faraday_pulsar ch42; Solar+EMF+CircuitPower(8.0 W) is sun_faraday_quasar ch41;
+                // Solar+EMF+CircuitPower(4.0 W) is sun_faraday_nova ch40; Solar+EMF+CircuitPower(2.0 W) is sun_faraday_apex ch39;
+                // Solar+EMF+CircuitPower(1.0 W) is sun_faraday_peak ch38; Solar+EMF+CircuitPower(0.5 W) is sun_faraday_surge ch37;
+                // Solar+EMF+CircuitPower(0.25 W) is sun_faraday_boost ch36; Solar+EMF+CircuitPower(0.05 W) is sun_faraday_lab ch23;
+                // Solar+EMF+MultipleBulbsLit(10) is sun_faraday_deca ch35; Solar+EMF+MotorRpm is sun_faraday_spin ch28.
+                new ChallengeDefinition
+                {
+                    id = "sun_faraday_magnetar",
+                    title = "Sun Faraday Magnetar",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and deliver >= 32.0 W load power P=|V|*|I| from the panel alone - no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Bulb and/or Motor (Dispenser2), Wire(s). No battery. Face MiniatureSun for strong alignment so load P hits 32.0 W; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + circuit W/lit. RESET retries cleanly.",
+                    prerequisiteId = "sun_faraday_pulsar",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.InducedEmfThreshold,
+                            displayText = "Peak |EMF| >= 0.05 V through the coil",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.CircuitPowerThreshold,
+                            displayText = "Deliver >= 32.0 W to a load (bulb or motor) from the solar panel",
+                            targetValue = 32.0f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 340f,
+                        threeStarTimeSeconds = 170f,
                         threeStarMaxComponents = 18
                     }
                 }
