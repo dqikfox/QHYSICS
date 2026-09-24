@@ -578,7 +578,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Sun Induction** (unlocked after Sun Power Lab). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and switch/RPM readout.
 2. Build a solar circuit from **Dispenser11** **Solar**, **Dispenser3** **Switch**, Bulb and/or **Dispenser2** **Motor**, plus **Wire(s)** (no battery). At the Induction Lab coil station, grab the bar magnet.
 3. Face **MiniatureSun** until solar powers a load, thrust the magnet through the coil until peak |EMF| >= 0.05 V, then **close** the knife switch so the motor spins to 120+ RPM.
-4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND switch closed with motor at 120+ RPM), objective completes -> stars. End of starter campaign (no further unlock yet).
+4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND switch closed with motor at 120+ RPM), objective completes -> stars + unlock **Sun Faraday Lab**. Completion banner shows Unlocked: Sun Faraday Lab.
+
+### Sun Faraday Lab (challenge 23)
+1. Press **C** -> Start **Sun Faraday Lab** (unlocked after Sun Induction). Overlay shows live [0.00/0.05 W load=0], peak EMF [pk 0.000/0.05 V live=0.000], and circuit power [0.00/0.05 W lit=0].
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **Bulb** and/or from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Lab: measurable load watts (P = |V| * |I|) + Induction Lab peak EMF.
+3. Snap Solar + wires + Bulb/Motor onto the breadboard. Face **MiniatureSun** until solar powers a load and circuit power hits >= 0.05 W. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
+4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND circuit load power >= 0.05 W), objective completes -> stars. End of starter campaign (campaign deepest / next unlock N/A).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only
