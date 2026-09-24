@@ -4,7 +4,7 @@ namespace RealityEngine.Player
 {
     /// <summary>
     /// Worn hip pouch under HipAnchor: belt + bag mesh, plus a tiny cube for the
-    /// currently selected QhysicsInventory slot (hidden on Empty/Delete).
+    /// currently selected carry item (plaza kit), falling back to BUILD hotbar slot.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(133)]
@@ -19,6 +19,8 @@ namespace RealityEngine.Player
         Renderer _iconRenderer;
         Material _iconMat;
         int _lastSlot = int.MinValue;
+        CarryItemId _lastCarry = (CarryItemId)(-1);
+        PlayerCarryInventory _carryHooked;
 
         /// <summary>Build or refresh pouch mesh under HipAnchor; returns the root component.</summary>
         public static InventoryHipPouch Ensure(Transform hipAnchor)
@@ -56,7 +58,34 @@ namespace RealityEngine.Player
         void Awake()
         {
             CacheIcon(transform);
+            HookCarry();
         }
+
+        void OnEnable() => HookCarry();
+
+        void OnDisable() => UnhookCarry();
+
+        void OnDestroy() => UnhookCarry();
+
+        void HookCarry()
+        {
+            var carry = PlayerCarryInventory.Instance;
+            if (carry == _carryHooked)
+                return;
+            UnhookCarry();
+            _carryHooked = carry;
+            if (_carryHooked != null)
+                _carryHooked.Changed += OnCarryChanged;
+        }
+
+        void UnhookCarry()
+        {
+            if (_carryHooked != null)
+                _carryHooked.Changed -= OnCarryChanged;
+            _carryHooked = null;
+        }
+
+        void OnCarryChanged() => ForceRefresh();
 
         void LateUpdate()
         {
@@ -69,7 +98,35 @@ namespace RealityEngine.Player
                 if (_icon != null && _icon.gameObject.activeSelf)
                     _icon.gameObject.SetActive(false);
                 _lastSlot = int.MinValue;
+                _lastCarry = (CarryItemId)(-1);
                 return;
+            }
+
+            HookCarry();
+            RefreshIfNeeded();
+        }
+
+        public void ForceRefresh()
+        {
+            _lastSlot = int.MinValue;
+            _lastCarry = (CarryItemId)(-1);
+            RefreshIfNeeded();
+        }
+
+        void RefreshIfNeeded()
+        {
+            // Prefer selected carry item (plaza kits / training gear).
+            var carry = PlayerCarryInventory.Instance;
+            if (carry != null)
+            {
+                CarryItemId cid = carry.GetSlot(carry.SelectedIndex);
+                if (cid != CarryItemId.None)
+                {
+                    if (cid == _lastCarry)
+                        return;
+                    ApplyCarry(cid);
+                    return;
+                }
             }
 
             int slot = 0;
@@ -79,17 +136,9 @@ namespace RealityEngine.Player
             else
                 slot = (int)QhysicsInventory.SlotId.Empty;
 
-            if (slot == _lastSlot)
+            if (slot == _lastSlot && _lastCarry == CarryItemId.None)
                 return;
-            ApplySlot(slot);
-        }
-
-        public void ForceRefresh()
-        {
-            _lastSlot = int.MinValue;
-            var inv = QhysicsInventory.Instance;
-            int slot = inv != null ? inv.SelectedIndex : (int)QhysicsInventory.SlotId.Empty;
-            ApplySlot(slot);
+            ApplyBuildSlot(slot);
         }
 
         void BuildMeshes(Transform root)
@@ -175,9 +224,33 @@ namespace RealityEngine.Player
                 _iconRenderer = _icon.GetComponent<Renderer>();
         }
 
-        void ApplySlot(int slotIndex)
+        void ApplyCarry(CarryItemId id)
+        {
+            _lastCarry = id;
+            _lastSlot = int.MinValue;
+            if (_icon == null)
+                CacheIcon(transform);
+            if (_icon == null)
+                return;
+
+            if (!_icon.gameObject.activeSelf)
+                _icon.gameObject.SetActive(true);
+
+            Color c = CarryItemCatalog.ColorOf(id);
+            EnsureIconMat();
+            if (_iconMat != null)
+            {
+                _iconMat.color = c;
+                if (_iconMat.HasProperty("_BaseColor"))
+                    _iconMat.SetColor("_BaseColor", c);
+            }
+            _icon.localScale = ScaleForCarry(id);
+        }
+
+        void ApplyBuildSlot(int slotIndex)
         {
             _lastSlot = slotIndex;
+            _lastCarry = CarryItemId.None;
             if (_icon == null)
                 CacheIcon(transform);
             if (_icon == null)
@@ -201,12 +274,7 @@ namespace RealityEngine.Player
 
             string label = QhysicsInventory.SlotLabels[slotIndex];
             Color c = ColorForLabel(label);
-            if (_iconMat == null && _iconRenderer != null)
-            {
-                var sh = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-                _iconMat = new Material(sh);
-                _iconRenderer.sharedMaterial = _iconMat;
-            }
+            EnsureIconMat();
             if (_iconMat != null)
             {
                 _iconMat.color = c;
@@ -216,6 +284,29 @@ namespace RealityEngine.Player
             // Slight shape cue per family so the pouch reads at a glance (label-based = slot-order safe).
             if (_icon != null)
                 _icon.localScale = ScaleForLabel(label);
+        }
+
+        void EnsureIconMat()
+        {
+            if (_iconMat == null && _iconRenderer != null)
+            {
+                var sh = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+                _iconMat = new Material(sh);
+                _iconRenderer.sharedMaterial = _iconMat;
+            }
+        }
+
+        static Vector3 ScaleForCarry(CarryItemId id)
+        {
+            switch (id)
+            {
+                case CarryItemId.TrainingBaton: return new Vector3(0.22f, 0.55f, 0.22f);
+                case CarryItemId.HealthAmpoule: return new Vector3(0.28f, 0.5f, 0.28f);
+                case CarryItemId.BatteryPack: return new Vector3(0.5f, 0.28f, 0.35f);
+                case CarryItemId.ProbeTip: return new Vector3(0.55f, 0.22f, 0.22f);
+                case CarryItemId.ShieldCell: return new Vector3(0.45f, 0.45f, 0.18f);
+                default: return new Vector3(0.45f, 0.45f, 0.2f);
+            }
         }
 
         static Vector3 ScaleForLabel(string label)

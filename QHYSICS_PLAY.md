@@ -1,18 +1,18 @@
-# QHYSICS — how to Play (Editor)
+﻿# QHYSICS â€” how to Play (Editor)
 
 ## UI map (lab shell)
 
 Runtime auto-ensures on Play via `QhysicsUiBootstrap` (no scene YAML rewrite required).
-Editor: **Reality Engine → Place QHYSICS UI** or **Reality Engine → QHYSICS → Ensure UI**.
+Editor: **Reality Engine â†’ Place QHYSICS UI** or **Reality Engine â†’ QHYSICS â†’ Ensure UI**.
 
 | Piece | What | Toggle / notes |
 |-------|------|----------------|
-| **Toolbelt** (primary) | Hip/chest world panel — BUILD / PHYSICS / MEASURE / WORLD / EXPERIMENTS | **M / Tab / Menu / B / Grip**. MEASURE pages with scroll or `< >`. |
+| **Toolbelt** (primary) | Hip/chest world panel â€” BUILD / PHYSICS / MEASURE / WORLD / EXPERIMENTS | **M / Tab / Menu / B / Grip**. MEASURE pages with scroll or `< >`. |
 | **Status HUD** | QHYSICS + experiment name + run dot | Follows non-dominant side / camera |
 | **Inspect** | Hover = summary; hold = detail (EMF/I/Phi, mass, etc.) | Ray / desktop hover / grab |
 | **Sim chip** | Pause / 0.25x / 1x / 2x + **New Run** (clears `Gadget_*`) | Expand chip near right forearm |
-| **Pause** | Resume / Reset Experiment / Settings / Exit Play (Editor) | **Esc / P** — lab pause, not arcade |
-| **Onboarding strip** | One line: BOOT → ENTER → INTERACT → EXPERIMENT | Dismiss **X** (PlayerPrefs) |
+| **Pause** | Resume / Reset Experiment / Settings / Exit Play (Editor) | **Esc / P** â€” lab pause, not arcade |
+| **Onboarding strip** | One line: BOOT â†’ ENTER â†’ INTERACT â†’ EXPERIMENT | Dismiss **X** (PlayerPrefs) |
 | **Main menu** | Enter Sandbox (first run) | Auto-hides after enter |
 
 Visual language: dark glass panels, cyan `#00E5FF` accents, TMP LiberationSans, URP-safe `UI/Default` (never Sprites/Default).
@@ -21,12 +21,12 @@ XR: EventSystem + `XRUIInputModule` + `TrackedDeviceGraphicRaycaster`; Event Cam
 ### Ctrl+P checklist
 
 1. Open `Assets/Scenes/Faraday.unity` (one Editor only).
-2. Optional: **Reality Engine → QHYSICS → Ensure UI** (or trust runtime bootstrap).
+2. Optional: **Reality Engine â†’ QHYSICS â†’ Ensure UI** (or trust runtime bootstrap).
 3. Optional: **Fix Player Spawn** / **Ensure Player Character**.
 4. **Ctrl+P**. Desktop WASD works without headset; Quest Link or XR Device Simulator for XR.
-5. Enter Sandbox if shown → dismiss onboarding strip → **O** operator (optional) → **M** toolbelt → hover a gadget for Inspect → Sim chip for speed → **Esc** pause (Operator Select available).
+5. Enter Sandbox if shown â†’ dismiss onboarding strip â†’ **O** operator (optional) â†’ **M** toolbelt â†’ hover a gadget for Inspect â†’ Sim chip for speed â†’ **Esc** pause (Operator Select available).
 6. Training: pick up plaza kits with **E**, equip baton with **U**, **LMB** training drones east of plaza.
-6. EXPERIMENTS → **New Run** clears spawned gadgets (Giza/lab content stays).
+6. EXPERIMENTS â†’ **New Run** clears spawned gadgets (Giza/lab content stays).
 
 ---
 
@@ -34,13 +34,13 @@ XR: EventSystem + `XRUIInputModule` + `TrackedDeviceGraphicRaycaster`; Event Cam
 
 - Project: `C:\Users\KING\projects\QHYSICS`
 - Branch: `reality-engine`
-- Unity: **6000.7.0a4** (one instance ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â never a second Editor on this project)
+- Unity: **6000.7.0a4** (one instance ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â never a second Editor on this project)
 
 
 
 ## Operator / Carry / Training System (player vertical slice)
 
-Runtime auto-ensures via `QhysicsPlayerSystemsBootstrap` (also from `QhysicsUiBootstrap` / menu **Reality Engine → QHYSICS → Ensure Player Systems**). Lab training flavour — not fantasy MMO combat.
+Runtime auto-ensures via `QhysicsPlayerSystemsBootstrap` (also from `QhysicsUiBootstrap` / menu **Reality Engine â†’ QHYSICS â†’ Ensure Player Systems**). Lab training flavour â€” not fantasy MMO combat.
 
 ### Operator select (3 archetypes)
 
@@ -50,19 +50,22 @@ Runtime auto-ensures via `QhysicsPlayerSystemsBootstrap` (also from `QhysicsUiBo
 | **Lab Engineer** | Extra batteries + shield cell | 3.2 | x1.85 | 110 | 8 |
 | **Survey Ranger** | Dual batons, mobility | 3.9 | x2.35 | 90 | 5 |
 
-- **O** — Operator Select panel (dark glass + cyan). Also **Esc/P → Operator Select**.
+- **O** â€” Operator Select panel (dark glass + cyan). Also **Esc/P â†’ Operator Select**.
 - Choice applies locomotion, max HP, carry slots, starting kit, body/arm tint.
 - Persisted in `PlayerPrefs` key `qhysics.operator.id`.
 
-### Carry inventory (alongside BUILD hotbar 1–9)
+### Carry inventory (alongside BUILD hotbar 1â€“9)
 
-World pickups implement `IQhysicsInteractable` → **E** / LMB interact adds to carry slots (hip-pouch story; BUILD hotbar unchanged). **XR:** grip near plaza kits picks up into carry (trigger still baton swing).
+World pickups implement `IQhysicsInteractable` â†’ **E** / LMB interact adds to carry slots (hip-pouch story; BUILD hotbar unchanged). **XR:** grip near plaza kits picks up into carry (trigger still baton swing).
 
 | Key | Action |
 |-----|--------|
 | **[** / **]** | Select carry slot |
 | **U** | Use consumable (ampoule / shield cell) or equip Training Baton |
 | **X** | Drop selected carry item into world |
+| **XR stick L/R** | Cycle carry slots |
+| **XR stick click** | Use / equip selected (same as **U**) |
+| **XR stick down** | Drop selected (same as **X**) |
 | **E** | Pick up highlighted world item (Health Ampoule, Battery Pack, Probe Tip, Training Baton, Shield Cell) |
 
 Carry strip HUD sits above the BUILD hotbar; vitals chip top-left labelled **TRAINING SYSTEM**.
@@ -74,38 +77,38 @@ Carry strip HUD sits above the BUILD hotbar; vitals chip top-left labelled **TRA
 - **XR (Quest Link):** controller **trigger** (activate) on either hand swings; aim uses that controller pose (falls back to HMD forward).
 - Drones float east of plaza, fire soft pulses; brighter hit flash + floating damage chips; player HP chip flashes red on hurt.
 - Operator HP regen after delay; ampoule heals; shield cell softens damage briefly.
-- HP → 0 respawns at plaza via `LabPlayerSpawn` (no softlock / no game-over).
+- HP â†’ 0 respawns at plaza via `LabPlayerSpawn` (no softlock / no game-over).
 
 ### XR UI (headset)
 
-- **Operator Select** — world-space panel (Esc/P → Operator Select, or **O** on companion keyboard). Event Camera = XR Main Camera (`WireEventCamera`).
-- **Carry / Training HUD** — promotes to world-space follow when an XR display is running (left of view); stays ScreenSpaceOverlay on desktop. Never hidden in headset.
+- **Operator Select** â€” world-space panel (Esc/P â†’ Operator Select, or **O** on companion keyboard). Event Camera = XR Main Camera (`WireEventCamera`).
+- **Carry / Training HUD** â€” promotes to world-space follow when an XR display is running (left of view); stays ScreenSpaceOverlay on desktop. Never hidden in headset.
 
 ### Spawn locations (Ctrl+P)
 
 Under runtime root `QhysicsTrainingWorld` (relative to XR Origin / LabPlaza):
 
-- Pickups ~1–2 m around plaza stand pose (ampoule, battery, probe tip, baton, shield cell).
-- Training drones ~3.5–4.2 m east of plaza at ~1.4–1.6 m height.
+- Pickups ~1â€“2 m around plaza stand pose (ampoule, battery, probe tip, baton, shield cell).
+- Training drones ~3.5â€“4.2 m east of plaza at ~1.4â€“1.6 m height.
 
 ### Ctrl+P quick check
 
-1. Faraday → Ctrl+P → Enter Sandbox.
-2. **O** → pick Survey Ranger (or Field Scientist) → Close.
-3. Walk to cyan-highlighted pickups near plaza → **E** to bag.
-4. **]** to baton → **U** equip → **LMB** hit a Training Drone.
-5. Take a pulse hit → HP chip updates → **U** ampoule to heal.
-6. **Esc → Operator Select** to switch archetype (kit refill).
+1. Faraday â†’ Ctrl+P â†’ Enter Sandbox.
+2. **O** â†’ pick Survey Ranger (or Field Scientist) â†’ Close.
+3. Walk to cyan-highlighted pickups near plaza â†’ **E** to bag.
+4. **]** to baton â†’ **U** equip â†’ **LMB** hit a Training Drone.
+5. Take a pulse hit â†’ HP chip updates â†’ **U** ampoule to heal.
+6. **Esc â†’ Operator Select** to switch archetype (kit refill).
 
 
 
 ### XR combat Ctrl+P check (Quest Link)
 
-1. Link connected → Faraday → Ctrl+P → Enter Sandbox.
-2. **O** or Pause → Operator Select (world panel, laser/ray clickable) → pick Survey Ranger.
-3. Point controller at plaza pickups → **grip** to bag (companion **E** still works).
-4. Equip baton (**U** or use slot) → aim at Training Drone → **trigger** to swing.
-5. Take a drone pulse → TRAINING SYSTEM HP chip flashes → use ampoule.
+1. Link connected â†’ Faraday â†’ Ctrl+P â†’ Enter Sandbox.
+2. **O** or Pause â†’ Operator Select (world panel, laser/ray clickable) â†’ pick Survey Ranger.
+3. Point controller at plaza pickups â†’ **grip** to bag (companion **E** still works).
+4. Stick L/R select baton slot + **stick-click** equip (or companion **U**) — aim at Training Drone — **trigger** to swing.
+5. Take a drone pulse — TRAINING SYSTEM HP chip flashes — stick-click ampoule (or **U**) to heal; stick-down drops selected.
 6. Confirm Carry HUD floats in world-space (not missing in HMD).
 
 ## Who is the player?
@@ -118,29 +121,29 @@ On **desktop** (Editor Ctrl+P, no Quest Link / no running XR display):
 - Hand proxies sit in front of the view; **E / LMB grab** attaches held props to the right-hand attach point.
 - Bottom **hotbar 1-9** is the desktop inventory (VR toolbelt still works via M / Tab).
 
-On **Quest Link**: desktop body hides; XR locomotion + Left/Right Hand Direct/Ray interactors take over. Light `XrControllerProxy` grips show on each controller (Hand Presence still used when OpenXR devices match). Grab attach is on each hand's `Attach` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â desktop HandAttach does not fight XR grabs. If the headset shows nothing, fix Link ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â you are not missing a character mesh.
+On **Quest Link**: desktop body hides; XR locomotion + Left/Right Hand Direct/Ray interactors take over. Light `XrControllerProxy` grips show on each controller (Hand Presence still used when OpenXR devices match). Grab attach is on each hand's `Attach` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â desktop HandAttach does not fight XR grabs. If the headset shows nothing, fix Link ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â you are not missing a character mesh.
 
 
-## Play steps ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Meta Quest Link (Quest 3S)
+## Play steps ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â Meta Quest Link (Quest 3S)
 
 1. On PC: install/open **Meta Quest Link** (Air Link or cable). Quest in Developer Mode, same account, PC allowed.
-2. Put on headset ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ enable **Link** / connect to this PC. Confirm Link status is Connected.
+2. Put on headset ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ enable **Link** / connect to this PC. Confirm Link status is Connected.
 3. In Unity (only one Editor): open `Assets/Scenes/Faraday.unity`.
-4. Optional once: **Reality Engine ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Fix Player Spawn** (or **Reset Player at Lab**) then **Ctrl+S** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â parks XR Origin on LabPlaza north of the circuit table facing Khufu, enables Main Camera, wires locomotion XR Origin.
+4. Optional once: **Reality Engine ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Fix Player Spawn** (or **Reset Player at Lab**) then **Ctrl+S** ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â parks XR Origin on LabPlaza north of the circuit table facing Khufu, enables Main Camera, wires locomotion XR Origin.
 5. Press **Ctrl+P** (Play). Game view mirrors the HMD via OpenXR + Link.
-6. First run: world **Main Menu ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Enter Sandbox** (or skip if already entered).
+6. First run: world **Main Menu ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Enter Sandbox** (or skip if already entered).
 7. Interact: teleport / smooth move on plaza, grab circuit parts, Toolbelt **M / Tab / Menu**, Pause **Esc / P**.
 
-If Play works in Editor Game view but the headset stays on the Quest home / black: Link is not active ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â fix Link first. Do not build APK for daily testing.
+If Play works in Editor Game view but the headset stays on the Quest home / black: Link is not active ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â fix Link first. Do not build APK for daily testing.
 
 
-## Play steps ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â XR Device Simulator (desktop, no headset)
+## Play steps ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â XR Device Simulator (desktop, no headset)
 
-1. Package Manager ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **XR Interaction Toolkit** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Samples ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ import **XR Device Simulator** (once).
-2. Project Settings ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **XR Plug-in Management** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **XR Interaction Toolkit** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ enable **Use XR Device Simulator in scenes** / auto-instantiate (or add the `XR Device Simulator` prefab to Faraday).
-   - Asset: `Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â set simulator prefab after sample import; `Automatically Instantiate Simulator Prefab` can be on for Editor-only.
-3. Open Faraday ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **Ctrl+P**. Use keyboard/mouse per simulator HUD (move/look/grip).
-4. Optional: **Reality Engine ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Fix Player Spawn** before Play if Origin pose looks wrong in Hierarchy.
+1. Package Manager ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ **XR Interaction Toolkit** ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Samples ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ import **XR Device Simulator** (once).
+2. Project Settings ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ **XR Plug-in Management** ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ **XR Interaction Toolkit** ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ enable **Use XR Device Simulator in scenes** / auto-instantiate (or add the `XR Device Simulator` prefab to Faraday).
+   - Asset: `Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset` ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â set simulator prefab after sample import; `Automatically Instantiate Simulator Prefab` can be on for Editor-only.
+3. Open Faraday ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ **Ctrl+P**. Use keyboard/mouse per simulator HUD (move/look/grip).
+4. Optional: **Reality Engine ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Fix Player Spawn** before Play if Origin pose looks wrong in Hierarchy.
 
 
 ## Play steps - Desktop keyboard (no headset, no Device Simulator)
@@ -185,7 +188,7 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 
 ### CIRCUIT Motor (toolbelt BUILD)
 1. Enter Sandbox / Induction.
-2. Toolbelt **BUILD Ã¢â€ â€™ Motor**; grab it.
+2. Toolbelt **BUILD ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Motor**; grab it.
 3. Hold near Coil; rotor spins from classical |I| (pair with Battery and/or Magnet sweep + Resistor).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles gear 0.5x / 1x / 2x / REV. Honesty: kinematic spin proxy, not torque/back-EMF.
 
@@ -193,37 +196,37 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Solar**; grab it.
 3. Hold near Coil; classical series EMF from irradiance preset (pair with Lamp/Motor/Resistor/Multimeter).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / Dawn / Noon / Bright (0 / 1.5 / 3 / 6 V). Honesty: lumped photocurrent/irradiance EMF proxy â€” NOT a real PV I-V curve, not quantum, not MPPT.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / Dawn / Noon / Bright (0 / 1.5 / 3 / 6 V). Honesty: lumped photocurrent/irradiance EMF proxy Ã¢â‚¬â€ NOT a real PV I-V curve, not quantum, not MPPT.
 
 ### CIRCUIT Capacitor (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Capacitor**; grab it.
 3. Hold near Coil; classical series C (pair with Battery + Resistor/Lamp; Multimeter I falls as Vc rises).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / 1mF / 10mF / 100mF. Honesty: lumped RC only â€” NOT dielectric physics, not ESR/ESL. **New Run** clears Vc.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / 1mF / 10mF / 100mF. Honesty: lumped RC only Ã¢â‚¬â€ NOT dielectric physics, not ESR/ESL. **New Run** clears Vc.
 
 ### CIRCUIT Inductor (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Inductor**; grab it.
 3. Hold near Coil; classical series L (pair with Battery + Resistor/Lamp; Multimeter I ramps; with Capacitor = RLC).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / 1mH / 10mH / 100mH. Honesty: lumped RL/RLC only â€” NOT core saturation, not skin effect, not mutual M. **New Run** clears I_L (and Vc).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / 1mH / 10mH / 100mH. Honesty: lumped RL/RLC only Ã¢â‚¬â€ NOT core saturation, not skin effect, not mutual M. **New Run** clears I_L (and Vc).
 
 ### CIRCUIT Diode (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Diode**; grab it.
 3. Hold near Coil; ideal series diode clamp (pair with Magnet sweep + Multimeter **I** / Lamp; I one-sided).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / FWD / REV. Honesty: ideal half-wave only â€” NOT Shockley equation, not recovery, not avalanche; inductive kick not snubbered.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / FWD / REV. Honesty: ideal half-wave only Ã¢â‚¬â€ NOT Shockley equation, not recovery, not avalanche; inductive kick not snubbered.
 
 ### CIRCUIT Fuse (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Fuse**; grab it.
 3. Hold near Coil; ideal |I| trip open (pair with Magnet sweep + Multimeter **I** / Lamp; hard sweep blows fuse and I collapses).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 5mA / 20mA / 50mA / BYPASS. While **BLOWN**, activate / **N** rearms. Honesty: ideal |I| threshold only â€” NOT I2t, not arc, not thermal model.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 5mA / 20mA / 50mA / BYPASS. While **BLOWN**, activate / **N** rearms. Honesty: ideal |I| threshold only Ã¢â‚¬â€ NOT I2t, not arc, not thermal model.
 
 ### CIRCUIT LED (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> LED**; grab it.
 3. Hold near Coil; ideal series diode + colored glow (pair with Magnet sweep or Battery + Resistor; Multimeter **I** one-sided on color presets).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles RED / GREEN / BLUE / SHORT. Honesty: ideal diode + emission proxy ï¿½ NOT bandgap photons, not real LED I-V, not thermal.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles RED / GREEN / BLUE / SHORT. Honesty: ideal diode + emission proxy Ã¯Â¿Â½ NOT bandgap photons, not real LED I-V, not thermal.
 
 ### CIRCUIT Speaker (toolbelt BUILD)
 1. Enter Sandbox / Induction.
@@ -235,7 +238,7 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Potentiometer**; grab it.
 3. Hold near Coil; applies classical series R_load via discrete wiper presets (pair with Battery + Lamp/Motor/Multimeter).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 1Î© / 5Î© / 10Î© / 25Î© / 100Î© / 1kÎ© (default 10Î©). Honesty: discrete lumped R_load wiper steps â€” NOT a real potentiometer, not 3-terminal divider, not taper curve. Overrides Resistor when both near; Switch OPEN still wins.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 1ÃŽÂ© / 5ÃŽÂ© / 10ÃŽÂ© / 25ÃŽÂ© / 100ÃŽÂ© / 1kÃŽÂ© (default 10ÃŽÂ©). Honesty: discrete lumped R_load wiper steps Ã¢â‚¬â€ NOT a real potentiometer, not 3-terminal divider, not taper curve. Overrides Resistor when both near; Switch OPEN still wins.
 
 ### CIRCUIT Transformer (toolbelt BUILD)
 1. Enter Sandbox / Induction.
@@ -255,7 +258,7 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Oscilloscope**; grab it.
 3. Hold near Coil; strip chart samples classical Emf / I / Phi (pair with Magnet sweep or Battery + Resistor; Multimeter for cross-check).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles EMF0.5 / EMF1 / EMF2 / I0.5 / I1 / I2 / Phi1 / Phi2 (default EMF1 = EMF 1s). Honesty: ideal rolling strip from classical InductionCircuit Emf/I/Phi samples â€” NOT real ADC, not triggered scope, not FFT, not probe capacitance.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles EMF0.5 / EMF1 / EMF2 / I0.5 / I1 / I2 / Phi1 / Phi2 (default EMF1 = EMF 1s). Honesty: ideal rolling strip from classical InductionCircuit Emf/I/Phi samples Ã¢â‚¬â€ NOT real ADC, not triggered scope, not FFT, not probe capacitance.
 
 
 
@@ -277,12 +280,12 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Flux Meter**; grab it.
 3. Hold near Coil; classical Phi (Wb), dPhi/dt (Wb/s), or peak |Phi| hold (pair with PHYSICS Magnet sweep; Oscilloscope Phi / Multimeter for cross-check).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles PHI / DPHI / PEAK / CLR (default PHI; CLR zeros peak then snaps to PHI). Honesty: ideal lumped fluxmeter from InductionCircuit - NOT real integrating fluxmeter, not search-coil ballistic galvo, not Hall BÂ·A, not hysteresis tracer.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles PHI / DPHI / PEAK / CLR (default PHI; CLR zeros peak then snaps to PHI). Honesty: ideal lumped fluxmeter from InductionCircuit - NOT real integrating fluxmeter, not search-coil ballistic galvo, not Hall BÃ‚Â·A, not hysteresis tracer.
 
 ### MEASURE Charge Meter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Charge Meter**; grab it.
-3. Hold near Coil; classical Q=âˆ«I dt (C), peak |Q|, or Iavg (=Q/t since CLR) (pair with BUILD Capacitor / Function Generator / Magnet; Multimeter I / Power Meter for cross-check).
+3. Hold near Coil; classical Q=Ã¢Ë†Â«I dt (C), peak |Q|, or Iavg (=Q/t since CLR) (pair with BUILD Capacitor / Function Generator / Magnet; Multimeter I / Power Meter for cross-check).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles Q / PEAK / AVG / CLR (default Q; CLR zeros Q/peak/timer then snaps to Q). Honesty: ideal coulomb integrator from InductionCircuit I - NOT real electrometer, not Faraday cup, not Keithley charge amp, not dielectric absorption.
 
 
@@ -353,7 +356,7 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 ### MEASURE Energy Meter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Energy Meter**; grab it.
-3. Hold near Coil; classical energy integrator E=∫P dt from LoadPowerWatts, plus live P and window AVG=E/t (pair with BUILD Function Generator / Battery; Power Meter / Decibel Meter for cross-check). Energy accumulates while linked and within tip range.
+3. Hold near Coil; classical energy integrator E=âˆ«P dt from LoadPowerWatts, plus live P and window AVG=E/t (pair with BUILD Function Generator / Battery; Power Meter / Decibel Meter for cross-check). Energy accumulates while linked and within tip range.
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles E / P / AVG / CLR (default E; CLR zeros the integrator and window, then snaps to E). Honesty: ideal time integral of lumped InductionCircuit LoadPowerWatts - NOT a real watt-hour meter, not calibrated energy logger, not four-quadrant / true-RMS joule hardware.
 
 ### MEASURE Duty Cycle Meter (toolbelt MEASURE)
@@ -414,28 +417,28 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 2. Toolbelt **BUILD -> Function Generator**; grab it.
 3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Frequency Counter / Power Meter / Flux Meter / Charge Meter / Voltmeter / Ammeter / Ohmmeter / Capacitance Meter / Inductance Meter / Resonance Meter / Impedance Meter / Power Factor Meter / Q Factor Meter / Admittance Meter / Decibel Meter / Crest Factor Meter / Energy Meter / Duty Cycle Meter / Slew Rate Meter / Rise/Fall Meter / Overshoot Meter / Peak-to-Peak Meter / Mean Meter / Ripple Meter / THD Meter / Multimeter / Galvanometer / Lamp).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / SIN1 / SIN5 / SIN10 / SQR5 / SQR10 / TRI5 / TRI10 (default SIN5 = 5 Hz @ 1.5 Vpk). Honesty: ideal AWG series EMF on InductionCoil - NOT real DDS, not output impedance, not coil frequency response, not sync/trigger.
-## Play steps ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â checklist
+## Play steps ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â checklist
 
 1. Open `Assets/Scenes/Faraday.unity` (Build Settings already has Faraday enabled).
 2. Confirm Hierarchy has **LabLandscape** (Giza) and **QhysicsUI** (or RealityEngine host). If missing:
-   - Menu **Reality Engine ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Place Giza Complex**
-   - Menu **Reality Engine ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Place QHYSICS UI**
-   - **Ctrl+S** / File ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Save so placement persists.
-3. Optional: **Reality Engine ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Fix Player Spawn** (XR Origin on plaza, Main Camera MainCamera+enabled, facing Khufu).
+   - Menu **Reality Engine ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Place Giza Complex**
+   - Menu **Reality Engine ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Place QHYSICS UI**
+   - **Ctrl+S** / File ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Save so placement persists.
+3. Optional: **Reality Engine ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Fix Player Spawn** (XR Origin on plaza, Main Camera MainCamera+enabled, facing Khufu).
 4. Press **Ctrl+P** (or the Play button).
 5. Headset: Quest Link / OpenXR, **or** Editor with **XR Device Simulator**.
-6. First run: world **Main Menu ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Enter Sandbox** (or skip if already entered). Short onboarding tips are dismissible (Next / Skip).
+6. First run: world **Main Menu ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Enter Sandbox** (or skip if already entered). Short onboarding tips are dismissible (Next / Skip).
 7. Interact:
    - Move with XRI locomotion / teleport on plaza
    - Grab circuit parts from table dispensers (grip)
-   - Build Battery ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Wire ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Bulb ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Switch loop
+   - Build Battery ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Wire ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Bulb ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Switch loop
    - **M / Tab / Menu / B / Grip** toggles Toolbelt
-   - **Esc / P** opens Pause ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Resume / Reset Experiment / Settings / Exit Play (Editor)
+   - **Esc / P** opens Pause ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Resume / Reset Experiment / Settings / Exit Play (Editor)
    - SimChip (`> 1x`) cycles sim speed / pause / reset (Reset also calls CircuitLab.Reset)
 
 ## Shipping only
 
-- **Ctrl+B** / Build and Run ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Android (Quest) or Windows player.
+- **Ctrl+B** / Build and Run ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Android (Quest) or Windows player.
 - Quest: Developer Mode + authorized `adb devices` before APK install.
 - Do **not** build APK unless `adb devices` shows the authorized Quest serial you intend to flash.
 

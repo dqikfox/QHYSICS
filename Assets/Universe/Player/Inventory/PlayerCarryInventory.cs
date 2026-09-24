@@ -169,7 +169,7 @@ namespace RealityEngine.Player
             if (!CarryItemCatalog.TryGet(id, out var def))
                 return false;
 
-            var vitals = global::RealityEngine.Player.PlayerVitality.Instance;
+            var vitals = PlayerVitality.Instance;
             if (def.IsConsumable)
             {
                 if (def.HealAmount > 0f && vitals != null)
