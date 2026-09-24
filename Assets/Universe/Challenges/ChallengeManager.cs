@@ -301,8 +301,8 @@ namespace RealityEngine.Challenges
                 {
                     id = "double_trouble",
                     title = "Double Trouble",
-                    description = "Light up two bulbs at the same time in a single circuit.",
-                    mentorHint = "Connect two bulbs in series or parallel with a battery. Both need significant current to light up.",
+                    description = "Grab two bulbs from the Bulb dispenser and light both at once (series or parallel) with a battery and wires.",
+                    mentorHint = "Grab two bulbs (dispenser restocks). Series = one loop through both; parallel = each bulb its own path from the battery.",
                     prerequisiteId = "spin_up",
                     objectives = new[]
                     {
@@ -595,9 +595,10 @@ namespace RealityEngine.Challenges
             int count = 0;
             for (int i = 0; i < _bulbs.Length; i++)
             {
-                if (_bulbs[i] == null)
+                Bulb bulb = _bulbs[i];
+                if (bulb == null || !bulb.IsPlaced || !bulb.IsClone)
                     continue;
-                if (CircuitReader.GetIsActive(_bulbs[i]) && CircuitReader.IsCurrentSignificant(_bulbs[i]))
+                if (CircuitReader.GetIsActive(bulb) && CircuitReader.IsCurrentSignificant(bulb))
                     count++;
             }
             return count;
@@ -610,9 +611,10 @@ namespace RealityEngine.Challenges
             int count = 0;
             for (int i = 0; i < _resistors.Length; i++)
             {
-                if (_resistors[i] == null)
+                Resistor r = _resistors[i];
+                if (r == null || !r.IsPlaced || !r.IsClone)
                     continue;
-                if (CircuitReader.GetIsActive(_resistors[i]) && CircuitReader.IsCurrentSignificant(_resistors[i]))
+                if (CircuitReader.GetIsActive(r) && CircuitReader.IsCurrentSignificant(r))
                     count++;
             }
             return count;
@@ -625,9 +627,10 @@ namespace RealityEngine.Challenges
             float maxRpm = 0f;
             for (int i = 0; i < _motors.Length; i++)
             {
-                if (_motors[i] == null)
+                Motor motor = _motors[i];
+                if (motor == null || !motor.IsPlaced || !motor.IsClone)
                     continue;
-                float rpm = CircuitReader.GetMotorRpm(_motors[i]);
+                float rpm = CircuitReader.GetMotorRpm(motor);
                 if (rpm > maxRpm)
                     maxRpm = rpm;
             }
@@ -641,9 +644,10 @@ namespace RealityEngine.Challenges
             bool solarActive = false;
             for (int i = 0; i < _solars.Length; i++)
             {
-                if (_solars[i] == null)
+                Solar solar = _solars[i];
+                if (solar == null || !solar.IsPlaced || !solar.IsClone)
                     continue;
-                if (CircuitReader.GetIsActive(_solars[i]) && CircuitReader.IsCurrentSignificant(_solars[i]))
+                if (CircuitReader.GetIsActive(solar) && CircuitReader.IsCurrentSignificant(solar))
                 {
                     solarActive = true;
                     break;
@@ -659,9 +663,10 @@ namespace RealityEngine.Challenges
             {
                 for (int i = 0; i < _motors.Length; i++)
                 {
-                    if (_motors[i] == null)
+                    Motor motor = _motors[i];
+                    if (motor == null || !motor.IsPlaced || !motor.IsClone)
                         continue;
-                    if (CircuitReader.GetIsActive(_motors[i]) && CircuitReader.IsCurrentSignificant(_motors[i]))
+                    if (CircuitReader.GetIsActive(motor) && CircuitReader.IsCurrentSignificant(motor))
                         return true;
                 }
             }

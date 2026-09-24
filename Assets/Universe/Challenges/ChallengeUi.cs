@@ -193,24 +193,24 @@ namespace RealityEngine.Challenges
 
         void BuildOverlayPanel()
         {
-            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "OverlayPanel", new Vector2(440f, 280f));
+            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "OverlayPanel", new Vector2(460f, 340f));
             _overlayPanel = face.rectTransform;
             _overlayPanel.gameObject.SetActive(false);
 
             _overlayTitle = QhysicsUiBuilder.Label(face.transform, "Title", "Challenge",
                 QhysicsUiStyle.FontBody, QhysicsUiStyle.AccentInfo, TextAlignmentOptions.MidlineLeft);
-            _overlayTitle.rectTransform.anchoredPosition = new Vector2(0f, 110f);
+            _overlayTitle.rectTransform.anchoredPosition = new Vector2(0f, 135f);
             _overlayTitle.rectTransform.sizeDelta = new Vector2(420f, 36f);
 
             _overlayTimer = QhysicsUiBuilder.Label(face.transform, "Timer", "0.0s",
                 QhysicsUiStyle.FontSmall, QhysicsUiStyle.TextMuted, TextAlignmentOptions.MidlineRight);
-            _overlayTimer.rectTransform.anchoredPosition = new Vector2(0f, 110f);
+            _overlayTimer.rectTransform.anchoredPosition = new Vector2(0f, 135f);
             _overlayTimer.rectTransform.sizeDelta = new Vector2(100f, 28f);
 
             _overlayObjectives = QhysicsUiBuilder.Label(face.transform, "Objectives", "",
                 QhysicsUiStyle.FontSmall, QhysicsUiStyle.TextPrimary, TextAlignmentOptions.TopLeft);
-            _overlayObjectives.rectTransform.anchoredPosition = new Vector2(0f, 30f);
-            _overlayObjectives.rectTransform.sizeDelta = new Vector2(420f, 140f);
+            _overlayObjectives.rectTransform.anchoredPosition = new Vector2(0f, 40f);
+            _overlayObjectives.rectTransform.sizeDelta = new Vector2(440f, 200f);
 
             QhysicsUiBuilder.ChipButton(face.transform, "CancelBtn", "Abandon",
                 new Vector2(140f, 52f), OnAbandonClick);
@@ -218,7 +218,7 @@ namespace RealityEngine.Challenges
             var cancelRt = face.transform.Find("CancelBtn");
             if (cancelRt != null)
             {
-                cancelRt.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -110f);
+                cancelRt.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -135f);
             }
         }
 
@@ -469,7 +469,7 @@ namespace RealityEngine.Challenges
 
             if (_overlayObjectives != null && _manager.ActiveObjectives != null)
             {
-                var sb = new System.Text.StringBuilder(320);
+                var sb = new System.Text.StringBuilder(420);
                 for (int i = 0; i < _manager.ActiveObjectives.Length; i++)
                 {
                     ChallengeObjective obj = _manager.ActiveObjectives[i];
@@ -484,6 +484,12 @@ namespace RealityEngine.Challenges
                     }
                     if (i < _manager.ActiveObjectives.Length - 1)
                         sb.Append("\n");
+                }
+                if (_manager.ActiveChallenge != null &&
+                    !string.IsNullOrEmpty(_manager.ActiveChallenge.mentorHint))
+                {
+                    sb.Append("\n");
+                    sb.Append(_manager.ActiveChallenge.mentorHint);
                 }
                 _overlayObjectives.text = sb.ToString();
             }

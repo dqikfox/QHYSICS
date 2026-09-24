@@ -462,7 +462,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 ### Spin Up (challenge 3)
 1. Press **C** -> Start **Spin Up** (unlocked after Current Control). Overlay shows live RPM `[0/120 RPM]`.
 2. From table dispensers: grab **Battery**, **Wire(s)**, **Motor** (Dispenser2 / Motor shelf); close a loop.
-3. When motor RPM ≥ 120 (live meter), objective completes -> stars + unlock **Double Trouble**.
+3. When motor RPM >= 120 (live meter), objective completes -> stars + unlock **Double Trouble**.
+
+### Double Trouble (challenge 4)
+1. Press **C** -> Start **Double Trouble** (unlocked after Spin Up). Overlay shows live `[0/2 lit]` plus mentor tip.
+2. Grab **two Bulbs** from the Bulb dispenser (restocks after each grab), plus **Battery** and **Wire(s)**.
+3. Series or parallel both bulbs so both carry significant current; only breadboard-placed clones count.
+4. When meter hits `2/2 lit` -> stars + unlock **Sun Power**. Completion banner shows `Unlocked: Sun Power`.
 
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
