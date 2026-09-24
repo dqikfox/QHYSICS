@@ -482,7 +482,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Induction** (unlocked after Sun Power). Overlay shows peak EMF `[pk 0.000/0.05 V live=0.000]` (peak latched so brief Faraday spikes are not missed).
 2. Go to the **Induction Lab** coil station. Grab the bar **Magnet** (lab Magnet or PHYSICS gadget).
 3. Desktop: hold Magnet + **LMB/scroll** to impulse along N-S through the coil; VR: grab and throw/push the magnet through the coil bore.
-4. When peak |EMF| >= 0.05 V (pk meter), objective completes. Experiment RESET clears the peak latch for a clean retry.
+4. When peak |EMF| >= 0.05 V (pk meter), objective completes -> stars + unlock **Make and Break**. Completion banner shows `Unlocked: Make and Break`. Experiment RESET clears the peak latch for a clean retry.
+
+### Make and Break (challenge 7)
+1. Press **C** -> Start **Make and Break** (unlocked after Induction). Overlay shows live `[sw=0 lit=0]`.
+2. From table dispensers: grab **Battery**, **Wire(s)**, **Switch** (Dispenser3 / Switch shelf), and **Bulb**; snap onto breadboard pegs.
+3. Leave the knife switch open first (bulb stays dark), then **toggle/close** the switch to complete the loop.
+4. When meter shows `sw=1 lit=1` (closed placed Switch clone + lit placed Bulb clone), objective completes. End of starter campaign (no further unlock yet).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only

@@ -146,6 +146,7 @@ namespace RealityEngine.Challenges
         Motor[] _motors;
         Resistor[] _resistors;
         Solar[] _solars;
+        Switch[] _switches;
         InductionCircuit _inductionCircuit;
         bool _refsValid;
 
@@ -216,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 6 challenges with real, detectable conditions.
+        /// Build the starter campaign of 7 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -373,6 +374,30 @@ namespace RealityEngine.Challenges
                         twoStarTimeSeconds = 120f,
                         threeStarTimeSeconds = 60f,
                         threeStarMaxComponents = 0
+                    }
+                },
+
+                // 7. Make and Break - close a knife switch to light a bulb
+                new ChallengeDefinition
+                {
+                    id = "make_and_break",
+                    title = "Make and Break",
+                    description = "Build a Battery + Wire(s) + Switch + Bulb loop on the breadboard, then close the knife switch so the bulb lights.",
+                    mentorHint = "Close the knife switch to complete the loop; open = no current. Grab Switch from Dispenser3 (Switch shelf).",
+                    prerequisiteId = "induction",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SwitchClosedBulbLit,
+                            displayText = "Close the switch and light the bulb"
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 90f,
+                        threeStarTimeSeconds = 45f,
+                        threeStarMaxComponents = 8
                     }
                 }
             };
@@ -531,6 +556,7 @@ namespace RealityEngine.Challenges
             _motors = UnityEngine.Object.FindObjectsByType<Motor>(FindObjectsInactive.Exclude);
             _resistors = UnityEngine.Object.FindObjectsByType<Resistor>(FindObjectsInactive.Exclude);
             _solars = UnityEngine.Object.FindObjectsByType<Solar>(FindObjectsInactive.Exclude);
+            _switches = UnityEngine.Object.FindObjectsByType<Switch>(FindObjectsInactive.Exclude);
             _inductionCircuit = UnityEngine.Object.FindAnyObjectByType<InductionCircuit>(FindObjectsInactive.Exclude);
             _refsValid = true;
         }
@@ -594,6 +620,9 @@ namespace RealityEngine.Challenges
                 case ObjectiveType.InducedEmfThreshold:
                     return GetInducedEmf() >= obj.targetValue;
 
+                case ObjectiveType.SwitchClosedBulbLit:
+                    return HasClosedSwitch() && CountActiveBulbs() >= 1;
+
                 default:
                     return false;
             }
@@ -629,6 +658,28 @@ namespace RealityEngine.Challenges
                     count++;
             }
             return count;
+        }
+
+        /// <summary>Placed Switch clones with IsClosed == true (knife switch closed).</summary>
+        int CountClosedSwitches()
+        {
+            if (_switches == null)
+                return 0;
+            int count = 0;
+            for (int i = 0; i < _switches.Length; i++)
+            {
+                Switch sw = _switches[i];
+                if (sw == null || !sw.IsPlaced || !sw.IsClone)
+                    continue;
+                if (sw.IsClosed)
+                    count++;
+            }
+            return count;
+        }
+
+        bool HasClosedSwitch()
+        {
+            return CountClosedSwitches() >= 1;
         }
 
         float GetMaxMotorRpm()
@@ -798,6 +849,12 @@ namespace RealityEngine.Challenges
                     float live = GetLiveInducedEmf();
                     float pk = _peakInducedEmf;
                     return "pk " + pk.ToString("0.000") + "/" + obj.targetValue.ToString("0.00") + " V live=" + live.ToString("0.000");
+                }
+                case ObjectiveType.SwitchClosedBulbLit:
+                {
+                    int sw = CountClosedSwitches();
+                    int lit = CountActiveBulbs();
+                    return "sw=" + (sw >= 1 ? "1" : "0") + " lit=" + (lit >= 1 ? "1" : "0");
                 }
                 default:
                     return string.Empty;

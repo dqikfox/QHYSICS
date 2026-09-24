@@ -19,7 +19,9 @@ namespace RealityEngine.Challenges
         /// <summary>A solar panel in an active circuit with a load (bulb or motor) also active.</summary>
         SolarPoweringLoad = 4,
         /// <summary>Induced EMF (|EmfVolts|) from InductionCircuit >= targetValue volts.</summary>
-        InducedEmfThreshold = 5
+        InducedEmfThreshold = 5,
+        /// <summary>At least one placed Switch clone is closed AND at least one placed Bulb clone is lit.</summary>
+        SwitchClosedBulbLit = 6
     }
 
     /// <summary>
