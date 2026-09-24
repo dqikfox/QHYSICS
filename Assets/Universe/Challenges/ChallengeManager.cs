@@ -995,6 +995,43 @@ namespace RealityEngine.Challenges
                         threeStarTimeSeconds = 90f,
                         threeStarMaxComponents = 16
                     }
+                },
+
+                // 26. Sun Faraday Twin - solar load + Faraday peak EMF + two bulbs lit (Solar+EMF+SwitchBulb is sun_faraday_gate ch25; Solar+EMF+SwitchMotor is sun_induction ch22)
+                new ChallengeDefinition
+                {
+                    id = "sun_faraday_twin",
+                    title = "Sun Faraday Twin",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light two bulbs at once from the panel alone — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), two Bulbs, Wire(s). No battery. Face MiniatureSun; parallel keeps both bright; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + N/2 lit. RESET retries cleanly.",
+                    prerequisiteId = "sun_faraday_gate",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.InducedEmfThreshold,
+                            displayText = "Peak |EMF| >= 0.05 V through the coil",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MultipleBulbsLit,
+                            displayText = "Light up 2 bulbs from the solar panel simultaneously",
+                            targetCount = 2
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 16
+                    }
                 }
             };
 

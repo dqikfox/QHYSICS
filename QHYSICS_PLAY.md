@@ -596,7 +596,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Sun Faraday Gate** (unlocked after Sun Faraday Drive). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and switch/bulb `[sw=0 lit=0]`.
 2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Gate: knife-switch gated lit bulb + Induction Lab peak EMF.
 3. Snap Solar + Switch + wires + Bulb onto the breadboard. Face **MiniatureSun** until solar powers a load; keep the switch open first (bulb dark), then **close** so the bulb lights. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
-4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND switch closed with bulb lit), objective completes -> stars. End of starter campaign (campaign deepest / next unlock N/A).
+4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND switch closed with bulb lit), objective completes -> stars + unlock **Sun Faraday Twin**. Completion banner shows `Unlocked: Sun Faraday Twin`.
+
+### Sun Faraday Twin (challenge 26)
+1. Press **C** -> Start **Sun Faraday Twin** (unlocked after Sun Faraday Gate). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and twin bulbs `[0/2 lit]`.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **two Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Twin: two bulbs lit from the panel + Induction Lab peak EMF.
+3. Snap Solar + wires + two Bulbs onto the breadboard (parallel preferred). Face **MiniatureSun** until solar powers a load and both bulbs light. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
+4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 2 bulbs lit), objective completes -> stars. End of starter campaign (campaign deepest / next unlock N/A).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only
