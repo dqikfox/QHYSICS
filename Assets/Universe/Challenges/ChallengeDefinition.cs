@@ -21,7 +21,9 @@ namespace RealityEngine.Challenges
         /// <summary>Induced EMF (|EmfVolts|) from InductionCircuit >= targetValue volts.</summary>
         InducedEmfThreshold = 5,
         /// <summary>At least one placed Switch clone is closed AND at least one placed Bulb clone is lit.</summary>
-        SwitchClosedBulbLit = 6
+        SwitchClosedBulbLit = 6,
+        /// <summary>At least one placed Switch clone is closed AND a placed Motor clone reaches targetValue RPM.</summary>
+        SwitchClosedMotorSpinning = 7
     }
 
     /// <summary>

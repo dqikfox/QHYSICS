@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 7 challenges with real, detectable conditions.
+        /// Build the starter campaign of 8 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -391,6 +391,31 @@ namespace RealityEngine.Challenges
                         {
                             type = ObjectiveType.SwitchClosedBulbLit,
                             displayText = "Close the switch and light the bulb"
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 90f,
+                        threeStarTimeSeconds = 45f,
+                        threeStarMaxComponents = 8
+                    }
+                },
+
+                // 8. Gear Up - close switch to spin a motor
+                new ChallengeDefinition
+                {
+                    id = "gear_up",
+                    title = "Gear Up",
+                    description = "Build a Battery + Wire(s) + Switch + Motor loop on the breadboard, close the knife switch, and spin the motor to 120+ RPM.",
+                    mentorHint = "Same knife-switch skill as Make and Break, but the load is a Motor (Dispenser2). Close the switch to complete the loop; open = no spin. Overlay shows sw + RPM.",
+                    prerequisiteId = "make_and_break",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SwitchClosedMotorSpinning,
+                            displayText = "Close the switch and spin a motor to 120+ RPM",
+                            targetValue = 120f
                         }
                     },
                     starThresholds = new StarThresholds
@@ -622,6 +647,9 @@ namespace RealityEngine.Challenges
 
                 case ObjectiveType.SwitchClosedBulbLit:
                     return HasClosedSwitch() && CountActiveBulbs() >= 1;
+
+                case ObjectiveType.SwitchClosedMotorSpinning:
+                    return HasClosedSwitch() && GetMaxMotorRpm() >= obj.targetValue;
 
                 default:
                     return false;
@@ -855,6 +883,13 @@ namespace RealityEngine.Challenges
                     int sw = CountClosedSwitches();
                     int lit = CountActiveBulbs();
                     return "sw=" + (sw >= 1 ? "1" : "0") + " lit=" + (lit >= 1 ? "1" : "0");
+                }
+                case ObjectiveType.SwitchClosedMotorSpinning:
+                {
+                    int sw = CountClosedSwitches();
+                    float rpm = GetMaxMotorRpm();
+                    float need = obj.targetValue > 0f ? obj.targetValue : 120f;
+                    return "sw=" + (sw >= 1 ? "1" : "0") + " " + rpm.ToString("0") + "/" + need.ToString("0") + " RPM";
                 }
                 default:
                     return string.Empty;
