@@ -506,7 +506,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Power Play** (unlocked after Light and Spin). Overlay shows live `[0/1 lit]` and `[0.00/0.05 W lit=0|1]`.
 2. From table dispensers: grab **Battery**, **Wire(s)**, and **Bulb** (optional Motor); snap onto breadboard pegs to close a loop.
 3. When the bulb lights, CircuitLab load power `P = |V| * |I|` rises (a 10 V / 1 kOhm bulb is ~0.1 W). Live W meter tracks the max across placed bulb/motor clones.
-4. When both objectives complete (bulb lit AND power >= 0.05 W), objective completes. End of starter campaign (no further unlock yet).
+4. When both objectives complete (bulb lit AND power >= 0.05 W), objective completes -> stars + unlock **Three Lights**. Completion banner shows `Unlocked: Three Lights`.
+
+### Three Lights (challenge 11)
+1. Press **C** -> Start **Three Lights** (unlocked after Power Play). Overlay shows live `[0/3 lit]`.
+2. Grab **three Bulbs** from the Bulb dispenser (restocks after each grab), plus **Battery** and **Wire(s)**.
+3. Series or parallel all three so each carries significant current; only breadboard-placed clones count.
+4. When meter hits `3/3 lit` -> stars. End of starter campaign (no further unlock yet).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only

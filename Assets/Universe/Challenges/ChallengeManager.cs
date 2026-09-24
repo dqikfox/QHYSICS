@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 10 challenges with real, detectable conditions.
+        /// Build the starter campaign of 11 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -482,6 +482,31 @@ namespace RealityEngine.Challenges
                         twoStarTimeSeconds = 90f,
                         threeStarTimeSeconds = 45f,
                         threeStarMaxComponents = 8
+                    }
+                },
+
+                // 11. Three Lights - three bulbs lit simultaneously
+                new ChallengeDefinition
+                {
+                    id = "three_lights",
+                    title = "Three Lights",
+                    description = "Grab three bulbs from the Bulb dispenser and light all three at once (series or parallel) with a battery and wires.",
+                    mentorHint = "Dispenser restocks after each grab. Parallel keeps bulbs bright; series splits voltage. Overlay shows N/3 lit. RESET retries cleanly.",
+                    prerequisiteId = "power_play",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MultipleBulbsLit,
+                            displayText = "Light up 3 bulbs simultaneously",
+                            targetCount = 3
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 150f,
+                        threeStarTimeSeconds = 75f,
+                        threeStarMaxComponents = 12
                     }
                 }
             };
