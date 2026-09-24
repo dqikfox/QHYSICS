@@ -9,7 +9,9 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// Screen HUD: Training System vitals + carry slots. Extends hip-pouch story without replacing BUILD hotbar.
+    /// Training System vitals + carry slots.
+    /// Desktop: ScreenSpaceOverlay above BUILD hotbar.
+    /// XR: WorldSpace follow, Event Camera = XR cam (readable in headset).
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(201)]
@@ -18,6 +20,9 @@ namespace RealityEngine.UI
         public const string RootName = "QhysicsCarryHud";
 
         Canvas _canvas;
+        RectTransform _vitalsRt;
+        RectTransform _stripRt;
+        Image _vitalsBg;
         Image _hpFill;
         TextMeshProUGUI _hpLabel;
         TextMeshProUGUI _opLabel;
@@ -27,6 +32,9 @@ namespace RealityEngine.UI
         PlayerCarryInventory _carry;
         PlayerVitality _vitals;
         PlayerOperatorController _op;
+        Camera _cam;
+        bool _worldMode;
+        Color _hpBase = QhysicsUiStyle.AccentActive;
 
         public static QhysicsCarryHud Ensure(Transform parent)
         {
@@ -66,27 +74,27 @@ namespace RealityEngine.UI
             var canvasGo = new GameObject("CarryHudCanvas", typeof(RectTransform));
             canvasGo.transform.SetParent(transform, false);
             _canvas = canvasGo.AddComponent<Canvas>();
-            _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             _canvas.sortingOrder = 190;
             var scaler = canvasGo.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             canvasGo.AddComponent<GraphicRaycaster>();
+            _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            _worldMode = false;
 
-            // Training vitals — top left
-            var vitals = QhysicsUiBuilder.Panel(canvasGo.transform, "Vitals", QhysicsUiStyle.PanelBg, new Vector2(360f, 96f));
-            var vrt = vitals.rectTransform;
-            vrt.anchorMin = new Vector2(0f, 1f);
-            vrt.anchorMax = new Vector2(0f, 1f);
-            vrt.pivot = new Vector2(0f, 1f);
-            vrt.anchoredPosition = new Vector2(24f, -24f);
+            _vitalsBg = QhysicsUiBuilder.Panel(canvasGo.transform, "Vitals", QhysicsUiStyle.PanelBg, new Vector2(360f, 96f));
+            _vitalsRt = _vitalsBg.rectTransform;
+            _vitalsRt.anchorMin = new Vector2(0f, 1f);
+            _vitalsRt.anchorMax = new Vector2(0f, 1f);
+            _vitalsRt.pivot = new Vector2(0f, 1f);
+            _vitalsRt.anchoredPosition = new Vector2(24f, -24f);
 
-            _opLabel = QhysicsUiBuilder.Label(vitals.transform, "Op", "TRAINING SYSTEM", QhysicsUiStyle.FontSmall,
+            _opLabel = QhysicsUiBuilder.Label(_vitalsBg.transform, "Op", "TRAINING SYSTEM", QhysicsUiStyle.FontSmall,
                 QhysicsUiStyle.AccentInfo, TextAlignmentOptions.MidlineLeft);
             _opLabel.rectTransform.anchoredPosition = new Vector2(8f, 28f);
             _opLabel.rectTransform.sizeDelta = new Vector2(330f, 28f);
 
-            var barBg = QhysicsUiBuilder.Panel(vitals.transform, "HpBg", QhysicsUiStyle.ChipBg, new Vector2(300f, 18f));
+            var barBg = QhysicsUiBuilder.Panel(_vitalsBg.transform, "HpBg", QhysicsUiStyle.ChipBg, new Vector2(300f, 18f));
             barBg.rectTransform.anchoredPosition = new Vector2(8f, 0f);
             barBg.rectTransform.anchorMin = barBg.rectTransform.anchorMax = new Vector2(0f, 0.5f);
             barBg.rectTransform.pivot = new Vector2(0f, 0.5f);
@@ -98,18 +106,17 @@ namespace RealityEngine.UI
             _hpFill.rectTransform.anchoredPosition = Vector2.zero;
             _hpFill.rectTransform.sizeDelta = new Vector2(300f, 0f);
 
-            _hpLabel = QhysicsUiBuilder.Label(vitals.transform, "HpText", "HP 100/100", QhysicsUiStyle.FontSmall,
+            _hpLabel = QhysicsUiBuilder.Label(_vitalsBg.transform, "HpText", "HP 100/100", QhysicsUiStyle.FontSmall,
                 QhysicsUiStyle.TextPrimary, TextAlignmentOptions.MidlineLeft);
             _hpLabel.rectTransform.anchoredPosition = new Vector2(8f, -28f);
             _hpLabel.rectTransform.sizeDelta = new Vector2(330f, 24f);
 
-            // Carry strip — above BUILD hotbar
             var strip = QhysicsUiBuilder.Panel(canvasGo.transform, "CarryStrip", QhysicsUiStyle.PanelBg, new Vector2(720f, 78f));
-            var srt = strip.rectTransform;
-            srt.anchorMin = new Vector2(0.5f, 0f);
-            srt.anchorMax = new Vector2(0.5f, 0f);
-            srt.pivot = new Vector2(0.5f, 0f);
-            srt.anchoredPosition = new Vector2(0f, 140f);
+            _stripRt = strip.rectTransform;
+            _stripRt.anchorMin = new Vector2(0.5f, 0f);
+            _stripRt.anchorMax = new Vector2(0.5f, 0f);
+            _stripRt.pivot = new Vector2(0.5f, 0f);
+            _stripRt.anchoredPosition = new Vector2(0f, 140f);
 
             _slotImages = new Image[8];
             _slotLabels = new TextMeshProUGUI[8];
@@ -130,24 +137,19 @@ namespace RealityEngine.UI
             }
 
             _hint = QhysicsUiBuilder.Label(canvasGo.transform, "CarryHint",
-                "Carry [ ]  U use/equip  X drop  O operator  LMB baton (Training)",
+                "Carry [ ]  U use/equip  X drop  O operator  LMB / XR trigger baton",
                 QhysicsUiStyle.FontSmall, QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
             _hint.rectTransform.anchorMin = new Vector2(0.5f, 0f);
             _hint.rectTransform.anchorMax = new Vector2(0.5f, 0f);
             _hint.rectTransform.pivot = new Vector2(0.5f, 0f);
             _hint.rectTransform.anchoredPosition = new Vector2(0f, 222f);
             _hint.rectTransform.sizeDelta = new Vector2(900f, 24f);
+
+            ApplyRenderMode(DesktopPlayerController.IsXrDisplayRunning());
         }
 
-        void OnEnable()
-        {
-            Hook();
-        }
-
-        void OnDisable()
-        {
-            Unhook();
-        }
+        void OnEnable() => Hook();
+        void OnDisable() => Unhook();
 
         void Hook()
         {
@@ -175,10 +177,120 @@ namespace RealityEngine.UI
             if (_carry == null)
                 Hook();
             HandleCarryKeys();
-            // Desktop-only strip; hide when XR display running (toolbelt owns VR)
-            bool show = DesktopPlayerController.Instance == null || DesktopPlayerController.Instance.IsDesktopActive;
-            if (_canvas != null && _canvas.gameObject.activeSelf != show)
-                _canvas.gameObject.SetActive(show);
+            if (_canvas != null && !_canvas.gameObject.activeSelf)
+                _canvas.gameObject.SetActive(true);
+            ApplyHurtFlash();
+        }
+
+        void LateUpdate()
+        {
+            bool xr = DesktopPlayerController.IsXrDisplayRunning();
+            ApplyRenderMode(xr);
+            if (!_worldMode)
+                return;
+            if (_cam == null)
+                _cam = QhysicsUiBuilder.ResolveXrCamera();
+            if (_cam == null)
+                return;
+            FollowWorld(_cam);
+            QhysicsUiBuilder.FaceCamera(transform, _cam);
+            QhysicsUiBuilder.WireEventCamera(_canvas);
+        }
+
+        void ApplyRenderMode(bool world)
+        {
+            if (_canvas == null)
+                return;
+            RenderMode want = world ? RenderMode.WorldSpace : RenderMode.ScreenSpaceOverlay;
+            if (_worldMode == world && _canvas.renderMode == want)
+                return;
+            _worldMode = world;
+            _canvas.renderMode = want;
+
+            if (world)
+            {
+                var rt = _canvas.GetComponent<RectTransform>();
+                rt.sizeDelta = new Vector2(900f, 420f);
+                _canvas.transform.localScale = Vector3.one * QhysicsUiStyle.CanvasScale;
+                if (_vitalsRt != null)
+                {
+                    _vitalsRt.anchorMin = _vitalsRt.anchorMax = new Vector2(0.5f, 0.72f);
+                    _vitalsRt.pivot = new Vector2(0.5f, 0.5f);
+                    _vitalsRt.anchoredPosition = Vector2.zero;
+                }
+                if (_stripRt != null)
+                {
+                    _stripRt.anchorMin = _stripRt.anchorMax = new Vector2(0.5f, 0.28f);
+                    _stripRt.pivot = new Vector2(0.5f, 0.5f);
+                    _stripRt.anchoredPosition = Vector2.zero;
+                }
+                if (_hint != null)
+                {
+                    _hint.rectTransform.anchorMin = _hint.rectTransform.anchorMax = new Vector2(0.5f, 0.08f);
+                    _hint.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+                    _hint.rectTransform.anchoredPosition = Vector2.zero;
+                    _hint.text = "XR trigger = baton · Esc/P Operator Select · [ ] U X on companion keyboard";
+                }
+                QhysicsUiBuilder.WireEventCamera(_canvas);
+            }
+            else
+            {
+                _canvas.transform.localScale = Vector3.one;
+                if (_vitalsRt != null)
+                {
+                    _vitalsRt.anchorMin = new Vector2(0f, 1f);
+                    _vitalsRt.anchorMax = new Vector2(0f, 1f);
+                    _vitalsRt.pivot = new Vector2(0f, 1f);
+                    _vitalsRt.anchoredPosition = new Vector2(24f, -24f);
+                }
+                if (_stripRt != null)
+                {
+                    _stripRt.anchorMin = _stripRt.anchorMax = new Vector2(0.5f, 0f);
+                    _stripRt.pivot = new Vector2(0.5f, 0f);
+                    _stripRt.anchoredPosition = new Vector2(0f, 140f);
+                }
+                if (_hint != null)
+                {
+                    _hint.rectTransform.anchorMin = _hint.rectTransform.anchorMax = new Vector2(0.5f, 0f);
+                    _hint.rectTransform.pivot = new Vector2(0.5f, 0f);
+                    _hint.rectTransform.anchoredPosition = new Vector2(0f, 222f);
+                    _hint.text = "Carry [ ]  U use/equip  X drop  O operator  LMB / XR trigger baton";
+                }
+            }
+        }
+
+        void FollowWorld(Camera cam)
+        {
+            Vector3 fwd = cam.transform.forward;
+            fwd.y = 0f;
+            if (fwd.sqrMagnitude < 1e-6f)
+                fwd = Vector3.forward;
+            fwd.Normalize();
+            Vector3 right = Vector3.Cross(Vector3.up, fwd).normalized;
+            Vector3 pos = cam.transform.position
+                + fwd * QhysicsUiStyle.HudDistanceM
+                + right * (-0.28f)
+                + Vector3.up * (-0.18f);
+            transform.position = Vector3.Lerp(transform.position, pos, 1f - Mathf.Exp(-10f * Time.unscaledDeltaTime));
+        }
+
+        void ApplyHurtFlash()
+        {
+            if (_hpFill == null || _vitals == null)
+                return;
+            if (_vitals.IsFlashing)
+            {
+                float pulse = 0.55f + 0.45f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * 28f));
+                _hpFill.color = Color.Lerp(QhysicsUiStyle.AccentError, Color.white, pulse * 0.35f);
+                if (_vitalsBg != null)
+                    _vitalsBg.color = Color.Lerp(QhysicsUiStyle.PanelBg, new Color(0.45f, 0.08f, 0.08f, 0.9f), 0.55f);
+            }
+            else
+            {
+                _hpFill.color = _hpBase;
+                if (_vitalsBg != null)
+                    _vitalsBg.color = QhysicsUiStyle.PanelBg;
+            }
         }
 
         void HandleCarryKeys()
@@ -213,12 +325,15 @@ namespace RealityEngine.UI
             {
                 float w = 300f * _vitals.Hp01;
                 _hpFill.rectTransform.sizeDelta = new Vector2(w, 0f);
-                _hpFill.color = _vitals.HasShield ? new Color(0.4f, 0.7f, 1f) :
+                _hpBase = _vitals.HasShield ? new Color(0.4f, 0.7f, 1f) :
                     (_vitals.Hp01 < 0.3f ? QhysicsUiStyle.AccentError : QhysicsUiStyle.AccentActive);
+                if (!_vitals.IsFlashing)
+                    _hpFill.color = _hpBase;
             }
             if (_hpLabel != null && _vitals != null)
                 _hpLabel.text = "HP " + Mathf.CeilToInt(_vitals.Hp) + "/" + Mathf.CeilToInt(_vitals.MaxHp)
-                    + (_vitals.HasShield ? "  SHIELD" : "");
+                    + (_vitals.HasShield ? "  SHIELD" : "")
+                    + (_vitals.IsFlashing ? "  !!" : "");
             if (_opLabel != null)
             {
                 _op = PlayerOperatorController.Instance;
@@ -233,7 +348,6 @@ namespace RealityEngine.UI
                 _carry = PlayerCarryInventory.Instance;
             if (_slotImages == null || _carry == null)
                 return;
-            int n = Mathf.Min(_slotImages.Length, _carry.SlotCount);
             for (int i = 0; i < _slotImages.Length; i++)
             {
                 if (_slotImages[i] == null)
