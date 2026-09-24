@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using RealityEngine.Player;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,7 +27,7 @@ namespace RealityEngine.UI
         {
             new[] { "Wire", "Battery", "Switch", "Bulb", "Resistor", "Lamp", "Motor", "Solar", "Capacitor", "Inductor", "Diode", "Fuse", "LED", "Speaker", "Potentiometer", "Transformer", "Function Generator" },
             new[] { "Magnet", "Coil", "Field Lens", "Dipole" },
-            new[] { "Multimeter", "Galvanometer", "Oscilloscope", "Frequency Counter", "Power Meter", "Flux Meter", "Charge Meter", "Voltmeter", "Ammeter", "Ohmmeter", "Capacitance Meter", "Inductance Meter", "Resonance Meter", "Impedance Meter", "Power Factor Meter", "Q Factor Meter", "Admittance Meter", "Decibel Meter", "Crest Factor Meter", "Energy Meter", "Duty Cycle Meter", "Slew Rate Meter", "Rise/Fall Meter", "Overshoot Meter", "Peak-to-Peak Meter", "Mean Meter", "Ripple Meter", "THD Meter", "Cubit Rod", "Probe", "Stopwatch" },
+            new[] { "Multimeter", "Galvanometer", "Oscilloscope", "Frequency Counter", "Power Meter", "Flux Meter", "Charge Meter", "Voltmeter", "Ammeter", "Ohmmeter", "Capacitance Meter", "Inductance Meter", "Resonance Meter", "Impedance Meter", "Power Factor Meter", "Q Factor Meter", "Admittance Meter", "Decibel Meter", "Crest Factor Meter", "Energy Meter", "Duty Cycle Meter", "Slew Rate Meter", "Rise/Fall Meter", "Overshoot Meter", "Peak-to-Peak Meter", "Mean Meter", "Ripple Meter", "THD Meter", "Cubit Rod", "Probe", "Compass", "Stopwatch" },
             new[] { "Teleport", "Scale", "Sky", "Reset Pose" },
             new[] { "Induction", "New Run", "Save", "Load" }
         };
@@ -148,7 +148,7 @@ namespace RealityEngine.UI
             if (_cam == null)
                 return;
 
-            // Worn at hip/chest of DesktopBody / XR Origin — lag follow, not glued to HMD.
+            // Worn at hip/chest of DesktopBody / XR Origin â€” lag follow, not glued to HMD.
             Vector3 anchorPos;
             Vector3 flatFwd;
             if (_hip != null)
@@ -336,7 +336,7 @@ namespace RealityEngine.UI
             {
                 RealityEngine.XR.LabPlayerSpawn.EnsureApplied();
                 RealityEngine.XR.LabPlayerSpawn.RecalibratePlayerHeight(force: true);
-                Debug.Log("QHYSICS: " + label + " — plaza pose + eye height recalibrated.");
+                Debug.Log("QHYSICS: " + label + " â€” plaza pose + eye height recalibrated.");
                 return true;
             }
             if (key == "scale")
@@ -346,7 +346,7 @@ namespace RealityEngine.UI
             }
             if (key == "save" || key == "load")
             {
-                Debug.Log("QHYSICS: " + label + " stub — persistence comes with experiment runner save slots.");
+                Debug.Log("QHYSICS: " + label + " stub â€” persistence comes with experiment runner save slots.");
                 return true;
             }
             if (key == "induction")
