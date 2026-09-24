@@ -21,6 +21,11 @@ namespace RealityEngine.Visualization
         bool _visible;
         bool _built;
 
+        [SerializeField]
+        [Tooltip("Refresh rate for field vectors in Hz. Lower values save CPU on Quest.")]
+        float refreshRate = 10f;
+        float _refreshTimer;
+
         public bool Visible
         {
             get => _visible;
@@ -57,6 +62,13 @@ namespace RealityEngine.Visualization
         {
             if (!_visible || !_built || _arrows == null)
                 return;
+
+            // Throttle vector refresh to reduce per-frame CPU on Quest
+            _refreshTimer += Time.deltaTime;
+            float interval = 1f / Mathf.Max(refreshRate, 0.1f);
+            if (_refreshTimer < interval)
+                return;
+            _refreshTimer = 0f;
 
             if (_kind == FieldLensTargetKind.Load)
                 DrawLoadE();
