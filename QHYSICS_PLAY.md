@@ -61,7 +61,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Mouse** | Look (yaw Origin, pitch Main Camera) |
 | **Shift** | Sprint |
 | **Space** | Jump |
-| **Ctrl** | Crouch |
+| **Ctrl** | Crouch (CC height + Camera Offset eye duck ~0.95m) |
 | **H** | Recalibrate eye height (~1.65m Camera Offset / Floor) |
 | **1-9** | Hotbar: Wire, Battery, Switch, Bulb, Resistor, Magnet, Field Lens, Cubit Rod, Delete |
 | **Q** / **Scroll** | Cycle hotbar |
@@ -80,7 +80,7 @@ When no InductionCircuit is bound, Multimeter also reads the nearest placed Circ
 | **F** / **RMB** | Drop |
 | **R** | Throw |
 | **Esc** / **P** | Pause (releases cursor) - Resume re-locks |
-| **M** / **Tab** | Toolbelt (worn at hip/chest with lag ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â not glued to camera) |
+| **M** / **Tab** | Toolbelt (hip/chest lag follow; overflow tabs: scroll or < > pages) |
 
 When a Quest Link headset is connected / XR display running, desktop locomotion disables and XR continuous-move + snap turn own the CharacterController (no fight with WASD). Toolbelt follows HipAnchor on DesktopBody / XR Origin. Enter Sandbox / Fix Player Spawn recalibrates Floor + eye height.
 

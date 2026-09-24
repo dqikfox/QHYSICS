@@ -28,6 +28,7 @@ namespace RealityEngine.Player
         [SerializeField] float standHeight = 1.72f;
         [SerializeField] float gravity = -22f;
         [SerializeField] float desktopEyeHeight = 1.65f;
+        [SerializeField] float crouchEyeHeight = 0.95f;
         [SerializeField] float minPitch = -80f;
         [SerializeField] float maxPitch = 80f;
         [SerializeField] float acceleration = 12f;          // polished acceleration
@@ -197,13 +198,14 @@ namespace RealityEngine.Player
                 return;
             }
 
-            // Desktop: Camera Offset Y = eye height so Main Camera sits at ~1.65m above plaza.
+            // Desktop: Camera Offset Y = stand/crouch eye height so Main Camera ducks with Ctrl.
+            float targetEye = _crouching ? crouchEyeHeight : desktopEyeHeight;
             Vector3 dlp = _cameraOffset.localPosition;
-            if (force || Mathf.Abs(dlp.y - desktopEyeHeight) > 0.02f)
-            {
-                dlp.y = desktopEyeHeight;
-                _cameraOffset.localPosition = dlp;
-            }
+            if (force)
+                dlp.y = targetEye;
+            else
+                dlp.y = Mathf.Lerp(dlp.y, targetEye, Time.deltaTime * 12f);
+            _cameraOffset.localPosition = dlp;
             if (_mainCamera != null)
             {
                 Vector3 camLp = _mainCamera.localPosition;

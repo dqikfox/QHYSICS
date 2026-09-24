@@ -43,6 +43,9 @@ namespace RealityEngine.UI
         Camera _cam;
         Transform _hip;
         float _spawnCooldown;
+        int _chipPage;
+        TextMeshProUGUI _pageLabel;
+        const int ChipsPerPage = 5;
 
         public bool IsVisible => visible;
 
@@ -117,6 +120,11 @@ namespace RealityEngine.UI
             _chipRow.sizeDelta = new Vector2(1000f, 160f);
             QhysicsUiBuilder.LayoutHorizontal(_chipRow, 14f);
 
+            _pageLabel = QhysicsUiBuilder.Label(face.transform, "PageHint", "", QhysicsUiStyle.FontSmall,
+                QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
+            _pageLabel.rectTransform.anchoredPosition = new Vector2(0f, -150f);
+            _pageLabel.rectTransform.sizeDelta = new Vector2(900f, 28f);
+
             SelectCategory(Category.Build);
             SetVisible(false);
         }
@@ -125,6 +133,8 @@ namespace RealityEngine.UI
         {
             if (WasTogglePressed())
                 Toggle();
+            if (visible)
+                TryScrollChipPage();
         }
 
         void LateUpdate()
@@ -200,6 +210,7 @@ namespace RealityEngine.UI
         public void SelectCategory(Category cat)
         {
             _category = cat;
+            _chipPage = 0;
             for (int i = 0; i < _tabImages.Length; i++)
             {
                 if (_tabImages[i] != null)
@@ -219,12 +230,80 @@ namespace RealityEngine.UI
                 else DestroyImmediate(c.gameObject);
             }
             string[] chips = ChipSets[(int)_category];
-            for (int i = 0; i < chips.Length; i++)
+            int pageCount = Mathf.Max(1, (chips.Length + ChipsPerPage - 1) / ChipsPerPage);
+            if (_chipPage < 0) _chipPage = 0;
+            if (_chipPage >= pageCount) _chipPage = pageCount - 1;
+
+            bool multi = pageCount > 1;
+            if (multi)
+            {
+                QhysicsUiBuilder.ChipButton(_chipRow, "Chip_PrevPage", "<",
+                    new Vector2(72f, 96f), () => ShiftChipPage(-1));
+            }
+
+            int start = _chipPage * ChipsPerPage;
+            int end = Mathf.Min(chips.Length, start + ChipsPerPage);
+            for (int i = start; i < end; i++)
             {
                 string label = chips[i];
                 QhysicsUiBuilder.ChipButton(_chipRow, "Chip_" + label, label,
                     new Vector2(160f, 96f), () => OnChip(label));
             }
+
+            if (multi)
+            {
+                QhysicsUiBuilder.ChipButton(_chipRow, "Chip_NextPage", ">",
+                    new Vector2(72f, 96f), () => ShiftChipPage(1));
+            }
+
+            if (_pageLabel != null)
+            {
+                if (multi)
+                    _pageLabel.text = TabNames[(int)_category] + "  " + (_chipPage + 1) + "/" + pageCount
+                        + "  (scroll or < >)";
+                else
+                    _pageLabel.text = "";
+            }
+        }
+
+        void ShiftChipPage(int delta)
+        {
+            string[] chips = ChipSets[(int)_category];
+            int pageCount = Mathf.Max(1, (chips.Length + ChipsPerPage - 1) / ChipsPerPage);
+            int next = _chipPage + delta;
+            if (next < 0) next = pageCount - 1;
+            if (next >= pageCount) next = 0;
+            if (next == _chipPage)
+                return;
+            _chipPage = next;
+            RebuildChips();
+        }
+
+        void TryScrollChipPage()
+        {
+            string[] chips = ChipSets[(int)_category];
+            int pageCount = Mathf.Max(1, (chips.Length + ChipsPerPage - 1) / ChipsPerPage);
+            if (pageCount <= 1)
+                return;
+            int delta = 0;
+#if ENABLE_INPUT_SYSTEM
+            if (Mouse.current != null)
+            {
+                float y = Mouse.current.scroll.ReadValue().y;
+                if (y > 0.1f) delta = -1;
+                else if (y < -0.1f) delta = 1;
+            }
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (delta == 0)
+            {
+                float s = Input.mouseScrollDelta.y;
+                if (s > 0.1f) delta = -1;
+                else if (s < -0.1f) delta = 1;
+            }
+#endif
+            if (delta != 0)
+                ShiftChipPage(delta);
         }
 
         void OnChip(string label)
