@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using TMPro;
+using RealityEngine.Player;
 
-public class Solar : CircuitComponent, ISolar, IDynamic
+public class Solar : CircuitComponent, ISolar, IDynamic, IDesktopActivatable
 {
     // Public members set in Unity Object Inspector
     public GameObject labelWattage;
@@ -51,8 +52,10 @@ public class Solar : CircuitComponent, ISolar, IDynamic
     protected override void Start()
     {
         // Set wattage and voltage label text
-        labelWattageText.text = SolarWattage.ToString("0.0") + "W";
-        labelVoltageText.text = SolarVoltage.ToString("0.0") + "V";
+        if (labelWattageText != null)
+            labelWattageText.text = SolarWattage.ToString("0.0") + "W";
+        if (labelVoltageText != null)
+            labelVoltageText.text = SolarVoltage.ToString("0.0") + "V";
     }
 
     protected override void Update ()
@@ -71,16 +74,34 @@ public class Solar : CircuitComponent, ISolar, IDynamic
             Lab.RegisterDynamicComponent(this);
         }
 
+        EnsureSun();
+
         // Make sure the sun is active when any solar panel is placed on the board
-        if (IsPlaced && !sun.activeInHierarchy)
+        if (IsPlaced && sun != null && !sun.activeInHierarchy)
         {
             sun.SetActive(true);
-            StartCoroutine(PlaySound(sunActivationAudio, 0f));
+            if (sunActivationAudio != null)
+                StartCoroutine(PlaySound(sunActivationAudio, 0f));
+        }
+
+        // Without a sun / cell reference, panel output stays dark (angle math needs both).
+        if (sun == null || cell == null)
+        {
+            SolarWattage = 0;
+            SolarVoltage = 0;
+            SolarResistance = 0;
+            if (labelWattageText != null)
+                labelWattageText.text = "0.0W";
+            if (labelVoltageText != null)
+                labelVoltageText.text = "0.0V";
+            return;
         }
 
         // Show/hide the labels
-        labelWattage.gameObject.SetActive(IsActive && Lab.showLabels);
-        labelVoltage.gameObject.SetActive(IsActive && Lab.showLabels);
+        if (labelWattage != null)
+            labelWattage.gameObject.SetActive(IsActive && Lab.showLabels);
+        if (labelVoltage != null)
+            labelVoltage.gameObject.SetActive(IsActive && Lab.showLabels);
 
         // Cast a ray from the center of the panel so we can compute the relative angle of the sun
         Vector3 forwardPosition = cell.transform.position + cell.transform.forward * 0.5f;
@@ -126,8 +147,10 @@ public class Solar : CircuitComponent, ISolar, IDynamic
         }
 
         // Update label text
-        labelWattageText.text = SolarWattage.ToString("0.0") + "W";
-        labelVoltageText.text = SolarVoltage.ToString("0.0") + "V";
+        if (labelWattageText != null)
+            labelWattageText.text = SolarWattage.ToString("0.0") + "W";
+        if (labelVoltageText != null)
+            labelVoltageText.text = SolarVoltage.ToString("0.0") + "V";
     }
 
     public bool UpdateState(int numActiveCircuits)
@@ -163,18 +186,56 @@ public class Solar : CircuitComponent, ISolar, IDynamic
 
     void OnTriggerEnter(Collider other)
     {
-        if (!cooldownActive && other.gameObject.name.Contains("Pinch"))
-        {
-            // Rotate the panel by one increment
-            var rotation = panel.transform.localEulerAngles;
-            rotation.z += rotationIncrement;
-            panel.transform.localEulerAngles = rotation;
+        if (!cooldownActive && other != null && other.gameObject.name.Contains("Pinch"))
+            TryRotatePanel(1);
+    }
 
+    /// <summary>
+    /// Desktop LMB/scroll while holding the solar part rotates the panel toward/away from
+    /// the MiniatureSun so Sun Power is playable without VR pinch.
+    /// </summary>
+    public void DesktopActivate(int delta)
+    {
+        TryRotatePanel(delta == 0 ? 1 : delta);
+    }
+
+    void TryRotatePanel(int steps)
+    {
+        if (cooldownActive || panel == null)
+            return;
+        if (steps == 0)
+            steps = 1;
+
+        var rotation = panel.transform.localEulerAngles;
+        rotation.z += rotationIncrement * Mathf.Sign(steps);
+        panel.transform.localEulerAngles = rotation;
+
+        if (rotatePanelAudio != null)
             StartCoroutine(PlaySound(rotatePanelAudio, 0f));
 
-            cooldownActive = true;
-            Invoke("Cooldown", 0.5f);
+        cooldownActive = true;
+        Invoke(nameof(Cooldown), 0.5f);
+    }
+
+    void EnsureSun()
+    {
+        if (sun != null)
+            return;
+        // Prefer the lab MiniatureSun (starts inactive until a panel is placed).
+        GameObject found = GameObject.Find("MiniatureSun");
+        if (found == null)
+        {
+            var all = UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsInactive.Include);
+            for (int i = 0; i < all.Length; i++)
+            {
+                if (all[i] != null && all[i].name == "MiniatureSun")
+                {
+                    found = all[i].gameObject;
+                    break;
+                }
+            }
         }
+        sun = found;
     }
 
     void Cooldown()
@@ -182,4 +243,3 @@ public class Solar : CircuitComponent, ISolar, IDynamic
         cooldownActive = false;
     }
 }
-

@@ -470,6 +470,19 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 3. Series or parallel both bulbs so both carry significant current; only breadboard-placed clones count.
 4. When meter hits `2/2 lit` -> stars + unlock **Sun Power**. Completion banner shows `Unlocked: Sun Power`.
 
+
+### Sun Power (challenge 5)
+1. Press **C** -> Start **Sun Power** (unlocked after Double Trouble). Overlay shows live `[0.00/0.05 W load=0]`.
+2. From **Dispenser11** (Solar shelf): grab **Solar**, plus **Wire(s)** and a **Bulb** or **Motor**. Do **not** use a battery — the panel is the source.
+3. Snap Solar + wires + load onto the breadboard. Placing Solar wakes **MiniatureSun**.
+4. Desktop: hold Solar + **LMB/scroll** to rotate the panel; VR: pinch the panel. Face the sun until live W rises (>= 0.05) and the load is active.
+5. When meter shows enough wattage + `load=1` -> stars + unlock **Induction**. Completion banner shows `Unlocked: Induction`.
+
+### Induction (challenge 6)
+1. Press **C** -> Start **Induction** (unlocked after Sun Power). Overlay shows live EMF `[0.000/0.05 V]`.
+2. Enter Induction / use the coil station; move a magnet through the coil (Faraday's law).
+3. When |EMF| >= 0.05 V (live meter), objective completes.
+
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only
