@@ -548,7 +548,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Sun Switch Lab** (unlocked after Sun Switch Drive). Overlay shows live `[0.00/0.05 W load=0]`, switch/lit, and switch/RPM readouts.
 2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — renewable source + knife-switch gated multi-load.
 3. Snap Solar + Switch + wires + Bulb + Motor onto the breadboard (parallel loads preferred). Leave the switch **open** first (bulb dark / motor still). Rotate Solar toward **MiniatureSun** until wattage rises, then **close** the switch so the bulb lights and the motor spins to 120+ RPM.
-4. When all three objectives complete (solar >= 0.05 W powering a load AND switch closed with bulb lit AND switch closed with motor at 120+ RPM), objective completes -> stars. End of starter campaign (no further unlock yet).
+4. When all three objectives complete (solar >= 0.05 W powering a load AND switch closed with bulb lit AND switch closed with motor at 120+ RPM), objective completes -> stars + unlock **Sun Twin Gate**. Completion banner shows `Unlocked: Sun Twin Gate`.
+
+### Sun Twin Gate (challenge 18)
+1. Press **C** -> Start **Sun Twin Gate** (unlocked after Sun Switch Lab). Overlay shows live `[0.00/0.05 W load=0]`, `[0/2 lit]`, and switch/lit readout.
+2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **two Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable source + knife-switch gated twin bulbs (series or parallel).
+3. Snap Solar + Switch + wires + two Bulbs onto the breadboard. Leave the switch **open** first (both dark). Rotate Solar toward **MiniatureSun** until wattage rises, then **close** the switch so both bulbs light. Parallel keeps them bright; series splits voltage.
+4. When all three objectives complete (solar >= 0.05 W powering a load AND 2 bulbs lit AND switch closed with bulb lit), objective completes -> stars. End of starter campaign (no further unlock yet).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only
