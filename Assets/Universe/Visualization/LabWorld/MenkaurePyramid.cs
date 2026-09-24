@@ -29,7 +29,7 @@ namespace RealityEngine.Visualization
             "Base 105.5 m. Original height 65.5 m. Slope 51° 20' 25\".\n" +
             "Offset from Khufu centre (approx. WGS84, lat 30°): 563 m west, 743 m south.\n" +
             "North-face original entrance ~4.2 m up, on the centreline. Descending to antechamber + granite burial chamber (barrel vault, lidless coffer).\n" +
-            "Three schematic queens' pyramids on the south side (G3a-c). East chapels: small walkable limestone shells (~9.5 x 7.5 m) east of each queen with west door from pavement (Lehner schematic). Not pyramid interiors. Not photogrammetry.";
+            "Three schematic queens' pyramids on the south side (G3a-c) with honesty labels: G3-a pink granite sarcophagus; G3-b young woman's bones + sarcophagus (bones label-only); G3-c unfinished. Basalt burial coffer = RECONSTRUCTION / LOST FIND (1838). East chapels walkable. Not photogrammetry.";
 
         public static GameObject Build(Transform parent, Vector3 worldBaseCenter, Quaternion worldRot, bool comfortScale)
         {
@@ -114,11 +114,29 @@ namespace RealityEngine.Visualization
             conn.AddTunnel(aEnd, bStart, pw, ph, g, 4);
             GizaBuild.SpawnMesh(parent, "Menkaure_BurialDoor", conn.Build("Menkaure_BurialDoor"), granite, true);
 
-            var sarc = new LabMeshBuilder(24, 36);
+            // Basalt sarcophagus — LOST FIND (shipwreck 1838). Schematic RECONSTRUCTION only.
+            Material basalt = LabWorldMeshes.MakeLit("RELab_Basalt",
+                new Color(0.16f, 0.16f, 0.18f, 1f), 0.08f, 0.18f, false);
+            var sarc = new LabMeshBuilder(32, 48);
             Vector3 sarcC = new Vector3(0f, buryFloor.y + 0.45f, buryC.z - 1.6f);
-            sarc.AddBox(sarcC, new Vector3(0.9f, 0.9f, 2.2f), g);
+            sarc.AddBox(sarcC, new Vector3(0.95f, 0.95f, 2.25f), g);
+            // Palace-facade panel stubs (attested decoration type on lost coffer).
+            sarc.AddBox(sarcC + new Vector3(0.5f, 0f, 0f), new Vector3(0.06f, 0.7f, 1.9f), g);
+            sarc.AddBox(sarcC + new Vector3(-0.5f, 0f, 0f), new Vector3(0.06f, 0.7f, 1.9f), g);
             sarc.AddRoom(sarcC + Vector3.up * 0.08f, new Vector3(0.62f, 0.58f, 1.85f), g, false, false, false, false);
-            GizaBuild.SpawnMesh(parent, "Menkaure_Sarcophagus", sarc.Build("Menkaure_Sarcophagus"), granite, true);
+            GizaBuild.SpawnMesh(parent, "Menkaure_Sarcophagus", sarc.Build("Menkaure_Sarcophagus"), basalt, true);
+            const string sarcHonesty =
+                "RECONSTRUCTION / LOST FIND.\n" +
+                "Menkaure basalt sarcophagus (palace-facade decoration). Found by Vyse; lost at sea 1838 en route to Britain.\n" +
+                "This mesh is a labeled reconstruction of the lost find — NOT found here today. Chamber otherwise empty of treasure.";
+            GizaBuild.HonestyPlate(parent, "Menkaure_Sarcophagus_Honesty", sarcHonesty, 8f);
+            Transform sP = parent.Find("Menkaure_Sarcophagus_Honesty");
+            if (sP != null)
+            {
+                sP.localPosition = new Vector3(sarcC.x + 1.5f, buryFloor.y + 1.5f, sarcC.z);
+                sP.localRotation = Quaternion.Euler(0f, 90f, 0f);
+                sP.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            }
         }
 
         static void BuildQueens(Transform parent, Material tura, Material gold)
@@ -128,6 +146,7 @@ namespace RealityEngine.Visualization
             string[] names = { "G3a", "G3b", "G3c" };
             Material pav = GizaBuild.Pavement();
             Material lime = GizaBuild.InteriorLime();
+            Material granite = GizaBuild.Granite();
             for (int i = 0; i < 3; i++)
             {
                 var q = new GameObject(names[i]);
@@ -139,6 +158,50 @@ namespace RealityEngine.Visualization
                 GizaBuild.PavementRing(q.transform, names[i] + "_Pavement", QueenBaseM, 3f, pav);
                 // East chapel shells (Lehner schematic) - marker names[i]_Chapel for force-rebuild.
                 GizaPrecinct.BuildQueenEastChapel(q.transform, names[i], QueenBaseM, lime, tura, pav);
+                BuildQueenContents(q.transform, names[i], pav, granite);
+            }
+        }
+
+        static void BuildQueenContents(Transform queenRoot, string name, Material pav, Material granite)
+        {
+            // Honesty-only interiors for G3a-c — no invented treasure.
+            string body;
+            if (name == "G3a")
+            {
+                body =
+                    "ATTESTED type / parallel.\n" +
+                    "G3-a (Menkaure queen): pink granite sarcophagus attested (schematic). Chapel east of pyramid.\n" +
+                    "Not a full walkable burial interior in this build — honesty label at chapel.";
+                var sarc = new LabMeshBuilder(16, 24);
+                Color pg = new Color(0.62f, 0.42f, 0.40f, 1f);
+                Material pink = LabWorldMeshes.MakeLit("RELab_PinkGranite", pg, 0.06f, 0.18f, false);
+                sarc.AddBox(new Vector3(QueenBaseM * 0.5f + 4.5f, 0.55f, 0f), new Vector3(1.8f, 0.9f, 0.85f), Color.white);
+                GizaBuild.SpawnMesh(queenRoot, name + "_Sarcophagus", sarc.Build(name + "_Sarcophagus"), pink, true);
+            }
+            else if (name == "G3b")
+            {
+                body =
+                    "ATTESTED find context.\n" +
+                    "G3-b: sarcophagus + bones of a young woman (attested excavation). Schematic empty coffer here.\n" +
+                    "Bones not modeled as props (human remains — label only). No invented jewelry cache.";
+                var sarc = new LabMeshBuilder(16, 24);
+                sarc.AddBox(new Vector3(QueenBaseM * 0.5f + 4.5f, 0.5f, 0f), new Vector3(1.7f, 0.85f, 0.8f), Color.white);
+                GizaBuild.SpawnMesh(queenRoot, name + "_Sarcophagus", sarc.Build(name + "_Sarcophagus"), granite, true);
+            }
+            else
+            {
+                body =
+                    "ATTESTED unfinished.\n" +
+                    "G3-c: unfinished queen pyramid. No complete burial assemblage claimed here.\n" +
+                    "Honesty label only — do not invent contents.";
+            }
+            GizaBuild.HonestyPlate(queenRoot, name + "_ContentsHonesty", body, 10f);
+            Transform plate = queenRoot.Find(name + "_ContentsHonesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(QueenBaseM * 0.5f + 7f, 1.5f, 0f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+                plate.localScale = new Vector3(0.55f, 0.55f, 0.55f);
             }
         }
     }

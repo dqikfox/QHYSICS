@@ -47,7 +47,7 @@ namespace RealityEngine.Visualization
             "North-face original entrance only: 17 m up, 7.29 m east of centreline (Petrie). Passages 1.05 × 1.20 m at 26.5°. Comfort scale default OFF.\n" +
             "Descending 105 m to unfinished subterranean 14.1 × 8.3 × 3.5 m. Junction 28.2 m; well shaft Grand Gallery → descending; ascending 37.76 m.\n" +
             "Queen's chamber 5.8 × 5.3 × 6.2 m gabled, east-wall niche, horizontal 38.15 m. Grand Gallery 46.68 × 8.6 × 2.1 m corbelled.\n" +
-            "Antechamber with 3 portcullis slots. King's chamber 20 × 10 cubits (10.47 × 5.24 × 5.84 m) granite, lidless coffer, 5 intact relieving chambers. Air shafts thin channels.";
+            "Antechamber with 3 portcullis slots. King's chamber 20 × 10 cubits (10.47 × 5.24 × 5.84 m) granite, empty lidless coffer (no mummy/goods), 5 intact relieving chambers with attested crew graffiti. Air shafts geometric only — no treasure behind blocking stones. Subterranean unfinished empty.";
 
         public static GameObject Build(Transform parent, Vector3 worldBaseCenter, Quaternion worldRot, bool comfortScale)
         {
@@ -192,6 +192,18 @@ namespace RealityEngine.Visualization
             var pit = new Vector3(center.x, floor.y - 0.4f, center.z);
             b.AddRoom(pit, new Vector3(2.5f, 0.8f, 2.5f), c, false, false, false, false);
             GizaBuild.SpawnMesh(parent, "Khufu_Subterranean", b.Build("Khufu_Subterranean"), mat, true);
+            const string subHonesty =
+                "ATTESTED empty / unfinished.\n" +
+                "Khufu subterranean chamber. Unfinished rock-cut room with pit. No burial finds.\n" +
+                "Architectural only — not a treasure chamber.";
+            GizaBuild.HonestyPlate(parent, "Khufu_Subterranean_Honesty", subHonesty, 8f);
+            Transform subP = parent.Find("Khufu_Subterranean_Honesty");
+            if (subP != null)
+            {
+                subP.localPosition = new Vector3(center.x + SubEW * 0.5f + 1.5f, floor.y + 1.4f, center.z);
+                subP.localRotation = Quaternion.Euler(0f, 90f, 0f);
+                subP.localScale = new Vector3(0.55f, 0.55f, 0.55f);
+            }
         }
 
         static void BuildQueenChamber(Transform parent, Vector3 door, float pw, float ph, Material mat)
@@ -207,6 +219,18 @@ namespace RealityEngine.Visualization
             Vector3 nicheC = new Vector3(center.x + QueenEW * 0.5f + 0.52f, floor.y + 2.33f, center.z);
             b.AddRoom(nicheC, new Vector3(1.04f, 4.67f, 1.57f), c, false, false, true, false);
             GizaBuild.SpawnMesh(parent, "Khufu_QueenChamber", b.Build("Khufu_QueenChamber"), mat, true);
+            const string queenHonesty =
+                "ATTESTED empty.\n" +
+                "Queen's Chamber: empty limestone room + east-wall niche. No burial finds, no sarcophagus found here.\n" +
+                "Niche is architectural — not a statue cache invented for this build.";
+            GizaBuild.HonestyPlate(parent, "Khufu_QueenChamber_Honesty", queenHonesty, 8f);
+            Transform qP = parent.Find("Khufu_QueenChamber_Honesty");
+            if (qP != null)
+            {
+                qP.localPosition = new Vector3(center.x - QueenEW * 0.5f - 1.6f, floor.y + 1.5f, center.z);
+                qP.localRotation = Quaternion.Euler(0f, -90f, 0f);
+                qP.localScale = new Vector3(0.55f, 0.55f, 0.55f);
+            }
         }
 
         static void BuildKingSuite(Transform parent, Vector3 anteStart, float pw, float ph, Material granite)
@@ -241,6 +265,19 @@ namespace RealityEngine.Visualization
             sarc.AddBox(sarcC, new Vector3(2.28f, 1.05f, 0.98f), g);
             sarc.AddRoom(sarcC + Vector3.up * 0.08f, new Vector3(1.98f, 0.72f, 0.68f), g, false, false, false, false);
             GizaBuild.SpawnMesh(parent, "Khufu_Sarcophagus", sarc.Build("Khufu_Sarcophagus"), granite, true);
+            const string sarcHonesty =
+                "ATTESTED empty prop.\n" +
+                "King's Chamber: empty red granite sarcophagus / coffer (~2.28 x 0.98 x 1.05 m class). No lid found.\n" +
+                "No mummy, no canopic, no furniture found here. Robbed / empty — do not invent treasure.\n" +
+                "Burial kit typology: see Hetepheres G 7000 X (attested) for Old Kingdom royal furniture parallels.";
+            GizaBuild.HonestyPlate(parent, "Khufu_Sarcophagus_Honesty", sarcHonesty, 8f);
+            Transform sP = parent.Find("Khufu_Sarcophagus_Honesty");
+            if (sP != null)
+            {
+                sP.localPosition = new Vector3(sarcC.x, floor.y + 1.7f, sarcC.z + 1.4f);
+                sP.localRotation = Quaternion.Euler(0f, 180f, 0f);
+                sP.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            }
 
             var rel = new LabMeshBuilder(220, 360);
             Color rg = new Color(0.30f, 0.24f, 0.24f, 1f);

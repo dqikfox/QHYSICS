@@ -11,17 +11,19 @@ namespace RealityEngine.Visualization
     {
         public const float LengthM = 73.5f;
         public const float HeightM = 20.22f;
-        public const float WidthM = 19.3f;
+        public const float WidthM = 19.1f;
         public const string RootName = "Sphinx";
         public const string DreamSteleName = "Sphinx_DreamStele";
 
         public const string Honesty =
             GizaComplex.HonestyPrefix + "\n" +
             "Great Sphinx. Schematic Lehner/ARCE massing (boxes + quads), not a scan, not photogrammetry.\n" +
-            "~73.5 m long, ~20.2 m high, ~19.3 m wide. Limestone bedrock core. Faces east. Associated with Khafre.\n" +
+            "~73.5 m long, ~20.2 m high, ~19.1 m wide. Limestone bedrock core. Faces east. Associated with Khafre.\n" +
             "Body, haunches, chest, nemes head, forepaws with toe pads, hind paws, tail curl. No portrait face.\n" +
             "Granite Dream Stele (Thutmose IV) between the forepaws — schematic slab, not the Cairo Museum original.\n" +
-            "Offset from Khufu centre (approx. WGS84, lat 30°): 347 m east, 430 m south. No interior.";
+            "No constructed treasure chamber in the body (Lehner). Documented fissure/shaft only — not a room of goods.\n" +
+            "Sphinx Temple before paws; Khafre Valley Temple SE; Amenhotep II temple north = NEW KINGDOM (labeled).\n" +
+            "Offset from Khufu centre (approx. WGS84, lat 30°): 347 m east, 430 m south (~east of Khafre on plateau).";
 
         // Local axes: +X face/east, -X haunches/west, +Y up, ±Z north/south.
         public static GameObject Build(Transform parent, Vector3 worldBaseCenter, Quaternion worldRot)
@@ -122,6 +124,11 @@ namespace RealityEngine.Visualization
             b.AddBox(new Vector3(tailBaseX - 5.5f, 12.2f, 7.5f), new Vector3(2.4f, 2.4f, 5.5f), c);
 
             GizaBuild.SpawnMesh(root.transform, "Sphinx_Body", b.Build("Sphinx_Body"), lime, true);
+            // Marker: no constructed treasure chamber (Lehner) — force-rebuild when missing.
+            var noChamber = new LabMeshBuilder(8, 12);
+            noChamber.AddBox(new Vector3(0f, 0.15f, 0f), new Vector3(0.4f, 0.2f, 0.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, "Sphinx_NoChamberMarker", noChamber.Build("Sphinx_NoChamberMarker"),
+                GizaBuild.Pavement(), false);
             BuildDreamStele(root.transform, pawEast, pawLen);
             GizaBuild.HonestyPlate(root.transform, "Sphinx_Honesty", Honesty, WidthM);
             Transform plate = root.transform.Find("Sphinx_Honesty");

@@ -191,6 +191,7 @@ namespace RealityEngine.Visualization
             float menLipEast = L.menkaureTempleEast + L.menkaureTempleEW * 0.5f + 10f;
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, menLipEast, L.menkaureTempleNorth, 12f);
             GizaField.ExpandExtents(ref xMin, ref xMax, ref zMin, ref zMax);
+            GizaContents.ExpandExtents(ref xMin, ref xMax, ref zMin, ref zMax);
         }
 
         static void Enc(ref float xMin, ref float xMax, ref float zMin, ref float zMax, float east, float north, float r)
@@ -288,6 +289,10 @@ namespace RealityEngine.Visualization
             GizaField.EnsureCemeteryEnEchelon(pose);
             GizaField.EnsureEastField(pose);
             GizaField.EnsureAnkhhaf(pose);
+            GizaContents.EnsureHetepheres(pose);
+            GizaContents.EnsureMeresankh(pose);
+            GizaContents.EnsureKhufuShipReconstruction(pose);
+            GizaContents.EnsureBigVoidOverlay(pose);
             GizaField.EnsureSurveyAnomalies(pose);
             // Boat-pit / Trial Passages survey overlay (geophysical anomaly schematic).
             GameObject boats = GizaComplex.FindNamed(KhufuBoatPitsName);
@@ -307,13 +312,14 @@ namespace RealityEngine.Visualization
             const string valleyHonesty =
                 GizaComplex.HonestyPrefix + "\n" +
                 "Khafre valley temple. Granite and limestone, T-shaped pillared halls (walkable block rooms). Dual north/south east entrances (vestibule portals) — Lehner / well-preserved Khafre valley temple.\n" +
-                "Statue niches and empty pedestals along the T-hall (~Lehner seated-statue bays; colossi missing). North door opens onto the Sphinx-Khafre link court. Not photogrammetry. Causeway descends from the Khafre mortuary temple.";
+                "Statue niches and empty pedestals along the T-hall (~Lehner seated-statue bays; colossi missing). One diorite Khafre seated statue = ATTESTED FIND (now museum) replica labeled. North door opens onto the Sphinx-Khafre link court. Not photogrammetry.";
 
             // Force rebuild when dual-portal marker or causeway Terminal is missing.
             GameObject oldValley = GizaComplex.FindNamed(KhafreValleyName);
             if (oldValley != null && (oldValley.transform.Find(KhafreValleyName + "_Portals") == null
                 || oldValley.transform.Find(KhafreValleyName + "_LinkDoor") == null
-                || oldValley.transform.Find(KhafreValleyName + "_Niches") == null))
+                || oldValley.transform.Find(KhafreValleyName + "_Niches") == null
+                || oldValley.transform.Find("Khafre_DioriteStatue_Replica") == null))
                 DestroyNamed(oldValley);
             GameObject oldCause = GizaComplex.FindNamed(KhafreCausewayName);
             if (oldCause != null && (oldCause.transform.Find(KhafreCausewayName + "_Terminal") == null
@@ -327,6 +333,9 @@ namespace RealityEngine.Visualization
                 DestroyNamed(oldKhafreMort);
             Ensure(KhafreMortuaryName, pose, p => BuildMortuary(p, KhafreMortuaryName, L.khafreTempleEast, L.khafreTempleNorth, GizaComplex.KhafreBedrockM, L.khafreTempleEW, L.khafreTempleNS, true, mortHonesty), terrace, true);
             Ensure(KhafreValleyName, pose, p => BuildValleyTemple(p, L, valleyHonesty), GizaComplex.CourtY(pose), true);
+            GameObject khafreValley = GizaComplex.FindNamed(KhafreValleyName);
+            if (khafreValley != null)
+                GizaContents.EnsureKhafreDioriteStatue(khafreValley.transform);
             Ensure(KhafreCausewayName, pose, p => BuildCauseway(p, KhafreCausewayName, L.khafreCauseStartEast, L.khafreCauseStartNorth, L.khafreCauseEndEast, L.khafreCauseEndNorth, terrace, GizaComplex.CourtY(pose), 10f), pose.surfaceY, false);
             Vector3 khafre = GizaComplex.WorldFromKhufu(pose, -GizaComplex.KhafreWestM, -GizaComplex.KhafreSouthM, GizaComplex.KhafreBedrockM);
             Ensure(KhafreEnclosureName, pose, p => BuildEnclosure(p, KhafreEnclosureName, khafre, GizaComplex.KhafreBedrockM, KhafrePyramid.BaseMeters * 0.5f + 5f, L.khafreTempleNS + 4f, false), terrace, true);
@@ -377,6 +386,7 @@ namespace RealityEngine.Visualization
             if (oldEnc != null && oldEnc.transform.Find(SphinxEnclosureName + "_Ditch") == null)
                 DestroyNamed(oldEnc);
             Ensure(SphinxEnclosureName, pose, p => BuildSphinxEnclosure(p), GizaComplex.CourtY(pose), true);
+            GizaContents.EnsureAmenhotepII(pose);
             GizaField.EnsureOsirisShaft(pose);
         }
 
