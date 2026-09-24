@@ -512,7 +512,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Three Lights** (unlocked after Power Play). Overlay shows live `[0/3 lit]`.
 2. Grab **three Bulbs** from the Bulb dispenser (restocks after each grab), plus **Battery** and **Wire(s)**.
 3. Series or parallel all three so each carries significant current; only breadboard-placed clones count.
-4. When meter hits `3/3 lit` -> stars. End of starter campaign (no further unlock yet).
+4. When meter hits `3/3 lit` -> stars + unlock **Throttle Up**. Completion banner shows `Unlocked: Throttle Up`.
+
+### Throttle Up (challenge 12)
+1. Press **C** -> Start **Throttle Up** (unlocked after Three Lights). Overlay shows live `[R=0 lit=0]` and `[0/120 RPM]`.
+2. From table dispensers: grab **Battery**, **Wire(s)**, **Resistor** (Resistor shelf), **Bulb**, and **Motor** (Dispenser2 / Motor shelf); snap onto breadboard pegs.
+3. Put the resistor in series so it throttles current while the bulb stays lit and the motor spins.
+4. When both objectives complete (active resistor + lit bulb AND RPM >= 120), objective completes -> stars. End of starter campaign (no further unlock yet).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only

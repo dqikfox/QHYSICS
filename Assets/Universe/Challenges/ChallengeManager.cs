@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 11 challenges with real, detectable conditions.
+        /// Build the starter campaign of 12 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -500,6 +500,36 @@ namespace RealityEngine.Challenges
                             type = ObjectiveType.MultipleBulbsLit,
                             displayText = "Light up 3 bulbs simultaneously",
                             targetCount = 3
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 150f,
+                        threeStarTimeSeconds = 75f,
+                        threeStarMaxComponents = 12
+                    }
+                },
+
+                // 12. Throttle Up - resistor in circuit (with lit bulb) AND motor spinning
+                new ChallengeDefinition
+                {
+                    id = "throttle_up",
+                    title = "Throttle Up",
+                    description = "Limit current with a resistor while powering a lit bulb and spinning a motor to 120+ RPM at the same time.",
+                    mentorHint = "Grab Resistor (Resistor shelf), Bulb, Motor (Dispenser2), Battery, and Wire(s). Series resistor throttles current to both loads. Overlay shows R/lit + RPM. RESET retries cleanly.",
+                    prerequisiteId = "three_lights",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.ResistorInCircuit,
+                            displayText = "Add a resistor while keeping a bulb lit"
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MotorRpmThreshold,
+                            displayText = "Get a motor spinning at 120+ RPM",
+                            targetValue = 120f
                         }
                     },
                     starThresholds = new StarThresholds
