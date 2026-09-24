@@ -41,7 +41,7 @@ namespace RealityEngine.UI
 
             existing.BuildChildren();
             QhysicsDesktopBootstrap.Ensure();
-            QhysicsPlayerSystemsBootstrap.Ensure();
+            // QhysicsPlayerSystemsBootstrap auto-ensures via RuntimeInitializeOnLoad.
             return existing;
         }
 
