@@ -538,6 +538,37 @@ namespace RealityEngine.Challenges
                         threeStarTimeSeconds = 75f,
                         threeStarMaxComponents = 12
                     }
+                },
+
+                // 13. Sun Drive - solar powers a load AND motor spins (no battery needed)
+                new ChallengeDefinition
+                {
+                    id = "sun_drive",
+                    title = "Sun Drive",
+                    description = "Power a motor from the solar panel alone: face the sun until wattage rises and spin the motor to 120+ RPM — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Motor (Dispenser2), Wire(s). No battery. Rotate Solar toward MiniatureSun (LMB/scroll). Overlay shows solar W/load + RPM. RESET retries cleanly.",
+                    prerequisiteId = "throttle_up",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MotorRpmThreshold,
+                            displayText = "Get a motor spinning at 120+ RPM",
+                            targetValue = 120f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 150f,
+                        threeStarTimeSeconds = 75f,
+                        threeStarMaxComponents = 10
+                    }
                 }
             };
         }
