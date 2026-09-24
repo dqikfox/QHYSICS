@@ -518,7 +518,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Throttle Up** (unlocked after Three Lights). Overlay shows live `[R=0 lit=0]` and `[0/120 RPM]`.
 2. From table dispensers: grab **Battery**, **Wire(s)**, **Resistor** (Resistor shelf), **Bulb**, and **Motor** (Dispenser2 / Motor shelf); snap onto breadboard pegs.
 3. Put the resistor in series so it throttles current while the bulb stays lit and the motor spins.
-4. When both objectives complete (active resistor + lit bulb AND RPM >= 120), objective completes -> stars. End of starter campaign (no further unlock yet).
+4. When both objectives complete (active resistor + lit bulb AND RPM >= 120), objective completes -> stars + unlock **Sun Drive**. Completion banner shows `Unlocked: Sun Drive`.
+
+### Sun Drive (challenge 13)
+1. Press **C** -> Start **Sun Drive** (unlocked after Throttle Up). Overlay shows live `[0.00/0.05 W load=0]` and `[0/120 RPM]`.
+2. From **Dispenser11** grab **Solar**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — the panel is the source.
+3. Snap Solar + wires + Motor onto the breadboard. Rotate Solar toward **MiniatureSun** (desktop LMB/scroll; VR pinch) until wattage rises and the motor spins.
+4. When solar W/load meter and RPM both pass (>= 0.05 W powering a load AND RPM >= 120), objective completes -> stars. End of starter campaign (no further unlock yet).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only
