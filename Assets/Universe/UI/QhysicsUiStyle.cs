@@ -11,7 +11,7 @@ namespace RealityEngine.UI
     {
         public static readonly Color PanelBg = new Color(0.08f, 0.09f, 0.10f, 0.82f);
         public static readonly Color PanelBorder = new Color(0.35f, 0.38f, 0.42f, 0.55f);
-        public static readonly Color AccentInfo = new Color(0.25f, 0.85f, 0.95f, 1f);
+        public static readonly Color AccentInfo = new Color(0f, 0.898f, 1f, 1f); // #00E5FF cyan
         public static readonly Color AccentActive = new Color(0.35f, 0.90f, 0.45f, 1f);
         public static readonly Color AccentAttention = new Color(0.95f, 0.82f, 0.25f, 1f);
         public static readonly Color AccentError = new Color(0.95f, 0.30f, 0.28f, 1f);

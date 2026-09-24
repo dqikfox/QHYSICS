@@ -5,7 +5,7 @@ using RealityEngine.Player;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// Ensures QHYSICS UI on Play / Place UI. Wires XR camera + XR UI Input Module.
+    /// Ensures QHYSICS lab UI on Play / Place UI: Toolbelt (hip), HUD, Inspect, SimChip, Pause, Onboarding strip. Wires XR camera + XR UI Input Module.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(190)]

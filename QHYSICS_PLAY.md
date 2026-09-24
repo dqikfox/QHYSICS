@@ -1,7 +1,33 @@
-# QHYSICS ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â how to Play (Editor)
+# QHYSICS — how to Play (Editor)
 
-**Daily testing = Ctrl+P (Play).** Do **not** use Ctrl+B for daily runs ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â that builds an APK/player.
-**Ctrl+P ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°Ãƒâ€šÃ‚Â  APK.** Headset view needs **Meta Quest Link** (or Device Simulator on desktop).
+## UI map (lab shell)
+
+Runtime auto-ensures on Play via `QhysicsUiBootstrap` (no scene YAML rewrite required).
+Editor: **Reality Engine → Place QHYSICS UI** or **Reality Engine → QHYSICS → Ensure UI**.
+
+| Piece | What | Toggle / notes |
+|-------|------|----------------|
+| **Toolbelt** (primary) | Hip/chest world panel — BUILD / PHYSICS / MEASURE / WORLD / EXPERIMENTS | **M / Tab / Menu / B / Grip**. MEASURE pages with scroll or `< >`. |
+| **Status HUD** | QHYSICS + experiment name + run dot | Follows non-dominant side / camera |
+| **Inspect** | Hover = summary; hold = detail (EMF/I/Phi, mass, etc.) | Ray / desktop hover / grab |
+| **Sim chip** | Pause / 0.25x / 1x / 2x + **New Run** (clears `Gadget_*`) | Expand chip near right forearm |
+| **Pause** | Resume / Reset Experiment / Settings / Exit Play (Editor) | **Esc / P** — lab pause, not arcade |
+| **Onboarding strip** | One line: BOOT → ENTER → INTERACT → EXPERIMENT | Dismiss **X** (PlayerPrefs) |
+| **Main menu** | Enter Sandbox (first run) | Auto-hides after enter |
+
+Visual language: dark glass panels, cyan `#00E5FF` accents, TMP LiberationSans, URP-safe `UI/Default` (never Sprites/Default).
+XR: EventSystem + `XRUIInputModule` + `TrackedDeviceGraphicRaycaster`; Event Camera = XR / Main Camera.
+
+### Ctrl+P checklist
+
+1. Open `Assets/Scenes/Faraday.unity` (one Editor only).
+2. Optional: **Reality Engine → QHYSICS → Ensure UI** (or trust runtime bootstrap).
+3. Optional: **Fix Player Spawn** / **Ensure Player Character**.
+4. **Ctrl+P**. Desktop WASD works without headset; Quest Link or XR Device Simulator for XR.
+5. Enter Sandbox if shown → dismiss onboarding strip → **M** toolbelt → hover a gadget for Inspect → Sim chip for speed → **Esc** pause.
+6. EXPERIMENTS → **New Run** clears spawned gadgets (Giza/lab content stays).
+
+---
 
 ## One Editor only
 

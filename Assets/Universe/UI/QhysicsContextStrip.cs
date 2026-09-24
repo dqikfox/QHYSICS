@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using TMPro;
@@ -10,7 +10,7 @@ using RealityEngine.Visualization;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// Context strip when pointing at / holding an interactable: live classical lab stats + hints.
+    /// Inspect panel (context strip): hover = summary, hold = detail. Live classical lab stats + hints.
     /// Desktop uses DesktopInteractor hover/held; VR uses XR interactor hover/select.
     /// </summary>
     [DisallowMultipleComponent]
@@ -22,6 +22,7 @@ namespace RealityEngine.UI
         Canvas _canvas;
         TextMeshProUGUI _name;
         TextMeshProUGUI _stats;
+        TextMeshProUGUI _detail;
         TextMeshProUGUI _hints;
         Camera _cam;
         float _nextPoll;
@@ -65,26 +66,36 @@ namespace RealityEngine.UI
                 else DestroyImmediate(c.gameObject);
             }
 
-            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(520f, 160f));
+            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(540f, 200f));
             QhysicsUiBuilder.WireEventCamera(_canvas);
-            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(500f, 140f));
+            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(520f, 180f));
             face.raycastTarget = false;
             face.transform.parent.GetComponent<UnityEngine.UI.Image>().raycastTarget = false;
 
+            var tag = QhysicsUiBuilder.Label(face.transform, "Tag", "INSPECT", QhysicsUiStyle.FontSmall,
+                QhysicsUiStyle.AccentInfo, TextAlignmentOptions.MidlineLeft);
+            tag.rectTransform.anchoredPosition = new Vector2(-180f, 64f);
+            tag.rectTransform.sizeDelta = new Vector2(120f, 22f);
+
             _name = QhysicsUiBuilder.Label(face.transform, "Name", "-", QhysicsUiStyle.FontBody,
                 QhysicsUiStyle.TextPrimary, TextAlignmentOptions.MidlineLeft);
-            _name.rectTransform.anchoredPosition = new Vector2(0f, 40f);
-            _name.rectTransform.sizeDelta = new Vector2(460f, 36f);
+            _name.rectTransform.anchoredPosition = new Vector2(20f, 58f);
+            _name.rectTransform.sizeDelta = new Vector2(460f, 32f);
 
-            _stats = QhysicsUiBuilder.Label(face.transform, "Stats", "mass - | charge - | T -", QhysicsUiStyle.FontSmall,
+            _stats = QhysicsUiBuilder.Label(face.transform, "Stats", "hover for summary", QhysicsUiStyle.FontSmall,
                 QhysicsUiStyle.TextMuted, TextAlignmentOptions.MidlineLeft);
-            _stats.rectTransform.anchoredPosition = new Vector2(0f, 4f);
-            _stats.rectTransform.sizeDelta = new Vector2(460f, 28f);
+            _stats.rectTransform.anchoredPosition = new Vector2(0f, 22f);
+            _stats.rectTransform.sizeDelta = new Vector2(480f, 26f);
 
-            _hints = QhysicsUiBuilder.Label(face.transform, "Hints", "Rotate | Move | Inspect", QhysicsUiStyle.FontSmall,
+            _detail = QhysicsUiBuilder.Label(face.transform, "Detail", "", QhysicsUiStyle.FontSmall,
+                QhysicsUiStyle.TextPrimary, TextAlignmentOptions.MidlineLeft);
+            _detail.rectTransform.anchoredPosition = new Vector2(0f, -8f);
+            _detail.rectTransform.sizeDelta = new Vector2(480f, 26f);
+
+            _hints = QhysicsUiBuilder.Label(face.transform, "Hints", "Grip/E grab | Ray to select", QhysicsUiStyle.FontSmall,
                 QhysicsUiStyle.AccentInfo, TextAlignmentOptions.MidlineLeft);
-            _hints.rectTransform.anchoredPosition = new Vector2(0f, -36f);
-            _hints.rectTransform.sizeDelta = new Vector2(460f, 28f);
+            _hints.rectTransform.anchoredPosition = new Vector2(0f, -48f);
+            _hints.rectTransform.sizeDelta = new Vector2(480f, 26f);
 
             _canvas.gameObject.SetActive(false);
         }
@@ -198,6 +209,11 @@ namespace RealityEngine.UI
                 _name.text = PrettyName(target.gameObject.name);
             if (_stats != null)
                 _stats.text = FormatStats(target, selected);
+            if (_detail != null)
+            {
+                _detail.text = selected ? FormatDetail(target) : "hold to expand detail";
+                _detail.color = selected ? QhysicsUiStyle.TextPrimary : QhysicsUiStyle.TextMuted;
+            }
             if (_hints != null)
                 _hints.text = FormatHints(target, selected);
             if (_canvas != null)
@@ -296,6 +312,28 @@ namespace RealityEngine.UI
             if (mass != null)
                 return "mass " + mass + " | " + state;
             return state + " | inspect";
+        }
+
+        static string FormatDetail(Transform t)
+        {
+            if (t == null)
+                return "";
+            var circuit = t.GetComponentInParent<InductionCircuit>();
+            if (circuit == null)
+                circuit = Object.FindFirstObjectByType<InductionCircuit>(FindObjectsInactive.Exclude);
+            Rigidbody rb = t.GetComponentInParent<Rigidbody>();
+            if (circuit != null)
+            {
+                return "R " + circuit.TotalResistanceOhms.ToString("0.##") + " ohm"
+                    + " | Phi " + FormatFlux(circuit.FluxWebers)
+                    + " | dPhi/dt " + circuit.FluxRateWebersPerSecond.ToString("0.####");
+            }
+            if (rb != null)
+            {
+                return "v " + rb.linearVelocity.magnitude.ToString("0.###") + " m/s"
+                    + " | mass " + rb.mass.ToString("0.###") + " kg";
+            }
+            return "inspect focus";
         }
 
         static string FormatHints(Transform t, bool selected)

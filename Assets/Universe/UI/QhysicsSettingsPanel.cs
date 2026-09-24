@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using RealityEngine.Audio;
 
 namespace RealityEngine.UI
 {
@@ -22,6 +23,7 @@ namespace RealityEngine.UI
         bool _open;
         int _gravIndex;
         float _uiOpacity = 0.82f;
+        float _masterVolume = 1f;
 
         public static QhysicsSettingsPanel Ensure(Transform parent)
         {
@@ -77,6 +79,8 @@ namespace RealityEngine.UI
             QhysicsUiBuilder.ChipButton(face.transform, "Opacity", "UI opacity cycle", new Vector2(520f, 72f), CycleOpacity);
             QhysicsUiBuilder.ChipButton(face.transform, "Close", "Close", new Vector2(520f, 72f), () => SetOpen(false));
 
+            _masterVolume = AudioRouter.LoadMasterVolume();
+            AudioRouter.SetMasterVolume(_masterVolume);
             MatchGravityIndex();
             RefreshStatus();
             SetOpen(false);
@@ -113,7 +117,8 @@ namespace RealityEngine.UI
 
         void NudgeVolume(float delta)
         {
-            AudioListener.volume = Mathf.Clamp01(AudioListener.volume + delta);
+            _masterVolume = Mathf.Clamp01(_masterVolume + delta);
+            AudioRouter.SaveMasterVolume(_masterVolume);
             RefreshStatus();
         }
 
@@ -183,7 +188,7 @@ namespace RealityEngine.UI
         void RefreshStatus()
         {
             if (_status == null) return;
-            _status.text = "vol " + AudioListener.volume.ToString("0.00")
+            _status.text = "vol " + _masterVolume.ToString("0.00")
                 + " | speed " + Time.timeScale.ToString("0.##") + "x"
                 + " | " + GravityNames[_gravIndex]
                 + " | ui α " + _uiOpacity.ToString("0.00");

@@ -148,7 +148,7 @@ namespace RealityEngine.UI
             if (_cam == null)
                 return;
 
-            // Worn at hip/chest of DesktopBody / XR Origin Ã¢â‚¬â€ lag follow, not glued to HMD.
+            // Worn at hip/chest of DesktopBody / XR Origin — lag follow, not glued to HMD.
             Vector3 anchorPos;
             Vector3 flatFwd;
             if (_hip != null)
@@ -311,22 +311,65 @@ namespace RealityEngine.UI
             if (Time.unscaledTime < _spawnCooldown)
                 return;
             _spawnCooldown = Time.unscaledTime + 0.2f;
-            // chip selected Ã¢â‚¬â€ use table dispensers to spawn
-            TryCircuitLabHint(label);
+            if (TryLabAction(label))
+                return;
+            TrySpawnGadget(label);
         }
 
-        static void TryCircuitLabHint(string label)
+        static bool TryLabAction(string label)
         {
-            // Spawn via shared gadget API (desktop hotbar + VR toolbelt Build chips)
+            if (string.IsNullOrEmpty(label))
+                return false;
+            string key = label.Trim().ToLowerInvariant();
+
+            if (key == "new run" || key == "reset" || key == "reset experiment")
+            {
+                QhysicsLabActions.ResetCircuitLab();
+                return true;
+            }
+            if (key == "sky")
+            {
+                QhysicsLabActions.CycleSky();
+                return true;
+            }
+            if (key == "teleport" || key == "reset pose")
+            {
+                RealityEngine.XR.LabPlayerSpawn.EnsureApplied();
+                RealityEngine.XR.LabPlayerSpawn.RecalibratePlayerHeight(force: true);
+                Debug.Log("QHYSICS: " + label + " — plaza pose + eye height recalibrated.");
+                return true;
+            }
+            if (key == "scale")
+            {
+                Debug.Log("QHYSICS: Scale chip reserved (world scale locked). Use SimChip for timeScale.");
+                return true;
+            }
+            if (key == "save" || key == "load")
+            {
+                Debug.Log("QHYSICS: " + label + " stub — persistence comes with experiment runner save slots.");
+                return true;
+            }
+            if (key == "induction")
+            {
+                var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+                var lab = RealityEngine.Experiments.InductionLabBootstrap.EnsureLabInScene(scene);
+                if (lab != null)
+                    lab.BuildLab();
+                Debug.Log("QHYSICS: Induction lab ensured.");
+                return true;
+            }
+            return false;
+        }
+
+        static void TrySpawnGadget(string label)
+        {
             Camera cam = QhysicsUiBuilder.ResolveXrCamera();
             Vector3 pos = cam != null
                 ? cam.transform.position + cam.transform.forward * 1.1f + Vector3.up * 0.1f
                 : Vector3.zero;
             if (QhysicsGadgets.SpawnByLabel(label, pos) != null)
                 return;
-            var lab = UnityEngine.Object.FindAnyObjectByType<CircuitLab>(FindObjectsInactive.Include);
-            if (lab == null)
-                return;
+            UnityEngine.Object.FindAnyObjectByType<CircuitLab>(FindObjectsInactive.Include);
         }
 
         bool WasTogglePressed()
