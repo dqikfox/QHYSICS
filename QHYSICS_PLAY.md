@@ -629,7 +629,12 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Sun Faraday Hex** (unlocked after Sun Faraday Penta). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and hex bulbs `[0/6 lit]`.
 2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **six Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Hex: six bulbs lit from the panel + Induction Lab peak EMF.
 3. Snap Solar + wires + six Bulbs onto the breadboard (parallel preferred). Face **MiniatureSun** until solar powers a load and all six bulbs light. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
-4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 6 bulbs lit), objective completes -> stars. End of starter campaign (campaign deepest / next unlock N/A).
+4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 6 bulbs lit), objective completes -> stars + unlock **Sun Faraday Hept**. Completion banner shows `Unlocked: Sun Faraday Hept`.
+### Sun Faraday Hept (challenge 32)
+1. Press **C** -> Start **Sun Faraday Hept** (unlocked after Sun Faraday Hex). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and hept bulbs `[0/7 lit]`.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **seven Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Hept: seven bulbs lit from the panel + Induction Lab peak EMF.
+3. Snap Solar + wires + seven Bulbs onto the breadboard (parallel preferred). Face **MiniatureSun** until solar powers a load and all seven bulbs light. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
+4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 7 bulbs lit), objective completes -> stars. End of starter campaign (campaign deepest / next unlock N/A).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only

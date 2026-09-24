@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // Ã¢â€â‚¬Ã¢â€â‚¬ Campaign Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         /// <summary>
-        /// Build the starter campaign of 30 challenges with real, detectable conditions.
+        /// Build the starter campaign of 32 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -1233,6 +1233,47 @@ namespace RealityEngine.Challenges
                         twoStarTimeSeconds = 200f,
                         threeStarTimeSeconds = 100f,
                         threeStarMaxComponents = 28
+                    }
+                },
+                // 32. Sun Faraday Hept - solar load + Faraday peak EMF + seven bulbs lit
+                // NOTE: Solar+EMF+MultipleBulbsLit(6) is sun_faraday_hex ch31; Solar+EMF+MultipleBulbsLit(5) is sun_faraday_penta ch30;
+                // Solar+EMF+MultipleBulbsLit(4) is sun_faraday_quad ch29; Solar+EMF+MultipleBulbsLit(3) is sun_faraday_trio ch27;
+                // Solar+EMF+MultipleBulbsLit(2) is sun_faraday_twin ch26; Solar+EMF+MotorRpm is sun_faraday_spin ch28;
+                // Solar+EMF+SwitchMotor is sun_induction ch22; Solar+EMF+SwitchBulb is sun_faraday_gate ch25;
+                // Solar+EMF+Resistor is sun_faraday_drive ch24; Solar+EMF+CircuitPower is sun_faraday_lab ch23.
+                new ChallengeDefinition
+                {
+                    id = "sun_faraday_hept",
+                    title = "Sun Faraday Hept",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light seven bulbs at once from the panel alone — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), seven Bulbs, Wire(s). No battery. Face MiniatureSun; parallel keeps all seven bright; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + N/7 lit. RESET retries cleanly.",
+                    prerequisiteId = "sun_faraday_hex",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.InducedEmfThreshold,
+                            displayText = "Peak |EMF| >= 0.05 V through the coil",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MultipleBulbsLit,
+                            displayText = "Light up 7 bulbs from the solar panel simultaneously",
+                            targetCount = 7
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 220f,
+                        threeStarTimeSeconds = 110f,
+                        threeStarMaxComponents = 32
                     }
                 }
 
