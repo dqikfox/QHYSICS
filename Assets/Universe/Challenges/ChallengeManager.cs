@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 27 challenges with real, detectable conditions.
+        /// Build the starter campaign of 28 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -1071,6 +1071,47 @@ namespace RealityEngine.Challenges
                         twoStarTimeSeconds = 180f,
                         threeStarTimeSeconds = 90f,
                         threeStarMaxComponents = 18
+                    }
+                },
+
+                // 28. Sun Faraday Spin - solar load + Faraday peak EMF + motor RPM (no switch gate)
+                // NOTE: Solar+EMF+SwitchMotor is sun_induction ch22; Solar+EMF+MultipleBulbsLit(3) is sun_faraday_trio ch27;
+                // Solar+EMF+MultipleBulbsLit(2) is sun_faraday_twin ch26; Solar+EMF+SwitchBulb is sun_faraday_gate ch25;
+                // Solar+EMF+Resistor is sun_faraday_drive ch24; Solar+EMF+CircuitPower is sun_faraday_lab ch23;
+                // Solar+MotorRpm (no EMF) is sun_drive ch13.
+                new ChallengeDefinition
+                {
+                    id = "sun_faraday_spin",
+                    title = "Sun Faraday Spin",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and spin a motor to 120+ RPM from the panel alone - no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Motor (Dispenser2), Wire(s). No battery. Face MiniatureSun until motor spins; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + RPM. RESET retries cleanly.",
+                    prerequisiteId = "sun_faraday_trio",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.InducedEmfThreshold,
+                            displayText = "Peak |EMF| >= 0.05 V through the coil",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MotorRpmThreshold,
+                            displayText = "Get a motor spinning at 120+ RPM",
+                            targetValue = 120f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 16
                     }
                 }
             };
