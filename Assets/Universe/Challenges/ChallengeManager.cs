@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 14 challenges with real, detectable conditions.
+        /// Build the starter campaign of 15 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -597,6 +597,36 @@ namespace RealityEngine.Challenges
                             type = ObjectiveType.MotorRpmThreshold,
                             displayText = "Get a motor spinning at 120+ RPM",
                             targetValue = 120f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 12
+                    }
+                },
+
+                // 15. Sun Gate - solar + knife switch gates a lit bulb (renewable source + control)
+                new ChallengeDefinition
+                {
+                    id = "sun_gate",
+                    title = "Sun Gate",
+                    description = "Gate solar power with a knife switch: face the sun, close the switch, and light a bulb from the panel alone — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), Bulb, Wire(s). No battery. Open switch first (dark), face MiniatureSun, then close switch so bulb lights. Overlay shows solar W/load + sw/lit. RESET retries cleanly.",
+                    prerequisiteId = "sun_lab",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SwitchClosedBulbLit,
+                            displayText = "Close a switch and light a bulb from the solar panel"
                         }
                     },
                     starThresholds = new StarThresholds
