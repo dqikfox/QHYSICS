@@ -92,7 +92,7 @@ namespace RealityEngine.Challenges
     /// Singleton MonoBehaviour that self-spawns at runtime via RuntimeInitializeOnLoadMethod.
     /// Polls CircuitLab / InductionCircuit public state at ~5 Hz to evaluate objectives of the
     /// active challenge. Fires events for objective / challenge completion. Manages persistent
-    /// progress and exposes mentor context for the AI scientist. Additive â€” does not modify sim scripts.
+    /// progress and exposes mentor context for the AI scientist. Additive Ã¢â‚¬â€ does not modify sim scripts.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(60)]
@@ -105,7 +105,7 @@ namespace RealityEngine.Challenges
 
         public static ChallengeManager Instance => _instance;
 
-        // â”€â”€ Public state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Public state Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         /// <summary>All challenge definitions in the starter campaign (ordered by progression).</summary>
         public ChallengeDefinition[] Campaign { get; private set; }
@@ -124,7 +124,7 @@ namespace RealityEngine.Challenges
         /// <summary>Placed component count at the moment of completion (for star rating).</summary>
         public int LastComponentCount { get; private set; }
 
-        // â”€â”€ Events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Events Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         /// <summary>Fires when a single objective is completed. (objective, index)</summary>
         public event Action<ChallengeObjective, int> OnObjectiveCompleted;
@@ -135,7 +135,7 @@ namespace RealityEngine.Challenges
         /// <summary>Fires when the active challenge is abandoned.</summary>
         public event Action OnChallengeAbandoned;
 
-        // â”€â”€ Progress â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Progress Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         ChallengeProgressFile _progress;
         float _pollTimer;
@@ -153,7 +153,7 @@ namespace RealityEngine.Challenges
         /// <summary>Peak |EMF| seen while the active challenge runs (latched; cleared on start/RESET).</summary>
         float _peakInducedEmf;
 
-        // â”€â”€ Self-spawning â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Self-spawning Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void AutoSpawn()
@@ -170,7 +170,7 @@ namespace RealityEngine.Challenges
             go.AddComponent<ChallengeManager>();
         }
 
-        // Compatibility wrapper â€” FindFirstObjectByType is Unity 2023+,
+        // Compatibility wrapper Ã¢â‚¬â€ FindFirstObjectByType is Unity 2023+,
         // FindObjectOfType is deprecated but still compiles on 6000.x.
         static new T FindObjectOfType<T>() where T : Component
         {
@@ -214,7 +214,7 @@ namespace RealityEngine.Challenges
             }
         }
 
-        // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Campaign Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         /// <summary>
         /// Build the starter campaign of 30 challenges with real, detectable conditions.
@@ -224,7 +224,7 @@ namespace RealityEngine.Challenges
         {
             return new[]
             {
-                // 1. First Light â€” close a battery-bulb circuit; bulb lit
+                // 1. First Light Ã¢â‚¬â€ close a battery-bulb circuit; bulb lit
                 new ChallengeDefinition
                 {
                     id = "first_light",
@@ -248,7 +248,7 @@ namespace RealityEngine.Challenges
                     }
                 },
 
-                // 2. Current Control â€” add a resistor; bulb stays lit
+                // 2. Current Control Ã¢â‚¬â€ add a resistor; bulb stays lit
                 new ChallengeDefinition
                 {
                     id = "current_control",
@@ -277,7 +277,7 @@ namespace RealityEngine.Challenges
                     }
                 },
 
-                // 3. Spin Up â€” motor reaches RPM threshold
+                // 3. Spin Up Ã¢â‚¬â€ motor reaches RPM threshold
                 new ChallengeDefinition
                 {
                     id = "spin_up",
@@ -302,7 +302,7 @@ namespace RealityEngine.Challenges
                     }
                 },
 
-                // 4. Double Trouble â€” two bulbs lit simultaneously
+                // 4. Double Trouble Ã¢â‚¬â€ two bulbs lit simultaneously
                 new ChallengeDefinition
                 {
                     id = "double_trouble",
@@ -327,7 +327,7 @@ namespace RealityEngine.Challenges
                     }
                 },
 
-                // 5. Sun Power â€” solar panel powers a load
+                // 5. Sun Power Ã¢â‚¬â€ solar panel powers a load
                 new ChallengeDefinition
                 {
                     id = "sun_power",
@@ -352,7 +352,7 @@ namespace RealityEngine.Challenges
                     }
                 },
 
-                // 6. Induction â€” induce EMF >= threshold using magnet + coil
+                // 6. Induction Ã¢â‚¬â€ induce EMF >= threshold using magnet + coil
                 new ChallengeDefinition
                 {
                     id = "induction",
@@ -545,7 +545,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_drive",
                     title = "Sun Drive",
-                    description = "Power a motor from the solar panel alone: face the sun until wattage rises and spin the motor to 120+ RPM — no battery.",
+                    description = "Power a motor from the solar panel alone: face the sun until wattage rises and spin the motor to 120+ RPM â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), Motor (Dispenser2), Wire(s). No battery. Rotate Solar toward MiniatureSun (LMB/scroll). Overlay shows solar W/load + RPM. RESET retries cleanly.",
                     prerequisiteId = "throttle_up",
                     objectives = new[]
@@ -576,7 +576,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_lab",
                     title = "Sun Lab",
-                    description = "Power a lit bulb and a spinning motor from the solar panel alone — multi-load from one renewable source, no battery.",
+                    description = "Power a lit bulb and a spinning motor from the solar panel alone â€” multi-load from one renewable source, no battery.",
                     mentorHint = "Grab Solar (Dispenser11), Bulb, Motor (Dispenser2), Wire(s). No battery. Parallel loads share the panel; face MiniatureSun. Overlay shows solar W/load + lit + RPM. RESET retries cleanly.",
                     prerequisiteId = "sun_drive",
                     objectives = new[]
@@ -612,7 +612,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_gate",
                     title = "Sun Gate",
-                    description = "Gate solar power with a knife switch: face the sun, close the switch, and light a bulb from the panel alone — no battery.",
+                    description = "Gate solar power with a knife switch: face the sun, close the switch, and light a bulb from the panel alone â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), Bulb, Wire(s). No battery. Open switch first (dark), face MiniatureSun, then close switch so bulb lights. Overlay shows solar W/load + sw/lit. RESET retries cleanly.",
                     prerequisiteId = "sun_lab",
                     objectives = new[]
@@ -642,7 +642,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_switch_drive",
                     title = "Sun Switch Drive",
-                    description = "Gate solar power with a knife switch: face the sun, close the switch, and spin a motor to 120+ RPM from the panel alone — no battery.",
+                    description = "Gate solar power with a knife switch: face the sun, close the switch, and spin a motor to 120+ RPM from the panel alone â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), Motor (Dispenser2), Wire(s). No battery. Open switch first (no spin), face MiniatureSun, then close switch so motor spins. Overlay shows solar W/load + sw/RPM. RESET retries cleanly.",
                     prerequisiteId = "sun_gate",
                     objectives = new[]
@@ -673,7 +673,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_switch_lab",
                     title = "Sun Switch Lab",
-                    description = "Gate solar power with a knife switch: face the sun, close the switch, and light a bulb while spinning a motor to 120+ RPM from the panel alone — no battery.",
+                    description = "Gate solar power with a knife switch: face the sun, close the switch, and light a bulb while spinning a motor to 120+ RPM from the panel alone â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), Bulb, Motor (Dispenser2), Wire(s). No battery. Open switch first (dark/still), face MiniatureSun, then close switch so bulb lights and motor spins. Overlay shows solar W/load + sw/lit + RPM. RESET retries cleanly.",
                     prerequisiteId = "sun_switch_drive",
                     objectives = new[]
@@ -709,7 +709,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_twin_gate",
                     title = "Sun Twin Gate",
-                    description = "Gate solar power with a knife switch and light two bulbs at once from the panel alone — no battery.",
+                    description = "Gate solar power with a knife switch and light two bulbs at once from the panel alone â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), two Bulbs, Wire(s). No battery. Open switch first (both dark), face MiniatureSun, then close switch so both bulbs light. Parallel keeps them bright; series splits voltage. Overlay shows solar W/load + N/2 lit + sw/lit. RESET retries cleanly.",
                     prerequisiteId = "sun_switch_lab",
                     objectives = new[]
@@ -745,7 +745,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_twin_lab",
                     title = "Sun Twin Lab",
-                    description = "Gate solar power with a knife switch: face the sun, close the switch, light two bulbs at once, and spin a motor to 120+ RPM from the panel alone — no battery.",
+                    description = "Gate solar power with a knife switch: face the sun, close the switch, light two bulbs at once, and spin a motor to 120+ RPM from the panel alone â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), two Bulbs, Motor (Dispenser2), Wire(s). No battery. Open switch first (dark/still), face MiniatureSun, then close switch so both bulbs light and motor spins. Overlay shows solar W/load + N/2 lit + sw/RPM. RESET retries cleanly.",
                     prerequisiteId = "sun_twin_gate",
                     objectives = new[]
@@ -782,7 +782,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_throttle",
                     title = "Sun Throttle",
-                    description = "Throttle solar current with a resistor while keeping a bulb lit, and gate a motor to 120+ RPM with a knife switch — no battery.",
+                    description = "Throttle solar current with a resistor while keeping a bulb lit, and gate a motor to 120+ RPM with a knife switch â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), Resistor (Resistor shelf), Switch (Dispenser3), Bulb, Motor (Dispenser2), Wire(s). No battery. Series resistor throttles current; face MiniatureSun; close switch so motor spins. Overlay shows solar W/load + R/lit + sw/RPM. RESET retries cleanly.",
                     prerequisiteId = "sun_twin_lab",
                     objectives = new[]
@@ -818,7 +818,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_power_lab",
                     title = "Sun Power Lab",
-                    description = "Face the sun until the panel powers a load, deliver at least 0.05 W of measurable load power (P = |V| * |I|), and gate a motor to 120+ RPM with a knife switch — no battery.",
+                    description = "Face the sun until the panel powers a load, deliver at least 0.05 W of measurable load power (P = |V| * |I|), and gate a motor to 120+ RPM with a knife switch â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), Bulb and/or Motor (Dispenser2), Wire(s). No battery. Face MiniatureSun; overlay shows solar W/load + circuit W/lit + sw/RPM. Close switch so motor spins. RESET retries cleanly.",
                     prerequisiteId = "sun_throttle",
                     objectives = new[]
@@ -855,7 +855,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_induction",
                     title = "Sun Induction",
-                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil (thrust the magnet through), and gate a motor to 120+ RPM with a knife switch — no battery.",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil (thrust the magnet through), and gate a motor to 120+ RPM with a knife switch â€” no battery.",
                     mentorHint = "Solar circuit: Dispenser11 Solar + Dispenser3 Switch + Bulb/Motor + Wire(s), face MiniatureSun. Induction Lab: grab bar magnet, thrust through coil for peak EMF. Overlay shows solar W/load + pk EMF + sw/RPM. RESET retries cleanly.",
                     prerequisiteId = "sun_power_lab",
                     objectives = new[]
@@ -892,7 +892,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_faraday_lab",
                     title = "Sun Faraday Lab",
-                    description = "Keep a solar panel powering a load with measurable P=|V|*|I| >= 0.05 W, and induce peak |EMF| >= 0.05 V at the Faraday coil — no battery.",
+                    description = "Keep a solar panel powering a load with measurable P=|V|*|I| >= 0.05 W, and induce peak |EMF| >= 0.05 V at the Faraday coil â€” no battery.",
                     mentorHint = "Solar (Dispenser11) + Bulb/Motor + Wire(s), face MiniatureSun; Induction Lab magnet thrust for peak EMF; overlay solar W/load + pk EMF + circuit W/lit; RESET retries cleanly.",
                     prerequisiteId = "sun_induction",
                     objectives = new[]
@@ -929,7 +929,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_faraday_drive",
                     title = "Sun Faraday Drive",
-                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and throttle the renewable loop with a series resistor while keeping a bulb lit — no battery.",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and throttle the renewable loop with a series resistor while keeping a bulb lit â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), Resistor (Resistor shelf), Bulb, Wire(s). No battery. Face MiniatureSun; series resistor throttles current with bulb lit; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + R/lit. RESET retries cleanly.",
                     prerequisiteId = "sun_faraday_lab",
                     objectives = new[]
@@ -966,7 +966,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_faraday_gate",
                     title = "Sun Faraday Gate",
-                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and gate a lit bulb with a knife switch — no battery.",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and gate a lit bulb with a knife switch â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), Bulb, Wire(s). No battery. Face MiniatureSun; open switch first (dark), then close so bulb lights; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + sw/lit. RESET retries cleanly.",
                     prerequisiteId = "sun_faraday_drive",
                     objectives = new[]
@@ -1002,7 +1002,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_faraday_twin",
                     title = "Sun Faraday Twin",
-                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light two bulbs at once from the panel alone — no battery.",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light two bulbs at once from the panel alone â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), two Bulbs, Wire(s). No battery. Face MiniatureSun; parallel keeps both bright; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + N/2 lit. RESET retries cleanly.",
                     prerequisiteId = "sun_faraday_gate",
                     objectives = new[]
@@ -1042,7 +1042,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_faraday_trio",
                     title = "Sun Faraday Trio",
-                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light three bulbs at once from the panel alone — no battery.",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light three bulbs at once from the panel alone â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), three Bulbs, Wire(s). No battery. Face MiniatureSun; parallel keeps all three bright; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + N/3 lit. RESET retries cleanly.",
                     prerequisiteId = "sun_faraday_twin",
                     objectives = new[]
@@ -1123,7 +1123,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_faraday_quad",
                     title = "Sun Faraday Quad",
-                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light four bulbs at once from the panel alone — no battery.",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light four bulbs at once from the panel alone â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), four Bulbs, Wire(s). No battery. Face MiniatureSun; parallel keeps all four bright; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + N/4 lit. RESET retries cleanly.",
                     prerequisiteId = "sun_faraday_spin",
                     objectives = new[]
@@ -1163,7 +1163,7 @@ namespace RealityEngine.Challenges
                 {
                     id = "sun_faraday_penta",
                     title = "Sun Faraday Penta",
-                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light five bulbs at once from the panel alone — no battery.",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light five bulbs at once from the panel alone â€” no battery.",
                     mentorHint = "Grab Solar (Dispenser11), five Bulbs, Wire(s). No battery. Face MiniatureSun; parallel keeps all five bright; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + N/5 lit. RESET retries cleanly.",
                     prerequisiteId = "sun_faraday_quad",
                     objectives = new[]
@@ -1193,13 +1193,54 @@ namespace RealityEngine.Challenges
                         threeStarTimeSeconds = 90f,
                         threeStarMaxComponents = 24
                     }
+                },
+                // 31. Sun Faraday Hex - solar load + Faraday peak EMF + six bulbs lit
+                // NOTE: Solar+EMF+MultipleBulbsLit(5) is sun_faraday_penta ch30; Solar+EMF+MultipleBulbsLit(4) is sun_faraday_quad ch29;
+                // Solar+EMF+MultipleBulbsLit(3) is sun_faraday_trio ch27; Solar+EMF+MultipleBulbsLit(2) is sun_faraday_twin ch26;
+                // Solar+EMF+MotorRpm is sun_faraday_spin ch28; Solar+EMF+SwitchMotor is sun_induction ch22;
+                // Solar+EMF+SwitchBulb is sun_faraday_gate ch25; Solar+EMF+Resistor is sun_faraday_drive ch24;
+                // Solar+EMF+CircuitPower is sun_faraday_lab ch23.
+                new ChallengeDefinition
+                {
+                    id = "sun_faraday_hex",
+                    title = "Sun Faraday Hex",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and light six bulbs at once from the panel alone — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), six Bulbs, Wire(s). No battery. Face MiniatureSun; parallel keeps all six bright; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + N/6 lit. RESET retries cleanly.",
+                    prerequisiteId = "sun_faraday_penta",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.InducedEmfThreshold,
+                            displayText = "Peak |EMF| >= 0.05 V through the coil",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MultipleBulbsLit,
+                            displayText = "Light up 6 bulbs from the solar panel simultaneously",
+                            targetCount = 6
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 200f,
+                        threeStarTimeSeconds = 100f,
+                        threeStarMaxComponents = 28
+                    }
                 }
 
             };
 
         }
 
-        // â”€â”€ Progress / unlock logic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Progress / unlock logic Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         void ApplyUnlockState()
         {
@@ -1274,7 +1315,7 @@ namespace RealityEngine.Challenges
             return null;
         }
 
-        // â”€â”€ Challenge lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Challenge lifecycle Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         /// <summary>Start a challenge by id. Returns false if locked or not found.</summary>
         public bool StartChallenge(string id)
@@ -1344,7 +1385,7 @@ namespace RealityEngine.Challenges
             return titles.ToArray();
         }
 
-        // â”€â”€ Objective evaluation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Objective evaluation Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         void RefreshSimRefs()
         {
@@ -1640,7 +1681,7 @@ namespace RealityEngine.Challenges
         }
 
         /// <summary>
-        /// Live measured progress for the objective overlay (ACTION → MEASUREMENT → FEEDBACK).
+        /// Live measured progress for the objective overlay (ACTION â†’ MEASUREMENT â†’ FEEDBACK).
         /// Uses the same CircuitLab / InductionCircuit readers as objective evaluation.
         /// </summary>
         public string GetObjectiveLiveReadout(ChallengeObjective obj)
@@ -1795,7 +1836,7 @@ namespace RealityEngine.Challenges
             }
         }
 
-        // â”€â”€ Mentor context â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Ã¢â€â‚¬Ã¢â€â‚¬ Mentor context Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         /// <summary>
         /// Short context string for the AI scientist: challenge title, objective states,
