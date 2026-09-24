@@ -52,6 +52,8 @@ namespace RealityEngine.Player
             EnsureDipole();
             if (_readout == null)
                 BuildReadout();
+            if (GetComponent<MagnetDesktopThrust>() == null)
+                gameObject.AddComponent<MagnetDesktopThrust>();
             RefreshText();
             _built = true;
         }

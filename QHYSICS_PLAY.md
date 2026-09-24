@@ -479,10 +479,10 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 5. When meter shows enough wattage + `load=1` -> stars + unlock **Induction**. Completion banner shows `Unlocked: Induction`.
 
 ### Induction (challenge 6)
-1. Press **C** -> Start **Induction** (unlocked after Sun Power). Overlay shows live EMF `[0.000/0.05 V]`.
-2. Enter Induction / use the coil station; move a magnet through the coil (Faraday's law).
-3. When |EMF| >= 0.05 V (live meter), objective completes.
-
+1. Press **C** -> Start **Induction** (unlocked after Sun Power). Overlay shows peak EMF `[pk 0.000/0.05 V live=0.000]` (peak latched so brief Faraday spikes are not missed).
+2. Go to the **Induction Lab** coil station. Grab the bar **Magnet** (lab Magnet or PHYSICS gadget).
+3. Desktop: hold Magnet + **LMB/scroll** to impulse along N-S through the coil; VR: grab and throw/push the magnet through the coil bore.
+4. When peak |EMF| >= 0.05 V (pk meter), objective completes. Experiment RESET clears the peak latch for a clean retry.
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only

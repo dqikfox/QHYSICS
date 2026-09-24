@@ -149,6 +149,9 @@ namespace RealityEngine.Challenges
         InductionCircuit _inductionCircuit;
         bool _refsValid;
 
+        /// <summary>Peak |EMF| seen while the active challenge runs (latched; cleared on start/RESET).</summary>
+        float _peakInducedEmf;
+
         // â”€â”€ Self-spawning â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -199,6 +202,8 @@ namespace RealityEngine.Challenges
                 return;
 
             ElapsedTime += Time.deltaTime;
+            // Sample every frame so brief Faraday spikes are not missed by the 5 Hz poll.
+            SamplePeakInducedEmf();
             _pollTimer += Time.deltaTime;
 
             if (_pollTimer >= PollInterval)
@@ -351,15 +356,15 @@ namespace RealityEngine.Challenges
                 {
                     id = "induction",
                     title = "Induction",
-                    description = "Move a magnet through the coil to induce an EMF of 0.05 V or higher (Faraday's law).",
-                    mentorHint = "EMF = -N * dPhi/dt. Move the magnet faster or closer to the coil to increase the rate of flux change.",
+                    description = "At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V (Faraday's law).",
+                    mentorHint = "Desktop: hold Magnet + LMB/scroll to impulse along N-S. VR: grab and throw through the coil. EMF = -N dPhi/dt; faster pass = higher peak (live pk meter).",
                     prerequisiteId = "sun_power",
                     objectives = new[]
                     {
                         new ChallengeObjective
                         {
                             type = ObjectiveType.InducedEmfThreshold,
-                            displayText = "Induce EMF >= 0.05 V",
+                            displayText = "Peak |EMF| >= 0.05 V through the coil",
                             targetValue = 0.05f
                         }
                     },
@@ -464,7 +469,10 @@ namespace RealityEngine.Challenges
             ElapsedTime = 0f;
             LastComponentCount = 0;
             _pollTimer = 0f;
+            _peakInducedEmf = 0f;
             _refsValid = false; // force refresh on first poll
+            if (def.id == "induction")
+                EnsureInductionBound();
             return true;
         }
 
@@ -476,6 +484,7 @@ namespace RealityEngine.Challenges
             ActiveChallenge = null;
             ActiveObjectives = null;
             ElapsedTime = 0f;
+            _peakInducedEmf = 0f;
             if (OnChallengeAbandoned != null)
                 OnChallengeAbandoned.Invoke();
         }
@@ -492,6 +501,7 @@ namespace RealityEngine.Challenges
             ElapsedTime = 0f;
             LastComponentCount = 0;
             _pollTimer = 0f;
+            _peakInducedEmf = 0f;
             _refsValid = false;
         }
 
@@ -698,11 +708,45 @@ namespace RealityEngine.Challenges
             return HasActiveLoad();
         }
 
-        float GetInducedEmf()
+        float GetLiveInducedEmf()
         {
             if (_inductionCircuit == null)
                 return 0f;
             return Mathf.Abs(_inductionCircuit.EmfVolts);
+        }
+
+        /// <summary>
+        /// Peak |EMF| latched while the challenge is active. Instantaneous Faraday spikes
+        /// last < one poll interval; evaluating the peak makes Induction completable.
+        /// </summary>
+        float GetInducedEmf()
+        {
+            SamplePeakInducedEmf();
+            return _peakInducedEmf;
+        }
+
+        void SamplePeakInducedEmf()
+        {
+            if (_inductionCircuit == null)
+            {
+                _inductionCircuit = UnityEngine.Object.FindAnyObjectByType<InductionCircuit>(FindObjectsInactive.Exclude);
+                if (_inductionCircuit == null)
+                    return;
+            }
+            float live = GetLiveInducedEmf();
+            if (live > _peakInducedEmf)
+                _peakInducedEmf = live;
+        }
+
+        void EnsureInductionBound()
+        {
+            RefreshSimRefs();
+            if (_inductionCircuit == null)
+                return;
+            InductionCoil coil = _inductionCircuit.Coil;
+            if (coil != null)
+                coil.BindAllSceneDipoles();
+            SamplePeakInducedEmf();
         }
 
         /// <summary>
@@ -750,8 +794,10 @@ namespace RealityEngine.Challenges
                 }
                 case ObjectiveType.InducedEmfThreshold:
                 {
-                    float emf = GetInducedEmf();
-                    return emf.ToString("0.000") + "/" + obj.targetValue.ToString("0.00") + " V";
+                    SamplePeakInducedEmf();
+                    float live = GetLiveInducedEmf();
+                    float pk = _peakInducedEmf;
+                    return "pk " + pk.ToString("0.000") + "/" + obj.targetValue.ToString("0.00") + " V live=" + live.ToString("0.000");
                 }
                 default:
                     return string.Empty;
@@ -800,6 +846,7 @@ namespace RealityEngine.Challenges
             ActiveChallenge = null;
             ActiveObjectives = null;
             ElapsedTime = 0f;
+            _peakInducedEmf = 0f;
         }
 
         int CalculateStars(ChallengeDefinition def, float time, int componentCount)

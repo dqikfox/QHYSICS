@@ -5,6 +5,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using TMPro;
 using RealityEngine.Physics.Electromagnetism;
+using RealityEngine.Player;
 using RealityEngine.Visualization;
 using RealityEngine.Core;
 using RealityEngine.AI;
@@ -388,7 +389,11 @@ namespace RealityEngine.Experiments
             Transform load = transform.Find("Load");
 
             if (magnet != null)
+            {
                 _dipole = magnet.GetComponent<MagneticDipole>();
+                if (magnet.GetComponent<MagnetDesktopThrust>() == null)
+                    magnet.gameObject.AddComponent<MagnetDesktopThrust>();
+            }
             if (coil != null)
             {
                 _coil = coil.GetComponent<InductionCoil>();
@@ -799,6 +804,10 @@ namespace RealityEngine.Experiments
             grab.useDynamicAttach = true;
             grab.selectMode = InteractableSelectMode.Single;
             // Default XRI interaction layers: either hand can grab. Do not bind to a right-hand-only mask.
+
+            // Desktop LMB/scroll while held: impulse along N-S for Induction challenge playability.
+            if (go.GetComponent<MagnetDesktopThrust>() == null)
+                go.AddComponent<MagnetDesktopThrust>();
 
             return go;
         }
