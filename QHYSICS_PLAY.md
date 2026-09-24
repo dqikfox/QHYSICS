@@ -566,7 +566,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Sun Throttle** (unlocked after Sun Twin Lab). Overlay shows live `[0.00/0.05 W load=0]`, `[R=0 lit=0]`, and switch/RPM readout.
 2. From **Dispenser11** grab **Solar**, from Resistor shelf grab **Resistor**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — renewable Throttle Up: series resistor + lit bulb + knife-switch gated motor.
 3. Snap Solar + Resistor + Switch + wires + Bulb + Motor onto the breadboard. Put the resistor in series so it throttles current while the bulb stays lit. Leave the switch **open** first (motor still). Rotate Solar toward **MiniatureSun** until wattage rises, then **close** the switch so the motor spins to 120+ RPM.
-4. When all three objectives complete (solar >= 0.05 W powering a load AND resistor in circuit with lit bulb AND switch closed with motor at 120+ RPM), objective completes -> stars. End of starter campaign (no further unlock yet).
+4. When all three objectives complete (solar >= 0.05 W powering a load AND resistor in circuit with lit bulb AND switch closed with motor at 120+ RPM), objective completes -> stars + unlock **Sun Power Lab**. Completion banner shows `Unlocked: Sun Power Lab`.
+
+### Sun Power Lab (challenge 21)
+1. Press **C** -> Start **Sun Power Lab** (unlocked after Sun Throttle). Overlay shows live `[0.00/0.05 W load=0]`, circuit power `[0.00/0.05 W lit=0]`, and switch/RPM readout.
+2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — renewable Power Play: measurable load watts (P = |V| * |I|) + knife-switch gated motor.
+3. Snap Solar + Switch + wires + Bulb + Motor onto the breadboard. Leave the switch **open** first (motor still). Rotate Solar toward **MiniatureSun** until wattage rises and load power hits >= 0.05 W, then **close** the switch so the motor spins to 120+ RPM.
+4. When all three objectives complete (solar >= 0.05 W powering a load AND circuit load power >= 0.05 W AND switch closed with motor at 120+ RPM), objective completes -> stars. End of starter campaign (no further unlock yet).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only
