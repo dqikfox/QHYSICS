@@ -102,8 +102,9 @@ namespace RealityEngine.Player
             else if (HoldsActivatable)
             {
                 // Better desktop activation while holding activatable gadgets
-                if (WasActivatePressed())
-                    ActivateHeld();
+                int activateDelta = ReadActivateDelta();
+                if (activateDelta != 0)
+                    TryActivateHeld(activateDelta);
             }
             else
             {
@@ -372,11 +373,19 @@ namespace RealityEngine.Player
                 }
                 else
                 {
-                    // Soft drop: restore gravity, gentle settle — no launch.
-                    _heldRb.isKinematic = false;
-                    _heldRb.useGravity = true;
-                    _heldRb.linearVelocity = Vector3.down * softDropDownSpeed;
-                    _heldRb.angularVelocity = Vector3.zero;
+                    // Soft drop: restore pre-grab kinematic/gravity; gentle settle if dynamic.
+                    _heldRb.isKinematic = _heldWasKinematic;
+                    _heldRb.useGravity = _heldUsedGravity;
+                    if (_heldWasKinematic)
+                    {
+                        _heldRb.linearVelocity = Vector3.zero;
+                        _heldRb.angularVelocity = Vector3.zero;
+                    }
+                    else
+                    {
+                        _heldRb.linearVelocity = Vector3.down * softDropDownSpeed;
+                        _heldRb.angularVelocity = Vector3.zero;
+                    }
                 }
             }
 
@@ -421,22 +430,20 @@ namespace RealityEngine.Player
             HoverTarget = (col != null && IsGrabTarget(col)) ? col.transform : null;
             if (_hoverRenderer == null)
                 return;
+            // PropertyBlock only — never touch .material (avoids instance leaks / shared tint fight).
             var mat = _hoverRenderer.sharedMaterial;
+            _hoverRenderer.GetPropertyBlock(_mpb);
             if (mat != null && mat.HasProperty("_EmissionColor"))
             {
                 _hoverHadEmission = mat.IsKeywordEnabled("_EMISSION");
                 _hoverBaseEmission = mat.GetColor("_EmissionColor");
-                _hoverRenderer.GetPropertyBlock(_mpb);
                 _mpb.SetColor("_EmissionColor", new Color(0.15f, 0.55f, 0.7f) * 1.4f);
-                _hoverRenderer.SetPropertyBlock(_mpb);
-                _hoverRenderer.material.EnableKeyword("_EMISSION");
             }
-            else if (_hoverRenderer != null)
-            {
-                _hoverRenderer.GetPropertyBlock(_mpb);
+            if (mat != null && mat.HasProperty("_Color"))
                 _mpb.SetColor("_Color", new Color(0.55f, 0.9f, 1f, 1f));
-                _hoverRenderer.SetPropertyBlock(_mpb);
-            }
+            else if (mat != null && mat.HasProperty("_BaseColor"))
+                _mpb.SetColor("_BaseColor", new Color(0.55f, 0.9f, 1f, 1f));
+            _hoverRenderer.SetPropertyBlock(_mpb);
         }
 
         void ClearHover()
@@ -444,18 +451,8 @@ namespace RealityEngine.Player
             HoverTarget = null;
             if (_hoverRenderer == null)
                 return;
+            // Clear MPB only — do not instantiate .material.
             _hoverRenderer.SetPropertyBlock(null);
-            if (_hoverRenderer.sharedMaterial != null && _hoverRenderer.sharedMaterial.HasProperty("_EmissionColor"))
-            {
-                if (!_hoverHadEmission)
-                    _hoverRenderer.material.DisableKeyword("_EMISSION");
-                else
-                {
-                    _hoverRenderer.GetPropertyBlock(_mpb);
-                    _mpb.SetColor("_EmissionColor", _hoverBaseEmission);
-                    _hoverRenderer.SetPropertyBlock(_mpb);
-                }
-            }
             _hoverRenderer = null;
         }
 
