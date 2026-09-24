@@ -76,6 +76,7 @@ Carry strip HUD sits above the BUILD hotbar; vitals chip top-left labelled **TRA
 - **Desktop:** **LMB** / Fire1 swings while baton equipped.
 - **XR (Quest Link):** controller **trigger** (activate) on either hand swings; aim uses that controller pose (falls back to HMD forward).
 - Drones float east of plaza, fire soft pulses; brighter hit flash + floating damage chips; player HP chip flashes red on hurt.
+- Drone HP to 0 soft-disables (dim body + RESPAWN countdown chip) then restores after ~6s — GameObject stays active so the timer runs (Invoke would die on SetActive false).
 - Operator HP regen after delay; ampoule heals; shield cell softens damage briefly.
 - HP â†’ 0 respawns at plaza via `LabPlayerSpawn` (no softlock / no game-over).
 
