@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 
 namespace RealityEngine.Visualization
@@ -82,9 +82,10 @@ namespace RealityEngine.Visualization
         {
             if ((which & Spawn.Khufu) != 0)
             {
-                // Force rebuild when Petrie relieving graffiti marker missing.
+                // Force rebuild when Petrie graffiti or sarcophagus honesty missing.
                 GameObject oldKhufu = FindNamed(KhufuPyramid.RootName);
-                if (oldKhufu != null && oldKhufu.transform.Find("Khufu_RelievingGraffiti") == null)
+                if (oldKhufu != null && (oldKhufu.transform.Find("Khufu_RelievingGraffiti") == null
+                    || oldKhufu.transform.Find("Khufu_Sarcophagus_Honesty") == null))
                 {
                     oldKhufu.name = oldKhufu.name + "_Obsolete";
                     if (Application.isPlaying)
@@ -97,6 +98,15 @@ namespace RealityEngine.Visualization
             }
             if ((which & Spawn.Khafre) != 0)
             {
+                GameObject oldKhafre = FindNamed(KhafrePyramid.RootName);
+                if (oldKhafre != null && oldKhafre.transform.Find("Khafre_Sarcophagus_Honesty") == null)
+                {
+                    oldKhafre.name = oldKhafre.name + "_Obsolete";
+                    if (Application.isPlaying)
+                        UnityEngine.Object.Destroy(oldKhafre);
+                    else
+                        UnityEngine.Object.DestroyImmediate(oldKhafre);
+                }
                 Vector3 c = WorldFromKhufu(pose, -KhafreWestM, -KhafreSouthM, 0f);
                 EnsureNamed(KhafrePyramid.RootName, pose, (p) => KhafrePyramid.Build(p.parent, c, p.rot, p.comfortScale), pose.surfaceY);
                 GizaPrecinct.EnsureKhafre(pose);
@@ -108,7 +118,9 @@ namespace RealityEngine.Visualization
                 if (oldMen != null)
                 {
                     Transform g3a = oldMen.transform.Find("G3a");
-                    if (g3a == null || g3a.Find("G3a_Chapel") == null)
+                    if (g3a == null || g3a.Find("G3a_Chapel") == null
+                        || oldMen.transform.Find("Menkaure_Sarcophagus_Honesty") == null
+                        || g3a.Find("G3a_ContentsHonesty") == null)
                     {
                         oldMen.name = oldMen.name + "_Obsolete";
                         if (Application.isPlaying)
@@ -126,7 +138,8 @@ namespace RealityEngine.Visualization
                 // Force rebuild when Dream Stele or attested translation plaque missing.
                 GameObject oldSphinx = FindNamed(GizaSphinx.RootName);
                 if (oldSphinx != null && (oldSphinx.transform.Find(GizaSphinx.DreamSteleName) == null
-                    || oldSphinx.transform.Find(GizaSphinx.DreamSteleName + "_Text") == null))
+                    || oldSphinx.transform.Find(GizaSphinx.DreamSteleName + "_Text") == null
+                    || oldSphinx.transform.Find("Sphinx_NoChamberMarker") == null))
                 {
                     oldSphinx.name = oldSphinx.name + "_Obsolete";
                     if (Application.isPlaying)
@@ -202,6 +215,7 @@ namespace RealityEngine.Visualization
                 || lower.Contains("hordjedef") || lower.Contains("djedefhor") || lower.Contains("g7210") || lower.Contains("g7220")
                 || lower.Contains("minkhaf") || lower.Contains("g7430") || lower.Contains("g7440")
                 || lower.Contains("hetepheres") || lower.Contains("g7000x")
+                || lower.Contains("amenhotep") || lower.Contains("khufuship") || lower.Contains("bigvoid") || lower.Contains("scanpyramids")
                 || lower.Contains("debehen") || lower.Contains("menkaurequarry")
                 || lower.Contains("gizasurveyanomalies") || lower.Contains("surveyanomal")
                 || lower.StartsWith("lablandscape");
@@ -922,6 +936,9 @@ namespace RealityEngine.Visualization
             SitFound("Hordjedef", top);
             SitFound("Minkhaf", top);
             SitFound("Hetepheres", top);
+            SitFound("AmenhotepIITemple", court);
+            SitFound("KhufuShip_Reconstruction", top);
+            SitFound("Khufu_ScanPyramidsBigVoid", top);
             SitFound("Debehen", terrace);
             SitFound("MenkaureQuarry", top);
             SitFound("CemeteryEnEchelon", top);

@@ -281,6 +281,7 @@ namespace RealityEngine.Visualization
             DestroyNamed(GizaComplex.FindNamed(WorkersVillageName));
             DestroyNamed(GizaComplex.FindNamed(KhentkawesName));
             DestroyNamed(GizaComplex.FindNamed(OsirisShaftName));
+            GizaContents.ForceRebuildAll();
         }
 
         public static void EnsureWestField(GizaComplex.Pose pose)

@@ -29,7 +29,7 @@ namespace RealityEngine.Visualization
             "Base 215.25 m. Original height 143.5 m. Slope 53° 10'. Bedrock terrace +10 m vs Khufu (why it looks taller).\n" +
             "Offset from Khufu centre (approx. WGS84, lat 30°): 323 m west, 342 m south.\n" +
             "Two-entrance system on the north face: upper 11.54 m up, and ground-level, both 12 m east of centreline.\n" +
-            "Descending to burial chamber in bedrock (14.15 × 5.05 m, gabled limestone, granite sarcophagus). Undecorated walls.";
+            "Descending to burial chamber in bedrock (14.15 × 5.05 m, gabled limestone, empty granite sarcophagus). Undecorated walls. Robbed — no burial goods.";
 
         public static GameObject Build(Transform parent, Vector3 worldBaseCenter, Quaternion worldRot, bool comfortScale)
         {
@@ -123,6 +123,18 @@ namespace RealityEngine.Visualization
             sarc.AddBox(sarcC, new Vector3(2.6f, 1.0f, 1.05f), g);
             sarc.AddRoom(sarcC + Vector3.up * 0.12f, new Vector3(2.2f, 0.55f, 0.72f), g, false, false, false, false);
             GizaBuild.SpawnMesh(parent, "Khafre_Sarcophagus", sarc.Build("Khafre_Sarcophagus"), granite, true);
+            const string sarcHonesty =
+                "ATTESTED empty prop.\n" +
+                "Khafre burial chamber: empty granite sarcophagus set in bedrock floor. No mummy / goods found.\n" +
+                "Robbed chamber — do not invent treasure. Undecorated walls.";
+            GizaBuild.HonestyPlate(parent, "Khafre_Sarcophagus_Honesty", sarcHonesty, 8f);
+            Transform sP = parent.Find("Khafre_Sarcophagus_Honesty");
+            if (sP != null)
+            {
+                sP.localPosition = new Vector3(sarcC.x, floor.y + 1.6f, sarcC.z + 1.5f);
+                sP.localRotation = Quaternion.Euler(0f, 180f, 0f);
+                sP.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            }
         }
     }
 }

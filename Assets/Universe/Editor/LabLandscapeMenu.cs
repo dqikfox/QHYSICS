@@ -68,7 +68,7 @@ namespace RealityEngine.EditorTools
         [MenuItem(ComplexPath)]
         public static void PlaceGizaComplex()
         {
-            Place(GizaComplex.Spawn.All, "FULL Giza complex force-rebuild: pyramids (incl. G1-d + Petrie relieving graffiti), Dream Stele text, temples, causeways, Trial Passages, West/East/Central/Menkaure fields, Hemiunu, Senedjemib, Ankhhaf G7510, Debehen, Menkaure quarry, Heit bakeries, Gisr el-Mudir, Khentkawes, workers village + Crow wall, Osiris Shaft, survey heatmaps, GizaSurveyAnomalies OFF, Nile harbor, desert dust.");
+            Place(GizaComplex.Spawn.All, "FULL Giza complex force-rebuild: pyramids + attested-empty sarcophagus honesty, Sphinx (no chamber) + Dream Stele + Amenhotep II NEW KINGDOM, Hetepheres G7000X furniture, Meresankh III JE54935, Menkaure lost basalt RECONSTRUCTION, Khafre diorite statue replica, Khufu ship reconstruction, ScanPyramids Big Void OFF, temples/fields/boats, survey overlays OFF.");
         }
 
         [MenuItem(ComplexPath, true)]
