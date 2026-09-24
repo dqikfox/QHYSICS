@@ -99,7 +99,7 @@ namespace RealityEngine.Player
             if (!IsAlive)
                 return;
             hp = Mathf.Max(0f, hp - amount);
-            _flashUntil = Time.time + 0.15f;
+            _flashUntil = Time.time + 0.22f;
             ApplyFlash(true);
             SpawnHitChip(hitPoint, amount);
             if (hp <= 0.01f)
@@ -135,7 +135,7 @@ namespace RealityEngine.Player
             _bodyRenderer.GetPropertyBlock(_mpb);
             Color glow = Color.white;
             if (_bodyRenderer.sharedMaterial != null && _bodyRenderer.sharedMaterial.HasProperty("_EmissionColor"))
-                _mpb.SetColor("_EmissionColor", glow * 2f);
+                _mpb.SetColor("_EmissionColor", glow * 3.2f);
             if (_bodyRenderer.sharedMaterial != null && _bodyRenderer.sharedMaterial.HasProperty("_BaseColor"))
                 _mpb.SetColor("_BaseColor", glow);
             _bodyRenderer.SetPropertyBlock(_mpb);
@@ -147,11 +147,11 @@ namespace RealityEngine.Player
             go.transform.position = pos + Vector3.up * 0.2f;
             var tmp = go.AddComponent<TextMeshPro>();
             tmp.text = "-" + Mathf.RoundToInt(amount);
-            tmp.fontSize = 3.5f;
+            tmp.fontSize = 4.2f;
             tmp.color = new Color(1f, 0.85f, 0.3f);
             tmp.alignment = TextAlignmentOptions.Center;
             go.AddComponent<TrainingHitChip>();
-            Object.Destroy(go, 0.9f);
+            Object.Destroy(go, 1.05f);
         }
 
         void EnsureLabels()
@@ -265,11 +265,29 @@ namespace RealityEngine.Player
 
     sealed class TrainingHitChip : MonoBehaviour
     {
+        float _age;
+
         void Update()
         {
-            transform.position += Vector3.up * (Time.deltaTime * 0.8f);
-            if (Camera.main != null)
-                transform.rotation = Quaternion.LookRotation(transform.position - Camera.main.transform.position);
+            _age += Time.deltaTime;
+            transform.position += Vector3.up * (Time.deltaTime * 0.95f);
+            Camera cam = Camera.main;
+            if (cam == null)
+            {
+                var desktop = DesktopPlayerController.Instance;
+                if (desktop != null && desktop.MainCamera != null)
+                    cam = desktop.MainCamera.GetComponent<Camera>();
+            }
+            if (cam != null)
+                transform.rotation = Quaternion.LookRotation(transform.position - cam.transform.position);
+            // Fade via TMP alpha
+            var tmp = GetComponent<TextMeshPro>();
+            if (tmp != null)
+            {
+                Color c = tmp.color;
+                c.a = Mathf.Clamp01(1.05f - _age);
+                tmp.color = c;
+            }
         }
     }
 }

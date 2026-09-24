@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.XR;
+using RealityEngine.UI;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -6,8 +8,8 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Player
 {
     /// <summary>
-    /// Training System melee: LMB / Fire1 while Training Baton equipped.
-    /// Hits <see cref="IDamageable"/> in a short forward cone (desktop + XR-safe).
+    /// Training System melee: desktop LMB / Fire1, or XR controller trigger/activate,
+    /// while Training Baton is equipped. Same damage cone for both paths.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(140)]
@@ -24,6 +26,13 @@ namespace RealityEngine.Player
 
         float _nextSwing;
         readonly Collider[] _hits = new Collider[16];
+        QhysicsPausePanel _pauseCached;
+        float _nextPauseScan;
+
+        // XR trigger edge state (null-safe when no headset).
+        bool _prevLeftTrig;
+        bool _prevRightTrig;
+        XRNode _lastTrigNode = XRNode.RightHand;
 
         public static TrainingCombatController Ensure(Transform parent = null)
         {
@@ -52,8 +61,7 @@ namespace RealityEngine.Player
         {
             if (!Application.isPlaying)
                 return;
-            var pause = Object.FindFirstObjectByType<RealityEngine.UI.QhysicsPausePanel>(FindObjectsInactive.Include);
-            if (pause != null && pause.IsOpen)
+            if (IsPauseOpen())
                 return;
 
             var carry = PlayerCarryInventory.Instance;
@@ -68,14 +76,36 @@ namespace RealityEngine.Player
             Swing();
         }
 
+        /// <summary>Public entry so XR activate listeners can share the desktop damage path.</summary>
+        public bool TrySwingFromExternal()
+        {
+            var carry = PlayerCarryInventory.Instance;
+            if (carry == null || carry.EquippedItem != CarryItemId.TrainingBaton)
+                return false;
+            if (IsPauseOpen())
+                return false;
+            if (Time.time < _nextSwing)
+                return false;
+            _nextSwing = Time.time + cooldown;
+            Swing();
+            return true;
+        }
+
+        bool IsPauseOpen()
+        {
+            if (_pauseCached == null && Time.unscaledTime >= _nextPauseScan)
+            {
+                _nextPauseScan = Time.unscaledTime + 0.5f;
+                _pauseCached = Object.FindFirstObjectByType<QhysicsPausePanel>(FindObjectsInactive.Include);
+            }
+            return _pauseCached != null && _pauseCached.IsOpen;
+        }
+
         void Swing()
         {
-            Transform cam = ResolveAim();
-            if (cam == null)
+            if (!TryResolveAim(out Vector3 origin, out Vector3 dir))
                 return;
 
-            Vector3 origin = cam.position;
-            Vector3 dir = cam.forward;
             int n = Physics.OverlapSphereNonAlloc(origin + dir * (range * 0.45f), radius + range * 0.25f, _hits,
                 ~0, QueryTriggerInteraction.Ignore);
 
@@ -92,7 +122,6 @@ namespace RealityEngine.Player
                 var dmg = c.GetComponentInParent<IDamageable>();
                 if (dmg == null || !dmg.IsAlive)
                     continue;
-                // Don't hit self
                 if (c.GetComponentInParent<PlayerVitality>() != null)
                     continue;
                 Vector3 pt = c.ClosestPoint(origin + dir * 0.5f);
@@ -116,18 +145,54 @@ namespace RealityEngine.Player
                 bestTarget.ApplyDamage(damage, hitPt, hitN);
         }
 
-        static Transform ResolveAim()
+        bool TryResolveAim(out Vector3 origin, out Vector3 dir)
         {
+            origin = Vector3.zero;
+            dir = Vector3.forward;
+
+            // Prefer the hand that just pressed trigger when XR is running.
+            if (DesktopPlayerController.IsXrDisplayRunning())
+            {
+                if (TryControllerAim(_lastTrigNode, out origin, out dir))
+                    return true;
+                if (TryControllerAim(XRNode.RightHand, out origin, out dir))
+                    return true;
+                if (TryControllerAim(XRNode.LeftHand, out origin, out dir))
+                    return true;
+            }
+
+            Transform cam = null;
             var desktop = DesktopPlayerController.Instance;
             if (desktop != null && desktop.MainCamera != null)
-                return desktop.MainCamera;
-            if (Camera.main != null)
-                return Camera.main.transform;
-            return null;
+                cam = desktop.MainCamera;
+            else if (Camera.main != null)
+                cam = Camera.main.transform;
+            if (cam == null)
+                return false;
+            origin = cam.position;
+            dir = cam.forward;
+            return true;
         }
 
-        static bool WasAttackPressed()
+        static bool TryControllerAim(XRNode node, out Vector3 origin, out Vector3 dir)
         {
+            origin = Vector3.zero;
+            dir = Vector3.forward;
+            InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+            if (!device.isValid)
+                return false;
+            if (!device.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 pos))
+                return false;
+            if (!device.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion rot))
+                return false;
+            origin = pos;
+            dir = rot * Vector3.forward;
+            return dir.sqrMagnitude > 1e-6f;
+        }
+
+        bool WasAttackPressed()
+        {
+            // Desktop LMB / Fire1
 #if ENABLE_INPUT_SYSTEM
             if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
                 return true;
@@ -136,7 +201,35 @@ namespace RealityEngine.Player
             if (Input.GetMouseButtonDown(0) || Input.GetButtonDown("Fire1"))
                 return true;
 #endif
+            // XR: either controller trigger / activate (edge-detect). Null-safe with no headset.
+            if (WasXrTriggerPressed(XRNode.LeftHand, ref _prevLeftTrig))
+            {
+                _lastTrigNode = XRNode.LeftHand;
+                return true;
+            }
+            if (WasXrTriggerPressed(XRNode.RightHand, ref _prevRightTrig))
+            {
+                _lastTrigNode = XRNode.RightHand;
+                return true;
+            }
             return false;
+        }
+
+        static bool WasXrTriggerPressed(XRNode node, ref bool prevDown)
+        {
+            bool down = false;
+            InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+            if (device.isValid)
+            {
+                if (device.TryGetFeatureValue(CommonUsages.triggerButton, out bool btn) && btn)
+                    down = true;
+                else if (device.TryGetFeatureValue(CommonUsages.trigger, out float axis) && axis > 0.72f)
+                    down = true;
+                // Some OpenXR profiles expose activate as primaryButton on grip-side — keep soft.
+            }
+            bool pressed = down && !prevDown;
+            prevDown = down;
+            return pressed;
         }
     }
 }

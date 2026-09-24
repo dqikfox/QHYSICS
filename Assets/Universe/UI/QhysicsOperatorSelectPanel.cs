@@ -59,9 +59,9 @@ namespace RealityEngine.UI
                 else DestroyImmediate(c.gameObject);
             }
 
-            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(860f, 620f));
+            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(920f, 640f));
             QhysicsUiBuilder.WireEventCamera(_canvas);
-            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(820f, 580f));
+            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(880f, 600f));
             QhysicsUiBuilder.LayoutVertical(face.rectTransform, 12f);
 
             var title = QhysicsUiBuilder.Label(face.transform, "Title", "OPERATOR SELECT", QhysicsUiStyle.FontTitle,

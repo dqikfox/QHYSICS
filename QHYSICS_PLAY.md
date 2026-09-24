@@ -69,10 +69,17 @@ Carry strip HUD sits above the BUILD hotbar; vitals chip top-left labelled **TRA
 
 ### Training combat
 
-- Equip **Training Baton** (**U** on baton slot) — LMB swings (desktop). Soft damage to training drones.
-- Drones float east of plaza, fire soft pulses; hit flash + damage chips.
+- Equip **Training Baton** (**U** on baton slot). Soft damage to training drones (same cone for desktop + XR).
+- **Desktop:** **LMB** / Fire1 swings while baton equipped.
+- **XR (Quest Link):** controller **trigger** (activate) on either hand swings; aim uses that controller pose (falls back to HMD forward).
+- Drones float east of plaza, fire soft pulses; brighter hit flash + floating damage chips; player HP chip flashes red on hurt.
 - Operator HP regen after delay; ampoule heals; shield cell softens damage briefly.
 - HP → 0 respawns at plaza via `LabPlayerSpawn` (no softlock / no game-over).
+
+### XR UI (headset)
+
+- **Operator Select** — world-space panel (Esc/P → Operator Select, or **O** on companion keyboard). Event Camera = XR Main Camera (`WireEventCamera`).
+- **Carry / Training HUD** — promotes to world-space follow when an XR display is running (left of view); stays ScreenSpaceOverlay on desktop. Never hidden in headset.
 
 ### Spawn locations (Ctrl+P)
 
@@ -90,6 +97,16 @@ Under runtime root `QhysicsTrainingWorld` (relative to XR Origin / LabPlaza):
 5. Take a pulse hit → HP chip updates → **U** ampoule to heal.
 6. **Esc → Operator Select** to switch archetype (kit refill).
 
+
+
+### XR combat Ctrl+P check (Quest Link)
+
+1. Link connected → Faraday → Ctrl+P → Enter Sandbox.
+2. **O** or Pause → Operator Select (world panel, laser/ray clickable) → pick Survey Ranger.
+3. Look at plaza pickups → grab / interact into carry (or companion **E**).
+4. Equip baton (**U** or use slot) → aim at Training Drone → **trigger** to swing.
+5. Take a drone pulse → TRAINING SYSTEM HP chip flashes → use ampoule.
+6. Confirm Carry HUD floats in world-space (not missing in HMD).
 
 ## Who is the player?
 
