@@ -1,6 +1,7 @@
 using UnityEngine;
 using RealityEngine.Player;
 using RealityEngine.Physics.Electromagnetism;
+using RealityEngine.Challenges;
 
 namespace RealityEngine.UI
 {
@@ -31,6 +32,7 @@ namespace RealityEngine.UI
         {
             ClearSpawnedExperimentProps();
             ResetInductionEnergyStorage();
+            ResetActiveChallengeIfAny();
 
             var lab = UnityEngine.Object.FindAnyObjectByType<CircuitLab>(FindObjectsInactive.Include);
             if (lab == null)
@@ -43,6 +45,18 @@ namespace RealityEngine.UI
             Time.timeScale = 1f;
             Debug.Log("QHYSICS: CircuitLab.Reset() done.");
             return true;
+        }
+
+        static void ResetActiveChallengeIfAny()
+        {
+            ChallengeManager cm = ChallengeManager.Instance;
+            if (cm == null)
+                cm = UnityEngine.Object.FindAnyObjectByType<ChallengeManager>(FindObjectsInactive.Include);
+            if (cm != null && cm.IsChallengeActive)
+            {
+                cm.ResetActiveChallengeProgress();
+                Debug.Log("QHYSICS: active challenge progress reset (objectives + timer).");
+            }
         }
 
         /// <summary>

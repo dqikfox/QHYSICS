@@ -479,6 +479,39 @@ namespace RealityEngine.Challenges
                 OnChallengeAbandoned.Invoke();
         }
 
+        /// <summary>
+        /// Clears sticky objective completion and elapsed timer for the active challenge
+        /// without abandoning it. Used by Experiment RESET so ACTION -> RESET -> CONTINUE retries cleanly.
+        /// </summary>
+        public void ResetActiveChallengeProgress()
+        {
+            if (!IsChallengeActive || ActiveChallenge == null)
+                return;
+            ActiveObjectives = ActiveChallenge.CloneObjectives();
+            ElapsedTime = 0f;
+            LastComponentCount = 0;
+            _pollTimer = 0f;
+            _refsValid = false;
+        }
+
+        /// <summary>
+        /// Titles of challenges unlocked by completing <paramref name="completedId"/> (prerequisite match).
+        /// Empty array when none.
+        /// </summary>
+        public string[] GetNextUnlockTitles(string completedId)
+        {
+            if (Campaign == null || string.IsNullOrEmpty(completedId))
+                return System.Array.Empty<string>();
+            var titles = new System.Collections.Generic.List<string>(2);
+            for (int i = 0; i < Campaign.Length; i++)
+            {
+                ChallengeDefinition def = Campaign[i];
+                if (def != null && def.prerequisiteId == completedId && !string.IsNullOrEmpty(def.title))
+                    titles.Add(def.title);
+            }
+            return titles.ToArray();
+        }
+
         // â”€â”€ Objective evaluation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         void RefreshSimRefs()

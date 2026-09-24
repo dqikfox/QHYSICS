@@ -509,6 +509,12 @@ namespace RealityEngine.Challenges
                 string stats = "Time: " + _manager.ElapsedTime.ToString("0.0") + "s";
                 if (componentCount > 0)
                     stats += "  |  Parts: " + componentCount;
+                if (def != null)
+                {
+                    string[] next = _manager.GetNextUnlockTitles(def.id);
+                    if (next != null && next.Length > 0)
+                        stats += "  |  Unlocked: " + string.Join(", ", next);
+                }
                 _bannerStats.text = stats;
             }
         }

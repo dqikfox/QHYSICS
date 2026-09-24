@@ -3,7 +3,7 @@
 ## UI map (lab shell)
 
 Runtime auto-ensures on Play via `QhysicsUiBootstrap` (no scene YAML rewrite required).
-Editor: **Reality Engine → Place QHYSICS UI** or **Reality Engine → QHYSICS → Ensure UI**.
+Editor: **Reality Engine -> Place QHYSICS UI** or **Reality Engine -> QHYSICS -> Ensure UI**.
 
 | Piece | What | Toggle / notes |
 |-------|------|----------------|
@@ -12,7 +12,7 @@ Editor: **Reality Engine → Place QHYSICS UI** or **Reality Engine → QHYSICS 
 | **Inspect** | Hover = summary; hold = detail (EMF/I/Phi, mass, etc.) | Ray / desktop hover / grab |
 | **Sim chip** | Pause / 0.25x / 1x / 2x + **New Run** (clears `Gadget_*`) | Expand chip near right forearm |
 | **Pause** | Resume / Reset Experiment / Settings / Exit Play (Editor) | **Esc / P** — lab pause, not arcade |
-| **Onboarding strip** | One line: BOOT → ENTER → INTERACT → EXPERIMENT | Dismiss **X** (PlayerPrefs) |
+| **Onboarding strip** | One line: BOOT -> ENTER -> INTERACT -> EXPERIMENT | Dismiss **X** (PlayerPrefs) |
 | **Main menu** | Enter Sandbox (first run) | Auto-hides after enter |
 
 Visual language: dark glass panels, cyan `#00E5FF` accents, TMP LiberationSans, URP-safe `UI/Default` (never Sprites/Default).
@@ -21,12 +21,12 @@ XR: EventSystem + `XRUIInputModule` + `TrackedDeviceGraphicRaycaster`; Event Cam
 ### Ctrl+P checklist
 
 1. Open `Assets/Scenes/Faraday.unity` (one Editor only).
-2. Optional: **Reality Engine → QHYSICS → Ensure UI** (or trust runtime bootstrap).
+2. Optional: **Reality Engine -> QHYSICS -> Ensure UI** (or trust runtime bootstrap).
 3. Optional: **Fix Player Spawn** / **Ensure Player Character**.
 4. **Ctrl+P**. Desktop WASD works without headset; Quest Link or XR Device Simulator for XR.
-5. Enter Sandbox if shown → dismiss onboarding strip → **O** operator (optional) → **M** toolbelt → hover a gadget for Inspect → Sim chip for speed → **Esc** pause (Operator Select available).
+5. Enter Sandbox if shown -> dismiss onboarding strip -> **O** operator (optional) -> **M** toolbelt -> hover a gadget for Inspect -> Sim chip for speed -> **Esc** pause (Operator Select available).
 6. Training: pick up plaza kits with **E**, equip baton with **U**, **LMB** training drones east of plaza.
-6. EXPERIMENTS → **New Run** clears spawned gadgets (Giza/lab content stays).
+6. EXPERIMENTS -> **New Run** clears spawned gadgets (Giza/lab content stays).
 
 ---
 
@@ -40,7 +40,7 @@ XR: EventSystem + `XRUIInputModule` + `TrackedDeviceGraphicRaycaster`; Event Cam
 
 ## Operator / Carry / Training System (player vertical slice)
 
-Runtime auto-ensures via `QhysicsPlayerSystemsBootstrap` (also from `QhysicsUiBootstrap` / menu **Reality Engine → QHYSICS → Ensure Player Systems**). Lab training flavour — not fantasy MMO combat.
+Runtime auto-ensures via `QhysicsPlayerSystemsBootstrap` (also from `QhysicsUiBootstrap` / menu **Reality Engine -> QHYSICS -> Ensure Player Systems**). Lab training flavour — not fantasy MMO combat.
 
 ### Operator select (3 archetypes)
 
@@ -50,13 +50,13 @@ Runtime auto-ensures via `QhysicsPlayerSystemsBootstrap` (also from `QhysicsUiBo
 | **Lab Engineer** | Extra batteries + shield cell | 3.2 | x1.85 | 110 | 8 |
 | **Survey Ranger** | Dual batons, mobility | 3.9 | x2.35 | 90 | 5 |
 
-- **O** — Operator Select panel (dark glass + cyan). Also **Esc/P → Operator Select**.
+- **O** — Operator Select panel (dark glass + cyan). Also **Esc/P -> Operator Select**.
 - Choice applies locomotion, max HP, carry slots, starting kit, body/arm tint.
 - Persisted in `PlayerPrefs` key `qhysics.operator.id`.
 
 ### Carry inventory (alongside BUILD hotbar 1–9)
 
-World pickups implement `IQhysicsInteractable` → **E** / LMB interact adds to carry slots (hip-pouch story; BUILD hotbar unchanged). **XR:** grip near plaza kits picks up into carry (trigger still baton swing).
+World pickups implement `IQhysicsInteractable` -> **E** / LMB interact adds to carry slots (hip-pouch story; BUILD hotbar unchanged). **XR:** grip near plaza kits picks up into carry (trigger still baton swing).
 
 | Key | Action |
 |-----|--------|
@@ -78,11 +78,11 @@ Carry strip HUD sits above the BUILD hotbar; vitals chip top-left labelled **TRA
 - Drones float east of plaza, fire soft pulses; brighter hit flash + floating damage chips; player HP chip flashes red on hurt.
 - Drone HP to 0 soft-disables (dim body + RESPAWN countdown chip) then restores after ~6s � GameObject stays active so the timer runs (Invoke would die on SetActive false).
 - Operator HP regen after delay; ampoule heals; shield cell softens damage briefly.
-- HP → 0 respawns at plaza via `LabPlayerSpawn` (no softlock / no game-over).
+- HP -> 0 respawns at plaza via `LabPlayerSpawn` (no softlock / no game-over).
 
 ### XR UI (headset)
 
-- **Operator Select** — world-space panel (Esc/P → Operator Select, or **O** on companion keyboard). Event Camera = XR Main Camera (`WireEventCamera`).
+- **Operator Select** — world-space panel (Esc/P -> Operator Select, or **O** on companion keyboard). Event Camera = XR Main Camera (`WireEventCamera`).
 - **Carry / Training HUD** — promotes to world-space follow when an XR display is running (left of view); stays ScreenSpaceOverlay on desktop. Never hidden in headset.
 
 ### Spawn locations (Ctrl+P)
@@ -94,20 +94,20 @@ Under runtime root `QhysicsTrainingWorld` (relative to XR Origin / LabPlaza):
 
 ### Ctrl+P quick check
 
-1. Faraday → Ctrl+P → Enter Sandbox.
-2. **O** → pick Survey Ranger (or Field Scientist) → Close.
-3. Walk to cyan-highlighted pickups near plaza → **E** to bag.
-4. **]** to baton → **U** equip → **LMB** hit a Training Drone.
-5. Take a pulse hit → HP chip updates → **U** ampoule to heal.
-6. **Esc → Operator Select** to switch archetype (kit refill).
+1. Faraday -> Ctrl+P -> Enter Sandbox.
+2. **O** -> pick Survey Ranger (or Field Scientist) -> Close.
+3. Walk to cyan-highlighted pickups near plaza -> **E** to bag.
+4. **]** to baton -> **U** equip -> **LMB** hit a Training Drone.
+5. Take a pulse hit -> HP chip updates -> **U** ampoule to heal.
+6. **Esc -> Operator Select** to switch archetype (kit refill).
 
 
 
 ### XR combat Ctrl+P check (Quest Link)
 
-1. Link connected → Faraday → Ctrl+P → Enter Sandbox.
-2. **O** or Pause → Operator Select (world panel, laser/ray clickable) → pick Survey Ranger.
-3. Point controller at plaza pickups → **grip** to bag (companion **E** still works).
+1. Link connected -> Faraday -> Ctrl+P -> Enter Sandbox.
+2. **O** or Pause -> Operator Select (world panel, laser/ray clickable) -> pick Survey Ranger.
+3. Point controller at plaza pickups -> **grip** to bag (companion **E** still works).
 4. Stick L/R select baton slot + **stick-click** equip (or companion **U**) � aim at Training Drone � **trigger** to swing.
 5. Take a drone pulse � TRAINING SYSTEM HP chip flashes � stick-click ampoule (or **U**) to heal; stick-down drops selected.
 6. Confirm Carry HUD floats in world-space (not missing in HMD).
@@ -454,10 +454,18 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 6. Completing First Light unlocks **Current Control** (needs the breadboard **Resistor** dispenser).
 
 ### Current Control (challenge 2)
-1. Press **C** ? Start **Current Control** (unlocked after First Light).
+1. Press **C** -> Start **Current Control** (unlocked after First Light).
 2. Grab a **Resistor** from the auto-spawned Resistor dispenser (beside the Bulb shelf).
 3. Place resistor in series with battery + bulb + wires; keep the bulb lit.
-4. Both objectives complete ? stars + unlock next challenge.
+4. Both objectives complete -> stars + unlock **Spin Up**. Completion banner shows `Unlocked: Spin Up`.
+
+### Spin Up (challenge 3)
+1. Press **C** -> Start **Spin Up** (unlocked after Current Control). Overlay shows live RPM `[0/120 RPM]`.
+2. From table dispensers: grab **Battery**, **Wire(s)**, **Motor** (Dispenser2 / Motor shelf); close a loop.
+3. When motor RPM ≥ 120 (live meter), objective completes -> stars + unlock **Double Trouble**.
+
+### Challenge RESET
+While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only
 
 - **Ctrl+B** / Build and Run ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Android (Quest) or Windows player.
