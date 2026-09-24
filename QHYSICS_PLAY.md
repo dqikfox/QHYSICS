@@ -536,7 +536,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Sun Gate** (unlocked after Sun Lab). Overlay shows live `[0.00/0.05 W load=0]` and switch/lit readout.
 2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, plus **Wire(s)**. Do **not** use a battery — renewable source + knife-switch control.
 3. Snap Solar + Switch + wires + Bulb onto the breadboard. Leave the switch **open** first (bulb dark). Rotate Solar toward **MiniatureSun** until wattage rises, then **close** the switch so the bulb lights.
-4. When both objectives complete (solar >= 0.05 W powering a load AND switch closed with bulb lit), objective completes -> stars. End of starter campaign (no further unlock yet).
+4. When both objectives complete (solar >= 0.05 W powering a load AND switch closed with bulb lit), objective completes -> stars + unlock **Sun Switch Drive**. Completion banner shows `Unlocked: Sun Switch Drive`.
+
+### Sun Switch Drive (challenge 16)
+1. Press **C** -> Start **Sun Switch Drive** (unlocked after Sun Gate). Overlay shows live `[0.00/0.05 W load=0]` and switch/RPM readout.
+2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — renewable source + knife-switch gated motor.
+3. Snap Solar + Switch + wires + Motor onto the breadboard. Leave the switch **open** first (motor still). Rotate Solar toward **MiniatureSun** until wattage rises, then **close** the switch so the motor spins to 120+ RPM.
+4. When both objectives complete (solar >= 0.05 W powering a load AND switch closed with motor at 120+ RPM), objective completes -> stars. End of starter campaign (no further unlock yet).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only
