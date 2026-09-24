@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 22 challenges with real, detectable conditions.
+        /// Build the starter campaign of 23 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -877,6 +877,43 @@ namespace RealityEngine.Challenges
                             type = ObjectiveType.SwitchClosedMotorSpinning,
                             displayText = "Close a switch and spin a motor to 120+ RPM from the solar panel",
                             targetValue = 120f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 16
+                    }
+                },
+
+                // 23. Sun Faraday Lab - solar load + Faraday peak EMF + measurable circuit power P=|V|*|I|
+                new ChallengeDefinition
+                {
+                    id = "sun_faraday_lab",
+                    title = "Sun Faraday Lab",
+                    description = "Keep a solar panel powering a load with measurable P=|V|*|I| >= 0.05 W, and induce peak |EMF| >= 0.05 V at the Faraday coil — no battery.",
+                    mentorHint = "Solar (Dispenser11) + Bulb/Motor + Wire(s), face MiniatureSun; Induction Lab magnet thrust for peak EMF; overlay solar W/load + pk EMF + circuit W/lit; RESET retries cleanly.",
+                    prerequisiteId = "sun_induction",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.InducedEmfThreshold,
+                            displayText = "Peak |EMF| >= 0.05 V through the coil",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.CircuitPowerThreshold,
+                            displayText = "Deliver >= 0.05 W to a load (bulb or motor) from the solar panel",
+                            targetValue = 0.05f
                         }
                     },
                     starThresholds = new StarThresholds
