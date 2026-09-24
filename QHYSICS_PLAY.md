@@ -1,4 +1,4 @@
-# QHYSICS — how to Play (Editor)
+# QHYSICS â€” how to Play (Editor)
 
 ## UI map (lab shell)
 
@@ -7,11 +7,11 @@ Editor: **Reality Engine -> Place QHYSICS UI** or **Reality Engine -> QHYSICS ->
 
 | Piece | What | Toggle / notes |
 |-------|------|----------------|
-| **Toolbelt** (primary) | Hip/chest world panel — BUILD / PHYSICS / MEASURE / WORLD / EXPERIMENTS | **M / Tab / Menu / B / Grip**. MEASURE pages with scroll or `< >`. |
+| **Toolbelt** (primary) | Hip/chest world panel â€” BUILD / PHYSICS / MEASURE / WORLD / EXPERIMENTS | **M / Tab / Menu / B / Grip**. MEASURE pages with scroll or `< >`. |
 | **Status HUD** | QHYSICS + experiment name + run dot | Follows non-dominant side / camera |
 | **Inspect** | Hover = summary; hold = detail (EMF/I/Phi, mass, etc.) | Ray / desktop hover / grab |
 | **Sim chip** | Pause / 0.25x / 1x / 2x + **New Run** (clears `Gadget_*`) | Expand chip near right forearm |
-| **Pause** | Resume / Reset Experiment / Settings / Exit Play (Editor) | **Esc / P** — lab pause, not arcade |
+| **Pause** | Resume / Reset Experiment / Settings / Exit Play (Editor) | **Esc / P** â€” lab pause, not arcade |
 | **Onboarding strip** | One line: BOOT -> ENTER -> INTERACT -> EXPERIMENT | Dismiss **X** (PlayerPrefs) |
 | **Main menu** | Enter Sandbox (first run) | Auto-hides after enter |
 
@@ -34,13 +34,13 @@ XR: EventSystem + `XRUIInputModule` + `TrackedDeviceGraphicRaycaster`; Event Cam
 
 - Project: `C:\Users\KING\projects\QHYSICS`
 - Branch: `reality-engine`
-- Unity: **6000.7.0a4** (one instance ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â never a second Editor on this project)
+- Unity: **6000.7.0a4** (one instance ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â never a second Editor on this project)
 
 
 
 ## Operator / Carry / Training System (player vertical slice)
 
-Runtime auto-ensures via `QhysicsPlayerSystemsBootstrap` (also from `QhysicsUiBootstrap` / menu **Reality Engine -> QHYSICS -> Ensure Player Systems**). Lab training flavour — not fantasy MMO combat.
+Runtime auto-ensures via `QhysicsPlayerSystemsBootstrap` (also from `QhysicsUiBootstrap` / menu **Reality Engine -> QHYSICS -> Ensure Player Systems**). Lab training flavour â€” not fantasy MMO combat.
 
 ### Operator select (3 archetypes)
 
@@ -50,11 +50,11 @@ Runtime auto-ensures via `QhysicsPlayerSystemsBootstrap` (also from `QhysicsUiBo
 | **Lab Engineer** | Extra batteries + shield cell | 3.2 | x1.85 | 110 | 8 |
 | **Survey Ranger** | Dual batons, mobility | 3.9 | x2.35 | 90 | 5 |
 
-- **O** — Operator Select panel (dark glass + cyan). Also **Esc/P -> Operator Select**.
+- **O** â€” Operator Select panel (dark glass + cyan). Also **Esc/P -> Operator Select**.
 - Choice applies locomotion, max HP, carry slots, starting kit, body/arm tint.
 - Persisted in `PlayerPrefs` key `qhysics.operator.id`.
 
-### Carry inventory (alongside BUILD hotbar 1–9)
+### Carry inventory (alongside BUILD hotbar 1â€“9)
 
 World pickups implement `IQhysicsInteractable` -> **E** / LMB interact adds to carry slots (hip-pouch story; BUILD hotbar unchanged). **XR:** grip near plaza kits picks up into carry (trigger still baton swing).
 
@@ -76,21 +76,21 @@ Carry strip HUD sits above the BUILD hotbar; vitals chip top-left labelled **TRA
 - **Desktop:** **LMB** / Fire1 swings while baton equipped.
 - **XR (Quest Link):** controller **trigger** (activate) on either hand swings; aim uses that controller pose (falls back to HMD forward).
 - Drones float east of plaza, fire soft pulses; brighter hit flash + floating damage chips; player HP chip flashes red on hurt.
-- Drone HP to 0 soft-disables (dim body + RESPAWN countdown chip) then restores after ~6s � GameObject stays active so the timer runs (Invoke would die on SetActive false).
+- Drone HP to 0 soft-disables (dim body + RESPAWN countdown chip) then restores after ~6s ï¿½ GameObject stays active so the timer runs (Invoke would die on SetActive false).
 - Operator HP regen after delay; ampoule heals; shield cell softens damage briefly.
 - HP -> 0 respawns at plaza via `LabPlayerSpawn` (no softlock / no game-over).
 
 ### XR UI (headset)
 
-- **Operator Select** — world-space panel (Esc/P -> Operator Select, or **O** on companion keyboard). Event Camera = XR Main Camera (`WireEventCamera`).
-- **Carry / Training HUD** — promotes to world-space follow when an XR display is running (left of view); stays ScreenSpaceOverlay on desktop. Never hidden in headset.
+- **Operator Select** â€” world-space panel (Esc/P -> Operator Select, or **O** on companion keyboard). Event Camera = XR Main Camera (`WireEventCamera`).
+- **Carry / Training HUD** â€” promotes to world-space follow when an XR display is running (left of view); stays ScreenSpaceOverlay on desktop. Never hidden in headset.
 
 ### Spawn locations (Ctrl+P)
 
 Under runtime root `QhysicsTrainingWorld` (relative to XR Origin / LabPlaza):
 
-- Pickups ~1–2 m around plaza stand pose (ampoule, battery, probe tip, baton, shield cell).
-- Training drones ~3.5–4.2 m east of plaza at ~1.4–1.6 m height.
+- Pickups ~1â€“2 m around plaza stand pose (ampoule, battery, probe tip, baton, shield cell).
+- Training drones ~3.5â€“4.2 m east of plaza at ~1.4â€“1.6 m height.
 
 ### Ctrl+P quick check
 
@@ -108,8 +108,8 @@ Under runtime root `QhysicsTrainingWorld` (relative to XR Origin / LabPlaza):
 1. Link connected -> Faraday -> Ctrl+P -> Enter Sandbox.
 2. **O** or Pause -> Operator Select (world panel, laser/ray clickable) -> pick Survey Ranger.
 3. Point controller at plaza pickups -> **grip** to bag (companion **E** still works).
-4. Stick L/R select baton slot + **stick-click** equip (or companion **U**) � aim at Training Drone � **trigger** to swing.
-5. Take a drone pulse � TRAINING SYSTEM HP chip flashes � stick-click ampoule (or **U**) to heal; stick-down drops selected.
+4. Stick L/R select baton slot + **stick-click** equip (or companion **U**) ï¿½ aim at Training Drone ï¿½ **trigger** to swing.
+5. Take a drone pulse ï¿½ TRAINING SYSTEM HP chip flashes ï¿½ stick-click ampoule (or **U**) to heal; stick-down drops selected.
 6. Confirm Carry HUD floats in world-space (not missing in HMD).
 
 ## Who is the player?
@@ -122,29 +122,29 @@ On **desktop** (Editor Ctrl+P, no Quest Link / no running XR display):
 - Hand proxies sit in front of the view; **E / LMB grab** attaches held props to the right-hand attach point.
 - Bottom **hotbar 1-9** is the desktop inventory (VR toolbelt still works via M / Tab).
 
-On **Quest Link**: desktop body hides; XR locomotion + Left/Right Hand Direct/Ray interactors take over. Light `XrControllerProxy` grips show on each controller (Hand Presence still used when OpenXR devices match). Grab attach is on each hand's `Attach` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â desktop HandAttach does not fight XR grabs. If the headset shows nothing, fix Link ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â you are not missing a character mesh.
+On **Quest Link**: desktop body hides; XR locomotion + Left/Right Hand Direct/Ray interactors take over. Light `XrControllerProxy` grips show on each controller (Hand Presence still used when OpenXR devices match). Grab attach is on each hand's `Attach` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â desktop HandAttach does not fight XR grabs. If the headset shows nothing, fix Link ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â you are not missing a character mesh.
 
 
-## Play steps ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Meta Quest Link (Quest 3S)
+## Play steps ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â Meta Quest Link (Quest 3S)
 
 1. On PC: install/open **Meta Quest Link** (Air Link or cable). Quest in Developer Mode, same account, PC allowed.
-2. Put on headset ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ enable **Link** / connect to this PC. Confirm Link status is Connected.
+2. Put on headset ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ enable **Link** / connect to this PC. Confirm Link status is Connected.
 3. In Unity (only one Editor): open `Assets/Scenes/Faraday.unity`.
-4. Optional once: **Reality Engine ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Fix Player Spawn** (or **Reset Player at Lab**) then **Ctrl+S** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â parks XR Origin on LabPlaza north of the circuit table facing Khufu, enables Main Camera, wires locomotion XR Origin.
+4. Optional once: **Reality Engine ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Fix Player Spawn** (or **Reset Player at Lab**) then **Ctrl+S** ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â parks XR Origin on LabPlaza north of the circuit table facing Khufu, enables Main Camera, wires locomotion XR Origin.
 5. Press **Ctrl+P** (Play). Game view mirrors the HMD via OpenXR + Link.
-6. First run: world **Main Menu ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Enter Sandbox** (or skip if already entered).
+6. First run: world **Main Menu ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Enter Sandbox** (or skip if already entered).
 7. Interact: teleport / smooth move on plaza, grab circuit parts, Toolbelt **M / Tab / Menu**, Pause **Esc / P**.
 
-If Play works in Editor Game view but the headset stays on the Quest home / black: Link is not active ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â fix Link first. Do not build APK for daily testing.
+If Play works in Editor Game view but the headset stays on the Quest home / black: Link is not active ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â fix Link first. Do not build APK for daily testing.
 
 
-## Play steps ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â XR Device Simulator (desktop, no headset)
+## Play steps ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â XR Device Simulator (desktop, no headset)
 
-1. Package Manager ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **XR Interaction Toolkit** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Samples ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ import **XR Device Simulator** (once).
-2. Project Settings ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **XR Plug-in Management** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **XR Interaction Toolkit** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ enable **Use XR Device Simulator in scenes** / auto-instantiate (or add the `XR Device Simulator` prefab to Faraday).
-   - Asset: `Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â set simulator prefab after sample import; `Automatically Instantiate Simulator Prefab` can be on for Editor-only.
-3. Open Faraday ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **Ctrl+P**. Use keyboard/mouse per simulator HUD (move/look/grip).
-4. Optional: **Reality Engine ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Fix Player Spawn** before Play if Origin pose looks wrong in Hierarchy.
+1. Package Manager ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ **XR Interaction Toolkit** ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Samples ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ import **XR Device Simulator** (once).
+2. Project Settings ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ **XR Plug-in Management** ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ **XR Interaction Toolkit** ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ enable **Use XR Device Simulator in scenes** / auto-instantiate (or add the `XR Device Simulator` prefab to Faraday).
+   - Asset: `Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset` ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â set simulator prefab after sample import; `Automatically Instantiate Simulator Prefab` can be on for Editor-only.
+3. Open Faraday ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ **Ctrl+P**. Use keyboard/mouse per simulator HUD (move/look/grip).
+4. Optional: **Reality Engine ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Fix Player Spawn** before Play if Origin pose looks wrong in Hierarchy.
 
 
 ## Play steps - Desktop keyboard (no headset, no Device Simulator)
@@ -170,7 +170,7 @@ Built-in fallback when **no XR display is running** (Editor Ctrl+P without Quest
 | **Q** / **Scroll** | Cycle hotbar |
 | **LMB** | Spawn selected part (or Delete when slot 8) |
 | **E** / **LMB** on part | Grab |
-| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse/Function Generator), Multimeter, Galvanometer, Oscilloscope, Frequency Counter, Power Meter, Flux Meter, Charge Meter, Voltmeter, Ammeter, Ohmmeter, Capacitance Meter, Inductance Meter, Resonance Meter, Impedance Meter, Power Factor Meter, Q Factor Meter, Admittance Meter, Decibel Meter, Crest Factor Meter, Energy Meter, Duty Cycle Meter, Slew Rate Meter, Rise/Fall Meter, Overshoot Meter, Peak-to-Peak Meter, Mean Meter, Ripple Meter, THD Meter, Probe, Stopwatch, or Field Lens |
+| **LMB** / **Scroll** while holding CIRCUIT gadget (incl. Motor/Solar/Capacitor/Inductor/Diode/Fuse/Function Generator), Multimeter, Galvanometer, Oscilloscope, Frequency Counter, Power Meter, Flux Meter, Charge Meter, Voltmeter, Ammeter, Ohmmeter, Capacitance Meter, Inductance Meter, Resonance Meter, Impedance Meter, Power Factor Meter, Q Factor Meter, Admittance Meter, Decibel Meter, Crest Factor Meter, Energy Meter, Duty Cycle Meter, Slew Rate Meter, Rise/Fall Meter, Overshoot Meter, Peak-to-Peak Meter, Mean Meter, Ripple Meter, THD Meter, Probe, Compass, Stopwatch, or Field Lens |
 
 ### MEASURE Multimeter (CircuitLab fallback)
 When no InductionCircuit is bound, Multimeter also reads the nearest placed CircuitLab component V/I (`GetVoltage` / `GetCurrentValue`) with honesty tag `[CircuitLab component]`. InductionCircuit still wins when present.
@@ -179,7 +179,7 @@ When no InductionCircuit is bound, Multimeter also reads the nearest placed Circ
 2. Hotbar **5** (or toolbelt) spawn **Resistor**; grab it.
 3. Hold near Coil; **N/P**, VR trigger, or desktop **LMB/scroll** cycles 2 / 8 / 50 / OPEN Ohm classical R_load.
 4. Pair with Magnet sweep + Multimeter **I** / Lamp glow.
- Activate / cycle (desktop trigger; Multimeter pages; Probe NEAREST/ALL/COMP; Stopwatch LMB toggle / scroll-reset; Field Lens layer peel) |
+ Activate / cycle (desktop trigger; Multimeter pages; Probe NEAREST/ALL/COMP; Compass ALL/NEAREST/LAB; Stopwatch LMB toggle / scroll-reset; Field Lens layer peel) |
 | **F** / **RMB** | Drop |
 | **R** | Throw |
 | **Esc** / **P** | Pause (releases cursor) - Resume re-locks |
@@ -189,7 +189,7 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 
 ### CIRCUIT Motor (toolbelt BUILD)
 1. Enter Sandbox / Induction.
-2. Toolbelt **BUILD Ã¢â€ â€™ Motor**; grab it.
+2. Toolbelt **BUILD ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Motor**; grab it.
 3. Hold near Coil; rotor spins from classical |I| (pair with Battery and/or Magnet sweep + Resistor).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles gear 0.5x / 1x / 2x / REV. Honesty: kinematic spin proxy, not torque/back-EMF.
 
@@ -197,37 +197,37 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Solar**; grab it.
 3. Hold near Coil; classical series EMF from irradiance preset (pair with Lamp/Motor/Resistor/Multimeter).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / Dawn / Noon / Bright (0 / 1.5 / 3 / 6 V). Honesty: lumped photocurrent/irradiance EMF proxy â€” NOT a real PV I-V curve, not quantum, not MPPT.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / Dawn / Noon / Bright (0 / 1.5 / 3 / 6 V). Honesty: lumped photocurrent/irradiance EMF proxy Ã¢â‚¬â€ NOT a real PV I-V curve, not quantum, not MPPT.
 
 ### CIRCUIT Capacitor (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Capacitor**; grab it.
 3. Hold near Coil; classical series C (pair with Battery + Resistor/Lamp; Multimeter I falls as Vc rises).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / 1mF / 10mF / 100mF. Honesty: lumped RC only â€” NOT dielectric physics, not ESR/ESL. **New Run** clears Vc.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / 1mF / 10mF / 100mF. Honesty: lumped RC only Ã¢â‚¬â€ NOT dielectric physics, not ESR/ESL. **New Run** clears Vc.
 
 ### CIRCUIT Inductor (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Inductor**; grab it.
 3. Hold near Coil; classical series L (pair with Battery + Resistor/Lamp; Multimeter I ramps; with Capacitor = RLC).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / 1mH / 10mH / 100mH. Honesty: lumped RL/RLC only â€” NOT core saturation, not skin effect, not mutual M. **New Run** clears I_L (and Vc).
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / 1mH / 10mH / 100mH. Honesty: lumped RL/RLC only Ã¢â‚¬â€ NOT core saturation, not skin effect, not mutual M. **New Run** clears I_L (and Vc).
 
 ### CIRCUIT Diode (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Diode**; grab it.
 3. Hold near Coil; ideal series diode clamp (pair with Magnet sweep + Multimeter **I** / Lamp; I one-sided).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / FWD / REV. Honesty: ideal half-wave only â€” NOT Shockley equation, not recovery, not avalanche; inductive kick not snubbered.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles SHORT / FWD / REV. Honesty: ideal half-wave only Ã¢â‚¬â€ NOT Shockley equation, not recovery, not avalanche; inductive kick not snubbered.
 
 ### CIRCUIT Fuse (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Fuse**; grab it.
 3. Hold near Coil; ideal |I| trip open (pair with Magnet sweep + Multimeter **I** / Lamp; hard sweep blows fuse and I collapses).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 5mA / 20mA / 50mA / BYPASS. While **BLOWN**, activate / **N** rearms. Honesty: ideal |I| threshold only â€” NOT I2t, not arc, not thermal model.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 5mA / 20mA / 50mA / BYPASS. While **BLOWN**, activate / **N** rearms. Honesty: ideal |I| threshold only Ã¢â‚¬â€ NOT I2t, not arc, not thermal model.
 
 ### CIRCUIT LED (toolbelt BUILD)
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> LED**; grab it.
 3. Hold near Coil; ideal series diode + colored glow (pair with Magnet sweep or Battery + Resistor; Multimeter **I** one-sided on color presets).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles RED / GREEN / BLUE / SHORT. Honesty: ideal diode + emission proxy ï¿½ NOT bandgap photons, not real LED I-V, not thermal.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles RED / GREEN / BLUE / SHORT. Honesty: ideal diode + emission proxy Ã¯Â¿Â½ NOT bandgap photons, not real LED I-V, not thermal.
 
 ### CIRCUIT Speaker (toolbelt BUILD)
 1. Enter Sandbox / Induction.
@@ -239,7 +239,7 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 1. Enter Sandbox / Induction.
 2. Toolbelt **BUILD -> Potentiometer**; grab it.
 3. Hold near Coil; applies classical series R_load via discrete wiper presets (pair with Battery + Lamp/Motor/Multimeter).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 1Î© / 5Î© / 10Î© / 25Î© / 100Î© / 1kÎ© (default 10Î©). Honesty: discrete lumped R_load wiper steps â€” NOT a real potentiometer, not 3-terminal divider, not taper curve. Overrides Resistor when both near; Switch OPEN still wins.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles 1ÃŽÂ© / 5ÃŽÂ© / 10ÃŽÂ© / 25ÃŽÂ© / 100ÃŽÂ© / 1kÃŽÂ© (default 10ÃŽÂ©). Honesty: discrete lumped R_load wiper steps Ã¢â‚¬â€ NOT a real potentiometer, not 3-terminal divider, not taper curve. Overrides Resistor when both near; Switch OPEN still wins.
 
 ### CIRCUIT Transformer (toolbelt BUILD)
 1. Enter Sandbox / Induction.
@@ -259,7 +259,7 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Oscilloscope**; grab it.
 3. Hold near Coil; strip chart samples classical Emf / I / Phi (pair with Magnet sweep or Battery + Resistor; Multimeter for cross-check).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles EMF0.5 / EMF1 / EMF2 / I0.5 / I1 / I2 / Phi1 / Phi2 (default EMF1 = EMF 1s). Honesty: ideal rolling strip from classical InductionCircuit Emf/I/Phi samples â€” NOT real ADC, not triggered scope, not FFT, not probe capacitance.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles EMF0.5 / EMF1 / EMF2 / I0.5 / I1 / I2 / Phi1 / Phi2 (default EMF1 = EMF 1s). Honesty: ideal rolling strip from classical InductionCircuit Emf/I/Phi samples Ã¢â‚¬â€ NOT real ADC, not triggered scope, not FFT, not probe capacitance.
 
 
 
@@ -281,12 +281,12 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Flux Meter**; grab it.
 3. Hold near Coil; classical Phi (Wb), dPhi/dt (Wb/s), or peak |Phi| hold (pair with PHYSICS Magnet sweep; Oscilloscope Phi / Multimeter for cross-check).
-4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles PHI / DPHI / PEAK / CLR (default PHI; CLR zeros peak then snaps to PHI). Honesty: ideal lumped fluxmeter from InductionCircuit - NOT real integrating fluxmeter, not search-coil ballistic galvo, not Hall BÂ·A, not hysteresis tracer.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles PHI / DPHI / PEAK / CLR (default PHI; CLR zeros peak then snaps to PHI). Honesty: ideal lumped fluxmeter from InductionCircuit - NOT real integrating fluxmeter, not search-coil ballistic galvo, not Hall BÃ‚Â·A, not hysteresis tracer.
 
 ### MEASURE Charge Meter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Charge Meter**; grab it.
-3. Hold near Coil; classical Q=âˆ«I dt (C), peak |Q|, or Iavg (=Q/t since CLR) (pair with BUILD Capacitor / Function Generator / Magnet; Multimeter I / Power Meter for cross-check).
+3. Hold near Coil; classical Q=Ã¢Ë†Â«I dt (C), peak |Q|, or Iavg (=Q/t since CLR) (pair with BUILD Capacitor / Function Generator / Magnet; Multimeter I / Power Meter for cross-check).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles Q / PEAK / AVG / CLR (default Q; CLR zeros Q/peak/timer then snaps to Q). Honesty: ideal coulomb integrator from InductionCircuit I - NOT real electrometer, not Faraday cup, not Keithley charge amp, not dielectric absorption.
 
 
@@ -357,7 +357,7 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 ### MEASURE Energy Meter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Energy Meter**; grab it.
-3. Hold near Coil; classical energy integrator E=∫P dt from LoadPowerWatts, plus live P and window AVG=E/t (pair with BUILD Function Generator / Battery; Power Meter / Decibel Meter for cross-check). Energy accumulates while linked and within tip range.
+3. Hold near Coil; classical energy integrator E=âˆ«P dt from LoadPowerWatts, plus live P and window AVG=E/t (pair with BUILD Function Generator / Battery; Power Meter / Decibel Meter for cross-check). Energy accumulates while linked and within tip range.
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles E / P / AVG / CLR (default E; CLR zeros the integrator and window, then snaps to E). Honesty: ideal time integral of lumped InductionCircuit LoadPowerWatts - NOT a real watt-hour meter, not calibrated energy logger, not four-quadrant / true-RMS joule hardware.
 
 ### MEASURE Duty Cycle Meter (toolbelt MEASURE)
@@ -408,6 +408,13 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Hold near Coil; classical windowed harmonic residual THD for Emf (THDV), I (THDI), and sine-assumed fund Emf (FUND) (pair with BUILD Function Generator; Ripple Meter / Crest Factor Meter / Mean Meter for cross-check). A pure sine should drive low THDV; a square/triangle raises it.
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles THDV / THDI / FUND / CLR (default THDV; CLR zeros window, then snaps to THDV). Honesty: ideal windowed harmonic residual from classical InductionCircuit Emf/I samples - NOT real THD analyzer, not FFT spectrum analyzer, not IEC distortion meter, not calibrated audio THD hardware.
 
+### MEASURE Magnetic Compass (toolbelt MEASURE)
+1. Enter Sandbox / Induction (or PHYSICS Magnet).
+2. Toolbelt **MEASURE -> Compass** (or spawn label Compass); grab the disc.
+3. Needle aligns to horizontal B from lab magnets + weak ambient lab north (world +Z, ~50 uT). Walk near Induction magnet / Handheld Magnet: needle swings; far away: rests toward lab north.
+4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles ALL / NEAREST / LAB (default ALL = dipoles + Earth; LAB = dipoles only). Honesty: classical MagneticDipole B + ambient Earth field - NOT a fluxgate, not a gyroscope.
+5. Ctrl+P test: WASD near magnet; M/Tab toolbelt -> MEASURE -> Compass; watch |Bh| / heading readout.
+
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
@@ -418,23 +425,23 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 2. Toolbelt **BUILD -> Function Generator**; grab it.
 3. Hold near Coil; drives classical ideal series EMF waveform (pair with MEASURE Oscilloscope / Frequency Counter / Power Meter / Flux Meter / Charge Meter / Voltmeter / Ammeter / Ohmmeter / Capacitance Meter / Inductance Meter / Resonance Meter / Impedance Meter / Power Factor Meter / Q Factor Meter / Admittance Meter / Decibel Meter / Crest Factor Meter / Energy Meter / Duty Cycle Meter / Slew Rate Meter / Rise/Fall Meter / Overshoot Meter / Peak-to-Peak Meter / Mean Meter / Ripple Meter / THD Meter / Multimeter / Galvanometer / Lamp).
 4. **N/P**, VR trigger, or desktop **LMB/scroll** cycles OFF / SIN1 / SIN5 / SIN10 / SQR5 / SQR10 / TRI5 / TRI10 (default SIN5 = 5 Hz @ 1.5 Vpk). Honesty: ideal AWG series EMF on InductionCoil - NOT real DDS, not output impedance, not coil frequency response, not sync/trigger.
-## Play steps ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â checklist
+## Play steps ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â checklist
 
 1. Open `Assets/Scenes/Faraday.unity` (Build Settings already has Faraday enabled).
 2. Confirm Hierarchy has **LabLandscape** (Giza) and **QhysicsUI** (or RealityEngine host). If missing:
-   - Menu **Reality Engine ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Place Giza Complex**
-   - Menu **Reality Engine ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Place QHYSICS UI**
-   - **Ctrl+S** / File ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Save so placement persists.
-3. Optional: **Reality Engine ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Fix Player Spawn** (XR Origin on plaza, Main Camera MainCamera+enabled, facing Khufu).
+   - Menu **Reality Engine ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Place Giza Complex**
+   - Menu **Reality Engine ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Place QHYSICS UI**
+   - **Ctrl+S** / File ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Save so placement persists.
+3. Optional: **Reality Engine ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Fix Player Spawn** (XR Origin on plaza, Main Camera MainCamera+enabled, facing Khufu).
 4. Press **Ctrl+P** (or the Play button).
 5. Headset: Quest Link / OpenXR, **or** Editor with **XR Device Simulator**.
-6. First run: world **Main Menu ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Enter Sandbox** (or skip if already entered). Short onboarding tips are dismissible (Next / Skip).
+6. First run: world **Main Menu ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Enter Sandbox** (or skip if already entered). Short onboarding tips are dismissible (Next / Skip).
 7. Interact:
    - Move with XRI locomotion / teleport on plaza
    - Grab circuit parts from table dispensers (grip)
-   - Build Battery ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Wire ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Bulb ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Switch loop
+   - Build Battery ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Wire ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Bulb ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Switch loop
    - **M / Tab / Menu / B / Grip** toggles Toolbelt
-   - **Esc / P** opens Pause ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Resume / Reset Experiment / Settings / Exit Play (Editor)
+   - **Esc / P** opens Pause ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Resume / Reset Experiment / Settings / Exit Play (Editor)
    - SimChip (`> 1x`) cycles sim speed / pause / reset (Reset also calls CircuitLab.Reset)
 
 
@@ -473,7 +480,7 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 
 ### Sun Power (challenge 5)
 1. Press **C** -> Start **Sun Power** (unlocked after Double Trouble). Overlay shows live `[0.00/0.05 W load=0]`.
-2. From **Dispenser11** (Solar shelf): grab **Solar**, plus **Wire(s)** and a **Bulb** or **Motor**. Do **not** use a battery — the panel is the source.
+2. From **Dispenser11** (Solar shelf): grab **Solar**, plus **Wire(s)** and a **Bulb** or **Motor**. Do **not** use a battery â€” the panel is the source.
 3. Snap Solar + wires + load onto the breadboard. Placing Solar wakes **MiniatureSun**.
 4. Desktop: hold Solar + **LMB/scroll** to rotate the panel; VR: pinch the panel. Face the sun until live W rises (>= 0.05) and the load is active.
 5. When meter shows enough wattage + `load=1` -> stars + unlock **Induction**. Completion banner shows `Unlocked: Induction`.
@@ -522,55 +529,55 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 
 ### Sun Drive (challenge 13)
 1. Press **C** -> Start **Sun Drive** (unlocked after Throttle Up). Overlay shows live `[0.00/0.05 W load=0]` and `[0/120 RPM]`.
-2. From **Dispenser11** grab **Solar**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — the panel is the source.
+2. From **Dispenser11** grab **Solar**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery â€” the panel is the source.
 3. Snap Solar + wires + Motor onto the breadboard. Rotate Solar toward **MiniatureSun** (desktop LMB/scroll; VR pinch) until wattage rises and the motor spins.
 4. When solar W/load meter and RPM both pass (>= 0.05 W powering a load AND RPM >= 120), objective completes -> stars + unlock **Sun Lab**. Completion banner shows `Unlocked: Sun Lab`.
 
 ### Sun Lab (challenge 14)
 1. Press **C** -> Start **Sun Lab** (unlocked after Sun Drive). Overlay shows live `[0.00/0.05 W load=0]`, `[0/1 lit]`, and `[0/120 RPM]`.
-2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **Bulb**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — multi-load from one renewable source.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **Bulb**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery â€” multi-load from one renewable source.
 3. Snap Solar + wires + Bulb + Motor onto the breadboard (parallel preferred so both loads get voltage). Rotate Solar toward **MiniatureSun** until wattage rises, the bulb lights, and the motor spins.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND bulb lit AND RPM >= 120), objective completes -> stars + unlock **Sun Gate**. Completion banner shows `Unlocked: Sun Gate`.
 
 ### Sun Gate (challenge 15)
 1. Press **C** -> Start **Sun Gate** (unlocked after Sun Lab). Overlay shows live `[0.00/0.05 W load=0]` and switch/lit readout.
-2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, plus **Wire(s)**. Do **not** use a battery — renewable source + knife-switch control.
+2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, plus **Wire(s)**. Do **not** use a battery â€” renewable source + knife-switch control.
 3. Snap Solar + Switch + wires + Bulb onto the breadboard. Leave the switch **open** first (bulb dark). Rotate Solar toward **MiniatureSun** until wattage rises, then **close** the switch so the bulb lights.
 4. When both objectives complete (solar >= 0.05 W powering a load AND switch closed with bulb lit), objective completes -> stars + unlock **Sun Switch Drive**. Completion banner shows `Unlocked: Sun Switch Drive`.
 
 ### Sun Switch Drive (challenge 16)
 1. Press **C** -> Start **Sun Switch Drive** (unlocked after Sun Gate). Overlay shows live `[0.00/0.05 W load=0]` and switch/RPM readout.
-2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — renewable source + knife-switch gated motor.
+2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery â€” renewable source + knife-switch gated motor.
 3. Snap Solar + Switch + wires + Motor onto the breadboard. Leave the switch **open** first (motor still). Rotate Solar toward **MiniatureSun** until wattage rises, then **close** the switch so the motor spins to 120+ RPM.
 4. When both objectives complete (solar >= 0.05 W powering a load AND switch closed with motor at 120+ RPM), objective completes -> stars + unlock **Sun Switch Lab**. Completion banner shows `Unlocked: Sun Switch Lab`.
 
 ### Sun Switch Lab (challenge 17)
 1. Press **C** -> Start **Sun Switch Lab** (unlocked after Sun Switch Drive). Overlay shows live `[0.00/0.05 W load=0]`, switch/lit, and switch/RPM readouts.
-2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — renewable source + knife-switch gated multi-load.
+2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery â€” renewable source + knife-switch gated multi-load.
 3. Snap Solar + Switch + wires + Bulb + Motor onto the breadboard (parallel loads preferred). Leave the switch **open** first (bulb dark / motor still). Rotate Solar toward **MiniatureSun** until wattage rises, then **close** the switch so the bulb lights and the motor spins to 120+ RPM.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND switch closed with bulb lit AND switch closed with motor at 120+ RPM), objective completes -> stars + unlock **Sun Twin Gate**. Completion banner shows `Unlocked: Sun Twin Gate`.
 
 ### Sun Twin Gate (challenge 18)
 1. Press **C** -> Start **Sun Twin Gate** (unlocked after Sun Switch Lab). Overlay shows live `[0.00/0.05 W load=0]`, `[0/2 lit]`, and switch/lit readout.
-2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **two Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable source + knife-switch gated twin bulbs (series or parallel).
+2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **two Bulbs**, plus **Wire(s)**. Do **not** use a battery â€” renewable source + knife-switch gated twin bulbs (series or parallel).
 3. Snap Solar + Switch + wires + two Bulbs onto the breadboard. Leave the switch **open** first (both dark). Rotate Solar toward **MiniatureSun** until wattage rises, then **close** the switch so both bulbs light. Parallel keeps them bright; series splits voltage.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND 2 bulbs lit AND switch closed with bulb lit), objective completes -> stars + unlock **Sun Twin Lab**. Completion banner shows `Unlocked: Sun Twin Lab`.
 
 ### Sun Twin Lab (challenge 19)
 1. Press **C** -> Start **Sun Twin Lab** (unlocked after Sun Twin Gate). Overlay shows live `[0.00/0.05 W load=0]`, `[0/2 lit]`, and switch/RPM readout.
-2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **two Bulbs**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — renewable source + knife-switch gated twin bulbs and motor.
+2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **two Bulbs**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery â€” renewable source + knife-switch gated twin bulbs and motor.
 3. Snap Solar + Switch + wires + two Bulbs + Motor onto the breadboard (parallel loads preferred). Leave the switch **open** first (bulbs dark / motor still). Rotate Solar toward **MiniatureSun** until wattage rises, then **close** the switch so both bulbs light and the motor spins to 120+ RPM.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND 2 bulbs lit AND switch closed with motor at 120+ RPM), objective completes -> stars + unlock **Sun Throttle**. Completion banner shows `Unlocked: Sun Throttle`.
 
 ### Sun Throttle (challenge 20)
 1. Press **C** -> Start **Sun Throttle** (unlocked after Sun Twin Lab). Overlay shows live `[0.00/0.05 W load=0]`, `[R=0 lit=0]`, and switch/RPM readout.
-2. From **Dispenser11** grab **Solar**, from Resistor shelf grab **Resistor**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — renewable Throttle Up: series resistor + lit bulb + knife-switch gated motor.
+2. From **Dispenser11** grab **Solar**, from Resistor shelf grab **Resistor**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery â€” renewable Throttle Up: series resistor + lit bulb + knife-switch gated motor.
 3. Snap Solar + Resistor + Switch + wires + Bulb + Motor onto the breadboard. Put the resistor in series so it throttles current while the bulb stays lit. Leave the switch **open** first (motor still). Rotate Solar toward **MiniatureSun** until wattage rises, then **close** the switch so the motor spins to 120+ RPM.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND resistor in circuit with lit bulb AND switch closed with motor at 120+ RPM), objective completes -> stars + unlock **Sun Power Lab**. Completion banner shows `Unlocked: Sun Power Lab`.
 
 ### Sun Power Lab (challenge 21)
 1. Press **C** -> Start **Sun Power Lab** (unlocked after Sun Throttle). Overlay shows live `[0.00/0.05 W load=0]`, circuit power `[0.00/0.05 W lit=0]`, and switch/RPM readout.
-2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — renewable Power Play: measurable load watts (P = |V| * |I|) + knife-switch gated motor.
+2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery â€” renewable Power Play: measurable load watts (P = |V| * |I|) + knife-switch gated motor.
 3. Snap Solar + Switch + wires + Bulb + Motor onto the breadboard. Leave the switch **open** first (motor still). Rotate Solar toward **MiniatureSun** until wattage rises and load power hits >= 0.05 W, then **close** the switch so the motor spins to 120+ RPM.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND circuit load power >= 0.05 W AND switch closed with motor at 120+ RPM), objective completes -> stars + unlock **Sun Induction**. Completion banner shows `Unlocked: Sun Induction`.
 
@@ -582,31 +589,31 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 
 ### Sun Faraday Lab (challenge 23)
 1. Press **C** -> Start **Sun Faraday Lab** (unlocked after Sun Induction). Overlay shows live [0.00/0.05 W load=0], peak EMF [pk 0.000/0.05 V live=0.000], and circuit power [0.00/0.05 W lit=0].
-2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **Bulb** and/or from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Lab: measurable load watts (P = |V| * |I|) + Induction Lab peak EMF.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **Bulb** and/or from **Dispenser2** grab **Motor**, plus **Wire(s)**. Do **not** use a battery â€” renewable Faraday Lab: measurable load watts (P = |V| * |I|) + Induction Lab peak EMF.
 3. Snap Solar + wires + Bulb/Motor onto the breadboard. Face **MiniatureSun** until solar powers a load and circuit power hits >= 0.05 W. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND circuit load power >= 0.05 W), objective completes -> stars + unlock **Sun Faraday Drive**. Completion banner shows `Unlocked: Sun Faraday Drive`.
 
 ### Sun Faraday Drive (challenge 24)
 1. Press **C** -> Start **Sun Faraday Drive** (unlocked after Sun Faraday Lab). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and resistor `[R=0 lit=0]`.
-2. From **Dispenser11** grab **Solar**, from Resistor shelf grab **Resistor**, from Bulb shelf grab **Bulb**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Drive: series resistor throttles current with bulb lit + Induction Lab peak EMF.
+2. From **Dispenser11** grab **Solar**, from Resistor shelf grab **Resistor**, from Bulb shelf grab **Bulb**, plus **Wire(s)**. Do **not** use a battery â€” renewable Faraday Drive: series resistor throttles current with bulb lit + Induction Lab peak EMF.
 3. Snap Solar + Resistor + wires + Bulb onto the breadboard (resistor in series). Face **MiniatureSun** until solar powers a load and the bulb stays lit with the resistor in circuit. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND resistor in circuit with lit bulb), objective completes -> stars + unlock **Sun Faraday Gate**. Completion banner shows `Unlocked: Sun Faraday Gate`.
 
 ### Sun Faraday Gate (challenge 25)
 1. Press **C** -> Start **Sun Faraday Gate** (unlocked after Sun Faraday Drive). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and switch/bulb `[sw=0 lit=0]`.
-2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Gate: knife-switch gated lit bulb + Induction Lab peak EMF.
+2. From **Dispenser11** grab **Solar**, from **Dispenser3** grab **Switch**, from Bulb shelf grab **Bulb**, plus **Wire(s)**. Do **not** use a battery â€” renewable Faraday Gate: knife-switch gated lit bulb + Induction Lab peak EMF.
 3. Snap Solar + Switch + wires + Bulb onto the breadboard. Face **MiniatureSun** until solar powers a load; keep the switch open first (bulb dark), then **close** so the bulb lights. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND switch closed with bulb lit), objective completes -> stars + unlock **Sun Faraday Twin**. Completion banner shows `Unlocked: Sun Faraday Twin`.
 
 ### Sun Faraday Twin (challenge 26)
 1. Press **C** -> Start **Sun Faraday Twin** (unlocked after Sun Faraday Gate). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and twin bulbs `[0/2 lit]`.
-2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **two Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Twin: two bulbs lit from the panel + Induction Lab peak EMF.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **two Bulbs**, plus **Wire(s)**. Do **not** use a battery â€” renewable Faraday Twin: two bulbs lit from the panel + Induction Lab peak EMF.
 3. Snap Solar + wires + two Bulbs onto the breadboard (parallel preferred). Face **MiniatureSun** until solar powers a load and both bulbs light. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 2 bulbs lit), objective completes -> stars + unlock **Sun Faraday Trio**. Completion banner shows `Unlocked: Sun Faraday Trio`.
 
 ### Sun Faraday Trio (challenge 27)
 1. Press **C** -> Start **Sun Faraday Trio** (unlocked after Sun Faraday Twin). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and trio bulbs `[0/3 lit]`.
-2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **three Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Trio: three bulbs lit from the panel + Induction Lab peak EMF.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **three Bulbs**, plus **Wire(s)**. Do **not** use a battery â€” renewable Faraday Trio: three bulbs lit from the panel + Induction Lab peak EMF.
 3. Snap Solar + wires + three Bulbs onto the breadboard (parallel preferred). Face **MiniatureSun** until solar powers a load and all three bulbs light. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 3 bulbs lit), objective completes -> stars + unlock **Sun Faraday Spin**. Completion banner shows `Unlocked: Sun Faraday Spin`.
 
@@ -617,22 +624,22 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND motor at 120+ RPM), objective completes -> stars + unlock **Sun Faraday Quad**. Completion banner shows `Unlocked: Sun Faraday Quad`.
 ### Sun Faraday Quad (challenge 29)
 1. Press **C** -> Start **Sun Faraday Quad** (unlocked after Sun Faraday Spin). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and quad bulbs `[0/4 lit]`.
-2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **four Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Quad: four bulbs lit from the panel + Induction Lab peak EMF.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **four Bulbs**, plus **Wire(s)**. Do **not** use a battery â€” renewable Faraday Quad: four bulbs lit from the panel + Induction Lab peak EMF.
 3. Snap Solar + wires + four Bulbs onto the breadboard (parallel preferred). Face **MiniatureSun** until solar powers a load and all four bulbs light. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 4 bulbs lit), objective completes -> stars + unlock **Sun Faraday Penta**. Completion banner shows `Unlocked: Sun Faraday Penta`.
 ### Sun Faraday Penta (challenge 30)
 1. Press **C** -> Start **Sun Faraday Penta** (unlocked after Sun Faraday Quad). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and penta bulbs `[0/5 lit]`.
-2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **five Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Penta: five bulbs lit from the panel + Induction Lab peak EMF.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **five Bulbs**, plus **Wire(s)**. Do **not** use a battery â€” renewable Faraday Penta: five bulbs lit from the panel + Induction Lab peak EMF.
 3. Snap Solar + wires + five Bulbs onto the breadboard (parallel preferred). Face **MiniatureSun** until solar powers a load and all five bulbs light. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 5 bulbs lit), objective completes -> stars + unlock **Sun Faraday Hex**. Completion banner shows `Unlocked: Sun Faraday Hex`.
 ### Sun Faraday Hex (challenge 31)
 1. Press **C** -> Start **Sun Faraday Hex** (unlocked after Sun Faraday Penta). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and hex bulbs `[0/6 lit]`.
-2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **six Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Hex: six bulbs lit from the panel + Induction Lab peak EMF.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **six Bulbs**, plus **Wire(s)**. Do **not** use a battery â€” renewable Faraday Hex: six bulbs lit from the panel + Induction Lab peak EMF.
 3. Snap Solar + wires + six Bulbs onto the breadboard (parallel preferred). Face **MiniatureSun** until solar powers a load and all six bulbs light. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 6 bulbs lit), objective completes -> stars + unlock **Sun Faraday Hept**. Completion banner shows `Unlocked: Sun Faraday Hept`.
 ### Sun Faraday Hept (challenge 32)
 1. Press **C** -> Start **Sun Faraday Hept** (unlocked after Sun Faraday Hex). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and hept bulbs `[0/7 lit]`.
-2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **seven Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Hept: seven bulbs lit from the panel + Induction Lab peak EMF.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **seven Bulbs**, plus **Wire(s)**. Do **not** use a battery â€” renewable Faraday Hept: seven bulbs lit from the panel + Induction Lab peak EMF.
 3. Snap Solar + wires + seven Bulbs onto the breadboard (parallel preferred). Face **MiniatureSun** until solar powers a load and all seven bulbs light. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 7 bulbs lit), objective completes -> stars + unlock **Sun Faraday Oct**. Completion banner shows `Unlocked: Sun Faraday Oct`.
 ### Sun Faraday Oct (challenge 33)
@@ -642,12 +649,12 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 8 bulbs lit), objective completes -> stars + unlock **Sun Faraday Nona**. Completion banner shows `Unlocked: Sun Faraday Nona`.
 ### Sun Faraday Nona (challenge 34)
 1. Press **C** -> Start **Sun Faraday Nona** (unlocked after Sun Faraday Oct). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and nona bulbs `[0/9 lit]`.
-2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **nine Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Nona: nine bulbs lit from the panel + Induction Lab peak EMF.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **nine Bulbs**, plus **Wire(s)**. Do **not** use a battery â€” renewable Faraday Nona: nine bulbs lit from the panel + Induction Lab peak EMF.
 3. Snap Solar + wires + nine Bulbs onto the breadboard (parallel preferred). Face **MiniatureSun** until solar powers a load and all nine bulbs light. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 9 bulbs lit), objective completes -> stars + unlock **Sun Faraday Deca**. Completion banner shows `Unlocked: Sun Faraday Deca`.
 ### Sun Faraday Deca (challenge 35)
 1. Press **C** -> Start **Sun Faraday Deca** (unlocked after Sun Faraday Nona). Overlay shows live `[0.00/0.05 W load=0]`, peak EMF `[pk 0.000/0.05 V live=0.000]`, and deca bulbs `[0/10 lit]`.
-2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **ten Bulbs**, plus **Wire(s)**. Do **not** use a battery — renewable Faraday Deca: ten bulbs lit from the panel + Induction Lab peak EMF.
+2. From **Dispenser11** grab **Solar**, from Bulb shelf grab **ten Bulbs**, plus **Wire(s)**. Do **not** use a battery â€” renewable Faraday Deca: ten bulbs lit from the panel + Induction Lab peak EMF.
 3. Snap Solar + wires + ten Bulbs onto the breadboard (parallel preferred). Face **MiniatureSun** until solar powers a load and all ten bulbs light. At the Induction Lab coil station, grab the bar magnet and thrust it through the coil until peak |EMF| >= 0.05 V.
 4. When all three objectives complete (solar >= 0.05 W powering a load AND peak |EMF| >= 0.05 V AND 10 bulbs lit), objective completes -> stars + unlock **Sun Faraday Boost**. Completion banner shows `Unlocked: Sun Faraday Boost`.
 ### Sun Faraday Boost (challenge 36)
@@ -694,7 +701,7 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only
 
-- **Ctrl+B** / Build and Run ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Android (Quest) or Windows player.
+- **Ctrl+B** / Build and Run ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Android (Quest) or Windows player.
 - Quest: Developer Mode + authorized `adb devices` before APK install.
 - Do **not** build APK unless `adb devices` shows the authorized Quest serial you intend to flash.
 
