@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 20 challenges with real, detectable conditions.
+        /// Build the starter campaign of 21 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -797,6 +797,43 @@ namespace RealityEngine.Challenges
                         {
                             type = ObjectiveType.ResistorInCircuit,
                             displayText = "Add a resistor while keeping a bulb lit from the solar panel"
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SwitchClosedMotorSpinning,
+                            displayText = "Close a switch and spin a motor to 120+ RPM from the solar panel",
+                            targetValue = 120f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 16
+                    }
+                },
+
+                // 21. Sun Power Lab - solar + measurable load power P=|V|*|I| + knife-switch gated motor
+                new ChallengeDefinition
+                {
+                    id = "sun_power_lab",
+                    title = "Sun Power Lab",
+                    description = "Face the sun until the panel powers a load, deliver at least 0.05 W of measurable load power (P = |V| * |I|), and gate a motor to 120+ RPM with a knife switch — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), Bulb and/or Motor (Dispenser2), Wire(s). No battery. Face MiniatureSun; overlay shows solar W/load + circuit W/lit + sw/RPM. Close switch so motor spins. RESET retries cleanly.",
+                    prerequisiteId = "sun_throttle",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.CircuitPowerThreshold,
+                            displayText = "Deliver >= 0.05 W to a load (bulb or motor) from the solar panel",
+                            targetValue = 0.05f
                         },
                         new ChallengeObjective
                         {
