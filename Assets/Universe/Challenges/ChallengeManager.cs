@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 21 challenges with real, detectable conditions.
+        /// Build the starter campaign of 22 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -833,6 +833,43 @@ namespace RealityEngine.Challenges
                         {
                             type = ObjectiveType.CircuitPowerThreshold,
                             displayText = "Deliver >= 0.05 W to a load (bulb or motor) from the solar panel",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SwitchClosedMotorSpinning,
+                            displayText = "Close a switch and spin a motor to 120+ RPM from the solar panel",
+                            targetValue = 120f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 16
+                    }
+                },
+
+                // 22. Sun Induction - solar load + Faraday peak EMF + knife-switch gated motor
+                new ChallengeDefinition
+                {
+                    id = "sun_induction",
+                    title = "Sun Induction",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil (thrust the magnet through), and gate a motor to 120+ RPM with a knife switch — no battery.",
+                    mentorHint = "Solar circuit: Dispenser11 Solar + Dispenser3 Switch + Bulb/Motor + Wire(s), face MiniatureSun. Induction Lab: grab bar magnet, thrust through coil for peak EMF. Overlay shows solar W/load + pk EMF + sw/RPM. RESET retries cleanly.",
+                    prerequisiteId = "sun_power_lab",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.InducedEmfThreshold,
+                            displayText = "Peak |EMF| >= 0.05 V through the coil",
                             targetValue = 0.05f
                         },
                         new ChallengeObjective
