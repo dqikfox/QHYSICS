@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 12 challenges with real, detectable conditions.
+        /// Build the starter campaign of 14 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -568,6 +568,42 @@ namespace RealityEngine.Challenges
                         twoStarTimeSeconds = 150f,
                         threeStarTimeSeconds = 75f,
                         threeStarMaxComponents = 10
+                    }
+                },
+
+                // 14. Sun Lab - solar powers BOTH a lit bulb and a spinning motor (multi-load renewable)
+                new ChallengeDefinition
+                {
+                    id = "sun_lab",
+                    title = "Sun Lab",
+                    description = "Power a lit bulb and a spinning motor from the solar panel alone — multi-load from one renewable source, no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Bulb, Motor (Dispenser2), Wire(s). No battery. Parallel loads share the panel; face MiniatureSun. Overlay shows solar W/load + lit + RPM. RESET retries cleanly.",
+                    prerequisiteId = "sun_drive",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.BulbLit,
+                            displayText = "Light up a bulb from the solar panel"
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MotorRpmThreshold,
+                            displayText = "Get a motor spinning at 120+ RPM",
+                            targetValue = 120f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 12
                     }
                 }
             };
