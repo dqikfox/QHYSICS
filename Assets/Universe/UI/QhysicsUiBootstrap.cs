@@ -26,7 +26,7 @@ namespace RealityEngine.UI
         {
             QhysicsUiBuilder.EnsureXrUiInputModule();
 
-            QhysicsUiBootstrap existing = Object.FindFirstObjectByType<QhysicsUiBootstrap>(FindObjectsInactive.Include);
+            QhysicsUiBootstrap existing = UnityEngine.Object.FindFirstObjectByType<QhysicsUiBootstrap>(FindObjectsInactive.Include);
             if (existing == null)
             {
                 GameObject host = GameObject.Find(HostName);

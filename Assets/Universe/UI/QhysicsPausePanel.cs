@@ -155,7 +155,7 @@ namespace RealityEngine.UI
         {
             Time.timeScale = 1f;
             SetOpen(false);
-            var panel = Object.FindFirstObjectByType<QhysicsOperatorSelectPanel>(FindObjectsInactive.Include);
+            var panel = UnityEngine.Object.FindFirstObjectByType<QhysicsOperatorSelectPanel>(FindObjectsInactive.Include);
             if (panel == null)
                 panel = QhysicsOperatorSelectPanel.Ensure(transform.parent != null ? transform.parent : null);
             if (panel != null)

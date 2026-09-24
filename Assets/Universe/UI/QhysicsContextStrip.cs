@@ -131,7 +131,7 @@ namespace RealityEngine.UI
             bool selected = false;
 
             if (_desktop == null)
-                _desktop = Object.FindFirstObjectByType<DesktopInteractor>(FindObjectsInactive.Exclude);
+                _desktop = UnityEngine.Object.FindFirstObjectByType<DesktopInteractor>(FindObjectsInactive.Exclude);
             if (_desktop != null)
             {
                 if (_desktop.Held != null)
@@ -150,7 +150,7 @@ namespace RealityEngine.UI
                 if (_interactors == null || Time.unscaledTime >= _nextInteractorRefresh)
                 {
                     _nextInteractorRefresh = Time.unscaledTime + 1f;
-                    _interactors = Object.FindObjectsByType<XRBaseInteractor>(FindObjectsInactive.Exclude);
+                    _interactors = UnityEngine.Object.FindObjectsByType<XRBaseInteractor>(FindObjectsInactive.Exclude);
                 }
 
                 var interactors = _interactors;
@@ -236,7 +236,7 @@ namespace RealityEngine.UI
 
             var circuit = t.GetComponentInParent<InductionCircuit>();
             if (circuit == null)
-                circuit = Object.FindFirstObjectByType<InductionCircuit>(FindObjectsInactive.Exclude);
+                circuit = UnityEngine.Object.FindFirstObjectByType<InductionCircuit>(FindObjectsInactive.Exclude);
 
             var magnet = t.GetComponentInParent<MagneticDipole>();
             var coil = t.GetComponentInParent<InductionCoil>();
@@ -247,7 +247,7 @@ namespace RealityEngine.UI
             var lensHand = t.GetComponentInParent<FieldLensHandheld>();
             var lens = t.GetComponentInParent<FieldLens>();
             if (lens == null && lensHand != null)
-                lens = Object.FindFirstObjectByType<FieldLens>(FindObjectsInactive.Include);
+                lens = UnityEngine.Object.FindFirstObjectByType<FieldLens>(FindObjectsInactive.Include);
 
             Rigidbody rb = t.GetComponentInParent<Rigidbody>();
             string mass = rb != null ? rb.mass.ToString("0.###") + " kg" : null;
@@ -296,7 +296,7 @@ namespace RealityEngine.UI
             if (lens != null || lensHand != null)
             {
                 if (lens == null)
-                    lens = Object.FindFirstObjectByType<FieldLens>(FindObjectsInactive.Include);
+                    lens = UnityEngine.Object.FindFirstObjectByType<FieldLens>(FindObjectsInactive.Include);
                 if (lens != null)
                     return "layer " + lens.CurrentLayerName + " | " + lens.CurrentHonestyTag + " | " + state;
                 return "Field Lens | " + state;
@@ -320,7 +320,7 @@ namespace RealityEngine.UI
                 return "";
             var circuit = t.GetComponentInParent<InductionCircuit>();
             if (circuit == null)
-                circuit = Object.FindFirstObjectByType<InductionCircuit>(FindObjectsInactive.Exclude);
+                circuit = UnityEngine.Object.FindFirstObjectByType<InductionCircuit>(FindObjectsInactive.Exclude);
             Rigidbody rb = t.GetComponentInParent<Rigidbody>();
             if (circuit != null)
             {
@@ -357,7 +357,7 @@ namespace RealityEngine.UI
 
         static Vector3 SampleB(Vector3 worldPoint)
         {
-            var dipoles = Object.FindObjectsByType<MagneticDipole>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            var dipoles = UnityEngine.Object.FindObjectsByType<MagneticDipole>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             Vector3 sum = Vector3.zero;
             for (int i = 0; i < dipoles.Length; i++)
             {

@@ -10,7 +10,7 @@ namespace RealityEngine.Player
     /// Grip (not trigger) so Training Baton swings stay on trigger. No-op when XR display is off.
     /// </summary>
     [DisallowMultipleComponent]
-    [DefaultExecutionOrder(141)]
+    [DefaultExecutionOrder(141)] // FORGE_POUCH_REFRESH
     public sealed class XrWorldInteractController : MonoBehaviour
     {
         public const string RootName = "XrWorldInteractController";
@@ -33,7 +33,7 @@ namespace RealityEngine.Player
         {
             if (Instance != null)
                 return Instance;
-            var found = Object.FindFirstObjectByType<XrWorldInteractController>(FindObjectsInactive.Include);
+            var found = UnityEngine.Object.FindFirstObjectByType<XrWorldInteractController>(FindObjectsInactive.Include);
             if (found != null)
             {
                 Instance = found;
@@ -117,7 +117,7 @@ namespace RealityEngine.Player
             if (_pauseCached == null && Time.unscaledTime >= _nextPauseScan)
             {
                 _nextPauseScan = Time.unscaledTime + 0.5f;
-                _pauseCached = Object.FindFirstObjectByType<QhysicsPausePanel>(FindObjectsInactive.Include);
+                _pauseCached = UnityEngine.Object.FindFirstObjectByType<QhysicsPausePanel>(FindObjectsInactive.Include);
             }
             return _pauseCached != null && _pauseCached.IsOpen;
         }
@@ -132,11 +132,11 @@ namespace RealityEngine.Player
             forward.Normalize();
 
             // Short forward ray
-            if (Physics.Raycast(pos, forward, out RaycastHit hit, rayDistance, hitMask, QueryTriggerInteraction.Ignore))
+            if (UnityEngine.Physics.Raycast(pos, forward, out RaycastHit hit, rayDistance, hitMask, QueryTriggerInteraction.Ignore))
                 ConsiderCollider(hit.collider, pos, ref best, ref bestScore);
 
             // Near-hand overlap sphere
-            int n = Physics.OverlapSphereNonAlloc(pos, overlapRadius, _overlap, hitMask, QueryTriggerInteraction.Ignore);
+            int n = UnityEngine.Physics.OverlapSphereNonAlloc(pos, overlapRadius, _overlap, hitMask, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < n; i++)
                 ConsiderCollider(_overlap[i], pos, ref best, ref bestScore);
         }
