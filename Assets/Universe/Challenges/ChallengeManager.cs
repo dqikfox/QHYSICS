@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 17 challenges with real, detectable conditions.
+        /// Build the starter campaign of 19 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -737,6 +737,43 @@ namespace RealityEngine.Challenges
                         twoStarTimeSeconds = 180f,
                         threeStarTimeSeconds = 90f,
                         threeStarMaxComponents = 14
+                    }
+                },
+
+                // 19. Sun Twin Lab - solar + knife switch gates TWO lit bulbs AND a spinning motor
+                new ChallengeDefinition
+                {
+                    id = "sun_twin_lab",
+                    title = "Sun Twin Lab",
+                    description = "Gate solar power with a knife switch: face the sun, close the switch, light two bulbs at once, and spin a motor to 120+ RPM from the panel alone — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), two Bulbs, Motor (Dispenser2), Wire(s). No battery. Open switch first (dark/still), face MiniatureSun, then close switch so both bulbs light and motor spins. Overlay shows solar W/load + N/2 lit + sw/RPM. RESET retries cleanly.",
+                    prerequisiteId = "sun_twin_gate",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MultipleBulbsLit,
+                            displayText = "Light up 2 bulbs from the solar panel simultaneously",
+                            targetCount = 2
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SwitchClosedMotorSpinning,
+                            displayText = "Close a switch and spin a motor to 120+ RPM from the solar panel",
+                            targetValue = 120f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 16
                     }
                 }
             };
