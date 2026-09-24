@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 8 challenges with real, detectable conditions.
+        /// Build the starter campaign of 9 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -423,6 +423,36 @@ namespace RealityEngine.Challenges
                         twoStarTimeSeconds = 90f,
                         threeStarTimeSeconds = 45f,
                         threeStarMaxComponents = 8
+                    }
+                },
+
+                // 9. Light and Spin - bulb lit AND motor spinning (dual load)
+                new ChallengeDefinition
+                {
+                    id = "light_and_spin",
+                    title = "Light and Spin",
+                    description = "Power a bulb and a motor from the same breadboard build (series or parallel). Light the bulb and spin the motor to 120+ RPM at the same time.",
+                    mentorHint = "Grab Bulb (Bulb shelf) and Motor (Dispenser2) plus Battery and Wire(s). Parallel = each load its own path; series = one loop through both. Overlay shows lit + RPM; RESET retries cleanly.",
+                    prerequisiteId = "gear_up",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.BulbLit,
+                            displayText = "Light up a bulb"
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MotorRpmThreshold,
+                            displayText = "Get a motor spinning at 120+ RPM",
+                            targetValue = 120f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 120f,
+                        threeStarTimeSeconds = 60f,
+                        threeStarMaxComponents = 10
                     }
                 }
             };
