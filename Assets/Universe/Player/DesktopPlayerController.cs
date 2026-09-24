@@ -52,6 +52,14 @@ namespace RealityEngine.Player
         Vector3 _baseCcCenter;
 
         public bool IsDesktopActive => _desktopActive;
+
+        /// <summary>Operator archetype locomotion (walk + sprint multiplier).</summary>
+        public void ApplyLocomotionStats(float walk, float sprintMult)
+        {
+            walkSpeed = Mathf.Clamp(walk, 1.5f, 8f);
+            sprintSpeed = walkSpeed * Mathf.Clamp(sprintMult, 1.1f, 3.5f);
+        }
+
         public Transform Origin => _origin;
         public Transform MainCamera => _mainCamera;
         public static DesktopPlayerController Instance { get; private set; }

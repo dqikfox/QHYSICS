@@ -24,7 +24,8 @@ XR: EventSystem + `XRUIInputModule` + `TrackedDeviceGraphicRaycaster`; Event Cam
 2. Optional: **Reality Engine → QHYSICS → Ensure UI** (or trust runtime bootstrap).
 3. Optional: **Fix Player Spawn** / **Ensure Player Character**.
 4. **Ctrl+P**. Desktop WASD works without headset; Quest Link or XR Device Simulator for XR.
-5. Enter Sandbox if shown → dismiss onboarding strip → **M** toolbelt → hover a gadget for Inspect → Sim chip for speed → **Esc** pause.
+5. Enter Sandbox if shown → dismiss onboarding strip → **O** operator (optional) → **M** toolbelt → hover a gadget for Inspect → Sim chip for speed → **Esc** pause (Operator Select available).
+6. Training: pick up plaza kits with **E**, equip baton with **U**, **LMB** training drones east of plaza.
 6. EXPERIMENTS → **New Run** clears spawned gadgets (Giza/lab content stays).
 
 ---
@@ -34,6 +35,61 @@ XR: EventSystem + `XRUIInputModule` + `TrackedDeviceGraphicRaycaster`; Event Cam
 - Project: `C:\Users\KING\projects\QHYSICS`
 - Branch: `reality-engine`
 - Unity: **6000.7.0a4** (one instance ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â never a second Editor on this project)
+
+
+
+## Operator / Carry / Training System (player vertical slice)
+
+Runtime auto-ensures via `QhysicsPlayerSystemsBootstrap` (also from `QhysicsUiBootstrap` / menu **Reality Engine → QHYSICS → Ensure Player Systems**). Lab training flavour — not fantasy MMO combat.
+
+### Operator select (3 archetypes)
+
+| Operator | Kit bias | Move | Sprint | HP | Slots |
+|----------|----------|------|--------|----|-------|
+| **Field Scientist** | Probe tip, battery, ampoule, baton | 3.4 | x2.0 | 100 | 6 |
+| **Lab Engineer** | Extra batteries + shield cell | 3.2 | x1.85 | 110 | 8 |
+| **Survey Ranger** | Dual batons, mobility | 3.9 | x2.35 | 90 | 5 |
+
+- **O** — Operator Select panel (dark glass + cyan). Also **Esc/P → Operator Select**.
+- Choice applies locomotion, max HP, carry slots, starting kit, body/arm tint.
+- Persisted in `PlayerPrefs` key `qhysics.operator.id`.
+
+### Carry inventory (alongside BUILD hotbar 1–9)
+
+World pickups implement `IQhysicsInteractable` → **E** / LMB interact adds to carry slots (hip-pouch story; BUILD hotbar unchanged).
+
+| Key | Action |
+|-----|--------|
+| **[** / **]** | Select carry slot |
+| **U** | Use consumable (ampoule / shield cell) or equip Training Baton |
+| **X** | Drop selected carry item into world |
+| **E** | Pick up highlighted world item (Health Ampoule, Battery Pack, Probe Tip, Training Baton, Shield Cell) |
+
+Carry strip HUD sits above the BUILD hotbar; vitals chip top-left labelled **TRAINING SYSTEM**.
+
+### Training combat
+
+- Equip **Training Baton** (**U** on baton slot) — LMB swings (desktop). Soft damage to training drones.
+- Drones float east of plaza, fire soft pulses; hit flash + damage chips.
+- Operator HP regen after delay; ampoule heals; shield cell softens damage briefly.
+- HP → 0 respawns at plaza via `LabPlayerSpawn` (no softlock / no game-over).
+
+### Spawn locations (Ctrl+P)
+
+Under runtime root `QhysicsTrainingWorld` (relative to XR Origin / LabPlaza):
+
+- Pickups ~1–2 m around plaza stand pose (ampoule, battery, probe tip, baton, shield cell).
+- Training drones ~3.5–4.2 m east of plaza at ~1.4–1.6 m height.
+
+### Ctrl+P quick check
+
+1. Faraday → Ctrl+P → Enter Sandbox.
+2. **O** → pick Survey Ranger (or Field Scientist) → Close.
+3. Walk to cyan-highlighted pickups near plaza → **E** to bag.
+4. **]** to baton → **U** equip → **LMB** hit a Training Drone.
+5. Take a pulse hit → HP chip updates → **U** ampoule to heal.
+6. **Esc → Operator Select** to switch archetype (kit refill).
+
 
 ## Who is the player?
 

@@ -31,6 +31,7 @@ namespace RealityEngine.Player
         bool _heldWasKinematic;
         bool _heldUsedGravity;
         Renderer _hoverRenderer;
+        IQhysicsInteractable _hoverInteractable;
         Color _hoverBaseEmission;
         bool _hoverHadEmission;
         MaterialPropertyBlock _mpb;
@@ -97,7 +98,12 @@ namespace RealityEngine.Player
             {
                 UpdateHover(hitSomething ? hit.collider : null);
                 if (!deleteMode && WasGrabPressed() && hitSomething)
-                    TryGrab(hit.collider);
+                {
+                    if (TryInteract(hit.collider))
+                    { /* carry pickup / interactable consumed E */ }
+                    else
+                        TryGrab(hit.collider);
+                }
             }
             else if (HoldsActivatable)
             {
@@ -118,8 +124,11 @@ namespace RealityEngine.Player
                     Drop(true);
             }
 
-            // LMB while tool selected (not Empty/Delete): spawn via gadgets when not hitting a grabable
-            if (WasPrimaryClick() && _held == null && QhysicsInventory.Instance != null)
+            // LMB while tool selected (not Empty/Delete): spawn via gadgets when not hitting a grabable.
+            // Training baton equipped → TrainingCombatController owns LMB.
+            bool batonEquipped = PlayerCarryInventory.Instance != null
+                && PlayerCarryInventory.Instance.EquippedItem == CarryItemId.TrainingBaton;
+            if (WasPrimaryClick() && _held == null && QhysicsInventory.Instance != null && !batonEquipped)
             {
                 var slot = QhysicsInventory.Instance.SelectedSlot;
                 if (slot != QhysicsInventory.SlotId.Empty)
@@ -413,21 +422,30 @@ namespace RealityEngine.Player
         void UpdateHover(Collider col)
         {
             Renderer next = null;
-            if (col != null && IsGrabTarget(col))
+            IQhysicsInteractable nextIx = null;
+            if (col != null)
             {
-                var r = col.GetComponentInParent<Renderer>();
-                if (r == null)
-                    r = col.GetComponentInChildren<Renderer>();
-                next = r;
+                nextIx = col.GetComponentInParent<IQhysicsInteractable>();
+                bool grabLike = nextIx != null || IsGrabTarget(col);
+                if (grabLike)
+                {
+                    var r = col.GetComponentInParent<Renderer>();
+                    if (r == null)
+                        r = col.GetComponentInChildren<Renderer>();
+                    next = r;
+                }
             }
-            if (next == _hoverRenderer)
+            if (next == _hoverRenderer && nextIx == _hoverInteractable)
             {
-                HoverTarget = (col != null && IsGrabTarget(col)) ? col.transform : null;
+                HoverTarget = (col != null && (nextIx != null || IsGrabTarget(col))) ? col.transform : null;
                 return;
             }
             ClearHover();
             _hoverRenderer = next;
-            HoverTarget = (col != null && IsGrabTarget(col)) ? col.transform : null;
+            _hoverInteractable = nextIx;
+            if (_hoverInteractable != null)
+                _hoverInteractable.SetHover(true);
+            HoverTarget = (col != null && (nextIx != null || IsGrabTarget(col))) ? col.transform : null;
             if (_hoverRenderer == null)
                 return;
             // PropertyBlock only — never touch .material (avoids instance leaks / shared tint fight).
@@ -449,11 +467,28 @@ namespace RealityEngine.Player
         void ClearHover()
         {
             HoverTarget = null;
+            if (_hoverInteractable != null)
+            {
+                _hoverInteractable.SetHover(false);
+                _hoverInteractable = null;
+            }
             if (_hoverRenderer == null)
                 return;
             // Clear MPB only — do not instantiate .material.
             _hoverRenderer.SetPropertyBlock(null);
             _hoverRenderer = null;
+        }
+
+        bool TryInteract(Collider col)
+        {
+            if (col == null)
+                return false;
+            var ix = col.GetComponentInParent<IQhysicsInteractable>();
+            if (ix == null || !ix.CanInteract(gameObject))
+                return false;
+            ix.Interact(gameObject);
+            ClearHover();
+            return true;
         }
 
         void TryActivateHeld(int delta)
