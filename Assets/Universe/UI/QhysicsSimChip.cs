@@ -13,7 +13,7 @@ namespace RealityEngine.UI
     {
         public const string RootName = "QhysicsSimChip";
 
-        static readonly float[] Speeds = { 0.25f, 0.5f, 1f, 2f, 4f };
+        static readonly float[] Speeds = { 0.25f, 1f, 2f };
 
         Canvas _canvas;
         TextMeshProUGUI _label;
@@ -58,7 +58,7 @@ namespace RealityEngine.UI
                 else DestroyImmediate(c.gameObject);
             }
 
-            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(720f, 120f));
+            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(640f, 120f));
             QhysicsUiBuilder.WireEventCamera(_canvas);
             var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(200f, 88f));
 
@@ -69,7 +69,7 @@ namespace RealityEngine.UI
             expandGo.transform.SetParent(_canvas.transform, false);
             _expandRow = expandGo.GetComponent<RectTransform>();
             _expandRow.anchoredPosition = new Vector2(0f, -90f);
-            _expandRow.sizeDelta = new Vector2(680f, 80f);
+            _expandRow.sizeDelta = new Vector2(600f, 80f);
             QhysicsUiBuilder.LayoutHorizontal(_expandRow, 8f);
             for (int i = 0; i < Speeds.Length; i++)
             {
@@ -79,7 +79,7 @@ namespace RealityEngine.UI
             }
             QhysicsUiBuilder.ChipButton(_expandRow, "Pause", "Pause", new Vector2(100f, 64f), TogglePause);
             QhysicsUiBuilder.ChipButton(_expandRow, "Step", "Step", new Vector2(88f, 64f), StepOnce);
-            QhysicsUiBuilder.ChipButton(_expandRow, "Reset", "Reset", new Vector2(100f, 64f), ResetSim);
+            QhysicsUiBuilder.ChipButton(_expandRow, "NewRun", "New Run", new Vector2(120f, 64f), ResetSim);
 
             _expandRow.gameObject.SetActive(false);
             RefreshLabel();

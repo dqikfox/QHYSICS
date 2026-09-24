@@ -1,4 +1,4 @@
-﻿using UnityEditor;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using RealityEngine.UI;
@@ -19,11 +19,28 @@ namespace RealityEngine.EditorTools
             if (boot != null && boot.gameObject.scene.IsValid())
                 EditorSceneManager.MarkSceneDirty(boot.gameObject.scene);
             Selection.activeGameObject = boot != null ? boot.gameObject : null;
-            Debug.Log("Reality Engine: placed QHYSICS UI v0.1 (world-space HUD, Toolbelt, ContextStrip, SimChip, PausePanel). Event Camera = XR camera; TrackedDeviceGraphicRaycaster. Toggle toolbelt with Menu/B/Grip or M/Tab.");
+            Debug.Log("Reality Engine: placed QHYSICS lab UI (HUD, Toolbelt, Inspect/ContextStrip, SimChip, Pause, Onboarding strip). Event Camera = XR camera; TrackedDeviceGraphicRaycaster. Toggle toolbelt with Menu/B/Grip or M/Tab.");
         }
 
         [MenuItem(PlacePath, true)]
         public static bool PlaceQhysicsUiValidate() => true;
+
+        const string EnsurePath = "Reality Engine/QHYSICS/Ensure UI (runtime bootstrap)";
+
+        [MenuItem(EnsurePath)]
+        public static void EnsureQhysicsUi()
+        {
+            EnsureTmpFont();
+            QhysicsUiBootstrap boot = QhysicsUiBootstrap.EnsurePlaced();
+            if (boot != null && boot.gameObject.scene.IsValid())
+                EditorSceneManager.MarkSceneDirty(boot.gameObject.scene);
+            Selection.activeGameObject = boot != null ? boot.gameObject : null;
+            Debug.Log("Reality Engine: ensured QHYSICS lab UI (HUD, Toolbelt hip, Inspect, SimChip, Pause, Onboarding strip). Runtime also auto-ensures on Play.");
+        }
+
+        [MenuItem(EnsurePath, true)]
+        public static bool EnsureQhysicsUiValidate() => true;
+
 
         static void EnsureTmpFont()
         {

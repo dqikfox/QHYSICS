@@ -41,6 +41,8 @@ namespace RealityEngine.UI
                 var hud = existing.GetComponent<QhysicsHud>();
                 if (hud == null)
                     hud = existing.gameObject.AddComponent<QhysicsHud>();
+                if (hud._title == null)
+                    hud.Build();
                 return hud;
             }
 
