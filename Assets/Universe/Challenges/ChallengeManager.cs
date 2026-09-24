@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 23 challenges with real, detectable conditions.
+        /// Build the starter campaign of 24 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -922,8 +922,45 @@ namespace RealityEngine.Challenges
                         threeStarTimeSeconds = 90f,
                         threeStarMaxComponents = 16
                     }
+                },
+
+                // 24. Sun Faraday Drive - solar load + Faraday peak EMF + series resistor throttle (Solar+EMF+SwitchMotor is sun_induction)
+                new ChallengeDefinition
+                {
+                    id = "sun_faraday_drive",
+                    title = "Sun Faraday Drive",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and throttle the renewable loop with a series resistor while keeping a bulb lit — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Resistor (Resistor shelf), Bulb, Wire(s). No battery. Face MiniatureSun; series resistor throttles current with bulb lit; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + R/lit. RESET retries cleanly.",
+                    prerequisiteId = "sun_faraday_lab",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.InducedEmfThreshold,
+                            displayText = "Peak |EMF| >= 0.05 V through the coil",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.ResistorInCircuit,
+                            displayText = "Add a resistor while keeping a bulb lit from the solar panel"
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 16
+                    }
                 }
             };
+
         }
 
         // â”€â”€ Progress / unlock logic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
