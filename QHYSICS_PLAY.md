@@ -494,7 +494,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Gear Up** (unlocked after Make and Break). Overlay shows live `[sw=0 0/120 RPM]`.
 2. From table dispensers: grab **Battery**, **Wire(s)**, **Switch** (Dispenser3 / Switch shelf), and **Motor** (Dispenser2 / Motor shelf); snap onto breadboard pegs.
 3. Leave the knife switch open first (motor stays still), then **toggle/close** the switch so the motor spins.
-4. When meter shows `sw=1` and RPM >= 120, objective completes. End of starter campaign (no further unlock yet).
+4. When meter shows `sw=1` and RPM >= 120, objective completes -> stars + unlock **Light and Spin**. Completion banner shows `Unlocked: Light and Spin`.
+
+### Light and Spin (challenge 9)
+1. Press **C** -> Start **Light and Spin** (unlocked after Gear Up). Overlay shows live `[0/1 lit]` and `[0/120 RPM]` (both must complete).
+2. From table dispensers: grab **Battery**, **Wire(s)**, **Bulb**, and **Motor** (Dispenser2 / Motor shelf); snap onto breadboard pegs (series or parallel).
+3. Close the loop so the bulb lights and the motor spins; meter should show lit + RPM rising together.
+4. When both objectives complete (bulb lit AND RPM >= 120), objective completes. End of starter campaign (no further unlock yet).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only
