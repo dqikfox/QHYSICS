@@ -421,6 +421,13 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Watch coil EMF / Flux Meter / Galvanometer as the rotating MagneticDipole sweeps flux (Faraday). Honesty: rotating dipole near coil - NOT a commutated dynamo / brushes / commercial alternator.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
 
+### Mutual Coupler (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Mutual Coupler** (or spawn key `mutual` / `coupler` / `mutual inductance`).
+2. Place near the Induction Lab coil (closer coil = primary). If only one coil is in range, a buddy secondary coil is created on the gadget.
+3. Drive primary current: thrust the lab magnet, use **Crank Generator**, or **BUILD Function Generator** on the primary. Grab the coupler; **N/P** / VR trigger / LMB-scroll cycles OFF / WEAK (0.5 mH) / MED (2 mH) / STRONG (10 mH).
+4. Readout shows Ip, Es=-M dIp/dt, peak |Es|. Pair with MEASURE Voltmeter / Galvanometer / Oscilloscope on the secondary. Honesty: lumped mutual M only — NOT geometric flux linkage, not core hysteresis, not leakage, not dual-winding transformer (BUILD Transformer is turns-tap).
+5. Desktop WASD; C Challenges; M/Tab toolbelt.
+
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
