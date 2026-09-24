@@ -488,7 +488,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Make and Break** (unlocked after Induction). Overlay shows live `[sw=0 lit=0]`.
 2. From table dispensers: grab **Battery**, **Wire(s)**, **Switch** (Dispenser3 / Switch shelf), and **Bulb**; snap onto breadboard pegs.
 3. Leave the knife switch open first (bulb stays dark), then **toggle/close** the switch to complete the loop.
-4. When meter shows `sw=1 lit=1` (closed placed Switch clone + lit placed Bulb clone), objective completes. End of starter campaign (no further unlock yet).
+4. When meter shows `sw=1 lit=1` (closed placed Switch clone + lit placed Bulb clone), objective completes -> stars + unlock **Gear Up**. Completion banner shows `Unlocked: Gear Up`.
+
+### Gear Up (challenge 8)
+1. Press **C** -> Start **Gear Up** (unlocked after Make and Break). Overlay shows live `[sw=0 0/120 RPM]`.
+2. From table dispensers: grab **Battery**, **Wire(s)**, **Switch** (Dispenser3 / Switch shelf), and **Motor** (Dispenser2 / Motor shelf); snap onto breadboard pegs.
+3. Leave the knife switch open first (motor stays still), then **toggle/close** the switch so the motor spins.
+4. When meter shows `sw=1` and RPM >= 120, objective completes. End of starter campaign (no further unlock yet).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only
