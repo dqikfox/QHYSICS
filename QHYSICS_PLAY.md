@@ -428,6 +428,12 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 4. Readout shows Ip, Es=-M dIp/dt, peak |Es|. Pair with MEASURE Voltmeter / Galvanometer / Oscilloscope on the secondary. Honesty: lumped mutual M only — NOT geometric flux linkage, not core hysteresis, not leakage, not dual-winding transformer (BUILD Transformer is turns-tap).
 5. Desktop WASD; C Challenges; M/Tab toolbelt.
 
+### Spring-Mass (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Spring Mass** (or spawn key `spring` / `mass` / `hooke`).
+2. Gadget spawns with a slight pluck and oscillates (lumped Hooke: m x'' = -k x - c x', m=0.25 kg). Grab it; **N/P** / VR trigger / LMB-scroll cycles k: SOFT / MED / STIFF / RIGID. **Shift+N/P** cycles damp: OFF / LIGHT / HEAVY.
+3. Readout shows displacement x, force F=-kx, spring energy 0.5 k x^2, natural frequency f0. Honesty: lumped Hooke spring-mass — NOT continuum elasticity, not nonlinear, not collision contact spring.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
+
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.

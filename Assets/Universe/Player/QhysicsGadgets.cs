@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -71,6 +71,8 @@ namespace RealityEngine.Player
                 return SpawnCrankGenerator(worldPos);
             if (key == "mutual" || key == "mutual coupler" || key == "mutualcoupler" || key == "coupler" || key == "mutual transformer" || key == "mutual xfmr" || key == "m-transformer" || key == "mtransformer" || key == "mutual inductance")
                 return SpawnMutualCoupler(worldPos);
+            if (key == "spring" || key == "spring mass" || key == "spring-mass" || key == "springmass" || key == "mass" || key == "hooke" || key == "hookes" || key == "hooke's law" || key == "oscillator")
+                return SpawnSpringMass(worldPos);
             if (key == "switch")
                 return SpawnLoadSwitch(worldPos);
             if (key == "battery" || key == "cell" || key == "emf")
@@ -1157,6 +1159,18 @@ namespace RealityEngine.Player
             if (mutual == null)
                 mutual = go.AddComponent<LoadMutualCouplerGadget>();
             mutual.EnsureBuilt();
+            return go;
+        }
+        static GameObject SpawnSpringMass(Vector3 worldPos)
+        {
+            // PHYSICS spring-mass: lumped Hooke oscillator m*x''=-k*x-c*x'.
+            var go = SpawnPrimitiveProxy("SpringMass", worldPos, new Color(0.18f, 0.55f, 0.62f));
+            go.name = LoadSpringMassGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.1f, 0.14f);
+            var spring = go.GetComponent<LoadSpringMassGadget>();
+            if (spring == null)
+                spring = go.AddComponent<LoadSpringMassGadget>();
+            spring.EnsureBuilt();
             return go;
         }
         static GameObject SpawnPrimitiveProxy(string name, Vector3 worldPos, Color color)
