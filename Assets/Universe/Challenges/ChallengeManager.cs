@@ -642,6 +642,54 @@ namespace RealityEngine.Challenges
             return Mathf.Abs(_inductionCircuit.EmfVolts);
         }
 
+        /// <summary>
+        /// Live measured progress for the objective overlay (ACTION → MEASUREMENT → FEEDBACK).
+        /// Uses the same CircuitLab / InductionCircuit readers as objective evaluation.
+        /// </summary>
+        public string GetObjectiveLiveReadout(ChallengeObjective obj)
+        {
+            if (obj == null)
+                return string.Empty;
+
+            if (!_refsValid)
+                RefreshSimRefs();
+
+            switch (obj.type)
+            {
+                case ObjectiveType.BulbLit:
+                {
+                    int lit = CountActiveBulbs();
+                    return lit.ToString() + "/1 lit";
+                }
+                case ObjectiveType.MultipleBulbsLit:
+                {
+                    int lit = CountActiveBulbs();
+                    int need = obj.targetCount > 0 ? obj.targetCount : 1;
+                    return lit.ToString() + "/" + need.ToString() + " lit";
+                }
+                case ObjectiveType.ResistorInCircuit:
+                {
+                    int r = CountActiveResistors();
+                    int b = CountActiveBulbs();
+                    return "R=" + r.ToString() + " lit=" + b.ToString();
+                }
+                case ObjectiveType.MotorRpmThreshold:
+                {
+                    float rpm = GetMaxMotorRpm();
+                    return rpm.ToString("0") + "/" + obj.targetValue.ToString("0") + " RPM";
+                }
+                case ObjectiveType.SolarPoweringLoad:
+                    return IsSolarPoweringLoad() ? "load powered" : "awaiting solar+load";
+                case ObjectiveType.InducedEmfThreshold:
+                {
+                    float emf = GetInducedEmf();
+                    return emf.ToString("0.000") + "/" + obj.targetValue.ToString("0.00") + " V";
+                }
+                default:
+                    return string.Empty;
+            }
+        }
+
         int CountPlacedComponents()
         {
             var all = UnityEngine.Object.FindObjectsByType<CircuitComponent>(
