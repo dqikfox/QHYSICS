@@ -23,7 +23,9 @@ namespace RealityEngine.Challenges
         /// <summary>At least one placed Switch clone is closed AND at least one placed Bulb clone is lit.</summary>
         SwitchClosedBulbLit = 6,
         /// <summary>At least one placed Switch clone is closed AND a placed Motor clone reaches targetValue RPM.</summary>
-        SwitchClosedMotorSpinning = 7
+        SwitchClosedMotorSpinning = 7,
+        /// <summary>At least one placed load (bulb or motor) delivering |V|*|I| power >= targetValue watts.</summary>
+        CircuitPowerThreshold = 8
     }
 
     /// <summary>

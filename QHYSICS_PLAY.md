@@ -500,7 +500,13 @@ While a challenge is active, the objective overlay appends live CircuitLab / Ind
 1. Press **C** -> Start **Light and Spin** (unlocked after Gear Up). Overlay shows live `[0/1 lit]` and `[0/120 RPM]` (both must complete).
 2. From table dispensers: grab **Battery**, **Wire(s)**, **Bulb**, and **Motor** (Dispenser2 / Motor shelf); snap onto breadboard pegs (series or parallel).
 3. Close the loop so the bulb lights and the motor spins; meter should show lit + RPM rising together.
-4. When both objectives complete (bulb lit AND RPM >= 120), objective completes. End of starter campaign (no further unlock yet).
+4. When both objectives complete (bulb lit AND RPM >= 120), objective completes -> stars + unlock **Power Play**. Completion banner shows `Unlocked: Power Play`.
+
+### Power Play (challenge 10)
+1. Press **C** -> Start **Power Play** (unlocked after Light and Spin). Overlay shows live `[0/1 lit]` and `[0.00/0.05 W lit=0|1]`.
+2. From table dispensers: grab **Battery**, **Wire(s)**, and **Bulb** (optional Motor); snap onto breadboard pegs to close a loop.
+3. When the bulb lights, CircuitLab load power `P = |V| * |I|` rises (a 10 V / 1 kOhm bulb is ~0.1 W). Live W meter tracks the max across placed bulb/motor clones.
+4. When both objectives complete (bulb lit AND power >= 0.05 W), objective completes. End of starter campaign (no further unlock yet).
 ### Challenge RESET
 While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbelt New Run) clears CircuitLab **and** sticky challenge objectives + elapsed timer, keeping the same challenge active for a clean retry.
 ## Shipping only

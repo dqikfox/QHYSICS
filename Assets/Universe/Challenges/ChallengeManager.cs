@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 9 challenges with real, detectable conditions.
+        /// Build the starter campaign of 10 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -454,6 +454,35 @@ namespace RealityEngine.Challenges
                         threeStarTimeSeconds = 60f,
                         threeStarMaxComponents = 10
                     }
+                },
+                // 10. Power Play - lit bulb delivering measurable load power
+                new ChallengeDefinition
+                {
+                    id = "power_play",
+                    title = "Power Play",
+                    description = "Light a bulb and deliver at least 0.05 W of electrical power to a load (bulb or motor). Power P = |V| * |I| from CircuitLab.",
+                    mentorHint = "Battery + Wire(s) + Bulb closes a loop (~0.1 W on a 10 V / 1 kOhm bulb). Overlay shows live watts; add Motor for more loads. RESET retries cleanly.",
+                    prerequisiteId = "light_and_spin",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.BulbLit,
+                            displayText = "Light up a bulb"
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.CircuitPowerThreshold,
+                            displayText = "Deliver >= 0.05 W to a load (bulb or motor)",
+                            targetValue = 0.05f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 90f,
+                        threeStarTimeSeconds = 45f,
+                        threeStarMaxComponents = 8
+                    }
                 }
             };
         }
@@ -681,6 +710,9 @@ namespace RealityEngine.Challenges
                 case ObjectiveType.SwitchClosedMotorSpinning:
                     return HasClosedSwitch() && GetMaxMotorRpm() >= obj.targetValue;
 
+                case ObjectiveType.CircuitPowerThreshold:
+                    return GetMaxCircuitPower() >= (obj.targetValue > 0f ? obj.targetValue : 0.05f);
+
                 default:
                     return false;
             }
@@ -755,6 +787,43 @@ namespace RealityEngine.Challenges
                     maxRpm = rpm;
             }
             return maxRpm;
+        }
+
+        /// <summary>
+        /// Max |V|*|I| watts across placed active bulb/motor clones (CircuitLab load power).
+        /// </summary>
+        float GetMaxCircuitPower()
+        {
+            float maxW = 0f;
+            if (_bulbs != null)
+            {
+                for (int i = 0; i < _bulbs.Length; i++)
+                {
+                    Bulb bulb = _bulbs[i];
+                    if (bulb == null || !bulb.IsPlaced || !bulb.IsClone)
+                        continue;
+                    if (!CircuitReader.GetIsActive(bulb) || !CircuitReader.IsCurrentSignificant(bulb))
+                        continue;
+                    float w = (float)(System.Math.Abs(bulb.GetVoltage()) * System.Math.Abs(bulb.GetCurrentValue()));
+                    if (w > maxW)
+                        maxW = w;
+                }
+            }
+            if (_motors != null)
+            {
+                for (int i = 0; i < _motors.Length; i++)
+                {
+                    Motor motor = _motors[i];
+                    if (motor == null || !motor.IsPlaced || !motor.IsClone)
+                        continue;
+                    if (!CircuitReader.GetIsActive(motor) || !CircuitReader.IsCurrentSignificant(motor))
+                        continue;
+                    float w = (float)(System.Math.Abs(motor.GetVoltage()) * System.Math.Abs(motor.GetCurrentValue()));
+                    if (w > maxW)
+                        maxW = w;
+                }
+            }
+            return maxW;
         }
 
         float GetMaxSolarWattage()
@@ -920,6 +989,13 @@ namespace RealityEngine.Challenges
                     float rpm = GetMaxMotorRpm();
                     float need = obj.targetValue > 0f ? obj.targetValue : 120f;
                     return "sw=" + (sw >= 1 ? "1" : "0") + " " + rpm.ToString("0") + "/" + need.ToString("0") + " RPM";
+                }
+                case ObjectiveType.CircuitPowerThreshold:
+                {
+                    float w = GetMaxCircuitPower();
+                    float need = obj.targetValue > 0f ? obj.targetValue : 0.05f;
+                    int lit = CountActiveBulbs();
+                    return w.ToString("0.00") + "/" + need.ToString("0.00") + " W lit=" + (lit >= 1 ? "1" : "0");
                 }
                 default:
                     return string.Empty;
