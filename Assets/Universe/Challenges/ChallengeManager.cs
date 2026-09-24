@@ -702,6 +702,42 @@ namespace RealityEngine.Challenges
                         threeStarTimeSeconds = 90f,
                         threeStarMaxComponents = 14
                     }
+                },
+
+                // 18. Sun Twin Gate - solar + knife switch gates TWO lit bulbs (series/parallel multi-bulb renewable)
+                new ChallengeDefinition
+                {
+                    id = "sun_twin_gate",
+                    title = "Sun Twin Gate",
+                    description = "Gate solar power with a knife switch and light two bulbs at once from the panel alone — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), two Bulbs, Wire(s). No battery. Open switch first (both dark), face MiniatureSun, then close switch so both bulbs light. Parallel keeps them bright; series splits voltage. Overlay shows solar W/load + N/2 lit + sw/lit. RESET retries cleanly.",
+                    prerequisiteId = "sun_switch_lab",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MultipleBulbsLit,
+                            displayText = "Light up 2 bulbs from the solar panel simultaneously",
+                            targetCount = 2
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SwitchClosedBulbLit,
+                            displayText = "Close a switch and light a bulb from the solar panel"
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 14
+                    }
                 }
             };
         }
