@@ -98,10 +98,11 @@ namespace RealityEngine.Challenges
 
             QhysicsUiBuilder.WireEventCamera(_canvas);
 
-            // Refresh overlay and list periodically
+            // Refresh overlay faster while a challenge is active so live meters feel responsive.
             if (Time.unscaledTime >= _nextListRefresh)
             {
-                _nextListRefresh = Time.unscaledTime + 0.5f;
+                bool challengeActive = _manager != null && _manager.IsChallengeActive;
+                _nextListRefresh = Time.unscaledTime + (challengeActive ? 0.2f : 0.5f);
                 if (_listVisible)
                     RefreshList();
                 RefreshOverlay();
@@ -468,12 +469,19 @@ namespace RealityEngine.Challenges
 
             if (_overlayObjectives != null && _manager.ActiveObjectives != null)
             {
-                var sb = new System.Text.StringBuilder(256);
+                var sb = new System.Text.StringBuilder(320);
                 for (int i = 0; i < _manager.ActiveObjectives.Length; i++)
                 {
                     ChallengeObjective obj = _manager.ActiveObjectives[i];
                     sb.Append(obj.completed ? "\u2713 " : "\u25CB "); // ✓ or ○
                     sb.Append(obj.displayText);
+                    string live = _manager.GetObjectiveLiveReadout(obj);
+                    if (!string.IsNullOrEmpty(live))
+                    {
+                        sb.Append("  [");
+                        sb.Append(live);
+                        sb.Append(']');
+                    }
                     if (i < _manager.ActiveObjectives.Length - 1)
                         sb.Append("\n");
                 }

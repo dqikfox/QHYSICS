@@ -76,7 +76,7 @@ Carry strip HUD sits above the BUILD hotbar; vitals chip top-left labelled **TRA
 - **Desktop:** **LMB** / Fire1 swings while baton equipped.
 - **XR (Quest Link):** controller **trigger** (activate) on either hand swings; aim uses that controller pose (falls back to HMD forward).
 - Drones float east of plaza, fire soft pulses; brighter hit flash + floating damage chips; player HP chip flashes red on hurt.
-- Drone HP to 0 soft-disables (dim body + RESPAWN countdown chip) then restores after ~6s — GameObject stays active so the timer runs (Invoke would die on SetActive false).
+- Drone HP to 0 soft-disables (dim body + RESPAWN countdown chip) then restores after ~6s ï¿½ GameObject stays active so the timer runs (Invoke would die on SetActive false).
 - Operator HP regen after delay; ampoule heals; shield cell softens damage briefly.
 - HP â†’ 0 respawns at plaza via `LabPlayerSpawn` (no softlock / no game-over).
 
@@ -108,8 +108,8 @@ Under runtime root `QhysicsTrainingWorld` (relative to XR Origin / LabPlaza):
 1. Link connected â†’ Faraday â†’ Ctrl+P â†’ Enter Sandbox.
 2. **O** or Pause â†’ Operator Select (world panel, laser/ray clickable) â†’ pick Survey Ranger.
 3. Point controller at plaza pickups â†’ **grip** to bag (companion **E** still works).
-4. Stick L/R select baton slot + **stick-click** equip (or companion **U**) — aim at Training Drone — **trigger** to swing.
-5. Take a drone pulse — TRAINING SYSTEM HP chip flashes — stick-click ampoule (or **U**) to heal; stick-down drops selected.
+4. Stick L/R select baton slot + **stick-click** equip (or companion **U**) ï¿½ aim at Training Drone ï¿½ **trigger** to swing.
+5. Take a drone pulse ï¿½ TRAINING SYSTEM HP chip flashes ï¿½ stick-click ampoule (or **U**) to heal; stick-down drops selected.
 6. Confirm Carry HUD floats in world-space (not missing in HMD).
 
 ## Who is the player?
@@ -441,6 +441,9 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 ## Challenges (CircuitLab campaign)
 
 Runtime systems: `ChallengeManager` + `ChallengeUi` (AutoSpawn). Breadboard resistor dispenser is ensured at Play via `EnsureBreadboardResistorDispenser` (also **Reality Engine ? Ensure Breadboard Resistor Dispenser**).
+
+### Live challenge meters
+While a challenge is active, the objective overlay appends live CircuitLab / InductionCircuit readings in brackets (e.g. `[0/1 lit]`, `[R=1 lit=1]`, `[312/120 RPM]`, `[0.012/0.05 V]`) and refreshes about 5x/sec.
 
 ### First Light (challenge 1)
 1. Ctrl+P ? Enter Sandbox.
