@@ -217,7 +217,7 @@ namespace RealityEngine.Challenges
         // â”€â”€ Campaign â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         /// <summary>
-        /// Build the starter campaign of 24 challenges with real, detectable conditions.
+        /// Build the starter campaign of 25 challenges with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -950,6 +950,43 @@ namespace RealityEngine.Challenges
                         {
                             type = ObjectiveType.ResistorInCircuit,
                             displayText = "Add a resistor while keeping a bulb lit from the solar panel"
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 16
+                    }
+                },
+
+                // 25. Sun Faraday Gate - solar load + Faraday peak EMF + knife-switch gated lit bulb
+                // NOTE: Solar+EMF+SwitchMotor already exists as sun_induction (ch22); Solar+EMF+Resistor is sun_faraday_drive (ch24).
+                new ChallengeDefinition
+                {
+                    id = "sun_faraday_gate",
+                    title = "Sun Faraday Gate",
+                    description = "Keep a solar panel powering a load, induce peak |EMF| >= 0.05 V at the Faraday coil, and gate a lit bulb with a knife switch — no battery.",
+                    mentorHint = "Grab Solar (Dispenser11), Switch (Dispenser3), Bulb, Wire(s). No battery. Face MiniatureSun; open switch first (dark), then close so bulb lights; Induction Lab magnet thrust for peak EMF. Overlay shows solar W/load + pk EMF + sw/lit. RESET retries cleanly.",
+                    prerequisiteId = "sun_faraday_drive",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SolarPoweringLoad,
+                            displayText = "Solar >= 0.05 W powering a bulb or motor",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.InducedEmfThreshold,
+                            displayText = "Peak |EMF| >= 0.05 V through the coil",
+                            targetValue = 0.05f
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.SwitchClosedBulbLit,
+                            displayText = "Close a switch and light a bulb from the solar panel"
                         }
                     },
                     starThresholds = new StarThresholds
