@@ -469,6 +469,11 @@ ulcrum / seesaw).
 3. Readout shows C, R, V, Q=CV (uC), tau=RC, tgt V, and state CHARGING / HOLD / DISCHARGE. With R=OPEN, activate snaps V to target and HOLDs. With R load, V(t) approaches target exponentially (or discharges to 0 when tgt=0V). Cyan plate emission scales with |V|/24. Honesty: ideal lumped RC - NOT dielectric, not ESR/ESL, not fringe, not breakdown, not InductionCircuit C.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
 
+### Projectile Motion / Ballistic Range (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Projectile** (or spawn key `projectile` / `ballistics` / `ballistic` / `trajectory` / `cannon` / `range` / `throw`).
+2. Gadget spawns a barrel + predicted arc markers + ballistic ball (ideal 2D no-drag: R = v^2 sin(2*theta)/g, T = 2*v*sin(theta)/g, H = (v*sin(theta))^2/(2g)). Grab it; **N/P** cycles angle theta: LO (15 deg) / MED (30 deg) / HI (45 deg) / VERT (75 deg). **Shift+N/P** cycles speed v: SLOW (2) / MED (4) / FAST (6) / XFAST (8) m/s. VR trigger / desktop activate **launches** (or resets mid-flight).
+3. Readout shows v, theta, R, T, H, and state READY / FLIGHT / LANDED. Arc LineRenderer + sphere markers show the predicted trajectory; the ball animates along it. Honesty: ideal no-drag projectile on flat ground - NOT 3D wind, not Magnus, not bouncing, not rigid-body Unity physics sim of the ball (kinematic visual).
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.

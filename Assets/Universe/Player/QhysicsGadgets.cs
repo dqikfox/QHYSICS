@@ -97,6 +97,9 @@ namespace RealityEngine.Player
                 return SpawnLoadSolar(worldPos);
             if (key == "platecap" || key == "plate cap" || key == "plate-cap" || key == "plate capacitor" || key == "platecapacitor" || key == "parallel plate" || key == "parallelplate" || key == "parallel-plate" || key == "rc" || key == "rc cap" || key == "rccap" || key == "rc capacitor" || key == "rccapacitor")
                 return SpawnPlateCapacitor(worldPos);
+            if (key == "projectile" || key == "ballistics" || key == "ballistic" || key == "trajectory" || key == "cannon" || key == "range" || key == "throw" || key == "projectile motion" || key == "projectilemotion" || key == "ballistic range" || key == "ballisticrange")
+                return SpawnProjectile(worldPos);
+
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
             if (key == "inductor" || key == "inductance" || key == "choke" || key == "coil-l" || key == "series-l")
@@ -1255,6 +1258,18 @@ namespace RealityEngine.Player
             if (cap == null)
                 cap = go.AddComponent<LoadPlateCapacitorGadget>();
             cap.EnsureBuilt();
+            return go;
+        }
+        static GameObject SpawnProjectile(Vector3 worldPos)
+        {
+            // PHYSICS projectile / ballistic range: ideal R=v^2 sin(2theta)/g on flat ground (no drag).
+            var go = SpawnPrimitiveProxy("Projectile", worldPos, new Color(0.18f, 0.58f, 0.68f));
+            go.name = LoadProjectileGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.12f, 0.14f);
+            var proj = go.GetComponent<LoadProjectileGadget>();
+            if (proj == null)
+                proj = go.AddComponent<LoadProjectileGadget>();
+            proj.EnsureBuilt();
             return go;
         }
         static GameObject SpawnPrimitiveProxy(string name, Vector3 worldPos, Color color)
