@@ -457,6 +457,12 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 2. Gadget spawns a ramp plank + sliding block (ideal inclined plane: a = g(sin θ − μ cos θ), g=9.81). Grab it; **N/P** / VR trigger / LMB-scroll cycles angle: LO (15°) / MED (30°) / STEEP (45°) / CLIFF (60°). **Shift+N/P** cycles friction μ: OFF (0) / LIGHT (0.2) / HEAVY (0.4). When μ cos θ ≥ sin θ the block shows STICK (a=0).
 3. Readout shows θ, μ, a (m/s^2 downhill), v, and s (distance along plane). Soft end-stops at top/bottom. Honesty: lumped ideal inclined plane — NOT rolling, not air drag, not variable μ, not 3D tipping.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
+### Lever / Torque Balance (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Lever** (or spawn key `lever` / `torque` / `balance` / `fulcrum` / `seesaw`).
+ulcrum / seesaw).
+2. Gadget spawns a stand + fulcrum + beam with two point masses (ideal statics: tau_L = -m_L g d_L, tau_R = +m_R g d_R, tau_net = tau_L + tau_R, g=9.81). Grab it; **N/P** / VR trigger / LMB-scroll cycles mass pairs: BAL (1.0/1.0 kg) / LIGHT (1.2/0.8) / MED (1.5/0.5) / HEAVY (2.0/0.5). **Shift+N/P** cycles fulcrum offset: CENTER (arms 0.20/0.20 m) / NEAR_L (0.24/0.12) / FAR_L (0.30/0.10) / NEAR_R (0.12/0.24).
+3. Readout shows tau_L, tau_R, tau_net, and BALANCED when |tau_net| < eps (else TIP LEFT / TIP RIGHT). Beam uses light damped tip toward the static tip angle. Honesty: ideal statics tau=mgd, point masses on massless beam - NOT beam flex, not fulcrum friction, not 3D tipping, not distributed beam mass.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
