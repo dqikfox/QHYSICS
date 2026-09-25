@@ -452,6 +452,11 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 2. Gadget spawns a stand + overhead pulley with two hanging masses (ideal Atwood: a = g(m1-m2)/(m1+m2), T = 2 m1 m2 g/(m1+m2), g=9.81). Grab it; **N/P** / VR trigger / LMB-scroll cycles mass pairs: EQ (0.20/0.20 kg) / LIGHT (0.25/0.15) / MED (0.30/0.15) / HEAVY (0.40/0.10). **Shift+N/P** cycles damp: OFF / LIGHT / HEAVY.
 3. Readout shows preset, a (m/s^2), T (N), v, and dh. Soft end-stops keep masses from passing the pulley or floor. Honesty: lumped ideal Atwood — NOT real pulley inertia, not string mass, not friction, not air drag, not 3D swinging.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
+### Inclined Plane (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Inclined Plane** (or spawn key `incline` / `inclined` / `inclinedplane` / `ramp` / `plane` / `wedge`).
+2. Gadget spawns a ramp plank + sliding block (ideal inclined plane: a = g(sin θ − μ cos θ), g=9.81). Grab it; **N/P** / VR trigger / LMB-scroll cycles angle: LO (15°) / MED (30°) / STEEP (45°) / CLIFF (60°). **Shift+N/P** cycles friction μ: OFF (0) / LIGHT (0.2) / HEAVY (0.4). When μ cos θ ≥ sin θ the block shows STICK (a=0).
+3. Readout shows θ, μ, a (m/s^2 downhill), v, and s (distance along plane). Soft end-stops at top/bottom. Honesty: lumped ideal inclined plane — NOT rolling, not air drag, not variable μ, not 3D tipping.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
