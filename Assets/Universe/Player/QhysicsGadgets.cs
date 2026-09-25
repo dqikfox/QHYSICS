@@ -32,13 +32,17 @@ namespace RealityEngine.Player
             return SpawnByLabel(QhysicsInventory.Instance.SelectedLabel, worldPos);
         }
 
-        public static GameObject SpawnByLabel(string label, Vector3 worldPos)
+        /// <param name="ignoreCooldown">When true (sandbox restore), skip the 0.15s spawn throttle. Public default unchanged.</param>
+        public static GameObject SpawnByLabel(string label, Vector3 worldPos, bool ignoreCooldown = false)
         {
             if (string.IsNullOrEmpty(label))
                 return null;
-            if (Time.unscaledTime < _cooldown)
-                return null;
-            _cooldown = Time.unscaledTime + 0.15f;
+            if (!ignoreCooldown)
+            {
+                if (Time.unscaledTime < _cooldown)
+                    return null;
+                _cooldown = Time.unscaledTime + 0.15f;
+            }
 
             string key = label.Trim().ToLowerInvariant();
             if (key == "delete" || key == "empty")

@@ -1,5 +1,6 @@
 using System;
 using RealityEngine.Player;
+using RealityEngine.Systems;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -135,6 +136,27 @@ namespace RealityEngine.UI
                 Toggle();
             if (visible)
                 TryScrollChipPage();
+            PollSandboxSaveHotkeys();
+        }
+
+        static void PollSandboxSaveHotkeys()
+        {
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null)
+            {
+                if (Keyboard.current.f5Key.wasPressedThisFrame)
+                    LabSandboxSave.SaveSlot0();
+                if (Keyboard.current.f9Key.wasPressedThisFrame)
+                    LabSandboxSave.LoadSlot0();
+                return;
+            }
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.GetKeyDown(KeyCode.F5))
+                LabSandboxSave.SaveSlot0();
+            if (Input.GetKeyDown(KeyCode.F9))
+                LabSandboxSave.LoadSlot0();
+#endif
         }
 
         void LateUpdate()
@@ -344,9 +366,15 @@ namespace RealityEngine.UI
                 Debug.Log("QHYSICS: Scale chip reserved (world scale locked). Use SimChip for timeScale.");
                 return true;
             }
-            if (key == "save" || key == "load")
+            if (key == "save")
             {
-                Debug.Log("QHYSICS: " + label + " stub ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â persistence comes with experiment runner save slots.");
+                // Sandbox gadget poses only (LabSandboxSave) — not CircuitLab snaps / challenges / PlayerPrefs.
+                LabSandboxSave.SaveSlot0();
+                return true;
+            }
+            if (key == "load")
+            {
+                LabSandboxSave.LoadSlot0();
                 return true;
             }
             if (key == "induction")
