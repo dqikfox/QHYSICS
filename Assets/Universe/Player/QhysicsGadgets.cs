@@ -73,6 +73,8 @@ namespace RealityEngine.Player
                 return SpawnMutualCoupler(worldPos);
             if (key == "spring" || key == "spring mass" || key == "spring-mass" || key == "springmass" || key == "mass" || key == "hooke" || key == "hookes" || key == "hooke's law" || key == "oscillator")
                 return SpawnSpringMass(worldPos);
+            if (key == "pendulum" || key == "pend" || key == "swing" || key == "bob" || key == "simple pendulum" || key == "simplependulum")
+                return SpawnPendulum(worldPos);
             if (key == "switch")
                 return SpawnLoadSwitch(worldPos);
             if (key == "battery" || key == "cell" || key == "emf")
@@ -1171,6 +1173,18 @@ namespace RealityEngine.Player
             if (spring == null)
                 spring = go.AddComponent<LoadSpringMassGadget>();
             spring.EnsureBuilt();
+            return go;
+        }
+        static GameObject SpawnPendulum(Vector3 worldPos)
+        {
+            // PHYSICS simple pendulum: lumped planar theta''=-(g/L)sin(theta)-c*theta'.
+            var go = SpawnPrimitiveProxy("Pendulum", worldPos, new Color(0.16f, 0.50f, 0.58f));
+            go.name = LoadPendulumGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.12f, 0.14f);
+            var pend = go.GetComponent<LoadPendulumGadget>();
+            if (pend == null)
+                pend = go.AddComponent<LoadPendulumGadget>();
+            pend.EnsureBuilt();
             return go;
         }
         static GameObject SpawnPrimitiveProxy(string name, Vector3 worldPos, Color color)
