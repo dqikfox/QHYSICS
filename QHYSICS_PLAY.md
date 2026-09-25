@@ -493,6 +493,12 @@ ulcrum / seesaw).
 2. Gadget spawns a short 1D track with two colored bob masses (m1 fixed 0.25 kg; m2 from ratio). Grab it; **N/P** cycles mass ratio m2/m1: EQ (1:1) / LIGHT (0.5) / HEAVY (2) / XL (4). **Shift+N/P** cycles approach speed: SLOW (0.5) / MED (1.0) / FAST (2.0) / XFAST (4.0) m/s. VR trigger / desktop activate **starts the run**; while running, activate **toggles ELASTIC / INELASTIC** and re-fires.
 3. Readout shows mode ELASTIC/INELASTIC, m1/m2, approach v, p_before->p_after, KE_before->KE_after, and state APPROACH/IMPACT/PAUSED. Animation: approach -> impact formulas -> brief rebound -> reset. Honesty: lumped 1D collisions along a track - NOT 2D/3D rigidbody contact, not friction, not rotation, not deformation.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
+
+### Buoyancy / Archimedes (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Buoyancy** (or spawn key `buoyancy` / `buoyant` / `archimedes` / `float` / `sink` / `density`).
+2. Gadget spawns a semi-transparent fluid tank + 1 liter cube (V = 0.001 m^3). Grab it; **N/P** cycles object density rho_o: CORK (240) / WOOD (600) / ICE (917) / ALUM (2700) kg/m^3. **Shift+N/P** cycles fluid density rho_f: WATER (1000) / OIL (900) / SEA (1025) / HG (13500) kg/m^3. VR trigger / desktop activate **toggles RUN / PAUSE** (RUN resets a drop from the top and settles with damping toward equilibrium submerged fraction).
+3. Readout shows rho_o, rho_f, fraction submerged, F_b, Weight, and state FLOAT / SINK / SUSPEND (neutral when |rho_o-rho_f| small). Visual cube sinks/floats to float fraction = clamp(rho_o/rho_f, 0..1). Honesty: lumped Archimedes F_b = rho_f V_sub g - NOT viscous drag Cd, not free-surface waves, not 3D rigidbody fluid sim.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
