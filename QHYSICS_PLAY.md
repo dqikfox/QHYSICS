@@ -434,6 +434,12 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Readout shows displacement x, force F=-kx, spring energy 0.5 k x^2, natural frequency f0. Honesty: lumped Hooke spring-mass — NOT continuum elasticity, not nonlinear, not collision contact spring.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
 
+### Simple Pendulum (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Pendulum** (or spawn key `pendulum` / `pend` / `swing` / `bob`).
+2. Gadget spawns with a ~25 deg pluck and swings (lumped planar: theta'' = -(g/L) sin(theta) - c theta'', m=0.25 kg, g=9.81). Grab it; **N/P** / VR trigger / LMB-scroll cycles L: SHORT (0.15 m) / MED (0.25 m) / LONG (0.40 m) / XL (0.60 m). **Shift+N/P** cycles damp: OFF / LIGHT / HEAVY.
+3. Readout shows theta (deg), omega, small-angle period T~2pi sqrt(L/g), PE = mgL(1-cos theta), KE = 0.5 m (L omega)^2. Honesty: lumped planar pendulum - NOT spherical pendulum, not rigid-body collision, not air drag Cd model, not physical string stretch.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
+
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
