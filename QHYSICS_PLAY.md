@@ -504,6 +504,11 @@ ulcrum / seesaw).
 2. Gadget spawns a horizontal Venturi tube (inlet / throat / outlet) with manometer columns and a flow tracer. Grab it; **N/P** cycles inlet speed v1: SLOW (0.5) / MED (1.0) / FAST (2.0) / XFAST (4.0) m/s. **Shift+N/P** cycles throat area ratio A2/A1: WIDE (0.75) / MED (0.50) / NARROW (0.35) / PINCH (0.20). VR trigger / desktop activate **toggles RUN / PAUSE** (RUN animates the tracer through the tube).
 3. Readout shows v1, v2 = v1/(A2/A1), dP = 1/2 rho (v2^2 - v1^2) in kPa, head = dP/(rho g), and gauge P2. Throat glow + manometer height drop with dP. Honesty: ideal horizontal incompressible Venturi (P + 1/2 rho v^2 = const, continuity) - NOT viscous losses, not compressible flow, not cavitation, not 3D CFD.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
+### Snell's Law / Refraction (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Snell** (or spawn keys `snell` / `refraction` / `prism` / `tir`).
+2. Grab; **N/P** cycles theta1 15/30/45/60 deg; **Shift+N/P** cycles AIR->WATER / AIR->GLASS / WATER->GLASS / GLASS->AIR.
+3. Readout shows n1, n2, theta1, theta2 or TIR, thetac. Rays update; GLASS->AIR at high theta1 shows TIR. VR trigger / desktop activate toggles RUN/PAUSE tracer.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
