@@ -28,6 +28,14 @@ XR: EventSystem + `XRUIInputModule` + `TrackedDeviceGraphicRaycaster`; Event Cam
 6. Training: pick up plaza kits with **E**, equip baton with **U**, **LMB** training drones east of plaza.
 6. EXPERIMENTS -> **New Run** clears spawned gadgets (Giza/lab content stays).
 
+### EXPERIMENTS Save / Load
+1. Ctrl+P Play -> Enter Sandbox
+2. Spawn a few gadgets (M/Tab toolbelt) — PHYSICS Projectile / Lever / Pendulum etc.
+3. EXPERIMENTS -> **Save** (or desktop **F5**) writes spawned `Gadget_*` / `*_Desktop` poses to `Application.persistentDataPath/QHYSICS/sandbox_slot0.json`
+4. EXPERIMENTS -> **New Run** then EXPERIMENTS -> **Load** (or **F9**) clears then restores those poses over a few frames
+
+Honesty: poses of spawned `Gadget_*` / `*_Desktop` only — NOT CircuitLab breadboard snaps, NOT challenge progress, NOT PlayerPrefs settings, NOT Faraday scene objects. Single slot0.
+
 ---
 
 ## One Editor only
