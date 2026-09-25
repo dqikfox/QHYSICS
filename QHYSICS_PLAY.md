@@ -463,6 +463,12 @@ ulcrum / seesaw).
 2. Gadget spawns a stand + fulcrum + beam with two point masses (ideal statics: tau_L = -m_L g d_L, tau_R = +m_R g d_R, tau_net = tau_L + tau_R, g=9.81). Grab it; **N/P** / VR trigger / LMB-scroll cycles mass pairs: BAL (1.0/1.0 kg) / LIGHT (1.2/0.8) / MED (1.5/0.5) / HEAVY (2.0/0.5). **Shift+N/P** cycles fulcrum offset: CENTER (arms 0.20/0.20 m) / NEAR_L (0.24/0.12) / FAR_L (0.30/0.10) / NEAR_R (0.12/0.24).
 3. Readout shows tau_L, tau_R, tau_net, and BALANCED when |tau_net| < eps (else TIP LEFT / TIP RIGHT). Beam uses light damped tip toward the static tip angle. Honesty: ideal statics tau=mgd, point masses on massless beam - NOT beam flex, not fulcrum friction, not 3D tipping, not distributed beam mass.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
+### Parallel-Plate Capacitor / RC (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Plate Cap** (or spawn key c\ / \platecap\ / \parallel plate\ / \plate capacitor\). Distinct from BUILD **Capacitor** (CIRCUIT series C on InductionCoil).
+2. Gadget spawns two URP Lit parallel plates + gap (ideal RC: Q=CV, tau=RC). Grab it; **N/P** cycles C: SMALL (1 uF) / MED (10 uF) / LARGE (100 uF). **Shift+N/P** cycles R: OPEN (hold) / LIGHT (50 kOhm) / MED (100 kOhm) / HEAVY (500 kOhm). VR trigger / LMB-scroll cycles CHARGE target V: 0 / 5 / 12 / 24 V.
+3. Readout shows C, R, V, Q=CV (uC), tau=RC, tgt V, and state CHARGING / HOLD / DISCHARGE. With R=OPEN, activate snaps V to target and HOLDs. With R load, V(t) approaches target exponentially (or discharges to 0 when tgt=0V). Cyan plate emission scales with |V|/24. Honesty: ideal lumped RC - NOT dielectric, not ESR/ESL, not fringe, not breakdown, not InductionCircuit C.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
+
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
