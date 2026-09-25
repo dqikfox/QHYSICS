@@ -77,6 +77,8 @@ namespace RealityEngine.Player
                 return SpawnAtwood(worldPos);
             if (key == "incline" || key == "inclined" || key == "inclined plane" || key == "inclinedplane" || key == "ramp" || key == "plane" || key == "wedge" || key == "inclinedplane gadget")
                 return SpawnInclinedPlane(worldPos);
+            if (key == "lever" || key == "torque" || key == "balance" || key == "fulcrum" || key == "seesaw" || key == "see-saw" || key == "beam balance" || key == "beambalance" || key == "torque balance" || key == "lever balance")
+                return SpawnLever(worldPos);
             if (key == "spring" || key == "spring mass" || key == "spring-mass" || key == "springmass" || key == "mass" || key == "hooke" || key == "hookes" || key == "hooke's law" || key == "oscillator")
                 return SpawnSpringMass(worldPos);
             if (key == "pendulum" || key == "pend" || key == "swing" || key == "bob" || key == "simple pendulum" || key == "simplependulum")
@@ -1227,6 +1229,18 @@ namespace RealityEngine.Player
             if (incline == null)
                 incline = go.AddComponent<LoadInclinedPlaneGadget>();
             incline.EnsureBuilt();
+            return go;
+        }
+        static GameObject SpawnLever(Vector3 worldPos)
+        {
+            // PHYSICS lever / torque balance: ideal tau = m*g*d, equilibrium when tau_net ~ 0.
+            var go = SpawnPrimitiveProxy("Lever", worldPos, new Color(0.17f, 0.54f, 0.60f));
+            go.name = LoadLeverGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.12f, 0.14f);
+            var lever = go.GetComponent<LoadLeverGadget>();
+            if (lever == null)
+                lever = go.AddComponent<LoadLeverGadget>();
+            lever.EnsureBuilt();
             return go;
         }
         static GameObject SpawnPrimitiveProxy(string name, Vector3 worldPos, Color color)
