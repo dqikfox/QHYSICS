@@ -482,6 +482,12 @@ ulcrum / seesaw).
 2. Gadget spawns a barrel + predicted arc markers + ballistic ball (ideal 2D no-drag: R = v^2 sin(2*theta)/g, T = 2*v*sin(theta)/g, H = (v*sin(theta))^2/(2g)). Grab it; **N/P** cycles angle theta: LO (15 deg) / MED (30 deg) / HI (45 deg) / VERT (75 deg). **Shift+N/P** cycles speed v: SLOW (2) / MED (4) / FAST (6) / XFAST (8) m/s. VR trigger / desktop activate **launches** (or resets mid-flight).
 3. Readout shows v, theta, R, T, H, and state READY / FLIGHT / LANDED. Arc LineRenderer + sphere markers show the predicted trajectory; the ball animates along it. Honesty: ideal no-drag projectile on flat ground - NOT 3D wind, not Magnus, not bouncing, not rigid-body Unity physics sim of the ball (kinematic visual).
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
+
+### Centripetal / Uniform Circular Motion (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Centripetal** (or spawn key `centripetal` / `circular` / `circular motion` / `ucm` / `orbit` / `whirligig` / `centripetal force`).
+2. Gadget spawns a base stand + horizontal ring + orbiting bob on a spoke (ideal horizontal UCM: a = v^2/r, F = m*a, T = 2*pi*r/v, omega = v/r; m fixed 0.25 kg). Grab it; **N/P** cycles radius r: SHORT (0.10 m) / MED (0.20 m) / LONG (0.35 m) / XL (0.50 m). **Shift+N/P** cycles speed v: SLOW (0.5) / MED (1.0) / FAST (2.0) / XFAST (4.0) m/s. VR trigger / desktop activate **toggles RUNNING / PAUSED** (phase held).
+3. Readout shows r, v, a, F, T, omega, m, and state RUNNING / PAUSED. Cyan ring + bob orbit in local XZ; LineRenderer circle trail + spoke arm. Honesty: lumped ideal UCM - NOT conical pendulum, not banked curve, not friction-limited tire, not 3D rigid-body constraint solver.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.

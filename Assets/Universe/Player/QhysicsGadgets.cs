@@ -103,6 +103,8 @@ namespace RealityEngine.Player
                 return SpawnPlateCapacitor(worldPos);
             if (key == "projectile" || key == "ballistics" || key == "ballistic" || key == "trajectory" || key == "cannon" || key == "range" || key == "throw" || key == "projectile motion" || key == "projectilemotion" || key == "ballistic range" || key == "ballisticrange")
                 return SpawnProjectile(worldPos);
+            if (key == "centripetal" || key == "circular" || key == "circular motion" || key == "ucm" || key == "orbit" || key == "whirligig" || key == "centripetal force" || key == "circularmotion")
+                return SpawnCentripetal(worldPos);
 
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
@@ -1274,6 +1276,18 @@ namespace RealityEngine.Player
             if (proj == null)
                 proj = go.AddComponent<LoadProjectileGadget>();
             proj.EnsureBuilt();
+            return go;
+        }
+        static GameObject SpawnCentripetal(Vector3 worldPos)
+        {
+            // PHYSICS centripetal / UCM: ideal a=v^2/r, F=m*a on horizontal orbit (lumped).
+            var go = SpawnPrimitiveProxy("Centripetal", worldPos, new Color(0.16f, 0.56f, 0.66f));
+            go.name = LoadCentripetalGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.12f, 0.14f);
+            var cen = go.GetComponent<LoadCentripetalGadget>();
+            if (cen == null)
+                cen = go.AddComponent<LoadCentripetalGadget>();
+            cen.EnsureBuilt();
             return go;
         }
         static GameObject SpawnPrimitiveProxy(string name, Vector3 worldPos, Color color)
