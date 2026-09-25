@@ -111,6 +111,8 @@ namespace RealityEngine.Player
                 return SpawnBuoyancy(worldPos);
             if (key == "bernoulli" || key == "venturi" || key == "venturi tube" || key == "venturitube" || key == "flow tube" || key == "flowtube" || key == "dynamic pressure" || key == "pitot")
                 return SpawnBernoulli(worldPos);
+            if (key == "snell" || key == "snells" || key == "snell's" || key == "snells law" || key == "snellslaw" || key == "refraction" || key == "refract" || key == "prism" || key == "interface" || key == "critical angle" || key == "criticalangle" || key == "tir")
+                return SpawnSnell(worldPos);
 
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
@@ -1331,6 +1333,19 @@ namespace RealityEngine.Player
             if (bern == null)
                 bern = go.AddComponent<LoadBernoulliGadget>();
             bern.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnSnell(Vector3 worldPos)
+        {
+            // PHYSICS Snell's Law / Refraction: n1 sin theta1 = n2 sin theta2 with TIR.
+            var go = SpawnPrimitiveProxy("Snell", worldPos, new Color(0.18f, 0.48f, 0.72f));
+            go.name = LoadSnellGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
+            var snell = go.GetComponent<LoadSnellGadget>();
+            if (snell == null)
+                snell = go.AddComponent<LoadSnellGadget>();
+            snell.EnsureBuilt();
             return go;
         }
 

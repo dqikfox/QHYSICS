@@ -233,6 +233,7 @@ namespace RealityEngine.Systems
             var d = new Dictionary<string, string>(StringComparer.Ordinal)
             {
                 { "Gadget_Bernoulli", "bernoulli" },
+                { "Gadget_Snell", "snell" },
                 { "Gadget_Buoyancy", "buoyancy" },
                 { "Gadget_Centripetal", "centripetal" },
                 { "Gadget_Collision", "collision" },
