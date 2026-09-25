@@ -105,6 +105,8 @@ namespace RealityEngine.Player
                 return SpawnProjectile(worldPos);
             if (key == "centripetal" || key == "circular" || key == "circular motion" || key == "ucm" || key == "orbit" || key == "whirligig" || key == "centripetal force" || key == "circularmotion")
                 return SpawnCentripetal(worldPos);
+            if (key == "collision" || key == "collide" || key == "momentum" || key == "elastic" || key == "inelastic" || key == "impact" || key == "1d collision" || key == "1dcollision")
+                return SpawnCollision(worldPos);
 
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
@@ -1290,6 +1292,19 @@ namespace RealityEngine.Player
             cen.EnsureBuilt();
             return go;
         }
+        static GameObject SpawnCollision(Vector3 worldPos)
+        {
+            // PHYSICS 1D collision / momentum: elastic + sticky inelastic on a track (lumped).
+            var go = SpawnPrimitiveProxy("Collision", worldPos, new Color(0.18f, 0.55f, 0.70f));
+            go.name = LoadCollisionGadget.RootName;
+            go.transform.localScale = new Vector3(0.16f, 0.10f, 0.12f);
+            var col = go.GetComponent<LoadCollisionGadget>();
+            if (col == null)
+                col = go.AddComponent<LoadCollisionGadget>();
+            col.EnsureBuilt();
+            return go;
+        }
+
         static GameObject SpawnPrimitiveProxy(string name, Vector3 worldPos, Color color)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube);

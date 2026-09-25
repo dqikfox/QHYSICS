@@ -232,6 +232,7 @@ namespace RealityEngine.Systems
         {
             var d = new Dictionary<string, string>(StringComparer.Ordinal)
             {
+                { "Gadget_Collision", "collision" },
                 { "Gadget_Projectile", "projectile" },
                 { "Gadget_PlateCapacitor", "plate cap" },
                 { "Gadget_Lever", "lever" },
