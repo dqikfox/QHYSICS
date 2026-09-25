@@ -107,6 +107,8 @@ namespace RealityEngine.Player
                 return SpawnCentripetal(worldPos);
             if (key == "collision" || key == "collide" || key == "momentum" || key == "elastic" || key == "inelastic" || key == "impact" || key == "1d collision" || key == "1dcollision")
                 return SpawnCollision(worldPos);
+            if (key == "buoyancy" || key == "buoyant" || key == "archimedes" || key == "float" || key == "sink" || key == "density" || key == "buoy" || key == "archimedes principle" || key == "archimedesprinciple")
+                return SpawnBuoyancy(worldPos);
 
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
@@ -1302,6 +1304,18 @@ namespace RealityEngine.Player
             if (col == null)
                 col = go.AddComponent<LoadCollisionGadget>();
             col.EnsureBuilt();
+            return go;
+        }
+        static GameObject SpawnBuoyancy(Vector3 worldPos)
+        {
+            // PHYSICS buoyancy / Archimedes: float fraction = rho_o/rho_f (lumped).
+            var go = SpawnPrimitiveProxy("Buoyancy", worldPos, new Color(0.14f, 0.62f, 0.72f));
+            go.name = LoadBuoyancyGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
+            var buoy = go.GetComponent<LoadBuoyancyGadget>();
+            if (buoy == null)
+                buoy = go.AddComponent<LoadBuoyancyGadget>();
+            buoy.EnsureBuilt();
             return go;
         }
 
