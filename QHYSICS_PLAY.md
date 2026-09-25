@@ -446,6 +446,12 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Readout shows f, u, v, m, and REAL / VIRTUAL / NO IMAGE. Image marker scales by |m| and inverts when m < 0. Honesty: ideal thin lens, paraxial — NOT thick lens, not chromatic/spherical aberration, not wave optics.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
 
+
+### Atwood Machine (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Atwood** (or spawn key `atwood` / `pulley` / `twomass` / `two-mass`).
+2. Gadget spawns a stand + overhead pulley with two hanging masses (ideal Atwood: a = g(m1-m2)/(m1+m2), T = 2 m1 m2 g/(m1+m2), g=9.81). Grab it; **N/P** / VR trigger / LMB-scroll cycles mass pairs: EQ (0.20/0.20 kg) / LIGHT (0.25/0.15) / MED (0.30/0.15) / HEAVY (0.40/0.10). **Shift+N/P** cycles damp: OFF / LIGHT / HEAVY.
+3. Readout shows preset, a (m/s^2), T (N), v, and dh. Soft end-stops keep masses from passing the pulley or floor. Honesty: lumped ideal Atwood — NOT real pulley inertia, not string mass, not friction, not air drag, not 3D swinging.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
