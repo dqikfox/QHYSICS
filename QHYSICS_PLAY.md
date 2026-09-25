@@ -488,6 +488,11 @@ ulcrum / seesaw).
 2. Gadget spawns a base stand + horizontal ring + orbiting bob on a spoke (ideal horizontal UCM: a = v^2/r, F = m*a, T = 2*pi*r/v, omega = v/r; m fixed 0.25 kg). Grab it; **N/P** cycles radius r: SHORT (0.10 m) / MED (0.20 m) / LONG (0.35 m) / XL (0.50 m). **Shift+N/P** cycles speed v: SLOW (0.5) / MED (1.0) / FAST (2.0) / XFAST (4.0) m/s. VR trigger / desktop activate **toggles RUNNING / PAUSED** (phase held).
 3. Readout shows r, v, a, F, T, omega, m, and state RUNNING / PAUSED. Cyan ring + bob orbit in local XZ; LineRenderer circle trail + spoke arm. Honesty: lumped ideal UCM - NOT conical pendulum, not banked curve, not friction-limited tire, not 3D rigid-body constraint solver.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
+### Collision / Momentum (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Collision** (or spawn key `collision` / `collide` / `momentum` / `elastic` / `inelastic` / `impact` / `1d collision`).
+2. Gadget spawns a short 1D track with two colored bob masses (m1 fixed 0.25 kg; m2 from ratio). Grab it; **N/P** cycles mass ratio m2/m1: EQ (1:1) / LIGHT (0.5) / HEAVY (2) / XL (4). **Shift+N/P** cycles approach speed: SLOW (0.5) / MED (1.0) / FAST (2.0) / XFAST (4.0) m/s. VR trigger / desktop activate **starts the run**; while running, activate **toggles ELASTIC / INELASTIC** and re-fires.
+3. Readout shows mode ELASTIC/INELASTIC, m1/m2, approach v, p_before->p_after, KE_before->KE_after, and state APPROACH/IMPACT/PAUSED. Animation: approach -> impact formulas -> brief rebound -> reset. Honesty: lumped 1D collisions along a track - NOT 2D/3D rigidbody contact, not friction, not rotation, not deformation.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
