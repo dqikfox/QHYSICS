@@ -109,6 +109,8 @@ namespace RealityEngine.Player
                 return SpawnCollision(worldPos);
             if (key == "buoyancy" || key == "buoyant" || key == "archimedes" || key == "float" || key == "sink" || key == "density" || key == "buoy" || key == "archimedes principle" || key == "archimedesprinciple")
                 return SpawnBuoyancy(worldPos);
+            if (key == "bernoulli" || key == "venturi" || key == "venturi tube" || key == "venturitube" || key == "flow tube" || key == "flowtube" || key == "dynamic pressure" || key == "pitot")
+                return SpawnBernoulli(worldPos);
 
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
@@ -1316,6 +1318,19 @@ namespace RealityEngine.Player
             if (buoy == null)
                 buoy = go.AddComponent<LoadBuoyancyGadget>();
             buoy.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnBernoulli(Vector3 worldPos)
+        {
+            // PHYSICS Bernoulli / Venturi: P + 1/2 rho v^2 = const with A1 v1 = A2 v2.
+            var go = SpawnPrimitiveProxy("Bernoulli", worldPos, new Color(0.12f, 0.55f, 0.78f));
+            go.name = LoadBernoulliGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
+            var bern = go.GetComponent<LoadBernoulliGadget>();
+            if (bern == null)
+                bern = go.AddComponent<LoadBernoulliGadget>();
+            bern.EnsureBuilt();
             return go;
         }
 

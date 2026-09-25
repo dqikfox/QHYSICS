@@ -499,6 +499,11 @@ ulcrum / seesaw).
 2. Gadget spawns a semi-transparent fluid tank + 1 liter cube (V = 0.001 m^3). Grab it; **N/P** cycles object density rho_o: CORK (240) / WOOD (600) / ICE (917) / ALUM (2700) kg/m^3. **Shift+N/P** cycles fluid density rho_f: WATER (1000) / OIL (900) / SEA (1025) / HG (13500) kg/m^3. VR trigger / desktop activate **toggles RUN / PAUSE** (RUN resets a drop from the top and settles with damping toward equilibrium submerged fraction).
 3. Readout shows rho_o, rho_f, fraction submerged, F_b, Weight, and state FLOAT / SINK / SUSPEND (neutral when |rho_o-rho_f| small). Visual cube sinks/floats to float fraction = clamp(rho_o/rho_f, 0..1). Honesty: lumped Archimedes F_b = rho_f V_sub g - NOT viscous drag Cd, not free-surface waves, not 3D rigidbody fluid sim.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
+### Bernoulli / Venturi (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Bernoulli** (or spawn key `bernoulli` / `venturi` / `venturi tube` / `flow tube` / `pitot`).
+2. Gadget spawns a horizontal Venturi tube (inlet / throat / outlet) with manometer columns and a flow tracer. Grab it; **N/P** cycles inlet speed v1: SLOW (0.5) / MED (1.0) / FAST (2.0) / XFAST (4.0) m/s. **Shift+N/P** cycles throat area ratio A2/A1: WIDE (0.75) / MED (0.50) / NARROW (0.35) / PINCH (0.20). VR trigger / desktop activate **toggles RUN / PAUSE** (RUN animates the tracer through the tube).
+3. Readout shows v1, v2 = v1/(A2/A1), dP = 1/2 rho (v2^2 - v1^2) in kPa, head = dP/(rho g), and gauge P2. Throat glow + manometer height drop with dP. Honesty: ideal horizontal incompressible Venturi (P + 1/2 rho v^2 = const, continuity) - NOT viscous losses, not compressible flow, not cavitation, not 3D CFD.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.
