@@ -440,6 +440,12 @@ When a Quest Link headset is connected / XR display running, desktop locomotion 
 3. Readout shows theta (deg), omega, small-angle period T~2pi sqrt(L/g), PE = mgL(1-cos theta), KE = 0.5 m (L omega)^2. Honesty: lumped planar pendulum - NOT spherical pendulum, not rigid-body collision, not air drag Cd model, not physical string stretch.
 4. Desktop WASD; C Challenges; M/Tab toolbelt.
 
+### Thin Lens / Optics Bench (PHYSICS)
+1. Ctrl+P Play -> Enter Sandbox -> **M/Tab** toolbelt -> **PHYSICS** -> **Thin Lens** (or spawn key `lens` / `optics` / `thinlens` / `focus`).
+2. Gadget spawns an optics bench with URP Lit disc lens, amber object marker, and ghost image marker (Gaussian thin lens: 1/f = 1/u + 1/v, m = -v/u). Grab it; **N/P** / VR trigger / LMB-scroll cycles f: CONVEX5 (5 cm) / CONVEX10 (10 cm) / CONVEX20 (20 cm) / CONCAVE (-10 cm). **Shift+N/P** cycles object distance u presets (8/12/15/25/40 cm).
+3. Readout shows f, u, v, m, and REAL / VIRTUAL / NO IMAGE. Image marker scales by |m| and inverts when m < 0. Honesty: ideal thin lens, paraxial — NOT thick lens, not chromatic/spherical aberration, not wave optics.
+4. Desktop WASD; C Challenges; M/Tab toolbelt.
+
 ### MEASURE Voltmeter (toolbelt MEASURE)
 1. Enter Sandbox / Induction.
 2. Toolbelt **MEASURE -> Voltmeter**; grab it.

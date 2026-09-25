@@ -26,7 +26,7 @@ namespace RealityEngine.UI
         static readonly string[][] ChipSets =
         {
             new[] { "Wire", "Battery", "Switch", "Bulb", "Resistor", "Lamp", "Motor", "Solar", "Capacitor", "Inductor", "Diode", "Fuse", "LED", "Speaker", "Potentiometer", "Transformer", "Function Generator" },
-            new[] { "Magnet", "Coil", "Field Lens", "Dipole", "Crank Generator", "Mutual Coupler", "Spring Mass", "Pendulum" },
+            new[] { "Magnet", "Coil", "Field Lens", "Dipole", "Crank Generator", "Mutual Coupler", "Spring Mass", "Pendulum", "Thin Lens" },
             new[] { "Multimeter", "Galvanometer", "Oscilloscope", "Frequency Counter", "Power Meter", "Flux Meter", "Charge Meter", "Voltmeter", "Ammeter", "Ohmmeter", "Capacitance Meter", "Inductance Meter", "Resonance Meter", "Impedance Meter", "Power Factor Meter", "Q Factor Meter", "Admittance Meter", "Decibel Meter", "Crest Factor Meter", "Energy Meter", "Duty Cycle Meter", "Slew Rate Meter", "Rise/Fall Meter", "Overshoot Meter", "Peak-to-Peak Meter", "Mean Meter", "Ripple Meter", "THD Meter", "Cubit Rod", "Probe", "Compass", "Stopwatch" },
             new[] { "Teleport", "Scale", "Sky", "Reset Pose" },
             new[] { "Induction", "New Run", "Save", "Load" }
@@ -148,7 +148,7 @@ namespace RealityEngine.UI
             if (_cam == null)
                 return;
 
-            // Worn at hip/chest of DesktopBody / XR Origin Ã¢â‚¬â€ lag follow, not glued to HMD.
+            // Worn at hip/chest of DesktopBody / XR Origin ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â lag follow, not glued to HMD.
             Vector3 anchorPos;
             Vector3 flatFwd;
             if (_hip != null)
@@ -336,7 +336,7 @@ namespace RealityEngine.UI
             {
                 RealityEngine.XR.LabPlayerSpawn.EnsureApplied();
                 RealityEngine.XR.LabPlayerSpawn.RecalibratePlayerHeight(force: true);
-                Debug.Log("QHYSICS: " + label + " Ã¢â‚¬â€ plaza pose + eye height recalibrated.");
+                Debug.Log("QHYSICS: " + label + " ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â plaza pose + eye height recalibrated.");
                 return true;
             }
             if (key == "scale")
@@ -346,7 +346,7 @@ namespace RealityEngine.UI
             }
             if (key == "save" || key == "load")
             {
-                Debug.Log("QHYSICS: " + label + " stub Ã¢â‚¬â€ persistence comes with experiment runner save slots.");
+                Debug.Log("QHYSICS: " + label + " stub ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â persistence comes with experiment runner save slots.");
                 return true;
             }
             if (key == "induction")
