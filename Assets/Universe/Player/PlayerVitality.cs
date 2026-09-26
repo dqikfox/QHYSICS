@@ -32,6 +32,10 @@ namespace RealityEngine.Player
         public bool IsDead => _dead;
 
         public event Action Changed;
+        /// <summary>Raised with the damage actually taken (after shield).</summary>
+        public event Action<float> Damaged;
+        /// <summary>Raised when HP hits zero, before the plaza respawn.</summary>
+        public event Action Died;
 
         public static PlayerVitality Ensure(Transform parent = null)
         {
@@ -91,8 +95,12 @@ namespace RealityEngine.Player
             _lastHurtTime = Time.time;
             _flashUntil = Time.time + 0.18f;
             Changed?.Invoke();
+            Damaged?.Invoke(amount);
             if (hp <= 0.01f)
+            {
+                Died?.Invoke();
                 DieAndRespawn(source);
+            }
         }
 
         void Update()

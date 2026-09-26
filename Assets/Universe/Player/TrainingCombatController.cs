@@ -191,6 +191,9 @@ namespace RealityEngine.Player
 
         bool WasAttackPressed()
         {
+            // A held physics weapon owns the mouse buttons on desktop.
+            if (RealityEngine.Combat.PhysicsHands.DesktopBusy)
+                return false;
             // Desktop LMB / Fire1
 #if ENABLE_INPUT_SYSTEM
             if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)

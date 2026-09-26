@@ -69,6 +69,74 @@ Honesty: poses of spawned `Gadget_*` / `*_Desktop` only — NOT CircuitLab bread
 
 **Test (VR / Quest Link):** the boot menu sits about 1.7 m ahead and doesn't follow your head. After Enter, the strip floats above your view. The toolbelt (Menu / B / Y) has **WORLD → Controls** and **CARRY**. Grip no longer toggles the toolbelt.
 
+## Combat layer: physics melee, spells, skills (2026-09-27, compile-verified, not yet Play-tested)
+
+All runtime code is in `Assets/Universe/Combat/` (bootstrapped by `CombatBootstrap`, AfterSceneLoad). There are no scene edits, and MountainScene is untouched. The arena is an additive procedural object placed next to the plaza.
+
+**Weapons** (`WeaponFactory`, `PhysicsWeapon`) are dynamic rigidbodies built along +Y:
+
+| Weapon | Mass | Hands | Stabs? |
+|---|---|---|---|
+| Dagger | 0.45 kg | 1 | yes |
+| Sword | 1.3 kg | 1 or 2 | yes |
+| Spear | 2.2 kg | 2 | yes |
+| Mace | 2.8 kg | 2 | no |
+| Shield | 3.0 kg | 1 | no |
+
+- **Hands** (`PhysicsHands`): a force/torque PD drive with a strength clamp (320 N and 28 N·m per hand, ×1.8 with two hands). Heavy weapons lag, and a blade stops at walls and cannot pass through them.
+- **Damage:** 6 × (contact speed − 2 m/s) × √mass × a part multiplier. The edge slashes, the tip pierces, and the head or handle bludgeons. Each target has a 0.15 s cooldown.
+- **Stabs:** a tip hit at ≥ 3 m/s, within 30° of the blade axis, embeds the blade with a ConfigurableJoint. Pull back along the blade (or wrench hard) to free it.
+- **Block and parry:** if your blade meets an enemy blade mid-swing, it's a block. At ≥ 1.5 m/s it's a parry, which staggers the enemy for 1.3 s.
+
+**Enemies and training:**
+- **Enemy** (`CombatEnemy`): a primitive humanoid with a force-driven sword. It approaches, winds up (0.5 s), swings (0.32 s) and blocks fast incoming blades. It staggers when hit for 8 damage or more. On death it becomes a jointed ragdoll, and its sword becomes loot. `EnemyDirector` caps enemies at 3 and auto-spawns one while you are inside the arena.
+- **Training dummy:** a spring-jointed dummy with 500 HP that resets 3 s after the last hit. It shows DPS and your last hit.
+- **Arena:** built near the plaza. It has a floor, a low wall ring, pillars, a weapon table that auto-restocks, and 2 dummies. `L` teleports you there and back.
+
+**Spells** (`SpellSystem`):
+
+| Spell | How to cast | Mana | Effect |
+|---|---|---|---|
+| Fire | charge and release | 15 | bolt with splash damage; burns for 3 s |
+| Lightning | charge and release | 20 | hits the target and chains to 2 more within 4 m |
+| Force | tap | 8 | pulls a loose weapon into your hand |
+| Force | charge | 18 | push wave |
+
+- **Imbue:** puts Fire or Lightning on the held blade for 20 s (25 mana).
+- **Mana:** 100, regenerating at 12/s.
+- **Focus** (slow-mo): timeScale × 0.35, and fixedDeltaTime is scaled with it. The meter lasts 5 s. Focus steps aside if the pause menu or sim speed changes time.
+
+**Skills** (`SkillSystem`, `SkillsPanel`):
+- XP: enemy kill 40, challenge 50 + 10 per star, parry 5. Each level gives 1 point.
+- 12 skills in three branches: MELEE, MAGIC and MIND.
+- Saved to `persistentDataPath/QHYSICS/skills.json`.
+
+**HUD** (`CombatHud`): a compact bottom-right panel with HP, mana, focus, charge, spell, held weapon, kill count and level. It only appears in combat contexts. There is a red hurt flash and a cyan focus tint on desktop, plus haptics and hurt SFX in XR.
+
+### Controls
+| | Desktop | VR |
+|---|---|---|
+| Get a weapon | table in the arena, `E` to grab; or F2 dagger, F3 sword, F4 spear, F6 mace, F7 shield; or toolbelt COMBAT tab | grip near the handle; toolbelt COMBAT tab |
+| Attack | LMB slash (alternating), RMB thrust | swing your arm (speed = damage) |
+| Block | hold Alt | put the blade in the way |
+| Two hands | automatic for two-handed weapons | second hand grips the shaft |
+| Drop / throw | F / R | release grip while moving |
+| Cast | hold V, release (Force: tap = pull) | empty hand: hold trigger, release (only in the arena, near enemies, or while armed) |
+| Next spell | Z | A or X |
+| Imbue | B | full charge next to the blade in your other hand |
+| Focus | G | A + X together |
+| Skills | K (or pause menu, or COMBAT > Skills) | pause menu or COMBAT > Skills |
+| Enemy / dummy / arena | F8 / F10 / L | COMBAT > Enemy / Dummy / Arena |
+
+### Test steps
+1. Play, then Enter Sandbox. Press `L` to go to the arena. Walk to the table and press `E` on the sword.
+2. Slash a dummy with LMB. Numbers float up and the DPS label updates. RMB thrusts: a fast thrust embeds the blade. LMB again pulls it free.
+3. Walk into the middle of the arena and wait 4 s for an enemy to spawn. Hold Alt when it winds up, and swing into its blade to parry (it staggers). Kill it: it ragdolls, its sword drops, and you get +40 XP.
+4. Press `V`, hold, then release to cast Fire. Press `Z` for Lightning, then `Z` again for Force (tap it at a loose weapon to pull it). `G` turns slow-mo on and off. `B` imbues the held blade.
+5. Press `K`, spend a point, then restart Play. The rank is kept (skills.json).
+6. **VR:** grip the sword on the table and swing. Check the haptics and that it doesn't pass through the walls. Add your second hand on the spear shaft. Try an empty-hand trigger cast, A/X to change spell, and A+X for focus.
+7. **Regression:** outside combat, the dock, toolbelt, baton and drone behave as before. The baton's LMB is ignored only while a physics weapon is held.
+
 ## One Editor only
 
 - Project: `C:\Users\KING\projects\QHYSICS`

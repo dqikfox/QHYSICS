@@ -27,7 +27,8 @@ namespace RealityEngine.UI
             "O operator  |  H / J scientist  |  F5 save  |  F9 load\n" +
             "N / P cycle gadget mode  |  F1 this panel\n" +
             "<b><color=#00E5FF>COMBAT</color></b>\n" +
-            "LMB slash  |  RMB thrust  |  hold Alt block\n" +
+            "E grab weapon  |  LMB slash  |  RMB thrust  |  hold Alt block\n" +
+            "F drop  |  R throw (while holding a weapon)\n" +
             "hold V cast  |  Z next spell  |  B imbue weapon\n" +
             "G focus (slow-mo)  |  K skills  |  L arena\n" +
             "F2 dagger  F3 sword  F4 spear  F6 mace  F7 shield\n" +
@@ -42,9 +43,10 @@ namespace RealityEngine.UI
             "<b><color=#00E5FF>COMBAT</color></b>\n" +
             "Grip a weapon to hold it (weight + lag)\n" +
             "Second hand on the grip = two-handed\n" +
-            "Empty hand: grip + trigger charge, release = cast\n" +
-            "A / X cycle that hand's spell  |  A + X focus\n" +
-            "Other hand grip + trigger near a blade = imbue\n" +
+            "Empty hand: hold trigger = charge, release = cast\n" +
+            "(spells work in the arena / near enemies / armed)\n" +
+            "A / X next spell  |  A + X together = focus\n" +
+            "Full charge next to the blade in your other hand = imbue\n" +
             "Toolbelt COMBAT: weapons, enemy, dummy, skills, arena";
 
         static QhysicsControlsOverlay _instance;
