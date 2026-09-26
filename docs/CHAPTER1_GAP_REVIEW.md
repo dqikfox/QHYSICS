@@ -45,9 +45,11 @@ Per-load power is P = V²/R. One 10 V battery across a 1 kΩ bulb gives **0.1 W*
 | 40 | sun_faraday_nova | 4 W | 7 | Hard on 9×9 |
 | 41 | sun_faraday_quasar | 8 W | 9 | Probably not reachable |
 | 42 | sun_faraday_pulsar | 16 W | 13 | Probably not reachable |
-| 43 | sun_faraday_magnetar | 32 W | 18 (≈179 V) | **Almost certainly impossible** on a 9×9 board (perimeter ≈ 32 unit edges) |
+| 43 | sun_faraday_magnetar | 32 W | 18 (≈179 V) | Geometrically feasible but tedious (see correction below) |
 
-Solar panels max out at 1 W, so they don't help. Challenges 34–35 (9 and 10 bulbs lit) are also unverified on a 9×9 board. **None of challenges 13–43 has a recorded Play-mode clear.**
+**Correction (2026-09-27):** CircuitLab parts are all length 1 on the peg grid (only `LongWire` is length 2, see `PegMgr.cs`). A series loop of 18 batteries + 1 bulb is 19 edges, which fits inside the 9×9 board's 32-edge perimeter. So 32 W is **possible but tedious**, not impossible. Math: P = (10·N)² / 1000 Ω per bulb, so N = ⌈√(P·1000)/10⌉: 0.25 W→2, 0.5→3, 1→4, 2→5, 4→7, 8→9, 16→13, 32→18 batteries. Motor = 2 kΩ, resistor = 470 Ω, battery = 10 V.
+
+Solar panels max out at 1 W (10 V), so they don't help. Challenges 34–35 (9 and 10 bulbs lit) are also unverified on a 9×9 board. **None of challenges 13–43 has a recorded Play-mode clear.**
 
 ### 2.3 Onboarding and menus
 - `QhysicsMainMenu` has no **Continue / Chapter Select / Credits / Quit**. After the first launch it never shows again, so a returning player has no way back to a menu.
@@ -134,3 +136,37 @@ New objective types needed for levels 6, 8 and 9 (add to `ObjectiveType`, evalua
 17. Identity and build: `productName`/`companyName`/version, a Windows build profile, a recorded Quest Link session, an Android APK smoke test.
 18. Text cleanup: fix mojibake in `QHYSICS_PLAY.md`, `ChallengeManager.cs`, `GizaComplex.cs` (`kawÃ¡b` match), `QhysicsGadgets.cs`.
 19. Decide on the pending settings drift (`manifest.json` ai.assistant bump, OpenXR feature list, ProjectAuditor, TMP fallback atlas) and commit or revert it deliberately.
+
+
+---
+
+## 5. Status update — 2026-09-27 (runtime code, compile-verified, not yet Play-tested)
+
+**Done (P0 2–6, P1 9 partially, P1 12):**
+- **Chapters:** `Assets/Universe/Challenges/ChapterCatalog.cs` (code table `ChapterDefinition`: id, order, title, subtitle, ids, `sequentialUnlock`).
+  - Chapter 1 "Faraday's Bench" (order 1), 10 levels: `bench_orientation` (new) → `first_light` → `make_and_break` → `current_control` → `double_trouble` → `spin_up` → `lines_of_force` (new) → `induction` → `the_dynamo` (new) → `transformer` (new finale).
+  - Unlock: entry N unlocks when entry N−1 has ≥1 star, OR via the original prerequisite chain (kept).
+  - "Sandbox / Extra" (order 99) = every other campaign id (old 13–43 + `sun_power`, `gear_up`, …). Hidden from Chapter 1, **not deleted**; original chain unlocks unchanged.
+- **Beatability of every Chapter 1 level (the parts that exist):**
+
+| Level | Objective | Why it is beatable |
+|---|---|---|
+| bench_orientation | any spawned `Gadget_*` root ≥ 1 | any toolbelt chip spawns one |
+| first_light | 1 bulb lit | 1 battery + 1 bulb: I = 10 V / 1 kΩ = 10 mA, P = 0.1 W (> significance threshold) |
+| make_and_break | switch closed + bulb lit | same loop + switch (series) |
+| current_control | resistor in loop + bulb lit | 10 V / 1.47 kΩ = 6.8 mA, still lit |
+| double_trouble | 2 bulbs lit | parallel: 10 mA each; series: 5 mA each (both above threshold) |
+| spin_up | motor ≥ 120 RPM | motor 2 kΩ: I = 5 mA = baseCurrent ⇒ RPM = 600 × 5/5 = 600 ≥ 120 |
+| lines_of_force | compass + horizontal \|B\| ≥ 150 µT | Earth 50 µT + dipole B ∝ 1/r³: halving distance is ×8, so a magnet within a few cm–dm clears 3× Earth (**threshold needs Play confirmation**) |
+| induction | peak \|EMF\| ≥ 0.05 V | unchanged; existing latched-peak sampling every frame |
+| the_dynamo | crank cranking + peak \|EMF\| ≥ 0.01 V held 2 s | rotating dipole near coil, sustained (hold timer resets if it drops) (**threshold needs Play confirmation**) |
+| transformer | coupler coupled + latched \|Es\| ≥ 0.1 mV | Es = −M dIp/dt: M = 2 mH (MED), 10 mA switched in ~1 frame (11 ms) ⇒ dI/dt ≈ 0.9 A/s ⇒ Es ≈ 1.8 mV ≫ 0.1 mV |
+
+- New objective types: `GadgetPresent` (9), `CompassFieldThreshold` (10), `CrankEmfThreshold` (11, sustained via `heldSeconds`), `MutualEmfThreshold` (12, latched peak) + live readouts. `ChallengeObjective.targetTag` added.
+- **VR access:** EXPERIMENTS toolbelt tab "Challenges" chip; pause menu "Challenges" (and "Skills"); `C` key kept.
+- **Scroll:** `ScrollRect` + `RectMask2D` + `ContentSizeFitter` (XR ray drag), right/left thumbstick Y while open, mouse wheel, UP/DOWN page buttons. Hotbar wheel, toolbelt page wheel and XR carry-pouch stick are suppressed while the list is open (`QhysicsUiScrollGate`).
+- **Positioning bug fixed:** the old list/overlay/banner moved `_listPanel.root` (the whole QhysicsUI hierarchy). Now three separate canvases, each placed on its own.
+- **Chapter complete** banner + SFX when the last Chapter 1 star lands.
+- **Audio:** `Assets/Sounds/QhysicsMixer.mixer` now tracked; `Assets/Resources/QhysicsAudioMixerRef.asset` references it, so `AudioRouter.LoadMixer()` succeeds and the Settings volume routes through `MasterVolume` (fallback to `AudioListener.volume` if the ref is ever missing). `QhysicsSfx` generates procedural clips (objective tick, complete arpeggio, chapter fanfare, unlock, UI tick, denied, plus combat sounds) on pooled sources routed to the SFX group.
+
+**Still open:** `requireSimultaneous` (objectives remain sticky), per-level intro cards, main menu v2, Play-verify every level on desktop + Quest Link, Quest perf items.

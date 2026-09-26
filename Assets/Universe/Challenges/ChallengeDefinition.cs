@@ -25,7 +25,15 @@ namespace RealityEngine.Challenges
         /// <summary>At least one placed Switch clone is closed AND a placed Motor clone reaches targetValue RPM.</summary>
         SwitchClosedMotorSpinning = 7,
         /// <summary>At least one placed load (bulb or motor) delivering |V|*|I| power >= targetValue watts.</summary>
-        CircuitPowerThreshold = 8
+        CircuitPowerThreshold = 8,
+        /// <summary>At least targetCount spawned lab roots whose name starts with targetTag (e.g. "Gadget_Multimeter"; default "Gadget_").</summary>
+        GadgetPresent = 9,
+        /// <summary>A spawned LoadCompassGadget reads horizontal |B| >= targetValue tesla (Earth ~5e-5 T, so this needs a magnet nearby).</summary>
+        CompassFieldThreshold = 10,
+        /// <summary>A LoadCrankGeneratorGadget is cranking with nearby peak |EMF| >= targetValue volts, held for targetCount seconds (sustained).</summary>
+        CrankEmfThreshold = 11,
+        /// <summary>A coupled LoadMutualCouplerGadget latched peak secondary |EMF| >= targetValue volts.</summary>
+        MutualEmfThreshold = 12
     }
 
     /// <summary>
@@ -41,9 +49,13 @@ namespace RealityEngine.Challenges
         public float targetValue = 0f;
         [Tooltip("Count threshold (e.g. number of bulbs for MultipleBulbsLit).")]
         public int targetCount = 1;
+        [Tooltip("Optional name/tag filter (e.g. GadgetPresent root-name prefix).")]
+        public string targetTag = "";
 
         /// <summary>Runtime completion state â€” not serialized.</summary>
         [NonSerialized] public bool completed;
+        /// <summary>Runtime hold timer for sustained objectives â€” not serialized.</summary>
+        [NonSerialized] public float heldSeconds;
 
         public ChallengeObjective Clone()
         {
@@ -52,7 +64,8 @@ namespace RealityEngine.Challenges
                 type = type,
                 displayText = displayText,
                 targetValue = targetValue,
-                targetCount = targetCount
+                targetCount = targetCount,
+                targetTag = targetTag
             };
         }
     }

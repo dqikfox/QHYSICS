@@ -222,6 +222,9 @@ namespace RealityEngine.Audio
             EnsureInitialized();
             if (_mixer != null)
                 _mixer.SetFloat(ParamMaster, ToDb(normalized));
+            else
+                AudioListener.volume = Mathf.Clamp01(normalized); // fallback when the mixer ref is missing
+
         }
 
         /// <summary>Set a child bus volume (0–1) on the mixer.</summary>

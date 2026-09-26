@@ -275,6 +275,9 @@ namespace RealityEngine.Player
 
         static int ReadScrollCycle()
         {
+            // Challenge list / skills panel own the wheel while open.
+            if (RealityEngine.UI.QhysicsUiScrollGate.IsCaptured)
+                return 0;
 #if ENABLE_INPUT_SYSTEM
             if (Mouse.current != null)
             {
