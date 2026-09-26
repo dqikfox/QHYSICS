@@ -358,7 +358,7 @@ namespace RealityEngine.UI
             {
                 RealityEngine.XR.LabPlayerSpawn.EnsureApplied();
                 RealityEngine.XR.LabPlayerSpawn.RecalibratePlayerHeight(force: true);
-                Debug.Log("QHYSICS: " + label + " ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â plaza pose + eye height recalibrated.");
+                Debug.Log("QHYSICS: " + label + " - plaza pose + eye height recalibrated.");
                 return true;
             }
             if (key == "scale")
