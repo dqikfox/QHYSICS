@@ -6,7 +6,7 @@ namespace RealityEngine.Player
 {
     /// <summary>
     /// Runtime Ensure for operator / carry inventory / training combat / XR grip pickup / XR pouch stick / plaza pickups + drones.
-    /// Composes on existing desktop + UI bootstrap â€” no Faraday scene rewrite.
+    /// Composes on existing desktop + UI bootstrap — no Faraday scene rewrite.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(136)]

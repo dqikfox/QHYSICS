@@ -5,9 +5,9 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 /// <summary>
 /// Subscribes to XR interactable select/activate events and sends haptic impulses.
-/// Grab/select â†’ 0.3 amplitude, 0.05 s.  Activate (trigger) â†’ 0.6 amplitude, 0.1 s.
+/// Grab/select → 0.3 amplitude, 0.05 s.  Activate (trigger) → 0.6 amplitude, 0.1 s.
 /// No-ops cleanly on desktop or when no XR device is present.
-/// Self-initializing via RuntimeInitializeOnLoadMethod â€” no scene edits required.
+/// Self-initializing via RuntimeInitializeOnLoadMethod — no scene edits required.
 /// Compatible with XR Interaction Toolkit 3.6.0.
 /// </summary>
 public class XRHaptics : MonoBehaviour

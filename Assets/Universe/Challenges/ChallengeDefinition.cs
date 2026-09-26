@@ -52,9 +52,9 @@ namespace RealityEngine.Challenges
         [Tooltip("Optional name/tag filter (e.g. GadgetPresent root-name prefix).")]
         public string targetTag = "";
 
-        /// <summary>Runtime completion state â€” not serialized.</summary>
+        /// <summary>Runtime completion state — not serialized.</summary>
         [NonSerialized] public bool completed;
-        /// <summary>Runtime hold timer for sustained objectives â€” not serialized.</summary>
+        /// <summary>Runtime hold timer for sustained objectives — not serialized.</summary>
         [NonSerialized] public float heldSeconds;
 
         public ChallengeObjective Clone()

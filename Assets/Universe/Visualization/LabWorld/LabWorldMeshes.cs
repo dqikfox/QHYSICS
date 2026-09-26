@@ -267,7 +267,7 @@ namespace RealityEngine.Visualization
         {
             if (_turaTex != null && _turaBump != null)
                 return;
-            // Cooler ivory limestone (diorama white) â€” slight cool bias, not sandy-plastic yellow.
+            // Cooler ivory limestone (diorama white) — slight cool bias, not sandy-plastic yellow.
             BuildCourseBlocks(
                 "RELab_TuraBlocks", "RELab_TuraBlocksN", 8, 8, 0.085f, 1.22f,
                 new Color(0.95f, 0.94f, 0.91f, 1f),

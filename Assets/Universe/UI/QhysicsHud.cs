@@ -86,8 +86,18 @@ namespace RealityEngine.UI
             _experiment.rectTransform.sizeDelta = new Vector2(340f, 32f);
         }
 
+        /// <summary>Legacy floating card; its content now lives in <see cref="QhysicsStatusStrip"/>. Off by default.</summary>
+        public static bool ShowLegacyCard;
+
         void LateUpdate()
         {
+            if (_canvasCached == null)
+                _canvasCached = GetComponentInChildren<Canvas>(true);
+            bool show = ShowLegacyCard && QhysicsUiState.GameplayHudVisible;
+            if (_canvasCached != null && _canvasCached.gameObject.activeSelf != show)
+                _canvasCached.gameObject.SetActive(show);
+            if (!show)
+                return;
             if (_cam == null)
                 _cam = QhysicsUiBuilder.ResolveXrCamera();
             if (_cam == null)

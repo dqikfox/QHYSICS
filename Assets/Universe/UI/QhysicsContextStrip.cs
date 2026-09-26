@@ -102,6 +102,12 @@ namespace RealityEngine.UI
 
         void LateUpdate()
         {
+            if (!QhysicsUiState.GameplayHudVisible)
+            {
+                if (_canvas != null && _canvas.gameObject.activeSelf)
+                    _canvas.gameObject.SetActive(false);
+                return;
+            }
             if (Time.unscaledTime >= _nextPoll)
             {
                 _nextPoll = Time.unscaledTime + 0.08f;

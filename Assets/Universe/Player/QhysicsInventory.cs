@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Player
 {
     /// <summary>
-    /// Desktop hotbar slots 1â€“8 + screen overlay. VR toolbelt remains separate.
+    /// Desktop bottom dock: tool slots 1-9 + carry readout (screen overlay). VR uses the toolbelt.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(132)]
@@ -42,6 +42,7 @@ namespace RealityEngine.Player
         Image[] _slotImages;
         TextMeshProUGUI[] _slotLabels;
         TextMeshProUGUI _hint;
+        TextMeshProUGUI _carryLabel;
         GameObject _ghost;
         Transform _ghostParent;
 
@@ -76,7 +77,7 @@ namespace RealityEngine.Player
         void Update()
         {
             var desktop = DesktopPlayerController.Instance;
-            bool show = desktop != null && desktop.IsDesktopActive;
+            bool show = desktop != null && desktop.IsDesktopActive && QhysicsUiState.GameplayHudVisible;
             if (_canvas != null && _canvas.gameObject.activeSelf != show)
                 _canvas.gameObject.SetActive(show);
             if (!show)
@@ -134,46 +135,61 @@ namespace RealityEngine.Player
             canvasGo.GetComponent<CanvasScaler>().referenceResolution = new Vector2(1920f, 1080f);
             canvasGo.AddComponent<GraphicRaycaster>();
 
-            var bar = QhysicsUiBuilder.Panel(canvasGo.transform, "Bar", QhysicsUiStyle.PanelBg, new Vector2(920f, 96f));
+            // ONE bottom dock (2026-09-27 declutter): tool slots 1-9 + a carry readout segment.
+            // The old separate carry strip moved into the M/Tab toolbelt (CARRY tab); the permanent help line
+            // became the F1 controls overlay + a fading first-run hint.
+            const float slotW = 108f;
+            const float slotH = 72f;
+            const float gap = QhysicsUiStyle.Space1;
+            const float carryW = 220f;
+            float slotsW = SlotLabels.Length * slotW + (SlotLabels.Length - 1) * gap;
+            float barW = QhysicsUiStyle.Space2 * 2f + slotsW + QhysicsUiStyle.Space2 + 2f + QhysicsUiStyle.Space2 + carryW;
+            var bar = QhysicsUiBuilder.Panel(canvasGo.transform, "Dock", QhysicsUiStyle.PanelBg, new Vector2(barW, slotH + 24f));
+            bar.raycastTarget = false;
             var barRt = bar.rectTransform;
             barRt.anchorMin = new Vector2(0.5f, 0f);
             barRt.anchorMax = new Vector2(0.5f, 0f);
             barRt.pivot = new Vector2(0.5f, 0f);
-            barRt.anchoredPosition = new Vector2(0f, 28f);
+            barRt.anchoredPosition = new Vector2(0f, QhysicsUiStyle.Space2 + 8f);
 
             _slotImages = new Image[SlotLabels.Length];
             _slotLabels = new TextMeshProUGUI[SlotLabels.Length];
-            float slotW = 100f;
-            float startX = -((SlotLabels.Length - 1) * (slotW + 8f)) * 0.5f;
+            float x0 = -barW * 0.5f + QhysicsUiStyle.Space2 + slotW * 0.5f;
             for (int i = 0; i < SlotLabels.Length; i++)
             {
-                var slot = QhysicsUiBuilder.Panel(bar.transform, "Slot_" + (i + 1), QhysicsUiStyle.ChipBg, new Vector2(slotW, 78f));
-                slot.rectTransform.anchoredPosition = new Vector2(startX + i * (slotW + 8f), 0f);
+                var slot = QhysicsUiBuilder.Panel(bar.transform, "Slot_" + (i + 1), QhysicsUiStyle.ChipBg, new Vector2(slotW, slotH));
+                slot.rectTransform.anchoredPosition = new Vector2(x0 + i * (slotW + gap), 0f);
+                slot.raycastTarget = false;
                 _slotImages[i] = slot;
 
-                var key = QhysicsUiBuilder.Label(slot.transform, "Key", (i + 1).ToString(), QhysicsUiStyle.FontSmall,
-                    QhysicsUiStyle.TextMuted, TextAlignmentOptions.Top);
-                key.rectTransform.anchoredPosition = new Vector2(0f, 28f);
-                key.rectTransform.sizeDelta = new Vector2(90f, 24f);
+                var key = QhysicsUiBuilder.Label(slot.transform, "Key", (i + 1).ToString(), QhysicsUiStyle.FontSmall - 6f,
+                    QhysicsUiStyle.TextMuted, TextAlignmentOptions.TopLeft);
+                key.rectTransform.anchorMin = key.rectTransform.anchorMax = new Vector2(0f, 1f);
+                key.rectTransform.pivot = new Vector2(0f, 1f);
+                key.rectTransform.anchoredPosition = new Vector2(QhysicsUiStyle.Space1, -4f);
+                key.rectTransform.sizeDelta = new Vector2(30f, 20f);
 
-                var lab = QhysicsUiBuilder.Label(slot.transform, "Label", SlotLabels[i], QhysicsUiStyle.FontChip,
+                var lab = QhysicsUiBuilder.Label(slot.transform, "Label", ShortSlotLabel(i), QhysicsUiStyle.FontSmall,
                     QhysicsUiStyle.TextPrimary, TextAlignmentOptions.Center);
-                lab.rectTransform.anchoredPosition = new Vector2(0f, -6f);
-                lab.rectTransform.sizeDelta = new Vector2(94f, 40f);
-                lab.enableAutoSizing = true;
-                lab.fontSizeMin = 14f;
-                lab.fontSizeMax = QhysicsUiStyle.FontChip;
+                lab.rectTransform.anchoredPosition = new Vector2(0f, -8f);
+                lab.rectTransform.sizeDelta = new Vector2(slotW - 8f, 36f);
+                lab.overflowMode = TextOverflowModes.Overflow;
                 _slotLabels[i] = lab;
             }
 
-            _hint = QhysicsUiBuilder.Label(canvasGo.transform, "Hint",
-                "WASD move Â· Mouse look Â· 1-9 tools Â· E grab Â· F/R drop Â· Esc pause",
-                QhysicsUiStyle.FontSmall, QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
-            _hint.rectTransform.anchorMin = new Vector2(0.5f, 0f);
-            _hint.rectTransform.anchorMax = new Vector2(0.5f, 0f);
-            _hint.rectTransform.pivot = new Vector2(0.5f, 0f);
-            _hint.rectTransform.anchoredPosition = new Vector2(0f, 132f);
-            _hint.rectTransform.sizeDelta = new Vector2(900f, 28f);
+            float sepX = -barW * 0.5f + QhysicsUiStyle.Space2 + slotsW + QhysicsUiStyle.Space2;
+            var sep = QhysicsUiBuilder.Separator(bar.transform, slotH - 16f);
+            sep.rectTransform.anchoredPosition = new Vector2(sepX, 0f);
+
+            var carryTitle = QhysicsUiBuilder.Label(bar.transform, "CarryTitle", "CARRY  [ ]  U  X", QhysicsUiStyle.FontSmall - 6f,
+                QhysicsUiStyle.TextMuted, TextAlignmentOptions.MidlineLeft);
+            carryTitle.rectTransform.anchoredPosition = new Vector2(sepX + QhysicsUiStyle.Space2 + carryW * 0.5f, 18f);
+            carryTitle.rectTransform.sizeDelta = new Vector2(carryW, 20f);
+            _carryLabel = QhysicsUiBuilder.Label(bar.transform, "CarryItem", "-", QhysicsUiStyle.FontSmall,
+                QhysicsUiStyle.TextPrimary, TextAlignmentOptions.MidlineLeft);
+            _carryLabel.rectTransform.anchoredPosition = new Vector2(sepX + QhysicsUiStyle.Space2 + carryW * 0.5f, -12f);
+            _carryLabel.rectTransform.sizeDelta = new Vector2(carryW, 32f);
+            _carryLabel.overflowMode = TextOverflowModes.Overflow;
 
             RefreshHighlights();
         }
@@ -186,10 +202,42 @@ namespace RealityEngine.Player
             {
                 if (_slotImages[i] == null)
                     continue;
-                _slotImages[i].color = i == _selected ? QhysicsUiStyle.ChipBgActive : QhysicsUiStyle.ChipBg;
+                bool sel = i == _selected;
+                _slotImages[i].color = sel ? QhysicsUiStyle.ChipBgActive : QhysicsUiStyle.ChipBg;
+                QhysicsUiBuilder.SetSelectionRing(_slotImages[i].transform, sel);
                 if (_slotLabels[i] != null)
-                    _slotLabels[i].color = i == _selected ? QhysicsUiStyle.AccentInfo : QhysicsUiStyle.TextPrimary;
+                    _slotLabels[i].color = sel ? QhysicsUiStyle.AccentInfo : QhysicsUiStyle.TextPrimary;
             }
+            RefreshCarryReadout();
+        }
+
+        /// <summary>Short dock labels (no truncation at 108 px).</summary>
+        static string ShortSlotLabel(int i)
+        {
+            string s = SlotLabels[Mathf.Clamp(i, 0, SlotLabels.Length - 1)];
+            if (s == "Field Lens") return "Lens";
+            if (s == "Cubit Rod") return "Cubit";
+            return s;
+        }
+
+        float _nextCarryRefresh;
+
+        void RefreshCarryReadout()
+        {
+            if (_carryLabel == null || Time.unscaledTime < _nextCarryRefresh)
+                return;
+            _nextCarryRefresh = Time.unscaledTime + 0.2f;
+            var carry = PlayerCarryInventory.Instance;
+            if (carry == null || carry.SlotCount == 0)
+            {
+                _carryLabel.text = "-";
+                return;
+            }
+            CarryItemId id = carry.GetSlot(carry.SelectedIndex);
+            string label = id == CarryItemId.None ? "empty" : CarryItemCatalog.LabelOf(id);
+            bool equipped = carry.SelectedIndex == carry.EquippedSlot;
+            _carryLabel.text = (carry.SelectedIndex + 1) + "/" + carry.SlotCount + "  " + label + (equipped ? "  (held)" : "");
+            _carryLabel.color = equipped ? QhysicsUiStyle.AccentInfo : QhysicsUiStyle.TextPrimary;
         }
 
         void RebuildGhost()

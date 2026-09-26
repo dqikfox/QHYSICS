@@ -225,7 +225,7 @@ namespace RealityEngine.Player
                     down = true;
                 else if (device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.trigger, out float axis) && axis > 0.72f)
                     down = true;
-                // Some OpenXR profiles expose activate as primaryButton on grip-side â€” keep soft.
+                // Some OpenXR profiles expose activate as primaryButton on grip-side — keep soft.
             }
             bool pressed = down && !prevDown;
             prevDown = down;

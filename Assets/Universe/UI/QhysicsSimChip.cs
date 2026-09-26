@@ -62,7 +62,7 @@ namespace RealityEngine.UI
             QhysicsUiBuilder.WireEventCamera(_canvas);
             var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(200f, 88f));
 
-            var main = QhysicsUiBuilder.ChipButton(face.transform, "Main", "> 1x", new Vector2(160f, 72f), ToggleExpand);
+            var main = QhysicsUiBuilder.ChipButton(face.transform, "Main", "1x", new Vector2(160f, 72f), ToggleExpand);
             _label = main.GetComponentInChildren<TextMeshProUGUI>();
 
             var expandGo = new GameObject("Expand", typeof(RectTransform));
@@ -87,13 +87,20 @@ namespace RealityEngine.UI
 
         void LateUpdate()
         {
+            // 2026-09-27 declutter: the "> 1x" chip is shown in the top status strip; this panel only appears
+            // while expanded (speed / pause / step / new run).
+            bool show = _expanded && QhysicsUiState.GameplayHudVisible;
+            if (_canvas != null && _canvas.gameObject.activeSelf != show)
+                _canvas.gameObject.SetActive(show);
+            if (!show)
+                return;
             if (_cam == null)
                 _cam = QhysicsUiBuilder.ResolveXrCamera();
             if (_cam == null)
                 return;
             Vector3 right = Flatten(_cam.transform.right);
             Vector3 fwd = Flatten(_cam.transform.forward);
-            Vector3 pos = _cam.transform.position + fwd * 0.65f + right * 0.28f + Vector3.up * -0.18f;
+            Vector3 pos = _cam.transform.position + fwd * 0.8f + Vector3.up * 0.12f;
             transform.position = Vector3.Lerp(transform.position, pos, 1f - Mathf.Exp(-10f * Time.unscaledDeltaTime));
             QhysicsUiBuilder.FaceCamera(transform, _cam);
             QhysicsUiBuilder.WireEventCamera(_canvas);
@@ -106,7 +113,9 @@ namespace RealityEngine.UI
             return v.sqrMagnitude > 1e-6f ? v.normalized : Vector3.right;
         }
 
-        void ToggleExpand()
+        public bool IsExpanded => _expanded;
+
+        public void ToggleExpand()
         {
             _expanded = !_expanded;
             if (_expandRow != null)
@@ -182,7 +191,7 @@ namespace RealityEngine.UI
             if (_paused || Time.timeScale < 0.01f)
                 _label.text = "II";
             else
-                _label.text = "> " + Time.timeScale.ToString("0.##") + "x";
+                _label.text = Time.timeScale.ToString("0.##") + "x";
         }
     }
 }

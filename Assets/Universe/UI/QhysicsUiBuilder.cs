@@ -100,7 +100,9 @@ namespace RealityEngine.UI
             rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
             rt.pivot = new Vector2(0.5f, 0.5f);
             var img = go.AddComponent<Image>();
-            img.sprite = QhysicsUiStyle.WhiteSprite;
+            img.sprite = QhysicsUiStyle.RoundedSprite;
+            img.type = Image.Type.Sliced;
+            img.pixelsPerUnitMultiplier = 1f;
             img.color = color;
             img.material = QhysicsUiStyle.UiMaterial;
             img.raycastTarget = true;
@@ -132,14 +134,16 @@ namespace RealityEngine.UI
         // CircuitLab defines a global Button class that shadows UnityEngine.UI.Button.
         public static UiButton ChipButton(Transform parent, string name, string label, Vector2 size, UnityEngine.Events.UnityAction onClick)
         {
-            Image bg = Panel(parent, name, QhysicsUiStyle.ChipBg, size);
+            // Image stays white; the ColorBlock carries the real colours (tint multiplies, so no double-darkening).
+            Image bg = Panel(parent, name, Color.white, size);
             var btn = bg.gameObject.AddComponent<UiButton>();
             var colors = btn.colors;
             colors.normalColor = QhysicsUiStyle.ChipBg;
-            colors.highlightedColor = QhysicsUiStyle.ChipBgActive;
-            colors.pressedColor = QhysicsUiStyle.TabActive;
-            colors.selectedColor = QhysicsUiStyle.ChipBgActive;
+            colors.highlightedColor = QhysicsUiStyle.ChipBgHover;
+            colors.pressedColor = QhysicsUiStyle.ChipBgPressed;
+            colors.selectedColor = QhysicsUiStyle.ChipBg;
             colors.disabledColor = new Color(0.2f, 0.2f, 0.22f, 0.5f);
+            colors.fadeDuration = 0.08f;
             btn.colors = colors;
             btn.targetGraphic = bg;
             if (onClick != null)
@@ -156,6 +160,60 @@ namespace RealityEngine.UI
             return btn;
         }
 
+        /// <summary>Selected/idle state for a chip or tab: fill colour + thin cyan outline ring when selected.</summary>
+        public static void SetChipSelected(UiButton btn, bool selected)
+        {
+            if (btn == null)
+                return;
+            var colors = btn.colors;
+            colors.normalColor = selected ? QhysicsUiStyle.TabActive : QhysicsUiStyle.ChipBg;
+            colors.selectedColor = colors.normalColor;
+            btn.colors = colors;
+            if (btn.targetGraphic != null)
+                btn.targetGraphic.CrossFadeColor(colors.normalColor, 0f, true, true);
+            SetSelectionRing(btn.transform, selected);
+        }
+
+        /// <summary>Adds (once) and toggles a cyan rounded outline ring child on any rect.</summary>
+        public static void SetSelectionRing(Transform target, bool on)
+        {
+            if (target == null)
+                return;
+            Transform ring = target.Find("SelRing");
+            if (ring == null)
+            {
+                if (!on)
+                    return;
+                var go = new GameObject("SelRing", typeof(RectTransform));
+                go.transform.SetParent(target, false);
+                var rt = go.GetComponent<RectTransform>();
+                rt.anchorMin = Vector2.zero;
+                rt.anchorMax = Vector2.one;
+                rt.offsetMin = new Vector2(-2f, -2f);
+                rt.offsetMax = new Vector2(2f, 2f);
+                var img = go.AddComponent<Image>();
+                img.sprite = QhysicsUiStyle.RingSprite;
+                img.type = Image.Type.Sliced;
+                img.color = QhysicsUiStyle.AccentInfo;
+                img.material = QhysicsUiStyle.UiMaterial;
+                img.raycastTarget = false;
+                var le = go.AddComponent<LayoutElement>();
+                le.ignoreLayout = true;
+                ring = go.transform;
+            }
+            ring.gameObject.SetActive(on);
+        }
+
+        /// <summary>Thin vertical separator for strips.</summary>
+        public static Image Separator(Transform parent, float height)
+        {
+            Image sep = Panel(parent, "Sep", QhysicsUiStyle.Separator, new Vector2(2f, height));
+            sep.sprite = QhysicsUiStyle.WhiteSprite;
+            sep.type = Image.Type.Simple;
+            sep.raycastTarget = false;
+            return sep;
+        }
+
         public static void LayoutHorizontal(RectTransform row, float spacing)
         {
             var h = row.gameObject.GetComponent<HorizontalLayoutGroup>();
@@ -167,7 +225,7 @@ namespace RealityEngine.UI
             h.childControlWidth = false;
             h.childForceExpandHeight = true;
             h.childForceExpandWidth = false;
-            h.padding = new RectOffset(12, 12, 8, 8);
+            h.padding = new RectOffset(16, 16, 8, 8);
         }
 
         public static void LayoutVertical(RectTransform col, float spacing)

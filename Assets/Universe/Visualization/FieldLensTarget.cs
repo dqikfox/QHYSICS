@@ -22,7 +22,7 @@ namespace RealityEngine.Visualization
 
     /// <summary>
     /// Per-object Field Lens peel. Enables/disables child viz per layer.
-    /// Samples live sim (MagneticDipole.CalculateFieldAt, coil flux/EMF/I) â€” no decorative noise.
+    /// Samples live sim (MagneticDipole.CalculateFieldAt, coil flux/EMF/I) — no decorative noise.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensTarget : MonoBehaviour
@@ -533,7 +533,7 @@ namespace RealityEngine.Visualization
             string extra = "";
             FieldLensLayer L = (FieldLensLayer)_layer;
             if (L == FieldLensLayer.EnergyFlow)
-                extra = "\nEducational approximation â€” not a full EM energy-flow solver";
+                extra = "\nEducational approximation — not a full EM energy-flow solver";
             else if (L == FieldLensLayer.Atomic)
             {
                 extra = "\nNot a literal quantum state";

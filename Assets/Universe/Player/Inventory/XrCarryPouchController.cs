@@ -75,7 +75,7 @@ namespace RealityEngine.Player
             if (carry == null)
                 return;
 
-            // Prefer right hand axis, then left â€” either may drive pouch.
+            // Prefer right hand axis, then left — either may drive pouch.
             bool used = false;
             used |= PollHand(XRNode.RightHand, carry, ref _prevRightClick, ref _prevRightCycleLatch, ref _prevRightDropLatch);
             if (!used)

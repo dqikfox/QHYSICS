@@ -8,7 +8,7 @@ namespace RealityEngine.Visualization
 {
     /// <summary>
     /// Reality Engine lab style: restyles Faraday Circuit Lab meshes to a dark
-    /// graphite / copper scientific bench. Materials only â€” no gameplay, grab,
+    /// graphite / copper scientific bench. Materials only — no gameplay, grab,
     /// collider, XR Origin, or breadboard-layout changes.
     /// </summary>
     [DisallowMultipleComponent]
