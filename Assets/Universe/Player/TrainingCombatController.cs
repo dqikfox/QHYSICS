@@ -181,9 +181,8 @@ namespace RealityEngine.Player
             UnityEngine.XR.InputDevice device = InputDevices.GetDeviceAtXRNode(node);
             if (!device.isValid)
                 return false;
-            if (!device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.devicePosition, out Vector3 pos))
-                return false;
-            if (!device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.deviceRotation, out Quaternion rot))
+            // World pose (raw device pose is tracking space; wrong once the rig is at the plaza).
+            if (!XrTrackingSpace.TryGetWorldPose(node, out Vector3 pos, out Quaternion rot))
                 return false;
             origin = pos;
             dir = rot * Vector3.forward;

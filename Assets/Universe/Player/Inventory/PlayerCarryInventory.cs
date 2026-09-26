@@ -272,11 +272,8 @@ namespace RealityEngine.Player
             InputDevice device = InputDevices.GetDeviceAtXRNode(node);
             if (!device.isValid)
                 return false;
-            if (!device.TryGetFeatureValue(CommonUsages.devicePosition, out pos))
-                return false;
-            if (!device.TryGetFeatureValue(CommonUsages.deviceRotation, out rot))
-                return false;
-            return true;
+            // World pose (raw device pose is tracking space; wrong once the rig is at the plaza).
+            return XrTrackingSpace.TryGetWorldPose(node, out pos, out rot);
         }
 
         static Vector3 ResolveDropPose()
