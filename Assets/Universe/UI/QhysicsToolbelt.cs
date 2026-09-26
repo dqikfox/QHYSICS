@@ -21,9 +21,9 @@ namespace RealityEngine.UI
     {
         public const string RootName = "QhysicsToolbelt";
 
-        public enum Category { Build = 0, Physics = 1, Measure = 2, World = 3, Experiments = 4, Carry = 5 }
+        public enum Category { Build = 0, Physics = 1, Measure = 2, World = 3, Experiments = 4, Carry = 5, Combat = 6 }
 
-        static readonly string[] TabNames = { "BUILD", "PHYSICS", "MEASURE", "WORLD", "EXPERIMENTS", "CARRY" };
+        static readonly string[] TabNames = { "BUILD", "PHYSICS", "MEASURE", "WORLD", "EXPERIMENTS", "CARRY", "COMBAT" };
         const float TabWidth = 164f;
         static readonly string[][] ChipSets =
         {
@@ -32,7 +32,8 @@ namespace RealityEngine.UI
             new[] { "Multimeter", "Galvanometer", "Oscilloscope", "Frequency Counter", "Power Meter", "Flux Meter", "Charge Meter", "Voltmeter", "Ammeter", "Ohmmeter", "Capacitance Meter", "Inductance Meter", "Resonance Meter", "Impedance Meter", "Power Factor Meter", "Q Factor Meter", "Admittance Meter", "Decibel Meter", "Crest Factor Meter", "Energy Meter", "Duty Cycle Meter", "Slew Rate Meter", "Rise/Fall Meter", "Overshoot Meter", "Peak-to-Peak Meter", "Mean Meter", "Ripple Meter", "THD Meter", "Cubit Rod", "Probe", "Compass", "Stopwatch" },
             new[] { "Teleport", "Scale", "Sky", "Reset Pose", "Controls" },
             new[] { "Challenges", "Induction", "New Run", "Save", "Load" },
-            new string[0] // CARRY: filled live from PlayerCarryInventory (the old separate tools row)
+            new string[0], // CARRY: filled live from PlayerCarryInventory (the old separate tools row)
+            new[] { "Dagger", "Sword", "Spear", "Mace", "Shield", "Enemy", "Dummy", "Skills", "Arena" }
         };
 
         [SerializeField] bool visible;
@@ -88,25 +89,25 @@ namespace RealityEngine.UI
                 else DestroyImmediate(c.gameObject);
             }
 
-            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(1240f, 420f));
+            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(1320f, 420f));
             QhysicsUiBuilder.WireEventCamera(_canvas);
-            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(1200f, 380f));
+            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(1280f, 380f));
 
             var title = QhysicsUiBuilder.Label(face.transform, "Title", "TOOLBELT", QhysicsUiStyle.FontBody,
                 QhysicsUiStyle.AccentInfo, TextAlignmentOptions.MidlineLeft);
-            title.rectTransform.anchoredPosition = new Vector2(-460f, 150f);
+            title.rectTransform.anchoredPosition = new Vector2(-500f, 150f);
             title.rectTransform.sizeDelta = new Vector2(240f, 36f);
 
             var hint = QhysicsUiBuilder.Label(face.transform, "Hint", "Menu / B / Y / M to toggle", QhysicsUiStyle.FontSmall,
                 QhysicsUiStyle.TextMuted, TextAlignmentOptions.MidlineRight);
-            hint.rectTransform.anchoredPosition = new Vector2(360f, 150f);
+            hint.rectTransform.anchoredPosition = new Vector2(400f, 150f);
             hint.rectTransform.sizeDelta = new Vector2(360f, 28f);
 
             var tabRowGo = new GameObject("Tabs", typeof(RectTransform));
             tabRowGo.transform.SetParent(face.transform, false);
             var tabRow = tabRowGo.GetComponent<RectTransform>();
             tabRow.anchoredPosition = new Vector2(0f, 90f);
-            tabRow.sizeDelta = new Vector2(1160f, QhysicsUiStyle.TargetMinPx);
+            tabRow.sizeDelta = new Vector2(1240f, QhysicsUiStyle.TargetMinPx);
             QhysicsUiBuilder.LayoutHorizontal(tabRow, QhysicsUiStyle.Space1);
             _tabImages = new Image[TabNames.Length];
             _tabButtons = new UnityEngine.UI.Button[TabNames.Length];
@@ -123,7 +124,7 @@ namespace RealityEngine.UI
             chipGo.transform.SetParent(face.transform, false);
             _chipRow = chipGo.GetComponent<RectTransform>();
             _chipRow.anchoredPosition = new Vector2(0f, -40f);
-            _chipRow.sizeDelta = new Vector2(1160f, 160f);
+            _chipRow.sizeDelta = new Vector2(1240f, 160f);
             QhysicsUiBuilder.LayoutHorizontal(_chipRow, QhysicsUiStyle.Space2);
 
             _pageLabel = QhysicsUiBuilder.Label(face.transform, "PageHint", "", QhysicsUiStyle.FontSmall,
@@ -379,12 +380,31 @@ namespace RealityEngine.UI
             TrySpawnGadget(label);
         }
 
+        static bool TryCombatAction(string key)
+        {
+            switch (key)
+            {
+                case "dagger": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Dagger); return true;
+                case "sword": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Sword); return true;
+                case "spear": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Spear); return true;
+                case "mace": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Mace); return true;
+                case "shield": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Shield); return true;
+                case "enemy": RealityEngine.Combat.CombatBootstrap.SpawnEnemy(); return true;
+                case "dummy": RealityEngine.Combat.CombatBootstrap.SpawnDummy(); return true;
+                case "skills": RealityEngine.Combat.SkillsPanel.Open(); return true;
+                case "arena": RealityEngine.Combat.CombatBootstrap.ToggleArena(); return true;
+            }
+            return false;
+        }
+
         static bool TryLabAction(string label)
         {
             if (string.IsNullOrEmpty(label))
                 return false;
             string key = label.Trim().ToLowerInvariant();
 
+            if (TryCombatAction(key))
+                return true;
             if (key == "controls")
             {
                 QhysicsControlsOverlay.Toggle();

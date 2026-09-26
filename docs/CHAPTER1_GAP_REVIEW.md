@@ -170,3 +170,20 @@ New objective types needed for levels 6, 8 and 9 (add to `ObjectiveType`, evalua
 - **Audio:** `Assets/Sounds/QhysicsMixer.mixer` now tracked; `Assets/Resources/QhysicsAudioMixerRef.asset` references it, so `AudioRouter.LoadMixer()` succeeds and the Settings volume routes through `MasterVolume` (fallback to `AudioListener.volume` if the ref is ever missing). `QhysicsSfx` generates procedural clips (objective tick, complete arpeggio, chapter fanfare, unlock, UI tick, denied, plus combat sounds) on pooled sources routed to the SFX group.
 
 **Still open:** `requireSimultaneous` (objectives remain sticky), per-level intro cards, main menu v2, Play-verify every level on desktop + Quest Link, Quest perf items.
+
+## 6. Status update: combat layer (2026-09-27, compile-verified, not yet Play-tested)
+
+- **XR pose bug fixed** (`XrTrackingSpace`): baton aim, XR pickups, carry pouch and carry-equip read raw tracking-space poses, so they were wrong once the rig moved to the plaza. They now convert through `XR Origin/Camera Offset`.
+- **Physics melee:**
+  - Dagger, sword, spear, mace and shield are dynamic rigidbodies driven by clamped PD forces. Mass matters and weapons cannot pass through walls.
+  - Damage comes from velocity and part. Tips can stab and stick, and pull back out. Block and parry against enemy blades.
+- **Enemies:** force-driven sword AI (approach, wind-up, swing, block, stagger) that turns into a ragdoll on death, max 3. There are also training dummies and a procedural arena next to the plaza.
+- **Magic:** Fire, Lightning and Force, plus imbue, a mana pool and Focus slow-mo (the latter respects pause and sim speed).
+- **Progression:** XP (kills, challenges, parries), levels and a 12-skill tree saved to JSON. Reachable with K, the pause menu's Skills button, or the toolbelt COMBAT tab.
+- **Still open:**
+  - Play-tune: strengths, damage and the enemy timing.
+  - Active-ragdoll enemies (they are currently rigid until death).
+  - Enemy variety.
+  - A left-wrist HUD in XR (it currently floats low-left).
+  - Quest performance with 3 enemies and particles.
+  - Thumbstick smooth-turn while scrolling the challenge list.

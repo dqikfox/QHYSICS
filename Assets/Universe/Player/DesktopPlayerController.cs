@@ -314,6 +314,8 @@ namespace RealityEngine.Player
 
         static bool IsPauseOpen()
         {
+            if (RealityEngine.Combat.SkillsPanel.IsOpen)
+                return true; // free the cursor for the skill tree
             var pause = Object.FindFirstObjectByType<QhysicsPausePanel>(FindObjectsInactive.Include);
             return pause != null && pause.IsOpen;
         }

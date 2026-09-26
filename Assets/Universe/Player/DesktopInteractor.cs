@@ -80,6 +80,15 @@ namespace RealityEngine.Player
                 return;
             }
 
+            // Holding a physics weapon: PhysicsHands owns LMB/RMB/F/R until it is dropped.
+            if (RealityEngine.Combat.PhysicsHands.DesktopBusy)
+            {
+                if (_held != null)
+                    Drop(false);
+                ClearHover();
+                return;
+            }
+
             ResolveCamera();
             if (_cam == null)
                 return;
@@ -254,6 +263,17 @@ namespace RealityEngine.Player
         void TryGrab(Collider col)
         {
             if (col == null)
+                return;
+            // Physics weapons are force-driven by PhysicsHands (never kinematic-parented).
+            var weapon = col.GetComponentInParent<RealityEngine.Combat.PhysicsWeapon>();
+            if (weapon != null)
+            {
+                RealityEngine.Combat.PhysicsHands.Ensure().DesktopGrab(weapon);
+                return;
+            }
+            // Enemies, dummies and ragdoll parts are not carryable.
+            if (col.GetComponentInParent<RealityEngine.Combat.CombatHealth>() != null
+                || col.GetComponent<RealityEngine.Combat.BodyPart>() != null)
                 return;
             Transform root = col.transform;
             var grab = col.GetComponentInParent<XRGrabInteractable>();
