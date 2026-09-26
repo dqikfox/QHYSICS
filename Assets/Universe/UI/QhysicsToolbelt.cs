@@ -13,7 +13,7 @@ namespace RealityEngine.UI
 {
     /// <summary>
     /// Primary summoned toolbelt: BUILD / PHYSICS / MEASURE / WORLD / EXPERIMENTS tabs + tool chips.
-    /// Toggle via menu key, B button, or grip (Input System / legacy fallback).
+    /// Toggle via menu key, B/Y (secondary) button, M or Tab (Input System / legacy fallback).
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(201)]
@@ -30,7 +30,7 @@ namespace RealityEngine.UI
             new[] { "Magnet", "Coil", "Field Lens", "Dipole", "Crank Generator", "Mutual Coupler", "Spring Mass", "Pendulum", "Thin Lens", "Atwood", "Inclined Plane", "Lever", "Plate Cap", "Projectile", "Centripetal", "Collision", "Buoyancy", "Bernoulli", "Snell" },
             new[] { "Multimeter", "Galvanometer", "Oscilloscope", "Frequency Counter", "Power Meter", "Flux Meter", "Charge Meter", "Voltmeter", "Ammeter", "Ohmmeter", "Capacitance Meter", "Inductance Meter", "Resonance Meter", "Impedance Meter", "Power Factor Meter", "Q Factor Meter", "Admittance Meter", "Decibel Meter", "Crest Factor Meter", "Energy Meter", "Duty Cycle Meter", "Slew Rate Meter", "Rise/Fall Meter", "Overshoot Meter", "Peak-to-Peak Meter", "Mean Meter", "Ripple Meter", "THD Meter", "Cubit Rod", "Probe", "Compass", "Stopwatch" },
             new[] { "Teleport", "Scale", "Sky", "Reset Pose" },
-            new[] { "Induction", "New Run", "Save", "Load" }
+            new[] { "Challenges", "Induction", "New Run", "Save", "Load" }
         };
 
         [SerializeField] bool visible;
@@ -94,7 +94,7 @@ namespace RealityEngine.UI
             title.rectTransform.anchoredPosition = new Vector2(-420f, 150f);
             title.rectTransform.sizeDelta = new Vector2(240f, 36f);
 
-            var hint = QhysicsUiBuilder.Label(face.transform, "Hint", "Menu / B / Grip to toggle", QhysicsUiStyle.FontSmall,
+            var hint = QhysicsUiBuilder.Label(face.transform, "Hint", "Menu / B / Y / M to toggle", QhysicsUiStyle.FontSmall,
                 QhysicsUiStyle.TextMuted, TextAlignmentOptions.MidlineRight);
             hint.rectTransform.anchoredPosition = new Vector2(280f, 150f);
             hint.rectTransform.sizeDelta = new Vector2(360f, 28f);
@@ -303,6 +303,8 @@ namespace RealityEngine.UI
 
         void TryScrollChipPage()
         {
+            if (QhysicsUiScrollGate.IsCaptured)
+                return;
             string[] chips = ChipSets[(int)_category];
             int pageCount = Mathf.Max(1, (chips.Length + ChipsPerPage - 1) / ChipsPerPage);
             if (pageCount <= 1)
@@ -344,6 +346,11 @@ namespace RealityEngine.UI
                 return false;
             string key = label.Trim().ToLowerInvariant();
 
+            if (key == "challenges" || key == "challenge list")
+            {
+                RealityEngine.Challenges.ChallengeUi.ToggleListStatic();
+                return true;
+            }
             if (key == "new run" || key == "reset" || key == "reset experiment")
             {
                 QhysicsLabActions.ResetCircuitLab();
@@ -413,8 +420,8 @@ namespace RealityEngine.UI
             {
                 if (!(devices[i] is UnityEngine.InputSystem.XR.XRController xr))
                     continue;
-                if (TryButton(xr, "menuButton") || TryButton(xr, "secondaryButton")
-                    || TryButton(xr, "gripButton"))
+                // Grip is NOT a toggle any more: it is the grab button (weapons, gadgets, pickups).
+                if (TryButton(xr, "menuButton") || TryButton(xr, "secondaryButton"))
                     return true;
             }
 #endif

@@ -38,6 +38,14 @@ Honesty: poses of spawned `Gadget_*` / `*_Desktop` only — NOT CircuitLab bread
 
 ---
 
+## Challenges & chapters (2026-09-27)
+
+- **Open the list:** `C` (desktop), toolbelt **EXPERIMENTS → Challenges** (XR + desktop), or pause menu (**Esc**) → **Challenges**.
+- **Chapter tabs:** "Ch 1: Faraday's Bench" (10 curated levels, unlock in order) and "Sandbox / Extra" (all other challenges, original unlock chain).
+- **Scroll:** XR ray drag on the list, right (or left) thumbstick up/down while the list is open, mouse wheel, or the UP / DOWN buttons. The hotbar/pouch ignore the wheel/stick while the list is open.
+- **SFX:** objective complete (two-note chime), challenge complete (arpeggio), chapter complete (fanfare). All go through the QhysicsMixer SFX group; Settings master volume now routes through the mixer.
+- New levels: **Bench Orientation** (spawn any gadget), **Lines of Force** (Compass + Magnet/Dipole, |B| ≥ 150 µT), **The Dynamo** (Crank Generator near the coil, |EMF| ≥ 0.01 V for 2 s), **Transformer** (Mutual Coupler MED/STRONG, then switch the primary; |Es| ≥ 0.1 mV).
+
 ## One Editor only
 
 - Project: `C:\Users\KING\projects\QHYSICS`

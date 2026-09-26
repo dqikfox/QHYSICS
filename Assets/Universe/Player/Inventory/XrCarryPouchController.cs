@@ -64,8 +64,9 @@ namespace RealityEngine.Player
                 ResetEdges();
                 return;
             }
-            if (IsPauseOrOperatorOpen())
+            if (IsPauseOrOperatorOpen() || QhysicsUiScrollGate.IsCaptured)
             {
+                // Challenge list / skills panel use the thumbstick to scroll while open.
                 ResetEdges();
                 return;
             }

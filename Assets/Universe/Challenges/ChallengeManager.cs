@@ -3,6 +3,8 @@ using System.Reflection;
 using UnityEngine;
 using RealityEngine.Physics.Electromagnetism;
 using RealityEngine.Stations;
+using RealityEngine.Player;
+using RealityEngine.Systems;
 
 namespace RealityEngine.Challenges
 {
@@ -153,6 +155,13 @@ namespace RealityEngine.Challenges
         /// <summary>Peak |EMF| seen while the active challenge runs (latched; cleared on start/RESET).</summary>
         float _peakInducedEmf;
 
+        /// <summary>Peak |secondary EMF| from coupled mutual couplers (latched; cleared on start/RESET).</summary>
+        float _peakMutualEmf;
+        LoadMutualCouplerGadget[] _couplers;
+        LoadCrankGeneratorGadget[] _cranks;
+        LoadCompassGadget[] _compasses;
+        float _gadgetRefreshTimer = 99f;
+
         // Ã¢â€â‚¬Ã¢â€â‚¬ Self-spawning Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -187,6 +196,7 @@ namespace RealityEngine.Challenges
             }
             _instance = this;
             Campaign = BuildStarterCampaign();
+            ChapterCatalog.Build(Campaign);
             _progress = ChallengeProgress.Load();
             ApplyUnlockState();
         }
@@ -205,6 +215,7 @@ namespace RealityEngine.Challenges
             ElapsedTime += Time.deltaTime;
             // Sample every frame so brief Faraday spikes are not missed by the 5 Hz poll.
             SamplePeakInducedEmf();
+            SamplePeakMutualEmf();
             _pollTimer += Time.deltaTime;
 
             if (_pollTimer >= PollInterval)
@@ -217,7 +228,7 @@ namespace RealityEngine.Challenges
         // Ã¢â€â‚¬Ã¢â€â‚¬ Campaign Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
         /// <summary>
-        /// Build the starter campaign of 43 challenges with real, detectable conditions.
+        /// Build the starter campaign (43 original + 4 Chapter 1 additions) with real, detectable conditions.
         /// Thresholds chosen from what the sims actually expose.
         /// </summary>
         static ChallengeDefinition[] BuildStarterCampaign()
@@ -1730,6 +1741,123 @@ namespace RealityEngine.Challenges
                         threeStarMaxComponents = 18
                     }
                 }
+                ,
+                // ── Chapter 1 "Faraday's Bench" additions (see ChapterCatalog) ──
+                new ChallengeDefinition
+                {
+                    id = "bench_orientation",
+                    title = "Bench Orientation",
+                    description = "Welcome to Faraday's bench. Take any gadget from the toolbelt (M / Tab or the menu button) and place it on the bench.",
+                    mentorHint = "Open the toolbelt, pick a tab, press a gadget chip. Anything named Gadget_* that you spawn counts. Try the Multimeter or Compass.",
+                    prerequisiteId = "",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.GadgetPresent,
+                            displayText = "Place any gadget from the toolbelt",
+                            targetTag = "Gadget_",
+                            targetCount = 1
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 90f,
+                        threeStarTimeSeconds = 40f,
+                        threeStarMaxComponents = 0
+                    }
+                },
+                new ChallengeDefinition
+                {
+                    id = "lines_of_force",
+                    title = "Lines of Force",
+                    description = "A magnet has a field you can map. Place a Compass, then bring a Magnet or Dipole close until the compass reads at least 3x Earth's field (150 uT).",
+                    mentorHint = "Earth gives ~50 uT. A dipole falls off as 1/r^3, so halving the distance gives 8x the field. Move the magnet slowly toward the compass.",
+                    prerequisiteId = "spin_up",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.GadgetPresent,
+                            displayText = "Place a Compass",
+                            targetTag = "Gadget_Compass",
+                            targetCount = 1
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.CompassFieldThreshold,
+                            displayText = "Compass horizontal |B| >= 150 uT (magnet nearby)",
+                            targetValue = 1.5e-4f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 120f,
+                        threeStarTimeSeconds = 60f,
+                        threeStarMaxComponents = 0
+                    }
+                },
+                new ChallengeDefinition
+                {
+                    id = "the_dynamo",
+                    title = "The Dynamo",
+                    description = "Continuous motion gives continuous EMF. Place a Hand Crank generator near the Induction coil and keep it cranking with peak |EMF| >= 0.01 V for 2 seconds.",
+                    mentorHint = "The crank spins a magnet next to the coil (Faraday: EMF = -dPhi/dt). Faster presets (FAST / TURBO) change the flux faster. Keep it within ~1 m of the coil.",
+                    prerequisiteId = "induction",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.GadgetPresent,
+                            displayText = "Place a Hand Crank generator",
+                            targetTag = "Gadget_CrankGenerator",
+                            targetCount = 1
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.CrankEmfThreshold,
+                            displayText = "Crank: peak |EMF| >= 0.01 V held 2 s",
+                            targetValue = 0.01f,
+                            targetCount = 2
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 150f,
+                        threeStarTimeSeconds = 75f,
+                        threeStarMaxComponents = 0
+                    }
+                },
+                new ChallengeDefinition
+                {
+                    id = "transformer",
+                    title = "Transformer",
+                    description = "Finale: a changing current in one coil induces EMF in another. Place a Mutual Coupler between two coils, set it to MED or STRONG, then change the primary current (switch it or move a magnet).",
+                    mentorHint = "Es = -M dIp/dt. A steady current induces nothing; only a change does. With M = 2 mH a 1 A/s change gives 2 mV. Toggle the primary circuit to create a spike.",
+                    prerequisiteId = "the_dynamo",
+                    objectives = new[]
+                    {
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.GadgetPresent,
+                            displayText = "Place a Mutual Coupler",
+                            targetTag = "Gadget_MutualCoupler",
+                            targetCount = 1
+                        },
+                        new ChallengeObjective
+                        {
+                            type = ObjectiveType.MutualEmfThreshold,
+                            displayText = "Peak secondary |EMF| >= 0.1 mV while coupled",
+                            targetValue = 1e-4f
+                        }
+                    },
+                    starThresholds = new StarThresholds
+                    {
+                        twoStarTimeSeconds = 180f,
+                        threeStarTimeSeconds = 90f,
+                        threeStarMaxComponents = 0
+                    }
+                }
             };
 
         }
@@ -1751,6 +1879,24 @@ namespace RealityEngine.Challenges
                     ChallengeEntry prereq = FindEntry(def.prerequisiteId);
                     if (prereq != null && prereq.stars > 0)
                         entry.unlocked = true;
+                }
+
+                // Chapter rule: the previous entry in the same chapter has stars > 0 (or this is the chapter's first entry).
+                string prevInChapter;
+                if (ChapterCatalog.TryGetPreviousInChapter(def.id, out prevInChapter))
+                {
+                    if (string.IsNullOrEmpty(prevInChapter))
+                    {
+                        ChapterDefinition ch = ChapterCatalog.GetChapterFor(def.id);
+                        if (ch != null && ch.order == 1)
+                            entry.unlocked = true;
+                    }
+                    else
+                    {
+                        ChallengeEntry prev = FindEntry(prevInChapter);
+                        if (prev != null && prev.stars > 0)
+                            entry.unlocked = true;
+                    }
                 }
             }
             ChallengeProgress.Save(_progress);
@@ -1826,6 +1972,7 @@ namespace RealityEngine.Challenges
             LastComponentCount = 0;
             _pollTimer = 0f;
             _peakInducedEmf = 0f;
+            _peakMutualEmf = 0f;
             _refsValid = false; // force refresh on first poll
             if (def.id == "induction")
                 EnsureInductionBound();
@@ -1841,6 +1988,7 @@ namespace RealityEngine.Challenges
             ActiveObjectives = null;
             ElapsedTime = 0f;
             _peakInducedEmf = 0f;
+            _peakMutualEmf = 0f;
             if (OnChallengeAbandoned != null)
                 OnChallengeAbandoned.Invoke();
         }
@@ -1858,6 +2006,7 @@ namespace RealityEngine.Challenges
             LastComponentCount = 0;
             _pollTimer = 0f;
             _peakInducedEmf = 0f;
+            _peakMutualEmf = 0f;
             _refsValid = false;
         }
 
@@ -1873,7 +2022,11 @@ namespace RealityEngine.Challenges
             for (int i = 0; i < Campaign.Length; i++)
             {
                 ChallengeDefinition def = Campaign[i];
-                if (def != null && def.prerequisiteId == completedId && !string.IsNullOrEmpty(def.title))
+                if (def == null || string.IsNullOrEmpty(def.title))
+                    continue;
+                string prevInChapter;
+                bool chapterNext = ChapterCatalog.TryGetPreviousInChapter(def.id, out prevInChapter) && prevInChapter == completedId;
+                if ((def.prerequisiteId == completedId || chapterNext) && !titles.Contains(def.title))
                     titles.Add(def.title);
             }
             return titles.ToArray();
@@ -1959,6 +2112,22 @@ namespace RealityEngine.Challenges
 
                 case ObjectiveType.CircuitPowerThreshold:
                     return GetMaxCircuitPower() >= (obj.targetValue > 0f ? obj.targetValue : 0.05f);
+
+                case ObjectiveType.GadgetPresent:
+                    return CountGadgets(obj.targetTag) >= Mathf.Max(1, obj.targetCount);
+
+                case ObjectiveType.CompassFieldThreshold:
+                    return GetMaxCompassField() >= (obj.targetValue > 0f ? obj.targetValue : 1.5e-4f);
+
+                case ObjectiveType.CrankEmfThreshold:
+                {
+                    bool ok = GetCrankEmf(true) >= (obj.targetValue > 0f ? obj.targetValue : 0.01f);
+                    obj.heldSeconds = ok ? obj.heldSeconds + PollInterval : 0f;
+                    return obj.heldSeconds >= Mathf.Max(0.2f, obj.targetCount);
+                }
+
+                case ObjectiveType.MutualEmfThreshold:
+                    return _peakMutualEmf >= (obj.targetValue > 0f ? obj.targetValue : 1e-4f);
 
                 default:
                     return false;
@@ -2150,6 +2319,104 @@ namespace RealityEngine.Challenges
             return _peakInducedEmf;
         }
 
+        // ── Chapter 1 gadget objectives (compass / crank / mutual coupler / gadget present) ──
+
+        void RefreshGadgetRefs(bool force)
+        {
+            _gadgetRefreshTimer += Time.unscaledDeltaTime;
+            if (!force && _gadgetRefreshTimer < 1f && _couplers != null)
+                return;
+            _gadgetRefreshTimer = 0f;
+            _couplers = UnityEngine.Object.FindObjectsByType<LoadMutualCouplerGadget>(FindObjectsInactive.Exclude);
+            _cranks = UnityEngine.Object.FindObjectsByType<LoadCrankGeneratorGadget>(FindObjectsInactive.Exclude);
+            _compasses = UnityEngine.Object.FindObjectsByType<LoadCompassGadget>(FindObjectsInactive.Exclude);
+        }
+
+        bool ActiveNeedsType(ObjectiveType t)
+        {
+            if (ActiveObjectives == null)
+                return false;
+            for (int i = 0; i < ActiveObjectives.Length; i++)
+            {
+                if (ActiveObjectives[i] != null && ActiveObjectives[i].type == t)
+                    return true;
+            }
+            return false;
+        }
+
+        void SamplePeakMutualEmf()
+        {
+            if (!ActiveNeedsType(ObjectiveType.MutualEmfThreshold))
+                return;
+            RefreshGadgetRefs(false);
+            if (_couplers == null)
+                return;
+            for (int i = 0; i < _couplers.Length; i++)
+            {
+                LoadMutualCouplerGadget c = _couplers[i];
+                if (c == null || !c.IsCoupled)
+                    continue;
+                float a = Mathf.Abs(c.MutualEmfVolts);
+                if (a > _peakMutualEmf)
+                    _peakMutualEmf = a;
+            }
+        }
+
+        float GetMaxCompassField()
+        {
+            RefreshGadgetRefs(false);
+            float best = 0f;
+            if (_compasses == null)
+                return 0f;
+            for (int i = 0; i < _compasses.Length; i++)
+            {
+                if (_compasses[i] != null)
+                    best = Mathf.Max(best, _compasses[i].HorizontalFieldTesla);
+            }
+            return best;
+        }
+
+        float GetCrankEmf(bool requireCranking)
+        {
+            RefreshGadgetRefs(false);
+            float best = 0f;
+            if (_cranks == null)
+                return 0f;
+            for (int i = 0; i < _cranks.Length; i++)
+            {
+                LoadCrankGeneratorGadget c = _cranks[i];
+                if (c == null)
+                    continue;
+                if (requireCranking && !c.IsCranking)
+                    continue;
+                best = Mathf.Max(best, c.PeakAbsEmfNearby);
+            }
+            return best;
+        }
+
+        static string _gadgetCountPrefix;
+        static float _gadgetCountTime = -99f;
+        static int _gadgetCountValue;
+
+        static int CountGadgets(string prefix)
+        {
+            string p = string.IsNullOrEmpty(prefix) ? "Gadget_" : prefix;
+            // Cached ~0.5 s: CollectSpawnedRoots walks every Transform (readout is queried per UI refresh).
+            if (p == _gadgetCountPrefix && Time.unscaledTime - _gadgetCountTime < 0.5f)
+                return _gadgetCountValue;
+            _gadgetCountPrefix = p;
+            _gadgetCountTime = Time.unscaledTime;
+            var roots = LabSandboxSave.CollectSpawnedRoots();
+            int n = 0;
+            for (int i = 0; i < roots.Count; i++)
+            {
+                if (roots[i] != null && roots[i].name.StartsWith(p, StringComparison.Ordinal))
+                    n++;
+            }
+            _gadgetCountValue = n;
+            return n;
+        }
+
         void SamplePeakInducedEmf()
         {
             if (_inductionCircuit == null)
@@ -2244,6 +2511,28 @@ namespace RealityEngine.Challenges
                     int lit = CountActiveBulbs();
                     return w.ToString("0.00") + "/" + need.ToString("0.00") + " W lit=" + (lit >= 1 ? "1" : "0");
                 }
+                case ObjectiveType.GadgetPresent:
+                {
+                    int n = CountGadgets(obj.targetTag);
+                    return n.ToString() + "/" + Mathf.Max(1, obj.targetCount).ToString() + " placed";
+                }
+                case ObjectiveType.CompassFieldThreshold:
+                {
+                    float b = GetMaxCompassField();
+                    float need = obj.targetValue > 0f ? obj.targetValue : 1.5e-4f;
+                    return (b * 1e6f).ToString("0") + "/" + (need * 1e6f).ToString("0") + " uT";
+                }
+                case ObjectiveType.CrankEmfThreshold:
+                {
+                    float e = GetCrankEmf(false);
+                    float need = obj.targetValue > 0f ? obj.targetValue : 0.01f;
+                    return e.ToString("0.000") + "/" + need.ToString("0.000") + " V hold " + obj.heldSeconds.ToString("0.0") + "/" + Mathf.Max(0.2f, obj.targetCount).ToString("0") + " s";
+                }
+                case ObjectiveType.MutualEmfThreshold:
+                {
+                    float need = obj.targetValue > 0f ? obj.targetValue : 1e-4f;
+                    return "pk " + (_peakMutualEmf * 1000f).ToString("0.000") + "/" + (need * 1000f).ToString("0.000") + " mV";
+                }
                 default:
                     return string.Empty;
             }
@@ -2292,6 +2581,7 @@ namespace RealityEngine.Challenges
             ActiveObjectives = null;
             ElapsedTime = 0f;
             _peakInducedEmf = 0f;
+            _peakMutualEmf = 0f;
         }
 
         int CalculateStars(ChallengeDefinition def, float time, int componentCount)
@@ -2322,7 +2612,9 @@ namespace RealityEngine.Challenges
                 return;
             foreach (ChallengeDefinition def in Campaign)
             {
-                if (def.prerequisiteId == completedId)
+                string prevInChapter;
+                bool chapterNext = ChapterCatalog.TryGetPreviousInChapter(def.id, out prevInChapter) && prevInChapter == completedId;
+                if (def.prerequisiteId == completedId || chapterNext)
                 {
                     ChallengeEntry entry = ChallengeProgress.GetOrCreate(_progress, def.id, false);
                     entry.unlocked = true;
