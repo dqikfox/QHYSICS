@@ -511,22 +511,13 @@ namespace RealityEngine.Challenges
             ChapterDefinition chapter = chapters[_chapterIndex];
 
             for (int t = 0; t < _chapterTabs.Count; t++)
-            {
-                if (_chapterTabs[t] == null)
-                    continue;
-                var img = _chapterTabs[t].targetGraphic as Image;
-                var colors = _chapterTabs[t].colors;
-                colors.normalColor = t == _chapterIndex ? QhysicsUiStyle.TabActive : QhysicsUiStyle.TabIdle;
-                _chapterTabs[t].colors = colors;
-                if (img != null)
-                    img.color = colors.normalColor;
-            }
+                QhysicsUiBuilder.SetChipSelected(_chapterTabs[t], t == _chapterIndex);
 
             if (_chapterSubtitle != null)
             {
                 int stars = ChapterCatalog.CountStars(chapter, _manager);
                 int max = (chapter.challengeIds != null ? chapter.challengeIds.Length : 0) * 3;
-                _chapterSubtitle.text = chapter.subtitle + "   \u2605 " + stars + "/" + max;
+                _chapterSubtitle.text = chapter.subtitle + "   |   Stars " + stars + "/" + max;
             }
 
             if (chapter.challengeIds != null)
@@ -611,13 +602,9 @@ namespace RealityEngine.Challenges
 
         static string FormatStars(int stars)
         {
-            switch (stars)
-            {
-                case 0: return "\u2606\u2606\u2606";
-                case 1: return "\u2605\u2606\u2606";
-                case 2: return "\u2605\u2605\u2606";
-                default: return "\u2605\u2605\u2605";
-            }
+            // ASCII stars (LiberationSans has no U+2605): lit '*' in gold, unlit in grey.
+            int n = Mathf.Clamp(stars, 0, 3);
+            return "<color=#F2D140>" + new string('*', n) + "</color><color=#5A636D>" + new string('*', 3 - n) + "</color>";
         }
 
         void OnStartClick(string challengeId)
@@ -685,7 +672,7 @@ namespace RealityEngine.Challenges
                 for (int i = 0; i < _manager.ActiveObjectives.Length; i++)
                 {
                     ChallengeObjective obj = _manager.ActiveObjectives[i];
-                    sb.Append(obj.completed ? "\u2713 " : "\u25CB ");
+                    sb.Append(obj.completed ? "<color=#59E673>[x]</color> " : "[ ] ");
                     sb.Append(obj.displayText);
                     string live = _manager.GetObjectiveLiveReadout(obj);
                     if (!string.IsNullOrEmpty(live))

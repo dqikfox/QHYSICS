@@ -21,16 +21,18 @@ namespace RealityEngine.UI
     {
         public const string RootName = "QhysicsToolbelt";
 
-        public enum Category { Build = 0, Physics = 1, Measure = 2, World = 3, Experiments = 4 }
+        public enum Category { Build = 0, Physics = 1, Measure = 2, World = 3, Experiments = 4, Carry = 5 }
 
-        static readonly string[] TabNames = { "BUILD", "PHYSICS", "MEASURE", "WORLD", "EXPERIMENTS" };
+        static readonly string[] TabNames = { "BUILD", "PHYSICS", "MEASURE", "WORLD", "EXPERIMENTS", "CARRY" };
+        const float TabWidth = 164f;
         static readonly string[][] ChipSets =
         {
             new[] { "Wire", "Battery", "Switch", "Bulb", "Resistor", "Lamp", "Motor", "Solar", "Capacitor", "Inductor", "Diode", "Fuse", "LED", "Speaker", "Potentiometer", "Transformer", "Function Generator" },
             new[] { "Magnet", "Coil", "Field Lens", "Dipole", "Crank Generator", "Mutual Coupler", "Spring Mass", "Pendulum", "Thin Lens", "Atwood", "Inclined Plane", "Lever", "Plate Cap", "Projectile", "Centripetal", "Collision", "Buoyancy", "Bernoulli", "Snell" },
             new[] { "Multimeter", "Galvanometer", "Oscilloscope", "Frequency Counter", "Power Meter", "Flux Meter", "Charge Meter", "Voltmeter", "Ammeter", "Ohmmeter", "Capacitance Meter", "Inductance Meter", "Resonance Meter", "Impedance Meter", "Power Factor Meter", "Q Factor Meter", "Admittance Meter", "Decibel Meter", "Crest Factor Meter", "Energy Meter", "Duty Cycle Meter", "Slew Rate Meter", "Rise/Fall Meter", "Overshoot Meter", "Peak-to-Peak Meter", "Mean Meter", "Ripple Meter", "THD Meter", "Cubit Rod", "Probe", "Compass", "Stopwatch" },
-            new[] { "Teleport", "Scale", "Sky", "Reset Pose" },
-            new[] { "Challenges", "Induction", "New Run", "Save", "Load" }
+            new[] { "Teleport", "Scale", "Sky", "Reset Pose", "Controls" },
+            new[] { "Challenges", "Induction", "New Run", "Save", "Load" },
+            new string[0] // CARRY: filled live from PlayerCarryInventory (the old separate tools row)
         };
 
         [SerializeField] bool visible;
@@ -41,6 +43,7 @@ namespace RealityEngine.UI
         Canvas _canvas;
         RectTransform _chipRow;
         Image[] _tabImages;
+        UnityEngine.UI.Button[] _tabButtons;
         Camera _cam;
         Transform _hip;
         float _spawnCooldown;
@@ -85,41 +88,43 @@ namespace RealityEngine.UI
                 else DestroyImmediate(c.gameObject);
             }
 
-            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(1100f, 420f));
+            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(1240f, 420f));
             QhysicsUiBuilder.WireEventCamera(_canvas);
-            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(1060f, 380f));
+            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(1200f, 380f));
 
             var title = QhysicsUiBuilder.Label(face.transform, "Title", "TOOLBELT", QhysicsUiStyle.FontBody,
                 QhysicsUiStyle.AccentInfo, TextAlignmentOptions.MidlineLeft);
-            title.rectTransform.anchoredPosition = new Vector2(-420f, 150f);
+            title.rectTransform.anchoredPosition = new Vector2(-460f, 150f);
             title.rectTransform.sizeDelta = new Vector2(240f, 36f);
 
             var hint = QhysicsUiBuilder.Label(face.transform, "Hint", "Menu / B / Y / M to toggle", QhysicsUiStyle.FontSmall,
                 QhysicsUiStyle.TextMuted, TextAlignmentOptions.MidlineRight);
-            hint.rectTransform.anchoredPosition = new Vector2(280f, 150f);
+            hint.rectTransform.anchoredPosition = new Vector2(360f, 150f);
             hint.rectTransform.sizeDelta = new Vector2(360f, 28f);
 
             var tabRowGo = new GameObject("Tabs", typeof(RectTransform));
             tabRowGo.transform.SetParent(face.transform, false);
             var tabRow = tabRowGo.GetComponent<RectTransform>();
             tabRow.anchoredPosition = new Vector2(0f, 90f);
-            tabRow.sizeDelta = new Vector2(1000f, QhysicsUiStyle.TargetMinPx);
-            QhysicsUiBuilder.LayoutHorizontal(tabRow, 10f);
+            tabRow.sizeDelta = new Vector2(1160f, QhysicsUiStyle.TargetMinPx);
+            QhysicsUiBuilder.LayoutHorizontal(tabRow, QhysicsUiStyle.Space1);
             _tabImages = new Image[TabNames.Length];
+            _tabButtons = new UnityEngine.UI.Button[TabNames.Length];
             for (int i = 0; i < TabNames.Length; i++)
             {
                 int idx = i;
                 var btn = QhysicsUiBuilder.ChipButton(tabRow, "Tab_" + TabNames[i], TabNames[i],
-                    new Vector2(180f, QhysicsUiStyle.TargetMinPx), () => SelectCategory((Category)idx));
+                    new Vector2(TabWidth, QhysicsUiStyle.TargetMinPx), () => SelectCategory((Category)idx));
                 _tabImages[i] = btn.targetGraphic as Image;
+                _tabButtons[i] = btn;
             }
 
             var chipGo = new GameObject("Chips", typeof(RectTransform));
             chipGo.transform.SetParent(face.transform, false);
             _chipRow = chipGo.GetComponent<RectTransform>();
             _chipRow.anchoredPosition = new Vector2(0f, -40f);
-            _chipRow.sizeDelta = new Vector2(1000f, 160f);
-            QhysicsUiBuilder.LayoutHorizontal(_chipRow, 14f);
+            _chipRow.sizeDelta = new Vector2(1160f, 160f);
+            QhysicsUiBuilder.LayoutHorizontal(_chipRow, QhysicsUiStyle.Space2);
 
             _pageLabel = QhysicsUiBuilder.Label(face.transform, "PageHint", "", QhysicsUiStyle.FontSmall,
                 QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
@@ -132,7 +137,7 @@ namespace RealityEngine.UI
 
         void Update()
         {
-            if (WasTogglePressed())
+            if (WasTogglePressed() && QhysicsUiState.GameplayHudVisible)
                 Toggle();
             if (visible)
                 TryScrollChipPage();
@@ -170,7 +175,7 @@ namespace RealityEngine.UI
             if (_cam == null)
                 return;
 
-            // Worn at hip/chest of DesktopBody / XR Origin ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â lag follow, not glued to HMD.
+            // Worn at hip/chest of DesktopBody / XR Origin — lag follow, not glued to HMD.
             Vector3 anchorPos;
             Vector3 flatFwd;
             if (_hip != null)
@@ -233,11 +238,8 @@ namespace RealityEngine.UI
         {
             _category = cat;
             _chipPage = 0;
-            for (int i = 0; i < _tabImages.Length; i++)
-            {
-                if (_tabImages[i] != null)
-                    _tabImages[i].color = i == (int)cat ? QhysicsUiStyle.TabActive : QhysicsUiStyle.TabIdle;
-            }
+            for (int i = 0; i < _tabButtons.Length; i++)
+                QhysicsUiBuilder.SetChipSelected(_tabButtons[i], i == (int)cat);
             RebuildChips();
         }
 
@@ -250,6 +252,11 @@ namespace RealityEngine.UI
                 Transform c = _chipRow.GetChild(i);
                 if (Application.isPlaying) Destroy(c.gameObject);
                 else DestroyImmediate(c.gameObject);
+            }
+            if (_category == Category.Carry)
+            {
+                RebuildCarryChips();
+                return;
             }
             string[] chips = ChipSets[(int)_category];
             int pageCount = Mathf.Max(1, (chips.Length + ChipsPerPage - 1) / ChipsPerPage);
@@ -286,6 +293,38 @@ namespace RealityEngine.UI
                 else
                     _pageLabel.text = "";
             }
+        }
+
+        /// <summary>CARRY tab: the carry slots (formerly the separate tools row). Click = select + use/equip.</summary>
+        void RebuildCarryChips()
+        {
+            var carry = PlayerCarryInventory.Instance;
+            if (carry == null || carry.SlotCount == 0)
+            {
+                if (_pageLabel != null)
+                    _pageLabel.text = "No carry pouch yet";
+                return;
+            }
+            for (int i = 0; i < carry.SlotCount && i < 6; i++)
+            {
+                int idx = i;
+                CarryItemId id = carry.GetSlot(i);
+                string label = id == CarryItemId.None ? "empty" : CarryItemCatalog.LabelOf(id);
+                var chip = QhysicsUiBuilder.ChipButton(_chipRow, "Carry_" + i, label, new Vector2(170f, 96f), () => OnCarryChip(idx));
+                QhysicsUiBuilder.SetChipSelected(chip, i == carry.SelectedIndex || i == carry.EquippedSlot);
+            }
+            if (_pageLabel != null)
+                _pageLabel.text = "CARRY  |  tap = equip / use  |  desktop [ ] U X  |  VR right stick L/R + click";
+        }
+
+        void OnCarryChip(int index)
+        {
+            var carry = PlayerCarryInventory.Instance;
+            if (carry == null)
+                return;
+            carry.Select(index);
+            carry.TryUseOrEquipSelected();
+            RebuildChips();
         }
 
         void ShiftChipPage(int delta)
@@ -346,6 +385,11 @@ namespace RealityEngine.UI
                 return false;
             string key = label.Trim().ToLowerInvariant();
 
+            if (key == "controls")
+            {
+                QhysicsControlsOverlay.Toggle();
+                return true;
+            }
             if (key == "challenges" || key == "challenge list")
             {
                 RealityEngine.Challenges.ChallengeUi.ToggleListStatic();

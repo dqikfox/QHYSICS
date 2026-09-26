@@ -15,7 +15,7 @@ namespace RealityEngine.UI
         const string PrefKey = "QHYSICS.Onboarding.Dismissed";
 
         const string StripText =
-            "BOOT → ENTER Sandbox → INTERACT (E/grip) → EXPERIMENT  ·  M/Tab toolbelt  ·  Esc pause  ·  [X]";
+            "ENTER Sandbox  >  INTERACT (E / grip)  >  EXPERIMENT   |   M / Tab toolbelt   |   F1 controls";
 
         Canvas _canvas;
         TextMeshProUGUI _body;
@@ -71,17 +71,20 @@ namespace RealityEngine.UI
 
             _ready = true;
 
-            bool dismissed = PlayerPrefs.GetInt(PrefKey, 0) == 1;
-            if (dismissed || !Application.isPlaying)
-                SetVisible(false);
-            else
-                SetVisible(true);
+            // 2026-09-27 declutter: the permanent breadcrumb strip is hidden by default; the same guidance now
+            // appears once as the fading first-run hint card (QhysicsHintCard). ResetAndShow() still brings it back.
+            SetVisible(false);
         }
 
         void LateUpdate()
         {
             if (!_ready || _canvas == null || !_canvas.gameObject.activeSelf)
                 return;
+            if (!QhysicsUiState.GameplayHudVisible)
+            {
+                SetVisible(false);
+                return;
+            }
             if (_cam == null)
                 _cam = QhysicsUiBuilder.ResolveXrCamera();
             if (_cam == null)

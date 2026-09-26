@@ -70,6 +70,10 @@ namespace RealityEngine.UI
             QhysicsMainMenu.Ensure(root);
             QhysicsOperatorSelectPanel.Ensure(root);
             QhysicsCarryHud.Ensure(root);
+            // 2026-09-27 declutter: one top status strip, one transient hint card, F1 controls overlay.
+            QhysicsStatusStrip.Ensure(root);
+            QhysicsHintCard.Ensure(root);
+            QhysicsControlsOverlay.Ensure(root);
 
             var canvases = root.GetComponentsInChildren<Canvas>(true);
             for (int i = 0; i < canvases.Length; i++)

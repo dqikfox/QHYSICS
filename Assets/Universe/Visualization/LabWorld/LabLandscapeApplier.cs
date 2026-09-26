@@ -32,7 +32,7 @@ namespace RealityEngine.Visualization
 
         static readonly string[] HideContains =
         {
-            // Prefer exact meadow/RHEF tokens. Do NOT use bare "tree"/"grass" â€” too broad.
+            // Prefer exact meadow/RHEF tokens. Do NOT use bare "tree"/"grass" — too broad.
             "waterblock", "meadow", "rhef_spruce", "rhef_pine", "rhef_tree",
             "rhef_grass", "rhef_bush", "rhef_"
         };
@@ -196,7 +196,7 @@ namespace RealityEngine.Visualization
         static bool ShouldKeep(Transform t)
         {
             // Keep MountainScene ONLY on the transform itself (sky/distant).
-            // Do NOT keep because an ancestor is MountainScene â€” Faraday Terrain/Trees
+            // Do NOT keep because an ancestor is MountainScene — Faraday Terrain/Trees
             // live under MountainScene and must still be hidden/disabled.
             string self = SafeLower(t.name);
             if (self.Contains("mountainscene"))

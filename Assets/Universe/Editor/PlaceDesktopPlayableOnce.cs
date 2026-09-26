@@ -78,7 +78,7 @@ namespace RealityEngine.EditorTools
         static void Arm()
         {
             EditorPrefs.SetBool(PrefKey, true);
-            Debug.Log("PlaceDesktopPlayableOnce armed Ã¢â‚¬â€ will Place Desktop + UI and Save on next delayCall (Edit mode).");
+            Debug.Log("PlaceDesktopPlayableOnce armed — will Place Desktop + UI and Save on next delayCall (Edit mode).");
             EditorApplication.delayCall += TryRun;
         }
     }

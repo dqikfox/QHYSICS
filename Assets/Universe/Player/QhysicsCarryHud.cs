@@ -127,7 +127,7 @@ namespace RealityEngine.UI
                 var slot = QhysicsUiBuilder.Panel(strip.transform, "C" + i, QhysicsUiStyle.ChipBg, new Vector2(slotW, 62f));
                 slot.rectTransform.anchoredPosition = new Vector2(startX + i * (slotW + 6f), 0f);
                 _slotImages[i] = slot;
-                var lab = QhysicsUiBuilder.Label(slot.transform, "L", "â€”", QhysicsUiStyle.FontSmall,
+                var lab = QhysicsUiBuilder.Label(slot.transform, "L", "-", QhysicsUiStyle.FontSmall,
                     QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
                 lab.rectTransform.sizeDelta = new Vector2(74f, 50f);
                 lab.enableAutoSizing = true;
@@ -146,7 +146,20 @@ namespace RealityEngine.UI
             _hint.rectTransform.sizeDelta = new Vector2(900f, 24f);
 
             ApplyRenderMode(DesktopPlayerController.IsXrDisplayRunning());
+
+            // 2026-09-27 declutter: vitals moved to the top status strip, carry slots moved into the
+            // M/Tab toolbelt CARRY tab (+ the dock's carry readout), key hints moved to F1 controls.
+            // This component keeps the carry key handling; its legacy panels stay built but hidden.
+            if (!ShowLegacyPanels)
+            {
+                if (_vitalsBg != null) _vitalsBg.gameObject.SetActive(false);
+                if (_stripRt != null) _stripRt.gameObject.SetActive(false);
+                if (_hint != null) _hint.gameObject.SetActive(false);
+            }
         }
+
+        /// <summary>Re-enable the old vitals box / carry strip / hint line (debug only).</summary>
+        public static bool ShowLegacyPanels;
 
         void OnEnable() => Hook();
         void OnDisable() => Unhook();
@@ -177,8 +190,9 @@ namespace RealityEngine.UI
             if (_carry == null)
                 Hook();
             HandleCarryKeys();
-            if (_canvas != null && !_canvas.gameObject.activeSelf)
-                _canvas.gameObject.SetActive(true);
+            bool want = ShowLegacyPanels && QhysicsUiState.GameplayHudVisible;
+            if (_canvas != null && _canvas.gameObject.activeSelf != want)
+                _canvas.gameObject.SetActive(want);
             ApplyHurtFlash();
         }
 
@@ -229,7 +243,7 @@ namespace RealityEngine.UI
                     _hint.rectTransform.anchorMin = _hint.rectTransform.anchorMax = new Vector2(0.5f, 0.08f);
                     _hint.rectTransform.pivot = new Vector2(0.5f, 0.5f);
                     _hint.rectTransform.anchoredPosition = Vector2.zero;
-                    _hint.text = "XR trigger = baton Â· Esc/P Operator Select Â· [ ] U X on companion keyboard";
+                    _hint.text = "XR trigger = baton  |  Esc / P Operator Select  |  [ ] U X on companion keyboard";
                 }
                 QhysicsUiBuilder.WireEventCamera(_canvas);
             }
@@ -338,7 +352,7 @@ namespace RealityEngine.UI
             {
                 _op = PlayerOperatorController.Instance;
                 string name = _op != null ? _op.Current.DisplayName : "Operator";
-                _opLabel.text = "TRAINING SYSTEM Â· " + name;
+                _opLabel.text = "TRAINING SYSTEM | " + name;
             }
         }
 
@@ -363,7 +377,7 @@ namespace RealityEngine.UI
                     : (selected ? QhysicsUiStyle.ChipBgActive : QhysicsUiStyle.ChipBg);
                 if (_slotLabels[i] != null)
                 {
-                    _slotLabels[i].text = id == CarryItemId.None ? "â€”" : Short(CarryItemCatalog.LabelOf(id));
+                    _slotLabels[i].text = id == CarryItemId.None ? "-" : Short(CarryItemCatalog.LabelOf(id));
                     _slotLabels[i].color = id == CarryItemId.None ? QhysicsUiStyle.TextMuted
                         : (selected ? QhysicsUiStyle.AccentInfo : QhysicsUiStyle.TextPrimary);
                 }
@@ -373,10 +387,10 @@ namespace RealityEngine.UI
         static string Short(string s)
         {
             if (string.IsNullOrEmpty(s))
-                return "â€”";
+                return "-";
             if (s.Length <= 10)
                 return s;
-            return s.Substring(0, 9) + "â€¦";
+            return s.Substring(0, 9) + "...";
         }
 
         static bool WasPrev()

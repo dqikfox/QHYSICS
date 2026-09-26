@@ -78,7 +78,7 @@ Solar panels max out at 1 W (10 V), so they don't help. Challenges 34–35 (9 an
 - Build settings have only `Faraday.unity` enabled (`Basic.unity` is disabled). There's no build folder and no recorded **Windows build or Quest Link test**, and no Android APK build.
 - Git LFS: **the GitHub repo is over its LFS budget.** Pushing the updated `Faraday.unity` fails with "This repository exceeded its LFS budget". Every scene save needs LFS quota, so this blocks the team workflow.
 - Uncommitted drift is waiting for a decision: `Packages/manifest.json` (ai.assistant 2.18→2.20-pre), `OpenXR Package Settings.asset` (feature list entries removed, Touch Pro profile enabled), `ProjectAuditorSettings.asset`, TMP fallback atlas.
-- Text polish: mojibake (double-encoded `—`, `→`, `°`) in `QHYSICS_PLAY.md` headings, `ChallengeManager.cs` comments, `GizaComplex.cs` (including a `Contains("kawÃ¡b")` string match), `QhysicsGadgets.cs` comments.
+- Text polish: mojibake (double-encoded `—`, `→`, `°`) in `QHYSICS_PLAY.md` headings, `ChallengeManager.cs` comments, `GizaComplex.cs` (including a `Contains("kawáb")` string match), `QhysicsGadgets.cs` comments.
 
 ---
 
@@ -134,7 +134,7 @@ New objective types needed for levels 6, 8 and 9 (add to `ObjectiveType`, evalua
 15. Comfort: vignette toggle, snap/smooth turn, seated height, dominant hand in `QhysicsSettingsPanel`.
 16. Save breadboard layout per level (extend `LabSandboxSave` or checkpoint `CircuitLab`), plus a "Reset chapter progress" button.
 17. Identity and build: `productName`/`companyName`/version, a Windows build profile, a recorded Quest Link session, an Android APK smoke test.
-18. Text cleanup: fix mojibake in `QHYSICS_PLAY.md`, `ChallengeManager.cs`, `GizaComplex.cs` (`kawÃ¡b` match), `QhysicsGadgets.cs`.
+18. ~~Text cleanup~~ **Done 2026-09-27** (UI declutter commit): fixed mojibake in `QHYSICS_PLAY.md`, `ChallengeManager.cs`, `GizaComplex.cs` (`kawáb` match), `QhysicsGadgets.cs`.
 19. Decide on the pending settings drift (`manifest.json` ai.assistant bump, OpenXR feature list, ProjectAuditor, TMP fallback atlas) and commit or revert it deliberately.
 
 
