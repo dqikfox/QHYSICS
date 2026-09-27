@@ -976,3 +976,14 @@ Young two-slit Fraunhofer fringe prop - monochromatic equal-slit interference on
 4. **N / P** (near gadget) cycles slit spacing d; **Shift+N / Shift+P** cycles wavelength BLUE/GREEN/RED (source + fringe color follow)
 5. XR: grip grab, trigger/activate cycles d
 6. Honesty: far-field Fraunhofer only - not Fresnel, not single-slit envelope, not polarization
+
+## PHYSICS Boyle Law (2026-09-28)
+
+Ideal isothermal Boyle syringe prop - P*V = k at fixed T; plunger / gas column follow volume presets.
+
+1. Ctrl+P Play -> Enter Sandbox
+2. Desktop WASD near the plaza; **M / Tab** toolbelt -> **PHYSICS** -> page to **Boyle Law** (or spawn label `Boyle` / `Syringe` / `Gas` / `Boyle Law`)
+3. Grab the prop. Readout shows V (mL), P (kPa + atm), and product PV (constant). Plunger moves with volume; gas glow tracks pressure.
+4. **N / P** (near gadget) cycles volume SMALL/MED/LARGE/XL (activate / LMB also steps volume)
+5. XR: grip grab, trigger/activate cycles volume
+6. Honesty: ideal-gas isothermal only - not real syringe friction/leak, not temperature change, not non-ideal gas

@@ -116,6 +116,9 @@ namespace RealityEngine.Player
             if (key == "double slit" || key == "doubleslit" || key == "double-slit" || key == "young" || key == "youngs" || key == "young's" || key == "interference" || key == "fringe" || key == "diffraction" || key == "2slit" || key == "two slit" || key == "twoslit")
                 return SpawnDoubleSlit(worldPos);
 
+            if (key == "boyle" || key == "boyles" || key == "boyle's" || key == "boyle law" || key == "boyles law" || key == "boyle's law" || key == "syringe" || key == "gas" || key == "ideal gas" || key == "idealgas" || key == "pv law" || key == "pv=k" || key == "p-v" || key == "isothermal")
+                return SpawnBoyleLaw(worldPos);
+
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
             if (key == "inductor" || key == "inductance" || key == "choke" || key == "coil-l" || key == "series-l")
@@ -1361,6 +1364,19 @@ namespace RealityEngine.Player
             if (slit == null)
                 slit = go.AddComponent<LoadDoubleSlitGadget>();
             slit.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnBoyleLaw(Vector3 worldPos)
+        {
+            // PHYSICS Boyle syringe: ideal isothermal P*V=k.
+            var go = SpawnPrimitiveProxy("BoyleLaw", worldPos, new Color(0.35f, 0.72f, 0.82f));
+            go.name = LoadBoyleLawGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
+            var boyle = go.GetComponent<LoadBoyleLawGadget>();
+            if (boyle == null)
+                boyle = go.AddComponent<LoadBoyleLawGadget>();
+            boyle.EnsureBuilt();
             return go;
         }
 
