@@ -1009,3 +1009,14 @@ Ideal isobaric Charles heated-volume prop - V/T = k at fixed P; gas column heigh
 4. **N / P** (near gadget) cycles temperature COLD/ROOM/WARM/HOT (250/293/350/400 K; activate / LMB also steps T)
 5. XR: grip grab, trigger/activate cycles temperature
 6. Honesty: ideal-gas isobaric only - not Boyle (isothermal), not real gas, not phase change
+
+## PHYSICS Gay Lussac (2026-09-28)
+
+Ideal isochoric Gay-Lussac / Amontons rigid-vessel prop - P/T = k at fixed V; pressure indicator height and heat glow follow temperature presets.
+
+1. Ctrl+P Play -> Enter Sandbox
+2. Desktop WASD near the plaza; **M / Tab** toolbelt -> **PHYSICS** -> page to **Gay Lussac** (or spawn label `Gay Lussac` / `Amontons` / `p/t` / `isochoric` / `rigid vessel`)
+3. Grab the prop. Readout shows T (K + C), P (atm), P/T constant, and V=20 mL fixed. Gas fill stays fixed; pressure bar/needle rises with T; heater glow intensifies.
+4. **N / P** (near gadget) cycles temperature COLD/ROOM/WARM/HOT (250/293/350/400 K; activate / LMB also steps T)
+5. XR: grip grab, trigger/activate cycles temperature
+6. Honesty: ideal-gas isochoric P~T (fixed V) - NOT Boyle (isothermal), NOT Charles (isobaric), not real gas, not phase change, not burst vessel
