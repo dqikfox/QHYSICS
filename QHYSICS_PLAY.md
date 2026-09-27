@@ -998,3 +998,14 @@ Ideal Hooke's Law hanging-spring prop — static equilibrium x = mg/k; F = -kx; 
 4. **N / P** (near gadget) cycles k SMALL/MED/LARGE/XL; **Shift+N / Shift+P** cycles mass m0.10..m1.00 (activate / LMB also steps k)
 5. XR: grip grab, trigger/activate cycles k
 6. Honesty: ideal Hooke + static hanging equilibrium only — not oscillator dynamics (use Spring Mass for that), not continuum elasticity, not nonlinear spring
+
+## PHYSICS Charles Law (2026-09-28)
+
+Ideal isobaric Charles heated-volume prop - V/T = k at fixed P; gas column height and heat glow follow temperature presets.
+
+1. Ctrl+P Play -> Enter Sandbox
+2. Desktop WASD near the plaza; **M / Tab** toolbelt -> **PHYSICS** -> page to **Charles Law** (or spawn label `Charles` / `Charles Law` / `v/t` / `isobaric` / `heated volume`)
+3. Grab the prop. Readout shows T (K + C), V (mL), V/T constant, and P=1 atm fixed. Gas column expands with T; heater glow intensifies.
+4. **N / P** (near gadget) cycles temperature COLD/ROOM/WARM/HOT (250/293/350/400 K; activate / LMB also steps T)
+5. XR: grip grab, trigger/activate cycles temperature
+6. Honesty: ideal-gas isobaric only - not Boyle (isothermal), not real gas, not phase change
