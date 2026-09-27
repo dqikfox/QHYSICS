@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
@@ -19,6 +19,7 @@ namespace RealityEngine.Audio
     /// by heuristic, and assigns <see cref="AudioSource.outputAudioMixerGroup"/>.
     /// Also provides volume control helpers (dB conversion) and PlayerPrefs persistence.
     /// Re-scans on every scene load.
+    /// Honesty: Master bus gain via Unity AudioMixer exposed params — not per-SFX routing and not a full EQ.
     /// </summary>
     public static class AudioRouter
     {
@@ -35,6 +36,9 @@ namespace RealityEngine.Audio
         private const string ParamSfx = "SfxVolume";
         private const string ParamAmbience = "AmbienceVolume";
         private const string ParamVoice = "VoiceVolume";
+
+        /// <summary>Near-silence floor for Master/bus faders (Unity mixer practical mute).</summary>
+        public const float MinDb = -80f;
 
         private static AudioMixer _mixer;
         private static AudioMixerGroup _masterGroup;
@@ -166,6 +170,16 @@ namespace RealityEngine.Audio
             }
         }
 
+        /// <summary>True when QhysicsMixer loaded and MasterVolume can be driven in dB.</summary>
+        public static bool HasMixer
+        {
+            get
+            {
+                EnsureInitialized();
+                return _mixer != null;
+            }
+        }
+
         private static void RouteInternal(AudioSource source, AudioBus bus)
         {
             AudioMixerGroup group;
@@ -204,27 +218,46 @@ namespace RealityEngine.Audio
 
         // --- Volume control (dB conversion + persistence) ---
 
-        /// <summary>Convert a 0–1 normalized volume to decibels.</summary>
-        private static float ToDb(float normalized)
+        /// <summary>
+        /// Convert a 0–1 normalized volume to decibels.
+        /// Floor is <see cref="MinDb"/> (~mute) when near 0; unity gain is 0 dB at 1.
+        /// </summary>
+        public static float ToDb(float normalized)
         {
-            return Mathf.Log10(Mathf.Clamp(normalized, 0.0001f, 1f)) * 20f;
+            float v = Mathf.Clamp01(normalized);
+            if (v <= 0.0001f)
+                return MinDb;
+            return Mathf.Log10(v) * 20f;
         }
 
         /// <summary>Convert decibels back to a 0–1 normalized volume.</summary>
         private static float FromDb(float db)
         {
+            if (db <= MinDb)
+                return 0f;
             return Mathf.Pow(10f, db / 20f);
         }
 
-        /// <summary>Set the Master bus volume (0–1) on the mixer.</summary>
+        /// <summary>
+        /// Set the Master bus volume (0–1) on the QhysicsMixer MasterVolume param.
+        /// When the mixer is present, AudioListener.volume is pinned to 1 so the mixer
+        /// is the single gain control (Settings chips do not drive AudioListener).
+        /// </summary>
         public static void SetMasterVolume(float normalized)
         {
             EnsureInitialized();
+            normalized = Mathf.Clamp01(normalized);
             if (_mixer != null)
+            {
+                // Mixer Master is authoritative; keep the listener wide open.
+                AudioListener.volume = 1f;
                 _mixer.SetFloat(ParamMaster, ToDb(normalized));
+            }
             else
-                AudioListener.volume = Mathf.Clamp01(normalized); // fallback when the mixer ref is missing
-
+            {
+                // Fallback only when QhysicsAudioMixerRef / mixer failed to load.
+                AudioListener.volume = normalized;
+            }
         }
 
         /// <summary>Set a child bus volume (0–1) on the mixer.</summary>
@@ -281,6 +314,7 @@ namespace RealityEngine.Audio
         /// <summary>Persist the Master volume and apply it to the mixer.</summary>
         public static void SaveMasterVolume(float normalized)
         {
+            normalized = Mathf.Clamp01(normalized);
             PlayerPrefs.SetFloat(PrefsMaster, normalized);
             PlayerPrefs.Save();
             SetMasterVolume(normalized);
@@ -296,7 +330,7 @@ namespace RealityEngine.Audio
                 case AudioBus.Voice: key = PrefsVoice; break;
                 default: key = PrefsSfx; break;
             }
-            PlayerPrefs.SetFloat(key, normalized);
+            PlayerPrefs.SetFloat(key, Mathf.Clamp01(normalized));
             PlayerPrefs.Save();
             SetBusVolume(bus, normalized);
         }
