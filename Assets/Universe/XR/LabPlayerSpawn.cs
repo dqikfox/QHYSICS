@@ -607,6 +607,8 @@ namespace RealityEngine.XR
                 return;
             }
 
+            EnsureLocomotionMediator(originXf);
+
             // XRI 3.6 TeleportationProvider uses LocomotionMediator; legacy scenes still serialize
             // LocomotionSystem.m_XROrigin (shown near Teleportation Provider). Keep both wired.
 #pragma warning disable CS0618
@@ -656,6 +658,17 @@ namespace RealityEngine.XR
             else if (leftRay == null && rightRay == null)
                 Debug.LogWarning("LabPlayerSpawn: no XRI teleport ray under Camera Offset after OVR strip; using remaining controllers.");
 
+#pragma warning disable CS0618
+            // Scene rays press UI with A/X (PrimaryButton). Trigger is the natural "click" in VR; A/X still
+            // shows the ray and teleports (select). Menus keep the rays visible (QhysicsXrRayPolicy).
+            foreach (Transform ray in new[] { rightRay, leftRay })
+            {
+                XRController rc = ray != null ? ray.GetComponent<XRController>() : null;
+                if (rc != null)
+                    rc.uiPressUsage = InputHelpers.Button.Trigger;
+            }
+#pragma warning restore CS0618
+
             if (_teleportCtrl != null)
             {
 #pragma warning disable CS0618
@@ -669,6 +682,33 @@ namespace RealityEngine.XR
             CollectLocomotionBehaviours(originXf);
             if (n > 0)
                 Debug.Log("LabPlayerSpawn: wired " + n + " TeleportationArea(s) to TeleportationProvider.");
+        }
+
+        /// <summary>
+        /// Faraday only has the legacy LocomotionSystem. The XRI 3 TeleportationProvider needs a
+        /// LocomotionMediator (+ XRBodyTransformer) or it never moves the rig and the teleport reticle
+        /// throws NullReferenceException every frame (seen in Editor.log). Add one on the XR Origin.
+        /// </summary>
+        void EnsureLocomotionMediator(Transform originXf)
+        {
+            var mediator = originXf.GetComponent<UnityEngine.XR.Interaction.Toolkit.Locomotion.LocomotionMediator>();
+            if (mediator == null)
+            {
+                mediator = originXf.gameObject.AddComponent<UnityEngine.XR.Interaction.Toolkit.Locomotion.LocomotionMediator>();
+                var body = originXf.GetComponent<UnityEngine.XR.Interaction.Toolkit.Locomotion.XRBodyTransformer>();
+                // Keep the CharacterController profile owned by LabPlayerSpawn / desktop controller.
+                if (body != null)
+                    body.useCharacterControllerIfExists = false;
+                Debug.Log("LabPlayerSpawn: added LocomotionMediator + XRBodyTransformer on XR Origin (XRI 3 teleport).");
+            }
+            if (_origin != null && mediator.xrOrigin == null)
+                mediator.xrOrigin = _origin;
+            TeleportationProvider[] providers = originXf.GetComponentsInChildren<TeleportationProvider>(true);
+            for (int i = 0; i < providers.Length; i++)
+            {
+                if (providers[i] != null && providers[i].mediator == null)
+                    providers[i].mediator = mediator;
+            }
         }
 
         static void EnsureTeleportAreaOn(string name)
@@ -789,6 +829,13 @@ namespace RealityEngine.XR
                 if (_locomotionPaused)
                     SetLocomotionEnabled(true);
                 _locomotionPaused = false;
+                // Thumbsticks scroll the challenge list / skills: no smooth move or snap/turn-around meanwhile.
+                bool stickUi = RealityEngine.UI.QhysicsXrRayPolicy.StickScrollActive();
+                if (_move != null && _move.enabled == stickUi)
+                    _move.enabled = !stickUi;
+                bool noSnap = stickUi || RealityEngine.UI.QhysicsXrRayPolicy.ToolbeltVisible(); // right stick = carry slots
+                if (_snap != null && _snap.enabled == noSnap)
+                    _snap.enabled = !noSnap;
                 return;
             }
 

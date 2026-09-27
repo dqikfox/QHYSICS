@@ -106,7 +106,7 @@ namespace RealityEngine.Combat
     /// <summary>
     /// Spells: Fire (projectile + burn), Lightning (chain), Force (tap = pull a loose weapon to your hand,
     /// charge = push wave). Desktop: hold V to charge, release to cast; Z next spell; B imbue held weapon;
-    /// G focus. XR: hold trigger on an empty hand (combat mode), release to cast; A/X next spell; A+X focus;
+    /// G focus. XR: hold trigger on an empty hand (combat mode), release to cast; left stick click next spell, hold it for focus;
     /// charge next to the blade in your other hand to imbue it.
     /// </summary>
     [DefaultExecutionOrder(152)]
@@ -217,26 +217,25 @@ namespace RealityEngine.Combat
 
         void UpdateXr()
         {
-            // A/X: cycle spell; A+X together: focus.
-            bool aNow = Btn(XRNode.RightHand, CommonUsages.primaryButton);
-            bool xNow = Btn(XRNode.LeftHand, CommonUsages.primaryButton);
-            bool aDown = aNow && !_r.primPrev;
-            bool xDown = xNow && !_l.primPrev;
-            _r.primPrev = aNow; _l.primPrev = xNow;
-            if (aDown) _r.primDownAt = Time.unscaledTime;
-            if (xDown) _l.primDownAt = Time.unscaledTime;
-            if ((aDown || xDown) && Mathf.Abs(_r.primDownAt - _l.primDownAt) < 0.15f)
+            // Left stick click: short press = next spell, hold 0.5 s = focus (slow-mo).
+            // (A/X show the teleport ray and teleport on release, so they are not used for combat.)
+            bool clickNow = Btn(XRNode.LeftHand, CommonUsages.primary2DAxisClick);
+            if (clickNow && !_l.primPrev)
+            {
+                _l.primDownAt = Time.unscaledTime;
+                _pendingCycleAt = 1f; // armed
+            }
+            if (clickNow && _pendingCycleAt > 0f && Time.unscaledTime - _l.primDownAt >= 0.5f)
             {
                 _pendingCycleAt = -1f;
                 FocusTime.Toggle();
             }
-            else if (aDown || xDown)
-                _pendingCycleAt = Time.unscaledTime + 0.15f;
-            if (_pendingCycleAt > 0f && Time.unscaledTime >= _pendingCycleAt)
+            if (!clickNow && _l.primPrev && _pendingCycleAt > 0f)
             {
                 _pendingCycleAt = -1f;
                 CycleSpell();
             }
+            _l.primPrev = clickNow;
 
             bool mode = CombatModeActive();
             XrHand(_l, _r, mode);
