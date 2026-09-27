@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using RealityEngine.Audio;
 
@@ -6,6 +6,8 @@ namespace RealityEngine.UI
 {
     /// <summary>
     /// World-space settings with REAL wired toggles only (volume, sim speed, gravity, UI opacity).
+    /// Volume chips drive QhysicsMixer Master (dB) via <see cref="AudioRouter"/> — not AudioListener.volume.
+    /// Honesty: Master bus gain only; not per-SFX routing and not a full EQ.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(206)]
@@ -79,6 +81,7 @@ namespace RealityEngine.UI
             QhysicsUiBuilder.ChipButton(face.transform, "Opacity", "UI opacity cycle", new Vector2(520f, 72f), CycleOpacity);
             QhysicsUiBuilder.ChipButton(face.transform, "Close", "Close", new Vector2(520f, 72f), () => SetOpen(false));
 
+            // Boot path: apply PlayerPrefs master to mixer MasterVolume (dB). AudioListener stays at 1 when mixer is present.
             _masterVolume = AudioRouter.LoadMasterVolume();
             AudioRouter.SetMasterVolume(_masterVolume);
             MatchGravityIndex();
@@ -118,6 +121,7 @@ namespace RealityEngine.UI
         void NudgeVolume(float delta)
         {
             _masterVolume = Mathf.Clamp01(_masterVolume + delta);
+            // Persist + apply QhysicsMixer MasterVolume (linear 0-1 -> dB). Does not set AudioListener.volume when mixer is loaded.
             AudioRouter.SaveMasterVolume(_masterVolume);
             RefreshStatus();
         }
@@ -188,10 +192,14 @@ namespace RealityEngine.UI
         void RefreshStatus()
         {
             if (_status == null) return;
-            _status.text = "vol " + _masterVolume.ToString("0.00")
+            float db = AudioRouter.ToDb(_masterVolume);
+            string volBit = AudioRouter.HasMixer
+                ? "vol " + _masterVolume.ToString("0.00") + " (" + db.ToString("0.0") + " dB Master)"
+                : "vol " + _masterVolume.ToString("0.00") + " (listener fallback)";
+            _status.text = volBit
                 + " | speed " + Time.timeScale.ToString("0.##") + "x"
                 + " | " + GravityNames[_gravIndex]
-                + " | ui α " + _uiOpacity.ToString("0.00");
+                + " | ui a " + _uiOpacity.ToString("0.00");
         }
     }
 }

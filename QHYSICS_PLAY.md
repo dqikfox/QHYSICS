@@ -81,6 +81,17 @@ Honesty: poses of spawned `Gadget_*` / `*_Desktop` only — NOT CircuitLab bread
 - **Chapter tabs:** "Ch 1: Faraday's Bench" (10 curated levels, unlock in order) and "Sandbox / Extra" (all other challenges, original unlock chain).
 - **Scroll:** XR ray drag on the list, right (or left) thumbstick up/down while the list is open, mouse wheel, or the UP / DOWN buttons. The hotbar/pouch ignore the wheel/stick while the list is open.
 - **SFX:** objective complete (two-note chime), challenge complete (arpeggio), chapter complete (fanfare). All go through the QhysicsMixer SFX group; Settings master volume now routes through the mixer.
+
+### Settings master volume (mixer Master, 2026-09-28)
+
+Honesty: Settings **Volume - / Volume +** chips (±0.1) drive the **QhysicsMixer** exposed `MasterVolume` param in dB (`20*log10(linear)`, floor -80 dB near 0). `AudioListener.volume` stays at 1 when the mixer loads so the mixer is the single gain control — not per-SFX routing and not a full EQ. Value persists in PlayerPrefs key `QhysicsAudio_Master` and is re-applied on boot via `AudioRouter`.
+
+**Desktop Ctrl+P test:**
+1. Open `Assets/Scenes/Faraday.unity`, Play (Ctrl+P). WASD move; Enter Sandbox if the boot menu shows.
+2. Press **Esc** or **P** for Pause → click **Settings** (or open the world-space Settings panel).
+3. Click **Volume -** a few times: status shows `vol 0.xx (Y.Y dB Master)` and lab SFX (challenge chimes, UI clicks routed through the mixer) get quieter. At ~0.00 expect near silence (~-80 dB Master).
+4. Click **Volume +** back toward 1.00 (0.0 dB Master); gain returns.
+5. Stop Play, Play again: saved volume reapplies (status matches last value; audible gain matches).
 - New levels: **Bench Orientation** (spawn any gadget), **Lines of Force** (Compass + Magnet/Dipole, |B| ≥ 150 µT), **The Dynamo** (Crank Generator near the coil, |EMF| ≥ 0.01 V for 2 s), **Transformer** (Mutual Coupler MED/STRONG, then switch the primary; |Es| ≥ 0.1 mV).
 
 ## UI layout after the declutter pass (2026-09-27)
