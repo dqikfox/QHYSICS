@@ -113,6 +113,8 @@ namespace RealityEngine.Player
                 return SpawnBernoulli(worldPos);
             if (key == "snell" || key == "snells" || key == "snell's" || key == "snells law" || key == "snellslaw" || key == "refraction" || key == "refract" || key == "prism" || key == "interface" || key == "critical angle" || key == "criticalangle" || key == "tir")
                 return SpawnSnell(worldPos);
+            if (key == "double slit" || key == "doubleslit" || key == "double-slit" || key == "young" || key == "youngs" || key == "young's" || key == "interference" || key == "fringe" || key == "diffraction" || key == "2slit" || key == "two slit" || key == "twoslit")
+                return SpawnDoubleSlit(worldPos);
 
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
@@ -1346,6 +1348,19 @@ namespace RealityEngine.Player
             if (snell == null)
                 snell = go.AddComponent<LoadSnellGadget>();
             snell.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnDoubleSlit(Vector3 worldPos)
+        {
+            // PHYSICS Young double-slit: Fraunhofer I=I0 cos^2(pi d sin(theta)/lambda).
+            var go = SpawnPrimitiveProxy("DoubleSlit", worldPos, new Color(0.22f, 0.55f, 0.85f));
+            go.name = LoadDoubleSlitGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
+            var slit = go.GetComponent<LoadDoubleSlitGadget>();
+            if (slit == null)
+                slit = go.AddComponent<LoadDoubleSlitGadget>();
+            slit.EnsureBuilt();
             return go;
         }
 
