@@ -166,7 +166,7 @@ namespace RealityEngine.Combat
             SetFill(_focus, FocusTime.Meter01);
             SetFill(_charge, SpellSystem.Charge01);
             var sc = SpellSystem.SpellColor(SpellSystem.Current);
-            string key = CombatInputGate.IsXr ? "A/X" : "Z";
+            string key = CombatInputGate.IsXr ? "L-stick click" : "Z";
             _spell.text = "<color=#" + ColorUtility.ToHtmlStringRGB(sc) + ">" + SpellSystem.SpellName(SpellSystem.Current).ToUpperInvariant()
                 + "</color>  <size=80%><color=#9AA3AD>[" + key + "]</color></size>"
                 + (FocusTime.Active ? "   <color=#F2D140>FOCUS</color>" : "");

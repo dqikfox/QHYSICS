@@ -1,5 +1,42 @@
 # QHYSICS — how to Play (Editor)
 
+## Quest 3S in-headset test (Quest Link / Air Link, Editor Play) — checklist
+
+**Before you start (one-time, on THRONE):**
+- **Meta Horizon Link app:** Settings > General. Turn on **Unknown Sources** and click **OpenXR Runtime: Set Meta Horizon Link as active**.
+  - When checked, the active runtime was **SteamVR**. A black or frozen headset, or `XR_ERROR_FORM_FACTOR_UNAVAILABLE` in the log, means the wrong runtime or Link is not connected.
+- **Unity:** Edit > Project Settings > XR Plug-in Management.
+  - PC tab: **OpenXR** ticked and **Initialize XR on Startup** on (both already set).
+  - OpenXR (PC tab): render mode **Single Pass Instanced** (already set).
+  - Interaction Profiles: **Meta Quest Touch Plus** is enabled. Also add **Oculus Touch Controller Profile** with the `+` button as a fallback; SteamVR does not expose Touch Plus.
+- Editor Play uses the **PC/Standalone** XR settings even though the build target is Android. No build switch is needed.
+
+**Test (about 15 min):**
+1. Put on the headset and start Link (or Air Link). You should see the Link home. In Unity, click the Game view, then press **Play** (Ctrl+P).
+2. **Boot menu:** a centred panel about 1.7 m ahead. Both controller rays are visible while a menu is open. Point at **Enter Sandbox** and pull the **trigger**.
+3. **Plaza:** check the floor height feels right, the left stick walks, and right stick left/right snap-turns 45° (down = turn around). Hold **A/X** for the teleport arc and release to teleport.
+4. **Grab:** use grip on a gadget or the baton pickup. The right stick click equips the selected carry item.
+5. **Toolbelt:** press **Menu / B / Y**, point and trigger a tab (try COMBAT). While it is open, right stick left/right changes carry slot (snap turn pauses).
+6. **Arena:** toolbelt COMBAT > **Arena**. You land at the arena entrance facing the centre. Press it again to go back.
+7. **Sword on the dummy:** grip a sword on the table and swing at a dummy. Numbers, DPS and haptics should appear, and the sword should not go through walls. Put your second hand on the grip for two-handed. Thrust fast with the tip to stick it, then pull back to free it.
+8. **Enemy:** stand in the middle of the arena for 4 s to spawn one (or COMBAT > Enemy). Put your blade in its swing to block. Swing into its blade to parry: it staggers and you get a gold spark. Kill it: it ragdolls, drops its sword, and gives +40 XP.
+9. **Spells** (in the arena, near enemies, or while holding a weapon): with an empty hand, hold the **trigger** to charge and release to cast.
+   - **Left stick click** = next spell (Fire, Lightning, Force). Force tapped at a loose weapon pulls it to you.
+   - A fully charged spell held next to the blade in your other hand imbues it.
+10. **Focus:** hold the **left stick click** for 0.5 s for slow-mo. Hold it again, or wait for the meter, to end it.
+11. **Skills:** pause (Menu) > **Skills**, or COMBAT > Skills. Point and trigger a skill to buy it. Stop Play, Play again, and check the rank is kept.
+12. **Challenges:** EXPERIMENTS > Challenges. Scroll with either stick (walking and turning pause while the list is open).
+
+**If X happens, tell me Y:**
+- **Black or frozen headset, Game view in desktop mode:** the OpenXR runtime is not Meta Horizon Link, or Link is not active. Send the lines around `Runtime Name:` in `Logs/Editor.log`.
+- **Head moves but controllers are missing or frozen:** interaction profile. Add the Oculus Touch profile (see above). Tell me which runtime is active.
+- **No ray on the boot menu, or the trigger does nothing:** tell me whether rays show while holding A/X, and send any `LabPlayerSpawn:` lines from the Console.
+- **Teleport does nothing, or `NullReferenceException ... GetReticleDirection`:** send the Console line `LabPlayerSpawn: added LocomotionMediator`, or say that it is missing.
+- **Floor too high or low:** say by how much. Press the recalibrate key or re-enter Sandbox.
+- **Weapon flies off, jitters, or feels too weak or too heavy:** name the weapon and describe it. The strength and damage numbers are easy to tune.
+- **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
+
+
 ## UI map (lab shell)
 
 Runtime auto-ensures on Play via `QhysicsUiBootstrap` (no scene YAML rewrite required).

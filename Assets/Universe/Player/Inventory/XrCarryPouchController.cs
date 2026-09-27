@@ -75,11 +75,10 @@ namespace RealityEngine.Player
             if (carry == null)
                 return;
 
-            // Prefer right hand axis, then left — either may drive pouch.
-            bool used = false;
-            used |= PollHand(XRNode.RightHand, carry, ref _prevRightClick, ref _prevRightCycleLatch, ref _prevRightDropLatch);
-            if (!used)
-                PollHand(XRNode.LeftHand, carry, ref _prevLeftClick, ref _prevLeftCycleLatch, ref _prevLeftDropLatch);
+            // Right hand only: the left stick is smooth move (strafe/back would cycle/drop items) and the
+            // left stick click is spell select. Stick flicks only act while the toolbelt is open, because
+            // right stick X/Y is also snap turn / turn-around.
+            PollHand(XRNode.RightHand, carry, ref _prevRightClick, ref _prevRightCycleLatch, ref _prevRightDropLatch);
         }
 
         bool PollHand(XRNode node, PlayerCarryInventory carry,
@@ -109,6 +108,8 @@ namespace RealityEngine.Player
 
             Vector2 axis = Vector2.zero;
             device.TryGetFeatureValue(CommonUsages.primary2DAxis, out axis);
+            if (!RealityEngine.UI.QhysicsXrRayPolicy.ToolbeltVisible())
+                axis = Vector2.zero; // snap turn owns the stick outside the toolbelt
 
             // Horizontal flick = cycle carry slots ([ ] on desktop).
             bool cycleLatch = Mathf.Abs(axis.x) >= axisCycleThreshold && Mathf.Abs(axis.x) >= Mathf.Abs(axis.y);

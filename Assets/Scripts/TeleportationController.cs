@@ -12,6 +12,12 @@ public class TeleportationController : MonoBehaviour
     public InputHelpers.Button teleportActivationButton;
     public GameObject reticle;
 
+    /// <summary>
+    /// Set at runtime (QhysicsXrRayPolicy): while it returns true (boot menu, pause, toolbelt, lists open)
+    /// both rays stay visible so world UI can be pointed at and clicked without holding A/X.
+    /// </summary>
+    public static System.Func<bool> ForceVisible;
+
     void Update()
     {
         bool any = false;
@@ -37,6 +43,8 @@ public class TeleportationController : MonoBehaviour
     {
         if (controller == null)
             return false;
+        if (ForceVisible != null && ForceVisible())
+            return true;
         if (!controller.inputDevice.isValid)
             return false;
 

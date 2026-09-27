@@ -38,14 +38,15 @@ namespace RealityEngine.UI
             "<b><color=#00E5FF>VR (Quest)</color></b>\n" +
             "Left stick move  |  Right stick turn / scroll lists\n" +
             "Grip grab / hold  |  Trigger use / activate\n" +
-            "Menu / B / Y toolbelt  |  Ray + trigger press UI\n" +
-            "Right stick L/R carry slot  |  stick click equip\n" +
+            "Menu / B / Y toolbelt  |  point + trigger = click UI\n" +
+            "Hold A / X = teleport ray, release to teleport\n" +
+            "Right stick click equip  |  (toolbelt open) R stick L/R slot\n" +
             "<b><color=#00E5FF>COMBAT</color></b>\n" +
             "Grip a weapon to hold it (weight + lag)\n" +
             "Second hand on the grip = two-handed\n" +
             "Empty hand: hold trigger = charge, release = cast\n" +
             "(spells work in the arena / near enemies / armed)\n" +
-            "A / X next spell  |  A + X together = focus\n" +
+            "Left stick click next spell  |  hold it = focus\n" +
             "Full charge next to the blade in your other hand = imbue\n" +
             "Toolbelt COMBAT: weapons, enemy, dummy, skills, arena";
 
