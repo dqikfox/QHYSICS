@@ -125,6 +125,9 @@ namespace RealityEngine.Player
             if (key == "charles" || key == "charles law" || key == "charles's law" || key == "charleslaw" || key == "v/t" || key == "vt law" || key == "isobaric" || key == "heated volume" || key == "heatedvolume")
                 return SpawnCharlesLaw(worldPos);
 
+            if (key == "gay lussac" || key == "gaylussac" || key == "gay-lussac" || key == "amontons" || key == "amonton" || key == "p/t" || key == "pt law" || key == "isochoric" || key == "rigid vessel" || key == "rigidvessel" || key == "pressure temp" || key == "pressuretemp" || key == "gaylussaclaw" || key == "gay lussac law")
+                return SpawnGayLussac(worldPos);
+
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
             if (key == "inductor" || key == "inductance" || key == "choke" || key == "coil-l" || key == "series-l")
@@ -1409,6 +1412,19 @@ namespace RealityEngine.Player
             if (charles == null)
                 charles = go.AddComponent<LoadCharlesLawGadget>();
             charles.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnGayLussac(Vector3 worldPos)
+        {
+            // PHYSICS Gay-Lussac rigid vessel: ideal isochoric P/T=k.
+            var go = SpawnPrimitiveProxy("GayLussac", worldPos, new Color(0.85f, 0.35f, 0.45f));
+            go.name = LoadGayLussacGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
+            var gay = go.GetComponent<LoadGayLussacGadget>();
+            if (gay == null)
+                gay = go.AddComponent<LoadGayLussacGadget>();
+            gay.EnsureBuilt();
             return go;
         }
 
