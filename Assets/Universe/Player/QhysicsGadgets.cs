@@ -119,6 +119,9 @@ namespace RealityEngine.Player
             if (key == "boyle" || key == "boyles" || key == "boyle's" || key == "boyle law" || key == "boyles law" || key == "boyle's law" || key == "syringe" || key == "gas" || key == "ideal gas" || key == "idealgas" || key == "pv law" || key == "pv=k" || key == "p-v" || key == "isothermal")
                 return SpawnBoyleLaw(worldPos);
 
+            if (key == "hooke spring" || key == "hookespring" || key == "hooke-spring" || key == "f=-kx" || key == "static spring" || key == "staticspring" || key == "hooke law" || key == "hookelaw" || key == "ideal spring" || key == "idealspring")
+                return SpawnHookeSpring(worldPos);
+
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
             if (key == "inductor" || key == "inductance" || key == "choke" || key == "coil-l" || key == "series-l")
@@ -1377,6 +1380,19 @@ namespace RealityEngine.Player
             if (boyle == null)
                 boyle = go.AddComponent<LoadBoyleLawGadget>();
             boyle.EnsureBuilt();
+            return go;
+        }
+
+        static GameObject SpawnHookeSpring(Vector3 worldPos)
+        {
+            // PHYSICS Hooke spring: ideal static F=-kx at hanging eq x=mg/k.
+            var go = SpawnPrimitiveProxy("HookeSpring", worldPos, new Color(0.25f, 0.85f, 0.70f));
+            go.name = LoadHookeSpringGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
+            var hooke = go.GetComponent<LoadHookeSpringGadget>();
+            if (hooke == null)
+                hooke = go.AddComponent<LoadHookeSpringGadget>();
+            hooke.EnsureBuilt();
             return go;
         }
 

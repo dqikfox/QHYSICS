@@ -987,3 +987,14 @@ Ideal isothermal Boyle syringe prop - P*V = k at fixed T; plunger / gas column f
 4. **N / P** (near gadget) cycles volume SMALL/MED/LARGE/XL (activate / LMB also steps volume)
 5. XR: grip grab, trigger/activate cycles volume
 6. Honesty: ideal-gas isothermal only - not real syringe friction/leak, not temperature change, not non-ideal gas
+
+## PHYSICS Hooke Spring (2026-09-28)
+
+Ideal Hooke's Law hanging-spring prop — static equilibrium x = mg/k; F = -kx; PE = 0.5 k x^2. Distinct from Spring Mass (dynamic oscillator).
+
+1. Ctrl+P Play -> Enter Sandbox
+2. Desktop WASD near the plaza; **M / Tab** toolbelt -> **PHYSICS** -> page to **Hooke Spring** (or spawn label `Hooke Spring` / `f=-kx` / `static spring` / `hooke law`)
+3. Grab the prop. Coil stretches under hanging mass; readout shows k, stretch x=mg/k, |F|=kx, PE=0.5kx^2
+4. **N / P** (near gadget) cycles k SMALL/MED/LARGE/XL; **Shift+N / Shift+P** cycles mass m0.10..m1.00 (activate / LMB also steps k)
+5. XR: grip grab, trigger/activate cycles k
+6. Honesty: ideal Hooke + static hanging equilibrium only — not oscillator dynamics (use Spring Mass for that), not continuum elasticity, not nonlinear spring
