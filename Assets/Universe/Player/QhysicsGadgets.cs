@@ -122,6 +122,9 @@ namespace RealityEngine.Player
             if (key == "hooke spring" || key == "hookespring" || key == "hooke-spring" || key == "f=-kx" || key == "static spring" || key == "staticspring" || key == "hooke law" || key == "hookelaw" || key == "ideal spring" || key == "idealspring")
                 return SpawnHookeSpring(worldPos);
 
+            if (key == "charles" || key == "charles law" || key == "charles's law" || key == "charleslaw" || key == "v/t" || key == "vt law" || key == "isobaric" || key == "heated volume" || key == "heatedvolume")
+                return SpawnCharlesLaw(worldPos);
+
             if (key == "capacitor" || key == "cap" || key == "condenser")
                 return SpawnLoadCapacitor(worldPos);
             if (key == "inductor" || key == "inductance" || key == "choke" || key == "coil-l" || key == "series-l")
@@ -812,7 +815,7 @@ namespace RealityEngine.Player
 
         static GameObject SpawnLoadChargeMeter(Vector3 worldPos)
         {
-            // Real MEASURE tool: ideal coulomb integrator from classical InductionCircuit I (Q=∫I dt).
+            // Real MEASURE tool: ideal coulomb integrator from classical InductionCircuit I (Q=âˆ«I dt).
             var go = SpawnPrimitiveProxy("ChargeMeter", worldPos, new Color(0.48f, 0.22f, 0.58f));
             go.name = LoadChargeMeterGadget.RootName;
             go.transform.localScale = new Vector3(0.12f, 0.05f, 0.09f);
@@ -1248,7 +1251,7 @@ namespace RealityEngine.Player
         }
         static GameObject SpawnInclinedPlane(Vector3 worldPos)
         {
-            // PHYSICS inclined plane: ideal block-on-ramp a=g(sinθ-μ cosθ).
+            // PHYSICS inclined plane: ideal block-on-ramp a=g(sinÎ¸-Î¼ cosÎ¸).
             var go = SpawnPrimitiveProxy("InclinedPlane", worldPos, new Color(0.18f, 0.55f, 0.62f));
             go.name = LoadInclinedPlaneGadget.RootName;
             go.transform.localScale = new Vector3(0.14f, 0.12f, 0.14f);
@@ -1396,6 +1399,19 @@ namespace RealityEngine.Player
             return go;
         }
 
+        static GameObject SpawnCharlesLaw(Vector3 worldPos)
+        {
+            // PHYSICS Charles heated volume: ideal isobaric V/T=k.
+            var go = SpawnPrimitiveProxy("CharlesLaw", worldPos, new Color(0.95f, 0.55f, 0.25f));
+            go.name = LoadCharlesLawGadget.RootName;
+            go.transform.localScale = new Vector3(0.14f, 0.14f, 0.14f);
+            var charles = go.GetComponent<LoadCharlesLawGadget>();
+            if (charles == null)
+                charles = go.AddComponent<LoadCharlesLawGadget>();
+            charles.EnsureBuilt();
+            return go;
+        }
+
         static GameObject SpawnPrimitiveProxy(string name, Vector3 worldPos, Color color)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -1444,7 +1460,7 @@ namespace RealityEngine.Player
 
     /// <summary>
     /// Handheld Field Lens proxy: while held (or near camera), XR activate / N/P, or desktop LMB/scroll steps FieldLens layers.
-    /// Drives the existing scene FieldLens host — does not spawn a second lens.
+    /// Drives the existing scene FieldLens host â€” does not spawn a second lens.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class FieldLensHandheld : MonoBehaviour, IDesktopActivatable
