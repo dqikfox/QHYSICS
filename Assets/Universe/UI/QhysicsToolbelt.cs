@@ -1,5 +1,6 @@
 using System;
 using RealityEngine.Player;
+using RealityEngine.Stations;
 using RealityEngine.Systems;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,7 +31,7 @@ namespace RealityEngine.UI
             new[] { "Wire", "Battery", "Switch", "Bulb", "Resistor", "Lamp", "Motor", "Solar", "Capacitor", "Inductor", "Diode", "Fuse", "LED", "Speaker", "Potentiometer", "Transformer", "Function Generator" },
             new[] { "Magnet", "Coil", "Field Lens", "Dipole", "Crank Generator", "Mutual Coupler", "Spring Mass", "Pendulum", "Thin Lens", "Atwood", "Inclined Plane", "Lever", "Plate Cap", "Projectile", "Centripetal", "Collision", "Buoyancy", "Bernoulli", "Snell" },
             new[] { "Multimeter", "Galvanometer", "Oscilloscope", "Frequency Counter", "Power Meter", "Flux Meter", "Charge Meter", "Voltmeter", "Ammeter", "Ohmmeter", "Capacitance Meter", "Inductance Meter", "Resonance Meter", "Impedance Meter", "Power Factor Meter", "Q Factor Meter", "Admittance Meter", "Decibel Meter", "Crest Factor Meter", "Energy Meter", "Duty Cycle Meter", "Slew Rate Meter", "Rise/Fall Meter", "Overshoot Meter", "Peak-to-Peak Meter", "Mean Meter", "Ripple Meter", "THD Meter", "Cubit Rod", "Probe", "Compass", "Stopwatch" },
-            new[] { "Teleport", "Scale", "Sky", "Reset Pose", "Controls" },
+            new[] { "Teleport", "Scale", "Sky", "Reset Pose", "Controls", "Stations", "Bio", "Chem", "Thermo", "Survey", "Experiment" },
             new[] { "Challenges", "Induction", "New Run", "Save", "Load" },
             new string[0], // CARRY: filled live from PlayerCarryInventory (the old separate tools row)
             new[] { "Dagger", "Sword", "Spear", "Mace", "Shield", "Enemy", "Dummy", "Skills", "Arena" }
@@ -457,7 +458,90 @@ namespace RealityEngine.UI
                 Debug.Log("QHYSICS: Induction lab ensured.");
                 return true;
             }
+            if (key == "stations")
+            {
+                return TryStationTeleport(cycle: true, stationId: null);
+            }
+            if (key == "bio" || key == "biology")
+            {
+                return TryStationTeleport(cycle: false, stationId: "biology");
+            }
+            if (key == "chem" || key == "chemistry")
+            {
+                return TryStationTeleport(cycle: false, stationId: "chemistry");
+            }
+            if (key == "thermo" || key == "conservation")
+            {
+                return TryStationTeleport(cycle: false, stationId: "conservation");
+            }
+            if (key == "survey")
+            {
+                return TryStationTeleport(cycle: false, stationId: "survey");
+            }
+            if (key == "experiment")
+            {
+                return TryStationTeleport(cycle: false, stationId: "experiment");
+            }
             return false;
+        }
+
+        /// <summary>
+        /// WORLD Stations / Bio / Chem / Thermo / Survey / Experiment:
+        /// ensure lab boards + hub, then cycle or teleport to a station.
+        /// </summary>
+        static bool TryStationTeleport(bool cycle, string stationId)
+        {
+            LabStationHub hub = EnsureLabStationsReady();
+            if (hub == null || hub.Stations == null || hub.Stations.Count == 0)
+            {
+                hub = EnsureLabStationsReady();
+            }
+            if (hub == null || hub.Stations == null || hub.Stations.Count == 0)
+            {
+                Debug.Log("QHYSICS: Lab stations unavailable (hub/boards missing after EnsureLabInScene).");
+                return true;
+            }
+
+            if (cycle)
+            {
+                LabStation next = hub.CycleNextStation();
+                if (next != null)
+                    Debug.Log("QHYSICS: WORLD Stations -> " + next.DisplayName + " (" + next.Id + ").");
+                else
+                    Debug.Log("QHYSICS: WORLD Stations cycle found no station.");
+                return true;
+            }
+
+            LabStation station = hub.FindById(stationId);
+            if (station == null)
+            {
+                Debug.Log("QHYSICS: Station id '" + stationId + "' not found after refresh.");
+                return true;
+            }
+            if (hub.TeleportToStation(station))
+                Debug.Log("QHYSICS: Teleported to " + station.DisplayName + " (" + station.Id + ").");
+            else
+                Debug.Log("QHYSICS: Teleport to " + station.DisplayName + " failed (no XR Origin?).");
+            return true;
+        }
+
+        static LabStationHub EnsureLabStationsReady()
+        {
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            var lab = RealityEngine.Experiments.InductionLabBootstrap.EnsureLabInScene(scene);
+            if (lab != null)
+                lab.BuildLab();
+
+            LabStationHub hub = LabStationHub.Instance;
+            if (hub == null)
+                hub = UnityEngine.Object.FindAnyObjectByType<LabStationHub>(FindObjectsInactive.Include);
+            if (hub == null)
+            {
+                var go = new GameObject("LabStationHub");
+                hub = go.AddComponent<LabStationHub>();
+            }
+            hub.RefreshStations();
+            return hub;
         }
 
         static void TrySpawnGadget(string label)

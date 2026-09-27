@@ -4,6 +4,7 @@ using TMPro;
 using RealityEngine.Player;
 using RealityEngine.Experiments;
 using RealityEngine.Challenges;
+using RealityEngine.Stations;
 
 using UiButton = UnityEngine.UI.Button;
 
@@ -203,6 +204,24 @@ namespace RealityEngine.UI
             else
             {
                 ctx = ExperimentShortName();
+                // Append nearest lab station within ~4 m when idle (no active challenge).
+                LabStationHub hub = LabStationHub.Instance;
+                if (hub != null)
+                {
+                    if (_cam == null || !_cam.isActiveAndEnabled)
+                        _cam = QhysicsUiBuilder.ResolveXrCamera();
+                    Camera cam = _cam != null ? _cam : Camera.main;
+                    if (cam != null)
+                    {
+                        LabStation nearest = hub.NearestStation(cam.transform.position);
+                        if (nearest != null && nearest.WorldAnchor != null)
+                        {
+                            float dist = Vector3.Distance(cam.transform.position, nearest.WorldAnchor.position);
+                            if (dist <= 4f && !string.IsNullOrEmpty(nearest.DisplayName))
+                                ctx = ctx + " \u00B7 " + nearest.DisplayName;
+                        }
+                    }
+                }
             }
             _context.text = ctx;
 

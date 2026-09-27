@@ -94,6 +94,18 @@ Honesty: Settings **Volume - / Volume +** chips (±0.1) drive the **QhysicsMixer
 5. Stop Play, Play again: saved volume reapplies (status matches last value; audible gain matches).
 - New levels: **Bench Orientation** (spawn any gadget), **Lines of Force** (Compass + Magnet/Dipole, |B| ≥ 150 µT), **The Dynamo** (Crank Generator near the coil, |EMF| ≥ 0.01 V for 2 s), **Transformer** (Mutual Coupler MED/STRONG, then switch the primary; |Es| ≥ 0.1 mV).
 
+
+### WORLD lab stations teleport (2026-09-28)
+
+Honesty: WORLD tab chips **Stations** / **Bio** / **Chem** / **Thermo** / **Survey** / **Experiment** cycle or comfort-teleport the XR Origin so the head lands ~1.2 m in front of each lab bench (CharacterController briefly disabled; yaw corrected for room-scale). Thermo maps to the Conservation Bench. Status strip appends the nearest bench display name within ~4 m when no challenge is active (e.g. `Sandbox - Biology Bench`).
+
+**Desktop Ctrl+P test:**
+1. Open `Assets/Scenes/Faraday.unity`, Play (Ctrl+P). Enter Sandbox if the boot menu shows.
+2. **M/Tab** toolbelt -> **WORLD** -> **Stations**: cycles Biology -> Chemistry -> Conservation -> Survey -> Experiment (wrap). Console logs `QHYSICS: WORLD Stations -> ...`.
+3. Tap **Bio** / **Chem** / **Thermo** / **Survey** / **Experiment** for direct jumps.
+4. With no challenge active, stand within ~4 m of a bench: status context shows short experiment name plus nearest bench (e.g. `Sandbox - Biology Bench`). Farther than 4 m: short name alone.
+
+
 ## UI layout after the declutter pass (2026-09-27)
 
 **Before:** everything showed at once. Top-left "TRAINING SYSTEM (mojibake dot) Field S..." box, the QHYSICS boot menu floating over the scene, a world card "QHYSICS / What happens if I move the ma...", a "> 1x" sim-speed panel, a breadcrumb strip "BOOT → ENTER … [X]", a second tools row (Probe Tip / Battery P... / Health Am... with mojibake ellipses), a permanent help line "WASD move (mojibake) ...", and the circuit hotbar.
