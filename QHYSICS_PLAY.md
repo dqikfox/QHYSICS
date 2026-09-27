@@ -966,3 +966,13 @@ While a challenge is active, **Esc/P -> Reset Experiment** (or SimChip / Toolbel
 - Disabling MountainScene
 - Assuming Ctrl+P installs to the headset (it does not)
 
+## PHYSICS Double Slit (2026-09-28)
+
+Young two-slit Fraunhofer fringe prop - monochromatic equal-slit interference on a screen.
+
+1. Ctrl+P Play -> Enter Sandbox
+2. Desktop WASD near the plaza; **M / Tab** toolbelt -> **PHYSICS** -> page to **Double Slit** (or spawn label `Double Slit` / `Young` / `Interference`)
+3. Grab the prop. Screen bars show I = I0 cos^2(pi d sin(theta)/lambda); readout shows d, lambda, fringe spacing dy = lambda L / d
+4. **N / P** (near gadget) cycles slit spacing d; **Shift+N / Shift+P** cycles wavelength BLUE/GREEN/RED (source + fringe color follow)
+5. XR: grip grab, trigger/activate cycles d
+6. Honesty: far-field Fraunhofer only - not Fresnel, not single-slit envelope, not polarization
