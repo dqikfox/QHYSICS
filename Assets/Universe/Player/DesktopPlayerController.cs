@@ -339,6 +339,15 @@ namespace RealityEngine.Player
             _cursorOwned = false;
         }
 
+        /// <summary>After a scripted rig move (travel/teleport): adopt the origin yaw, clear fall/move velocity.</summary>
+        public void SyncAfterTeleport()
+        {
+            if (_origin != null)
+                _yaw = _origin.eulerAngles.y;
+            _vertVel = 0f;
+            _currentVelocity = Vector3.zero;
+        }
+
         void ApplyLook()
         {
             Vector2 delta = ReadMouseDelta();
