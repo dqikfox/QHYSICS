@@ -13,13 +13,13 @@
 
 **Test (about 15 min):**
 1. Put on the headset and start Link (or Air Link). You should see the Link home. In Unity, click the Game view, then press **Play** (Ctrl+P).
-2. **Boot menu:** a centred panel about 1.7 m ahead. Both controller rays are visible while a menu is open. Point at **Enter Sandbox** and pull the **trigger**.
+2. **Boot menu** (every Play): a centred panel about 1.7 m ahead with **Continue / Chapter 1: Faraday's Bench / Sandbox / Settings**. Both controller rays are visible while a menu is open. Point and pull the **trigger**. **Chapter 1** on a fresh save starts Level 1 with an intro card and the first-time tutorial.
 3. **Plaza:** check the floor height feels right, the left stick walks, and right stick left/right snap-turns 45° (down = turn around). Hold **A/X** for the teleport arc and release to teleport.
 4. **Grab:** use grip on a gadget or the baton pickup. The right stick click equips the selected carry item.
 5. **Toolbelt:** press **Menu / B / Y**, point and trigger a tab (try COMBAT). While it is open, right stick left/right changes carry slot (snap turn pauses).
 6. **Arena:** toolbelt COMBAT > **Arena**. You land at the arena entrance facing the centre. Press it again to go back.
 7. **Sword on the dummy:** grip a sword on the table and swing at a dummy. Numbers, DPS and haptics should appear, and the sword should not go through walls. Put your second hand on the grip for two-handed. Thrust fast with the tip to stick it, then pull back to free it.
-8. **Enemy:** stand in the middle of the arena for 4 s to spawn one (or COMBAT > Enemy). Put your blade in its swing to block. Swing into its blade to parry: it staggers and you get a gold spark. Kill it: it ragdolls, drops its sword, and gives +40 XP.
+8. **Enemy:** stand in the middle of the arena for 4 s to spawn one (or COMBAT > Enemy). Put your blade in its swing to block. Swing into its blade to parry: it staggers and you get a gold spark. It is an active ragdoll: hits shove its limbs, hard hits or a parry make it go limp and get back up. Kill it: it goes fully limp, drops its sword, and gives +40 XP. COMBAT > **Brute** spawns the heavy mace type.
 9. **Spells** (in the arena, near enemies, or while holding a weapon): with an empty hand, hold the **trigger** to charge and release to cast.
    - **Left stick click** = next spell (Fire, Lightning, Force). Force tapped at a loose weapon pulls it to you.
    - A fully charged spell held next to the blade in your other hand imbues it.
@@ -36,6 +36,36 @@
 - **Weapon flies off, jitters, or feels too weak or too heavy:** name the weapon and describe it. The strength and damage numbers are easy to tune.
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
+
+## 2026-09-30 build: Chapter 1 flow, wrist HUD, active ragdoll, Brute, tutorial, Giza travel
+
+**Controls added**
+
+| What | Desktop | VR (Quest) |
+|---|---|---|
+| Boot menu (every Play) | mouse click (cursor is freed while it is open) | ray + trigger |
+| Continue | resumes the highest unlocked Chapter 1 level (greyed out until you have a star) | same |
+| Chapter 1: Faraday's Bench | fresh save: starts Level 1. With progress: opens the level list | same |
+| Chapter-complete screen | appears ~2.5 s after the Transformer finale. **Return to Menu** / **Keep Building**. Editor preview: **End** | ray + trigger |
+| Giza travel | toolbelt **WORLD > Sphinx / Khufu / Khafre / Menkaure / Plaza**. **Home** cycles them | toolbelt WORLD chips |
+| Wrist HUD | n/a (desktop keeps the bottom-right combat panel) | look at the back of your **left wrist** like a watch: HP, mana, spell (+FOCUS), level / XP |
+| Brute enemy | **Shift+F8**, or toolbelt COMBAT > **Brute** (every 3rd auto spawn is a Brute) | COMBAT > Brute |
+| Tutorial replay | toolbelt **WORLD > Tutorial** | same |
+
+**Test: desktop**
+1. Play. The boot menu shows every time and the mouse is free. Click **Chapter 1** (fresh save) -> the "CHAPTER 1 | LEVEL 1 / 10" intro card fades in and out, and the tutorial card starts: walk 3 m, M/Tab, E-grab a gadget, light a bulb. Each step ticks off.
+2. Stop, Play, **Continue**: it names your highest unlocked level and starts it with its intro card. **Sandbox** gives a "Free Build" card and no challenge.
+3. Press **End** (Editor only) to preview the chapter-complete screen. Check the stars total and the 10 level lines, then click **Return to Menu**.
+4. Press **Home** repeatedly: Sphinx (court floor in front of the paws, facing the face), Khufu, Khafre, Menkaure (north faces), Plaza.
+5. F8 / Shift+F8 in the arena. Hit an enemy: its limbs react. A heavy hit or parry makes it collapse and stand back up after ~1.3-2 s. Force spell or a hard shove knocks it over. Kill it: full ragdoll, loot weapon, corpse gone after 8 s. At most 3 alive.
+
+**Test: VR**
+1. Boot menu: ray + trigger on Continue / Chapter 1 / Sandbox. The intro card floats ~1.3 m ahead and fades.
+2. Raise your left forearm across your chest with the back of the hand toward your eyes: the wrist panel fades in. Lower it: it fades out. The floating combat panel no longer appears in VR (only toasts like "Enemy down").
+3. WORLD > Sphinx: you stand on the court floor with the Sphinx in front of you.
+4. Enemies and Brute as in the desktop test (parry = limp Raider, the Brute only staggers).
+
+**Unverified / tuning:** active-ragdoll gains (pelvis 70 N/kg, joint springs), the get-up blend and the wrist-panel offset were built offline and not yet played. Report floaty, jittery or too-stiff enemies, or a wrist panel that sits inside the hand.
 
 ## UI map (lab shell)
 
