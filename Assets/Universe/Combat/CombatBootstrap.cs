@@ -11,7 +11,7 @@ namespace RealityEngine.Combat
     /// <summary>
     /// Runtime bootstrap for the combat layer (no scene edits): physics hands, spells, skills, HUD,
     /// hurtbox, enemy director and the arena near the plaza. Debug/spawn keys: F2 dagger, F3 sword,
-    /// F4 spear, F6 mace, F7 shield, F8 enemy, F10 dummy, L arena teleport.
+    /// F4 spear, F6 mace, F7 shield, F8 enemy (Shift+F8 brute), F10 dummy, L arena teleport.
     /// </summary>
     [DefaultExecutionOrder(151)]
     public sealed class CombatBootstrap : MonoBehaviour
@@ -59,7 +59,13 @@ namespace RealityEngine.Combat
             if (kb.f4Key.wasPressedThisFrame) SpawnWeapon(WeaponKind.Spear);
             if (kb.f6Key.wasPressedThisFrame) SpawnWeapon(WeaponKind.Mace);
             if (kb.f7Key.wasPressedThisFrame) SpawnWeapon(WeaponKind.Shield);
-            if (kb.f8Key.wasPressedThisFrame) SpawnEnemy();
+            if (kb.f8Key.wasPressedThisFrame)
+            {
+                if (kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed)
+                    CombatEnemy.NextSpawnOverride = EnemyType.Brute;
+                if (!EnemyDirector.Ensure().SpawnInFrontOfPlayer())
+                    CombatEnemy.NextSpawnOverride = null;
+            }
             if (kb.f10Key.wasPressedThisFrame) SpawnDummy();
             if (kb.lKey.wasPressedThisFrame) ToggleArena();
 #endif

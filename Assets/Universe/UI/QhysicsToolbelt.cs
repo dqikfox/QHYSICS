@@ -34,7 +34,7 @@ namespace RealityEngine.UI
             new[] { "Teleport", "Scale", "Sky", "Reset Pose", "Controls", "Stations", "Sphinx", "Khufu", "Khafre", "Menkaure", "Plaza", "Bio", "Chem", "Thermo", "Survey", "Experiment" },
             new[] { "Challenges", "Induction", "New Run", "Save", "Load" },
             new string[0], // CARRY: filled live from PlayerCarryInventory (the old separate tools row)
-            new[] { "Dagger", "Sword", "Spear", "Mace", "Shield", "Enemy", "Dummy", "Skills", "Arena" }
+            new[] { "Dagger", "Sword", "Spear", "Mace", "Shield", "Enemy", "Brute", "Dummy", "Skills", "Arena" }
         };
 
         [SerializeField] bool visible;
@@ -391,6 +391,11 @@ namespace RealityEngine.UI
                 case "mace": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Mace); return true;
                 case "shield": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Shield); return true;
                 case "enemy": RealityEngine.Combat.CombatBootstrap.SpawnEnemy(); return true;
+                case "brute":
+                    RealityEngine.Combat.CombatEnemy.NextSpawnOverride = RealityEngine.Combat.EnemyType.Brute;
+                    if (!RealityEngine.Combat.EnemyDirector.Ensure().SpawnInFrontOfPlayer())
+                        RealityEngine.Combat.CombatEnemy.NextSpawnOverride = null;
+                    return true;
                 case "dummy": RealityEngine.Combat.CombatBootstrap.SpawnDummy(); return true;
                 case "skills": RealityEngine.Combat.SkillsPanel.Open(); return true;
                 case "arena": RealityEngine.Combat.CombatBootstrap.ToggleArena(); return true;
