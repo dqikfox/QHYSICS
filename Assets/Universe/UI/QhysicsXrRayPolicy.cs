@@ -20,7 +20,7 @@ namespace RealityEngine.UI
 
         public static bool AnyMenuOpen()
         {
-            if (QhysicsUiState.BootMenuOpen || QhysicsPausePanel.AnyOpen || QhysicsControlsOverlay.IsOpen)
+            if (QhysicsUiState.BootMenuOpen || QhysicsModal.AnyOpen || QhysicsPausePanel.AnyOpen || QhysicsControlsOverlay.IsOpen)
                 return true;
             if (RealityEngine.Challenges.ChallengeUi.IsListOpen || RealityEngine.Combat.SkillsPanel.IsOpen)
                 return true;

@@ -173,7 +173,7 @@ namespace RealityEngine.Combat
                     return true;
                 if (RealityEngine.Challenges.ChallengeUi.IsListOpen)
                     return true;
-                if (SkillsPanel.IsOpen)
+                if (SkillsPanel.IsOpen || QhysicsModal.AnyOpen)
                     return true;
                 return false;
             }
