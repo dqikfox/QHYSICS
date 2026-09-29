@@ -49,6 +49,12 @@ namespace RealityEngine.Combat
             _renderers = GetComponentsInChildren<Renderer>();
         }
 
+        /// <summary>Hit-flash renderers for bodies that are not children of this object (active ragdoll parts).</summary>
+        public void SetRenderers(Renderer[] renderers)
+        {
+            _renderers = renderers;
+        }
+
         public void TakeHit(DamageInfo hit)
         {
             if (Hp <= 0f || hit.amount <= 0f)
