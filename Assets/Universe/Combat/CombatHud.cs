@@ -9,7 +9,8 @@ namespace RealityEngine.Combat
 {
     /// <summary>
     /// Compact combat readout (HP / mana / focus bars, spell, held weapon, kills) that only appears in
-    /// combat contexts, plus hurt flash and slow-mo tint. Same dark-glass style as the rest of the HUD.
+    /// combat contexts, plus hurt flash and slow-mo tint. Desktop only for the stats panel; in XR the stats are on
+    /// the left wrist (CombatWristHud) and this canvas only shows toasts. Same dark-glass style as the rest of the HUD.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(210)]
@@ -26,6 +27,7 @@ namespace RealityEngine.Combat
         float _hurtUntil;
         Camera _cam;
         float _lastCombat = -99f;
+        Image _face;
 
         public static CombatHud Ensure()
         {
@@ -67,6 +69,7 @@ namespace RealityEngine.Combat
             _hud.Root.sizeDelta = new Vector2(400f, 176f);
             var face = QhysicsUiBuilder.Panel(_hud.Root, "Panel", QhysicsUiStyle.PanelBg, new Vector2(400f, 176f));
             face.raycastTarget = false;
+            _face = face;
 
             _spell = Lbl(face.transform, "Spell", new Vector2(0f, 60f), new Vector2(368f, 36f), QhysicsUiStyle.FontSmall, TextAlignmentOptions.MidlineLeft);
             _hp = Bar(face.transform, "Hp", new Vector2(0f, 24f), new Color(0.95f, 0.3f, 0.28f));
@@ -149,6 +152,12 @@ namespace RealityEngine.Combat
             bool combat = SpellSystem.CombatModeActive() || FocusTime.Active || SpellSystem.Charging || ManaPool.Mana01 < 0.999f;
             if (combat) _lastCombat = Time.unscaledTime;
             bool show = QhysicsUiState.GameplayHudVisible && !CombatInputGate.Blocked && Time.unscaledTime - _lastCombat < 4f;
+            // XR: stats live on the left wrist (CombatWristHud); the floating panel only carries toasts.
+            bool xrHud = CombatInputGate.IsXr;
+            if (xrHud)
+                show = show && Time.unscaledTime < _toastUntil;
+            if (_face != null && _face.gameObject.activeSelf == xrHud)
+                _face.gameObject.SetActive(!xrHud);
             _hud.SetActive(show);
 
             // FX
