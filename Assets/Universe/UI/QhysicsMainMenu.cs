@@ -7,8 +7,8 @@ using RealityEngine.Player;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// Boot menu: clean centred world panel ~1.7 m ahead (fixed, not head-locked). While open the gameplay HUD is hidden (QhysicsUiState). Enter Sandbox loads into the usable Faraday lab.
-    /// Skipped if PlayerPrefs marks sandbox already entered this install (optional).
+    /// Boot menu (every Play): Continue (last unlocked Chapter 1 level) / Chapter 1 "Faraday's Bench" / Sandbox / Settings.
+    /// Clean centred world panel ~1.7 m ahead (fixed, not head-locked). While open the gameplay HUD is hidden (QhysicsUiState). Enter Sandbox loads into the usable Faraday lab.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(189)]
@@ -24,6 +24,11 @@ namespace RealityEngine.UI
         Camera _cam;
         bool _visible;
         bool _placed;
+        float _nextRefresh;
+        UnityEngine.UI.Button _continueBtn;
+        UnityEngine.UI.Button _chapterBtn;
+        TextMeshProUGUI _continueLabel;
+        TextMeshProUGUI _chapterLabel;
 
         public static QhysicsMainMenu Ensure(Transform parent)
         {
@@ -61,11 +66,11 @@ namespace RealityEngine.UI
             }
 
             // Scaled up so it reads well at ~1.7 m (≈ same angular size as the old 1.2 m panel).
-            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(720f, 520f));
+            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(720f, 640f));
             _canvas.transform.localScale = Vector3.one * QhysicsUiStyle.CanvasScale * 1.35f;
             _canvas.sortingOrder = 120;
             QhysicsUiBuilder.WireEventCamera(_canvas);
-            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(680f, 480f));
+            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(680f, 600f));
             QhysicsUiBuilder.LayoutVertical(face.rectTransform, QhysicsUiStyle.Space2);
             var v = face.GetComponent<UnityEngine.UI.VerticalLayoutGroup>();
             v.padding = new RectOffset(48, 48, 40, 32);
@@ -77,12 +82,16 @@ namespace RealityEngine.UI
             title.characterSpacing = 12f;
             title.rectTransform.sizeDelta = new Vector2(584f, 76f);
 
-            var sub = QhysicsUiBuilder.Label(face.transform, "Sub", "Faraday circuit sandbox  |  Giza plaza",
+            var sub = QhysicsUiBuilder.Label(face.transform, "Sub", "Faraday's bench  |  Giza plaza",
                 QhysicsUiStyle.FontSmall, QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
             sub.rectTransform.sizeDelta = new Vector2(584f, 40f);
 
-            QhysicsUiBuilder.ChipButton(face.transform, "Enter", "Enter Sandbox", new Vector2(584f, 96f), EnterSandbox);
-            QhysicsUiBuilder.ChipButton(face.transform, "Settings", "Settings", new Vector2(584f, 80f), OpenSettings);
+            _continueBtn = QhysicsUiBuilder.ChipButton(face.transform, "Continue", "Continue", new Vector2(584f, 92f), ContinueGame);
+            _continueLabel = _continueBtn.GetComponentInChildren<TextMeshProUGUI>(true);
+            _chapterBtn = QhysicsUiBuilder.ChipButton(face.transform, "Chapter1", "Chapter 1: Faraday's Bench", new Vector2(584f, 92f), PlayChapter1);
+            _chapterLabel = _chapterBtn.GetComponentInChildren<TextMeshProUGUI>(true);
+            QhysicsUiBuilder.ChipButton(face.transform, "Enter", "Sandbox", new Vector2(584f, 80f), EnterSandbox);
+            QhysicsUiBuilder.ChipButton(face.transform, "Settings", "Settings", new Vector2(584f, 64f), OpenSettings);
 
             var hint = QhysicsUiBuilder.Label(face.transform, "Hint", "F1 controls  |  Esc pause",
                 QhysicsUiStyle.FontSmall - 2f, QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
@@ -91,17 +100,21 @@ namespace RealityEngine.UI
             // no Exit here — pause panel has Exit Play
 #endif
 
-            // Show on first Play; if already entered once, stay hidden (lab is ready immediately).
-            bool show = Application.isPlaying && PlayerPrefs.GetInt(PrefEntered, 0) == 0;
-            SetVisible(show);
-            if (!show && Application.isPlaying)
-                QhysicsHintCard.ShowFirstRunOnce();
+            // Boot menu on every Play: Continue / Chapter 1 / Sandbox.
+            SetVisible(Application.isPlaying);
+            RefreshButtons();
         }
 
         void LateUpdate()
         {
             if (!_visible || _canvas == null)
                 return;
+            if (Time.unscaledTime >= _nextRefresh)
+            {
+                _nextRefresh = Time.unscaledTime + 0.5f;
+                RefreshButtons();
+            }
+            QhysicsModal.SyncDesktopRaycaster(_canvas);
             if (_cam == null)
                 _cam = QhysicsUiBuilder.ResolveXrCamera();
             if (_cam == null)
@@ -130,23 +143,78 @@ namespace RealityEngine.UI
             }
             QhysicsUiBuilder.FaceCamera(transform, _cam);
             QhysicsUiBuilder.WireEventCamera(_canvas);
+            QhysicsModal.SyncDesktopRaycaster(_canvas);
         }
 
         void EnterSandbox()
         {
             PlayerPrefs.SetInt(PrefEntered, 1);
             PlayerPrefs.Save();
-            Time.timeScale = 1f;
             SetVisible(false);
-            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-            var lab = InductionLabBootstrap.EnsureLabInScene(scene);
-            if (lab != null)
-                lab.BuildLab();
             // Plaza spawn + desktop character stack (body, WASD, hotbar, BuildingBlock cam strip).
-            LabPlayerSpawn.EnsureApplied();
-            QhysicsDesktopBootstrap.Ensure();
-            LabPlayerSpawn.RecalibratePlayerHeight(force: true);
+            QhysicsChapterFlow.EnterWorld();
+            var mgr = RealityEngine.Challenges.ChallengeManager.Instance;
+            if (mgr != null && mgr.IsChallengeActive)
+                mgr.AbandonChallenge();
+            QhysicsLevelIntroCard.Show("SANDBOX", "Free Build",
+                QhysicsUiState.IsXr ? "Menu / B / Y opens the toolbelt. Build anything." : "M / Tab opens the toolbelt. Build anything.");
             QhysicsHintCard.ShowFirstRunOnce();
+        }
+
+        /// <summary>Continue: resume the last unlocked Chapter 1 level from saved progress.</summary>
+        void ContinueGame()
+        {
+            int idx = QhysicsChapterFlow.ContinueIndex();
+            if (idx < 0)
+                return;
+            StartLevelFromMenu(idx);
+        }
+
+        /// <summary>Chapter 1: fresh save starts level 1; with progress opens the chapter's level list.</summary>
+        void PlayChapter1()
+        {
+            if (!QhysicsChapterFlow.HasProgress())
+            {
+                StartLevelFromMenu(0);
+                return;
+            }
+            PlayerPrefs.SetInt(PrefEntered, 1);
+            SetVisible(false);
+            QhysicsChapterFlow.EnterWorld();
+            RealityEngine.Challenges.ChallengeUi.OpenListStatic();
+            QhysicsHintCard.ShowFirstRunOnce();
+        }
+
+        void StartLevelFromMenu(int idx)
+        {
+            PlayerPrefs.SetInt(PrefEntered, 1);
+            PlayerPrefs.Save();
+            SetVisible(false);
+            QhysicsChapterFlow.EnterWorld();
+            if (!QhysicsChapterFlow.StartLevel(idx))
+                RealityEngine.Challenges.ChallengeUi.OpenListStatic();
+            QhysicsHintCard.ShowFirstRunOnce();
+        }
+
+        void RefreshButtons()
+        {
+            if (_continueBtn == null)
+                return;
+            int idx = QhysicsChapterFlow.ContinueIndex();
+            bool progress = QhysicsChapterFlow.HasProgress();
+            _continueBtn.interactable = idx >= 0 && progress;
+            if (_continueLabel != null)
+            {
+                _continueLabel.text = progress && idx >= 0
+                    ? "Continue  |  Level " + (idx + 1) + ": " + QhysicsChapterFlow.LevelTitle(idx)
+                    : "Continue  <color=#9AA3AD>(no saved progress)</color>";
+            }
+            if (_chapterLabel != null)
+            {
+                _chapterLabel.text = progress
+                    ? "Chapter 1: Faraday's Bench  <color=#F2D140>" + QhysicsChapterFlow.StarsTotal() + "/" + QhysicsChapterFlow.StarsMax + "*</color>"
+                    : "Chapter 1: Faraday's Bench  |  Start";
+            }
         }
 
         void OpenSettings()

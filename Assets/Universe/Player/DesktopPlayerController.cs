@@ -316,6 +316,8 @@ namespace RealityEngine.Player
         {
             if (RealityEngine.Combat.SkillsPanel.IsOpen)
                 return true; // free the cursor for the skill tree
+            if (RealityEngine.UI.QhysicsModal.CursorWanted)
+                return true; // boot menu / chapter-complete screen: mouse clicks
             var pause = Object.FindFirstObjectByType<QhysicsPausePanel>(FindObjectsInactive.Include);
             return pause != null && pause.IsOpen;
         }
