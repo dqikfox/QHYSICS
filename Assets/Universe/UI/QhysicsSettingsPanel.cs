@@ -6,7 +6,7 @@ using RealityEngine.XR;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// World-space settings with REAL wired toggles only (volume, sim speed, gravity, UI opacity, comfort vignette, teleport blink, snap turn angle, seated boost, foveation).
+    /// World-space settings with REAL wired toggles only (volume, sim speed, gravity, UI opacity, comfort vignette, teleport blink, snap turn angle, seated boost, foveation, walk speed).
     /// Volume chips drive QhysicsMixer Master (dB) via <see cref="AudioRouter"/> — not AudioListener.volume.
     /// Honesty: Master bus gain only; not per-SFX routing and not a full EQ.
     /// </summary>
@@ -32,6 +32,7 @@ namespace RealityEngine.UI
         TextMeshProUGUI _snapLabel;
         TextMeshProUGUI _seatedLabel;
         TextMeshProUGUI _foveationLabel;
+        TextMeshProUGUI _walkLabel;
 
         public static QhysicsSettingsPanel Ensure(Transform parent)
         {
@@ -68,9 +69,9 @@ namespace RealityEngine.UI
                 else DestroyImmediate(c.gameObject);
             }
 
-            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(780f, 1036f));
+            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(780f, 1118f));
             QhysicsUiBuilder.WireEventCamera(_canvas);
-            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(740f, 996f));
+            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(740f, 1078f));
             QhysicsUiBuilder.LayoutVertical(face.rectTransform, 10f);
 
             QhysicsUiBuilder.Label(face.transform, "Title", "SETTINGS", QhysicsUiStyle.FontTitle,
@@ -95,6 +96,8 @@ namespace RealityEngine.UI
             _seatedLabel = seated.GetComponentInChildren<TextMeshProUGUI>(true);
             var fov = QhysicsUiBuilder.ChipButton(face.transform, "Foveation", FoveationText(), new Vector2(520f, 72f), CycleFoveation);
             _foveationLabel = fov.GetComponentInChildren<TextMeshProUGUI>(true);
+            var walk = QhysicsUiBuilder.ChipButton(face.transform, "WalkSpeed", WalkText(), new Vector2(520f, 72f), CycleWalkSpeed);
+            _walkLabel = walk.GetComponentInChildren<TextMeshProUGUI>(true);
             QhysicsUiBuilder.ChipButton(face.transform, "Close", "Close", new Vector2(520f, 72f), () => SetOpen(false));
 
             // Boot path: apply PlayerPrefs master to mixer MasterVolume (dB). AudioListener stays at 1 when mixer is present.
@@ -247,6 +250,17 @@ namespace RealityEngine.UI
             RefreshStatus();
         }
 
+        static string WalkText() => "Walk speed: " + WalkSpeedSettings.Label;
+
+        void CycleWalkSpeed()
+        {
+            // Headset comfort: how fast the left stick walks you (Slow 1.2 / Normal 2.0 / Fast 3.0 m/s). Applies immediately.
+            WalkSpeedSettings.Cycle();
+            if (_walkLabel != null)
+                _walkLabel.text = WalkText();
+            RefreshStatus();
+        }
+
         void MatchGravityIndex()
         {
             float g = Mathf.Abs(UnityEngine.Physics.gravity.y);
@@ -275,7 +289,8 @@ namespace RealityEngine.UI
                 + " | blink " + TeleportBlink.StateLabel
                 + " | snap " + SnapTurnSettings.Label
                 + " | seated " + SeatedMode.Label
-                + " | foveation " + FoveationSettings.Label;
+                + " | foveation " + FoveationSettings.Label
+                + " | walk " + WalkSpeedSettings.Label;
         }
     }
 }

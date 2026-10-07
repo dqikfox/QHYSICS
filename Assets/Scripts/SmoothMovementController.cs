@@ -12,6 +12,8 @@ public class SmoothMovementController : MonoBehaviour
     public LayerMask groundLayer;
     public float additionalHeight = 0.2f;
     public Collider tableCollider;
+    [Tooltip("Radial left-stick deadzone (0-1). Below this the stick reads as centred so controller drift never creeps you along; above it the input is rescaled so walking still starts smoothly from zero.")]
+    [Range(0f, 0.5f)] public float stickDeadzone = 0.15f;
 
     private XROrigin origin;
     private Vector2 inputAxis;
@@ -50,6 +52,17 @@ public class SmoothMovementController : MonoBehaviour
         InputDevice device = InputDevices.GetDeviceAtXRNode(inputSource);
         if (!device.isValid || !device.TryGetFeatureValue(CommonUsages.primary2DAxis, out inputAxis))
             inputAxis = Vector2.zero;
+        inputAxis = ApplyDeadzone(inputAxis, stickDeadzone);
+    }
+
+    /// <summary>Radial deadzone with rescale: |v| below dz is zero, dz..1 maps to 0..1 (direction kept).</summary>
+    static Vector2 ApplyDeadzone(Vector2 v, float dz)
+    {
+        float m = v.magnitude;
+        if (m <= dz || m < 1e-5f)
+            return Vector2.zero;
+        float scaled = Mathf.Clamp01((m - dz) / Mathf.Max(1e-3f, 1f - dz));
+        return v * (scaled / m);
     }
 
     void FixedUpdate()
