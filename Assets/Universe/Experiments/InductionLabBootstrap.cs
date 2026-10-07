@@ -307,9 +307,8 @@ namespace RealityEngine.Experiments
         public static void SetTimeScale(float scale)
         {
             Time.timeScale = Mathf.Max(0f, scale);
-            Time.fixedDeltaTime = 0.02f * Mathf.Max(0.02f, Time.timeScale <= 0f ? 1f : Time.timeScale);
-            if (Time.timeScale <= 0f)
-                Time.fixedDeltaTime = 0.02f;
+            // One physics step per displayed headset frame at any sim speed (was a fixed 50 Hz base, which made held objects judder in VR).
+            Time.fixedDeltaTime = RealityEngine.XR.PhysicsTickSync.StepFor(Time.timeScale);
         }
 
         public void BuildLab()
