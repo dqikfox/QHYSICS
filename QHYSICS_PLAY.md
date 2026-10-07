@@ -37,6 +37,14 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Teleport blink (headset comfort)
+
+**What:** Whenever the rig jumps more than 1 m in one frame (teleport arc, toolbelt Arena / Giza / station travel, Chapter start, respawn) the view goes black for that frame and fades back in over about a quarter of a second, so the world never pops. Stick walking, falling and snap turns never blink. It uses unscaled time, so it still works in Focus slow-mo. Default **On**; **Settings > Teleport blink** toggles On / Off (saved between Plays). XR only; desktop and the Device Simulator are unchanged. Zero cost when not blinking (the quad is hidden).
+
+**Test VR (Ctrl+P, Link):** Sandbox > hold A/X, aim the arc a few metres away, release: a quick dark blink, then you are there. Toolbelt COMBAT > **Arena** and back: blink each way. Stick-walk and snap-turn: no blink. Settings > **Teleport blink: Off**, teleport again: instant cut. Console shows `TeleportBlink: ready (On, shader UI/Default)` and `TeleportBlink: first blink ...` once.
+
+**Report:** blink too long/short, a visible edge of the black quad at the side of your view, or a one-frame flash of the new spot before it goes dark (durations and quad size are one-line tweaks in `Assets/Universe/XR/TeleportBlink.cs`).
+
 ## 2026-10-07 build: UI haptics (headset menus)
 
 **What:** In the headset, sliding a controller ray onto a button, chip, toggle or slider gives a faint tick in that hand, and pulling the trigger on it gives a short firm click. A greyed-out control (for example **Continue** before you have a star) gives only a soft bump, so you can tell it did nothing. Sweeping fast down a long list is throttled so it does not buzz on every row. Nothing about the UI or input changes; desktop and the Device Simulator are unchanged.
