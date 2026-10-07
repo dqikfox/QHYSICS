@@ -29,7 +29,15 @@ namespace RealityEngine.Audio
         Unstick = 20,
         FocusOn = 21,
         FocusOff = 22,
-        Denied = 23
+        Denied = 23,
+        FleshHit = 24,
+        BoneCrunch = 25,
+        Shockwave = 26,
+        Recall = 27,
+        Catch = 28,
+        UiClick = 29,
+        SwooshHeavy = 30,
+        SlamCharge = 31
     }
 
     /// <summary>
@@ -103,6 +111,7 @@ namespace RealityEngine.Audio
             _next = (_next + 1) % _pool.Length;
             src.transform.position = pos;
             src.spatialBlend = spatial ? 1f : 0f;
+            if (spatial && id >= SfxId.HitBlunt && id != SfxId.UiClick) pitch *= Random.Range(0.94f, 1.06f); // natural variation on repeats
             src.pitch = Mathf.Clamp(pitch, 0.3f, 3f) * Mathf.Max(0.3f, Time.timeScale > 0.01f ? Mathf.Lerp(0.75f, 1f, Time.timeScale) : 1f);
             src.volume = Mathf.Clamp01(volume);
             src.clip = clip;
@@ -147,6 +156,14 @@ namespace RealityEngine.Audio
                 case SfxId.Unstick: return Sweep("sfx_unstick", 0.14f, 2600f, 900f, 0.4f);
                 case SfxId.FocusOn: return Tone("sfx_focus_on", 0.35f, 660f, 220f, 0.4f, 5f);
                 case SfxId.FocusOff: return Tone("sfx_focus_off", 0.3f, 220f, 660f, 0.35f, 6f);
+                case SfxId.FleshHit: return Impact("sfx_flesh", 0.2f, 75f, 0.6f, 650f);
+                case SfxId.BoneCrunch: return Impact("sfx_crunch", 0.24f, 150f, 0.7f, 5200f);
+                case SfxId.Shockwave: return Impact("sfx_shockwave", 0.9f, 38f, 0.95f, 380f);
+                case SfxId.Recall: return Sweep("sfx_recall", 0.45f, 400f, 3800f, 0.6f);
+                case SfxId.Catch: return Metal("sfx_catch", 0.22f, new[] { 1210f, 1873f, 2950f });
+                case SfxId.UiClick: return Tone("sfx_click", 0.035f, 2400f, 1800f, 0.45f, 90f);
+                case SfxId.SwooshHeavy: return Sweep("sfx_swoosh_heavy", 0.36f, 250f, 1400f, 0.6f);
+                case SfxId.SlamCharge: return Tone("sfx_slamcharge", 0.3f, 110f, 330f, 0.4f, 4f);
                 case SfxId.Denied: return Tone("sfx_denied", 0.18f, 180f, 140f, 0.4f, 12f);
             }
             return Tone("sfx_default", 0.1f, 440f, 0f, 0.4f, 20f);
