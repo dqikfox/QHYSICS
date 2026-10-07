@@ -37,6 +37,14 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Comfort vignette (headset locomotion)
+
+**What:** While you stick-walk, smooth-turn or fall, the edges of your view darken into a soft tunnel and fade back out about half a second after you stop. It only reacts to the rig moving (not your real head or body), and ignores teleport, arena/Giza travel and 45 deg snap turns. Default **Mild**; **Settings > Comfort vignette** cycles Mild / Strong / Off (saved between Plays). XR only; desktop and the Device Simulator are unchanged. Zero cost while standing still (the mesh is hidden).
+
+**Test VR (Ctrl+P, Link):** Sandbox > walk forward with the left stick: the periphery darkens, the centre stays clear. Stop: it fades out. Snap-turn and teleport: no vignette. Pause/toolbelt > Settings > **Comfort vignette** chip: Strong (tighter tunnel) > Off (nothing) > Mild. Console shows `ComfortVignette: ready (mode ..., shader UI/Default)` on the first XR frame.
+
+**Report:** too strong/weak, a visible ring edge, or the tunnel off-centre in one eye (radius/aperture are easy to tune). A hand right against your face can show through the dark edge (expected).
+
 ## 2026-10-07 build: Force telekinesis (B&S drag + fling)
 
 **What:** Holding Force charge now locks onto a loose weapon, free rigidbody, or enemy body part and drags it with a laggy physics drive (heavier = more lag). A purple tether shows the hold. Release flings with hand/camera velocity. Short tap still yanks a weapon to your hand; a long charge with no lock still fires the push wave. Lifting an enemy limb knocks them limp briefly. Mana: 10 to lock, then ~7/s.
