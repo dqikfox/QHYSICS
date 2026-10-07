@@ -37,6 +37,16 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Foveation (Quest performance)
+
+**What:** A new **Settings > Foveation** chip turns on fixed foveated rendering: the headset draws the soft outer edges of each lens at lower resolution so the GPU has more headroom for a steady frame rate on the Quest 3S. It cycles **Off** / **Low** / **Medium** (default) / **High**, applies the moment you click it and is saved between Plays. The OpenXR Foveated Rendering feature was already enabled for Android but nothing ever set a level, so until now it was effectively off. The Quest 3S has no eye tracking, so this is fixed (lens-centred) foveation only. Desktop and the Device Simulator are unchanged.
+
+**Test VR (Ctrl+P, Link):** Open Settings and check the chip reads **Foveation: Medium** and the status line ends `| foveation Medium`. Click it through **High**, **Off**, **Low** and back to **Medium**. Console shows `FoveationSettings: foveation High (level 1.00) on 1 XR display(s).` each click and, once per Play, `FoveationSettings: fixed foveated rendering Medium (level 0.66) on 1 XR display(s).` Over Link the PC runtime may ignore the level (it streams a full frame), so you may see no visual change there; that is expected. Stop Play, Play again: it remembers the last choice.
+
+**Test on device (Android build):** On **High**, look straight ahead and glance at the far edges of the view: text and grid lines at the edges are a little softer while the centre stays sharp. Use the Meta Quest Developer Hub / OVR Metrics overlay to compare GPU time on **Off** vs **High** in a busy spot (Giza plaza, the arena).
+
+**Report:** if the centre of the view looks blurry or shimmery on Low/Medium, if you see flicker at the edges, or if the Settings panel's bottom **Close** chip is cut off (the panel grew one row taller again).
+
 ## 2026-10-07 build: Seated boost (headset comfort / play sitting down)
 
 **What:** A new **Settings > Seated boost** chip raises your view and both hands by **+30 cm** or **+50 cm** so you can play sitting down and still see over the benches and reach gadgets, the toolbelt and weapons at standing height. It cycles **Off** (default) / **+30 cm** / **+50 cm**, applies the moment you click it (with a teleport blink if that is On) and is saved between Plays. It lifts the XR Origin's Camera Offset, so head, controllers and body capsule move together. XR only; desktop eye height, crouch and the Device Simulator are unchanged.
