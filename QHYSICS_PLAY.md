@@ -37,6 +37,13 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Lost items come back
+
+**What:** If you drop or throw a grabbable (gadget, magnet, coil, sword, prop) and it slips through the floor, tunnels through a bench or flies off the edge of the map, it now comes back instead of being gone for the session. Each grabbable remembers the last place it sat still (not in your hand). If it keeps falling for 3 seconds with nothing underneath it, or drops below 500 m under the world, it reappears at that resting spot with no speed. If it falls out again within 6 seconds of coming back, it goes to where it was first seen instead. Things that land on real ground (thrown off a pyramid, dropped down a slope) stay where they land. Objects in your hand, in a socket or locked in place are never moved. Slow-mo and pause do not set it off early. Nothing is saved to the scene or prefabs.
+
+**Test (Ctrl+P, Link or desktop):** On Play, the Console shows `LostItemReturn: watching N grabbables (...)`. Put a gadget down on the bench and let it settle for a second. Pick it up, walk to the edge of the lab or plaza area and throw it off the map (or into a floor gap if you know one). About 3 seconds after it starts falling into nothing it pops back onto the bench, and the Console shows `LostItemReturn: <name> fell out of the world - put back at its last resting spot (...)`. Throw something onto the floor or down off a step: it stays where it lands. Hold an object out over the edge for a while: nothing happens until you let go.
+
+**Report:** the N from the Console line, any object that disappeared and did not come back, and any object that jumped back when it should have stayed where it landed.
 ## 2026-10-07 build: Grab where you hold (natural pickups)
 
 **What:** Picking something up no longer snaps its centre into your palm. Most lab objects (spawned gadgets, magnets, coils, props) had no grip point, so a grab yanked the object's middle into your hand and twisted it to match the controller: long rods jumped sideways and big gadgets clipped through your wrist. Now the object stays exactly where your hand touched it and keeps the angle it was sitting at, like picking up a real thing, and the grip point stays on the object's surface. Ray grabs that pull an object to your hand should still do that (XRI keeps that rule), and things dropped into sockets still sit in their fixed pose. Objects that were deliberately given a handle or grip, and the few that already worked this way (lab magnets, cubit rod, muscle cell, cosmos toys, heat coupler), are unchanged. Nothing is saved to the scene or prefabs.
