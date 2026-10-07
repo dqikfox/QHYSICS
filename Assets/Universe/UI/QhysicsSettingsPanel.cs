@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using TMPro;
 using RealityEngine.Audio;
+using RealityEngine.XR;
 
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// World-space settings with REAL wired toggles only (volume, sim speed, gravity, UI opacity).
+    /// World-space settings with REAL wired toggles only (volume, sim speed, gravity, UI opacity, comfort vignette).
     /// Volume chips drive QhysicsMixer Master (dB) via <see cref="AudioRouter"/> — not AudioListener.volume.
     /// Honesty: Master bus gain only; not per-SFX routing and not a full EQ.
     /// </summary>
@@ -26,6 +27,7 @@ namespace RealityEngine.UI
         int _gravIndex;
         float _uiOpacity = 0.82f;
         float _masterVolume = 1f;
+        TextMeshProUGUI _vignetteLabel;
 
         public static QhysicsSettingsPanel Ensure(Transform parent)
         {
@@ -62,9 +64,9 @@ namespace RealityEngine.UI
                 else DestroyImmediate(c.gameObject);
             }
 
-            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(780f, 620f));
+            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(780f, 700f));
             QhysicsUiBuilder.WireEventCamera(_canvas);
-            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(740f, 580f));
+            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(740f, 660f));
             QhysicsUiBuilder.LayoutVertical(face.rectTransform, 10f);
 
             QhysicsUiBuilder.Label(face.transform, "Title", "SETTINGS", QhysicsUiStyle.FontTitle,
@@ -79,6 +81,8 @@ namespace RealityEngine.UI
             QhysicsUiBuilder.ChipButton(face.transform, "Speed", "Cycle sim speed", new Vector2(520f, 72f), CycleSpeed);
             QhysicsUiBuilder.ChipButton(face.transform, "Gravity", "Cycle gravity", new Vector2(520f, 72f), CycleGravity);
             QhysicsUiBuilder.ChipButton(face.transform, "Opacity", "UI opacity cycle", new Vector2(520f, 72f), CycleOpacity);
+            var vig = QhysicsUiBuilder.ChipButton(face.transform, "Vignette", VignetteText(), new Vector2(520f, 72f), CycleVignette);
+            _vignetteLabel = vig.GetComponentInChildren<TextMeshProUGUI>(true);
             QhysicsUiBuilder.ChipButton(face.transform, "Close", "Close", new Vector2(520f, 72f), () => SetOpen(false));
 
             // Boot path: apply PlayerPrefs master to mixer MasterVolume (dB). AudioListener stays at 1 when mixer is present.
@@ -176,6 +180,17 @@ namespace RealityEngine.UI
             }
         }
 
+        static string VignetteText() => "Comfort vignette: " + ComfortVignette.ModeLabel(ComfortVignette.CurrentMode);
+
+        void CycleVignette()
+        {
+            // Headset comfort: darkens the view edges while you stick-walk / smooth-turn (Mild / Strong / Off).
+            ComfortVignette.CycleMode();
+            if (_vignetteLabel != null)
+                _vignetteLabel.text = VignetteText();
+            RefreshStatus();
+        }
+
         void MatchGravityIndex()
         {
             float g = Mathf.Abs(UnityEngine.Physics.gravity.y);
@@ -199,7 +214,8 @@ namespace RealityEngine.UI
             _status.text = volBit
                 + " | speed " + Time.timeScale.ToString("0.##") + "x"
                 + " | " + GravityNames[_gravIndex]
-                + " | ui a " + _uiOpacity.ToString("0.00");
+                + " | ui a " + _uiOpacity.ToString("0.00")
+                + " | vignette " + ComfortVignette.ModeLabel(ComfortVignette.CurrentMode);
         }
     }
 }
