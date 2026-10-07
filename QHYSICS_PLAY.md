@@ -37,6 +37,13 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Walk direction (headset comfort)
+
+**What:** A new **Settings > Walk direction** chip picks which way pushing the left stick forward walks you: **Head** (default, same as before) walks where you are looking, **Left hand** walks where your left controller points. With Left hand you can look around, or down at a bench, while still walking in a straight line, which many players find more comfortable. It applies the moment you click it and is saved between Plays. If the controller points almost straight up or down, walking uses your head direction for that moment so you never get stuck. XR only; desktop WASD and the Device Simulator are unchanged.
+
+**Test VR (Ctrl+P, Link):** Open Settings and check the chip reads **Walk direction: Head** and the status line ends `| walk dir Head`. Click it: it reads **Walk direction: Left hand** and the Console shows `WalkDirectionSettings: walk direction Left hand.` Close Settings, point your left controller to your left, look straight ahead, and push the stick forward: you walk to the left (where the controller points), not where you look. Turn your head while walking: your path does not change. Click the chip back to **Head** and repeat: now you walk where you look. Stop Play, Play again: it remembers the last choice.
+
+**Report:** if Left hand walks the wrong way (say roughly which direction), if it jitters while walking, or if the Settings panel's bottom **Close** chip is cut off (the panel grew one row taller again).
 ## 2026-10-07 build: Walk speed + stick deadzone (headset comfort)
 
 **What:** A new **Settings > Walk speed** chip sets how fast the left stick walks you: **Slow (1.2 m/s)** for new or motion-sensitive players and careful bench work, **Normal (2.0 m/s)** (default, same as before) and **Fast (3.0 m/s)** for crossing the Giza plaza and the arena. It applies the moment you click it and is saved between Plays. Stick walking also gets a small deadzone now, so a slightly drifting Quest stick no longer slowly creeps you across the floor when you are not touching it; past the deadzone, walking still ramps up smoothly from zero. XR only; desktop WASD and the Device Simulator are unchanged.
