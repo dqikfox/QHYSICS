@@ -6,7 +6,7 @@ using RealityEngine.XR;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// World-space settings (two-column chip grid) with REAL wired toggles only (volume, sim speed, gravity, UI opacity, comfort vignette, teleport blink, snap turn angle, seated boost, foveation, render scale, walk speed, walk direction).
+    /// World-space settings (two-column chip grid) with REAL wired toggles only (volume, sim speed, gravity, UI opacity, comfort vignette, teleport blink, snap turn angle, seated boost, foveation, render scale, walk speed, walk direction, turn style).
     /// Volume chips drive QhysicsMixer Master (dB) via <see cref="AudioRouter"/> — not AudioListener.volume.
     /// Honesty: Master bus gain only; not per-SFX routing and not a full EQ.
     /// </summary>
@@ -20,8 +20,8 @@ namespace RealityEngine.UI
         static readonly string[] GravityNames = { "Earth g", "Moon g", "Mars g" };
         static readonly float[] Speeds = { 0.5f, 1f, 2f };
 
-        // Two-column chip grid (13 setting chips => 7 rows, last one left column); Close stays full width underneath.
-        const int GridChips = 13;
+        // Two-column chip grid (14 setting chips => 7 full rows); Close stays full width underneath.
+        const int GridChips = 14;
         const int GridRows = (GridChips + 1) / 2;
         const float GridCellW = 340f, GridCellH = 64f, GridGapX = 16f, GridGapY = 10f;
         const float StatusH = 96f;
@@ -41,6 +41,7 @@ namespace RealityEngine.UI
         TextMeshProUGUI _walkLabel;
         TextMeshProUGUI _walkDirLabel;
         TextMeshProUGUI _renderScaleLabel;
+        TextMeshProUGUI _turnStyleLabel;
 
         public static QhysicsSettingsPanel Ensure(Transform parent)
         {
@@ -120,6 +121,7 @@ namespace RealityEngine.UI
             _walkLabel = GridChip(g, "WalkSpeed", WalkText(), CycleWalkSpeed);
             _walkDirLabel = GridChip(g, "WalkDirection", WalkDirText(), ToggleWalkDirection);
             _renderScaleLabel = GridChip(g, "RenderScale", RenderScaleText(), CycleRenderScale);
+            _turnStyleLabel = GridChip(g, "TurnStyle", TurnStyleText(), CycleTurnStyle);
             QhysicsUiBuilder.ChipButton(face.transform, "Close", "Close", new Vector2(520f, 72f), () => SetOpen(false));
 
             // Boot path: apply PlayerPrefs master to mixer MasterVolume (dB). AudioListener stays at 1 when mixer is present.
@@ -320,6 +322,17 @@ namespace RealityEngine.UI
             RefreshStatus();
         }
 
+        static string TurnStyleText() => "Turn style: " + TurnStyleSettings.Label;
+
+        void CycleTurnStyle()
+        {
+            // Headset comfort: right stick snaps (Snap, uses the Snap turn angle) or turns smoothly (Smooth 60/s / 120/s). Applies immediately.
+            TurnStyleSettings.Cycle();
+            if (_turnStyleLabel != null)
+                _turnStyleLabel.text = TurnStyleText();
+            RefreshStatus();
+        }
+
         void MatchGravityIndex()
         {
             float g = Mathf.Abs(UnityEngine.Physics.gravity.y);
@@ -347,6 +360,7 @@ namespace RealityEngine.UI
                 + " | vignette " + ComfortVignette.ModeLabel(ComfortVignette.CurrentMode)
                 + " | blink " + TeleportBlink.StateLabel
                 + " | snap " + SnapTurnSettings.Label
+                + " | turn " + TurnStyleSettings.Label
                 + " | seated " + SeatedMode.Label
                 + " | foveation " + FoveationSettings.Label
                 + " | render " + RenderScaleSettings.Label
