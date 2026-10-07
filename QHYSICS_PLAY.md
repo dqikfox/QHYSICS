@@ -37,6 +37,14 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Grab where you hold (natural pickups)
+
+**What:** Picking something up no longer snaps its centre into your palm. Most lab objects (spawned gadgets, magnets, coils, props) had no grip point, so a grab yanked the object's middle into your hand and twisted it to match the controller: long rods jumped sideways and big gadgets clipped through your wrist. Now the object stays exactly where your hand touched it and keeps the angle it was sitting at, like picking up a real thing, and the grip point stays on the object's surface. Ray grabs that pull an object to your hand should still do that (XRI keeps that rule), and things dropped into sockets still sit in their fixed pose. Objects that were deliberately given a handle or grip, and the few that already worked this way (lab magnets, cubit rod, muscle cell, cosmos toys, heat coupler), are unchanged. Nothing is saved to the scene or prefabs.
+
+**Test VR (Ctrl+P, Link):** On Play, the Console shows `XrGrabFeel: grab where you hold - dynamic attach on N grabbables (...)`. Grip the end of a coil, rod or long gadget on the bench: it lifts from that end without jumping or rotating in your hand. Grab a big gadget by its corner: your hand stays at the corner instead of the gadget's centre moving onto your hand. Spawn a new gadget from the toolbelt and grab it straight away: same behaviour. Point the ray at something across the room and grab: it should still come to your hand (tell me if it now hangs at the ray tip instead). Two-handed holds still work.
+
+**Report:** the N from the Console line, and any object that now feels worse (for example a tool that you want to snap to a fixed angle in the hand, or something that ends up held awkwardly far from your palm).
+
 ## 2026-10-07 build: Grab haptics (feel what you hold)
 
 **What:** Every grabbable lab object (gadgets, magnets, coils, rods, toys, props) now has feel in the controller. Grabbing something gives a short firm bump in that hand, letting go gives a soft tap, and while you hold it, knocking it into a table, wall or another object buzzes that hand: a gentle tick for a light touch, a stronger buzz for a hard knock, softer for very light objects. Holding with two hands buzzes both. Touches against your own hands or body and very slow contacts stay silent, and there is a short gap between buzzes so dragging along a surface does not rattle. Swords and physics hands keep their own combat haptics (unchanged). Desktop and the Device Simulator are untouched.
