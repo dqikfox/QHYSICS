@@ -37,6 +37,14 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Seated boost (headset comfort / play sitting down)
+
+**What:** A new **Settings > Seated boost** chip raises your view and both hands by **+30 cm** or **+50 cm** so you can play sitting down and still see over the benches and reach gadgets, the toolbelt and weapons at standing height. It cycles **Off** (default) / **+30 cm** / **+50 cm**, applies the moment you click it (with a teleport blink if that is On) and is saved between Plays. It lifts the XR Origin's Camera Offset, so head, controllers and body capsule move together. XR only; desktop eye height, crouch and the Device Simulator are unchanged.
+
+**Test VR (Ctrl+P, Link):** Sit down. Open Settings, click **Seated boost** until it reads **+50 cm**: the view and hands jump up together and the bench tops sit at a normal standing height. Teleport, use toolbelt travel (Arena / Giza / a station) and check you stay boosted after each jump. Cycle to **Off**: back to your real seated height. Stop Play, Play again: it remembers the last choice. Console shows `SeatedMode: seated boost +50 cm.` and, once in the headset, `SeatedMode: applying seated boost +50 cm to Camera Offset.`
+
+**Report:** if the height flickers or drops back after a teleport/travel, if your hands end up offset from the controllers, or if the Settings panel's bottom **Close** chip is cut off (the panel grew one row taller again).
+
 ## 2026-10-07 build: Snap turn angle (headset comfort)
 
 **What:** A new **Settings > Snap turn** chip picks how far one right-stick flick turns you: **30 deg**, **45 deg** (default, same as before) or **90 deg**. It applies the moment you click it and is saved between Plays. Flicking the stick down for a 180 turn-around is unchanged, and snap turn still pauses while the toolbelt or a scrolling list is using the right stick. XR only; desktop and the Device Simulator are unchanged.
