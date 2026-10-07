@@ -37,6 +37,14 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Grab haptics (feel what you hold)
+
+**What:** Every grabbable lab object (gadgets, magnets, coils, rods, toys, props) now has feel in the controller. Grabbing something gives a short firm bump in that hand, letting go gives a soft tap, and while you hold it, knocking it into a table, wall or another object buzzes that hand: a gentle tick for a light touch, a stronger buzz for a hard knock, softer for very light objects. Holding with two hands buzzes both. Touches against your own hands or body and very slow contacts stay silent, and there is a short gap between buzzes so dragging along a surface does not rattle. Swords and physics hands keep their own combat haptics (unchanged). Desktop and the Device Simulator are untouched.
+
+**Test VR (Ctrl+P, Link):** On Play, the Console shows `XrGrabHaptics: ready (N hand interactors; grab bump, release tap, held-object impact buzz)`. Grip a gadget or magnet on the bench: a short bump in that hand. Let go: a faint tap. Pick it up again and tap it lightly on the bench top: a soft tick; knock it harder: a stronger buzz in the holding hand only. Slide it slowly across the bench: no constant buzzing. Grab an object with both hands and knock it: both hands buzz. Touch the held object with your other empty hand: nothing. In the arena, sword hits feel the same as before.
+
+**Report:** whether the bump, tap and knocks feel right, too weak or too strong, and any object that buzzes constantly while you just hold it still.
+
 ## 2026-10-07 build: Physics tick matches the headset (smoother held objects)
 
 **What:** Physics now takes exactly one step per frame the headset shows. Before, physics ran at a fixed 90 steps a second while Quest usually shows 72 frames a second, so some frames got one step and others two, and held swords, physics hands, gadgets and ragdolls could judder slightly against your smooth controller. Clicking the lab's **Time 1x** button (or keys 1/2/3) also dropped physics to 50 steps a second for the rest of the Play. Now the game reads the headset's refresh rate (72, 80, 90 or 120 Hz, checked every 2 s) and matches it. Slow sim speeds (0.1x, the sim chip, Focus slow-mo) still get one step per frame, so things move smoothly in slow motion instead of stepping. On desktop with no headset the project's own 90 Hz step is kept. Nothing is saved to the project settings; the original value is put back when Play stops.
