@@ -37,6 +37,14 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Compact Settings panel (headset UI)
+
+**What:** The Settings panel had grown one row per new setting until it was about 1.2 m tall in front of you, so the bottom chips and **Close** sat well below eye level. The twelve setting chips now sit in a two-column grid with **Close** full width underneath, so the whole panel is about 0.75 m tall and every chip is an easy glance and ray-click away. Long chip labels shrink slightly instead of being cut off with "...", and the status line wraps onto two or three lines instead of running off the edge. Every chip does exactly what it did before; nothing was removed.
+
+**Test VR (Ctrl+P, Link):** Open Settings from Pause or the boot menu. Check you see the title, a wrapped status line, six rows of two chips (Volume - / Volume +, sim speed / gravity, UI opacity / Comfort vignette, Teleport blink / Snap turn, Seated boost / Foveation, Walk speed / Walk direction) and **Close** at the bottom, all without tilting your head far down. Click a few cycling chips (Walk direction, Foveation, Comfort vignette): each label updates in place and stays readable, and the status line updates. Click **Close**: the panel hides.
+
+**Report:** if any chip label still shows "...", if the status line is clipped, or if a chip in the right column does not react to the ray.
+
 ## 2026-10-07 build: Walk direction (headset comfort)
 
 **What:** A new **Settings > Walk direction** chip picks which way pushing the left stick forward walks you: **Head** (default, same as before) walks where you are looking, **Left hand** walks where your left controller points. With Left hand you can look around, or down at a bench, while still walking in a straight line, which many players find more comfortable. It applies the moment you click it and is saved between Plays. If the controller points almost straight up or down, walking uses your head direction for that moment so you never get stuck. XR only; desktop WASD and the Device Simulator are unchanged.
