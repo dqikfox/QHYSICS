@@ -21,6 +21,8 @@ public class SmoothMovementController : MonoBehaviour
     private float fallingSpeed = 0f;
     private float colliderThreshold = 100.0f;
     private bool locomotionPaused;
+    private Quaternion handRotation = Quaternion.identity;
+    private bool handRotationValid;
 
     void Start()
     {
@@ -53,6 +55,8 @@ public class SmoothMovementController : MonoBehaviour
         if (!device.isValid || !device.TryGetFeatureValue(CommonUsages.primary2DAxis, out inputAxis))
             inputAxis = Vector2.zero;
         inputAxis = ApplyDeadzone(inputAxis, stickDeadzone);
+        // Settings > Walk direction = Left hand: remember where the stick's controller points (tracking space).
+        handRotationValid = device.isValid && device.TryGetFeatureValue(CommonUsages.deviceRotation, out handRotation);
     }
 
     /// <summary>Radial deadzone with rescale: |v| below dz is zero, dz..1 maps to 0..1 (direction kept).</summary>
@@ -79,8 +83,11 @@ public class SmoothMovementController : MonoBehaviour
 
         CapsuleFollowHeadset();
 
-        Quaternion headYaw = Quaternion.Euler(0, origin.Camera.transform.eulerAngles.y, 0);
-        Vector3 direction = headYaw * new Vector3(inputAxis.x, 0, inputAxis.y);
+        Quaternion moveYaw = Quaternion.Euler(0, origin.Camera.transform.eulerAngles.y, 0);
+        float handYaw;
+        if (RealityEngine.XR.WalkDirectionSettings.HandRelative && TryGetHandYaw(out handYaw))
+            moveYaw = Quaternion.Euler(0, handYaw, 0);
+        Vector3 direction = moveYaw * new Vector3(inputAxis.x, 0, inputAxis.y);
         character.Move(direction * Time.fixedDeltaTime * speed);
 
         if (IsGrounded())
@@ -88,6 +95,22 @@ public class SmoothMovementController : MonoBehaviour
         else
             fallingSpeed += gravity * Time.fixedDeltaTime;
         character.Move(Vector3.up * fallingSpeed * Time.fixedDeltaTime);
+    }
+
+    /// <summary>World yaw (degrees) of the stick controller's pointing direction. False if untracked or pointing nearly straight up/down.</summary>
+    bool TryGetHandYaw(out float yaw)
+    {
+        yaw = 0f;
+        if (!handRotationValid || origin == null || origin.Camera == null)
+            return false;
+        // Device poses are in tracking space = the camera's parent (Camera Offset) under the XR Origin.
+        Transform space = origin.Camera.transform.parent != null ? origin.Camera.transform.parent : origin.transform;
+        Vector3 fwd = space.rotation * (handRotation * Vector3.forward);
+        fwd.y = 0f;
+        if (fwd.sqrMagnitude < 0.04f)
+            return false;
+        yaw = Mathf.Atan2(fwd.x, fwd.z) * Mathf.Rad2Deg;
+        return true;
     }
 
     void CapsuleFollowHeadset()
