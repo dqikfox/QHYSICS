@@ -33,7 +33,7 @@ namespace RealityEngine.XR
         /// <summary>Desktop eye height on Camera Offset (XR Floor keeps offset at 0).</summary>
         public const float DesktopEyeHeightM = 1.65f;
         const float XrContinuousMoveSpeed = 2.0f;
-        const float XrSnapTurnDegrees = 45f;
+        // Snap-turn angle: Settings > Snap turn (30 / 45 / 90), see SnapTurnSettings.
 
         static int _appliedFrame = -1;
         bool _parked;
@@ -545,7 +545,7 @@ namespace RealityEngine.XR
             _snap = originXf.GetComponent<DeviceBasedSnapTurnProvider>();
             if (_snap != null)
             {
-                _snap.turnAmount = XrSnapTurnDegrees;
+                _snap.turnAmount = SnapTurnSettings.Degrees;
                 _snap.enableTurnLeftRight = true;
                 _snap.enableTurnAround = true;
                 List<XRBaseController> list = _snap.controllers;
@@ -578,6 +578,7 @@ namespace RealityEngine.XR
                 _locoSystem.xrOrigin = _origin;
 #pragma warning restore CS0618
 
+            SnapTurnSettings.ApplyToScene(); // also any XRI 3 SnapTurnProvider on the rig
             _teleportCtrl = originXf.GetComponent<TeleportationController>();
             CollectLocomotionBehaviours(originXf);
         }
