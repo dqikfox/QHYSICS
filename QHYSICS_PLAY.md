@@ -37,6 +37,15 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Render scale (Quest performance / sharpness)
+
+**What:** A new **Settings > Render scale** chip sets how many pixels the game renders per eye: **0.8 Perf** and **0.9 Balanced** draw fewer pixels so the GPU keeps a steadier frame rate in busy places (Giza plaza, the arena), **1.0 Native** (default, same as before) is the headset's normal resolution, and **1.2 Sharp** renders extra pixels for crisper text and grid lines when there is headroom. It applies the moment you click it (expect a tiny hitch as the eye images resize) and is saved between Plays. It works alongside **Foveation**, which only lowers the lens edges. The project's URP settings files are never changed on disk: the value is only set in memory and put back when Play stops. Until you first click the chip, nothing is changed at all. It also applies on desktop.
+
+**Test VR (Ctrl+P, Link):** Open Settings: the new chip sits alone in the bottom-left of a seventh row, above **Close**, and reads **Render scale: 1.0 Native**; the status line includes `| render 1.0 Native`. Click it to **1.2 Sharp**: Console shows `RenderScaleSettings: render scale 1.2 Sharp on the active URP asset.` and small text (chip labels, gadget readouts) looks a bit crisper. Click to **0.8 Perf**: the whole view gets slightly softer. Click to **0.9 Balanced**, then **1.0 Native**. Stop Play: check the URP asset under `Assets/Settings` still shows Render Scale 1 in the Inspector and is not marked changed in git. Play again: the chip remembers the last choice and the Console logs it once at start.
+
+**Test on device (Android build):** Use the OVR Metrics overlay to compare GPU time on **0.8 Perf** vs **1.0 Native** in the Giza plaza; Perf should be clearly lower. Try **1.2 Sharp** at the bench and watch for dropped frames.
+
+**Report:** if the view looks wrong (stretched, black or flickering) after a click, if a URP asset shows up as modified in git after Play, or if the Close chip is cut off (the panel grew one row taller).
 ## 2026-10-07 build: Compact Settings panel (headset UI)
 
 **What:** The Settings panel had grown one row per new setting until it was about 1.2 m tall in front of you, so the bottom chips and **Close** sat well below eye level. The twelve setting chips now sit in a two-column grid with **Close** full width underneath, so the whole panel is about 0.75 m tall and every chip is an easy glance and ray-click away. Long chip labels shrink slightly instead of being cut off with "...", and the status line wraps onto two or three lines instead of running off the edge. Every chip does exactly what it did before; nothing was removed.
