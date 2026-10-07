@@ -6,7 +6,7 @@ using RealityEngine.XR;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// World-space settings with REAL wired toggles only (volume, sim speed, gravity, UI opacity, comfort vignette, teleport blink, snap turn angle, seated boost, foveation, walk speed, walk direction).
+    /// World-space settings (two-column chip grid) with REAL wired toggles only (volume, sim speed, gravity, UI opacity, comfort vignette, teleport blink, snap turn angle, seated boost, foveation, walk speed, walk direction).
     /// Volume chips drive QhysicsMixer Master (dB) via <see cref="AudioRouter"/> — not AudioListener.volume.
     /// Honesty: Master bus gain only; not per-SFX routing and not a full EQ.
     /// </summary>
@@ -19,6 +19,12 @@ namespace RealityEngine.UI
         static readonly float[] GravityPresets = { 9.81f, 1.62f, 3.71f }; // Earth, Moon, Mars
         static readonly string[] GravityNames = { "Earth g", "Moon g", "Mars g" };
         static readonly float[] Speeds = { 0.5f, 1f, 2f };
+
+        // Two-column chip grid (12 setting chips => 6 rows); Close stays full width underneath.
+        const int GridChips = 12;
+        const int GridRows = (GridChips + 1) / 2;
+        const float GridCellW = 340f, GridCellH = 64f, GridGapX = 16f, GridGapY = 10f;
+        const float StatusH = 96f;
 
         Canvas _canvas;
         TextMeshProUGUI _status;
@@ -70,9 +76,13 @@ namespace RealityEngine.UI
                 else DestroyImmediate(c.gameObject);
             }
 
-            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(780f, 1200f));
+            // Two-column chip grid: the one-chip-per-row list had grown to 1.2 m tall at 1.1 m away, so the bottom
+            // chips (and Close) sat far below eye level in the headset. The grid keeps every chip within an easy glance.
+            float gridH = GridRows * GridCellH + (GridRows - 1) * GridGapY;
+            float faceH = 16f + 48f + 10f + StatusH + 10f + gridH + 10f + 72f + 16f;
+            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(780f, faceH + 40f));
             QhysicsUiBuilder.WireEventCamera(_canvas);
-            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(740f, 1160f));
+            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(740f, faceH));
             QhysicsUiBuilder.LayoutVertical(face.rectTransform, 10f);
 
             QhysicsUiBuilder.Label(face.transform, "Title", "SETTINGS", QhysicsUiStyle.FontTitle,
@@ -80,27 +90,34 @@ namespace RealityEngine.UI
 
             _status = QhysicsUiBuilder.Label(face.transform, "Status", "", QhysicsUiStyle.FontSmall,
                 QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
-            _status.rectTransform.sizeDelta = new Vector2(700f, 36f);
+            _status.rectTransform.sizeDelta = new Vector2(700f, StatusH);
+            _status.textWrappingMode = TextWrappingModes.Normal; // the status line wraps over 2-3 lines instead of ellipsing
+            _status.overflowMode = TextOverflowModes.Truncate;
 
-            QhysicsUiBuilder.ChipButton(face.transform, "VolDown", "Volume -", new Vector2(520f, 72f), () => NudgeVolume(-0.1f));
-            QhysicsUiBuilder.ChipButton(face.transform, "VolUp", "Volume +", new Vector2(520f, 72f), () => NudgeVolume(0.1f));
-            QhysicsUiBuilder.ChipButton(face.transform, "Speed", "Cycle sim speed", new Vector2(520f, 72f), CycleSpeed);
-            QhysicsUiBuilder.ChipButton(face.transform, "Gravity", "Cycle gravity", new Vector2(520f, 72f), CycleGravity);
-            QhysicsUiBuilder.ChipButton(face.transform, "Opacity", "UI opacity cycle", new Vector2(520f, 72f), CycleOpacity);
-            var vig = QhysicsUiBuilder.ChipButton(face.transform, "Vignette", VignetteText(), new Vector2(520f, 72f), CycleVignette);
-            _vignetteLabel = vig.GetComponentInChildren<TextMeshProUGUI>(true);
-            var blink = QhysicsUiBuilder.ChipButton(face.transform, "Blink", BlinkText(), new Vector2(520f, 72f), ToggleBlink);
-            _blinkLabel = blink.GetComponentInChildren<TextMeshProUGUI>(true);
-            var snap = QhysicsUiBuilder.ChipButton(face.transform, "SnapTurn", SnapText(), new Vector2(520f, 72f), CycleSnapTurn);
-            _snapLabel = snap.GetComponentInChildren<TextMeshProUGUI>(true);
-            var seated = QhysicsUiBuilder.ChipButton(face.transform, "Seated", SeatedText(), new Vector2(520f, 72f), CycleSeated);
-            _seatedLabel = seated.GetComponentInChildren<TextMeshProUGUI>(true);
-            var fov = QhysicsUiBuilder.ChipButton(face.transform, "Foveation", FoveationText(), new Vector2(520f, 72f), CycleFoveation);
-            _foveationLabel = fov.GetComponentInChildren<TextMeshProUGUI>(true);
-            var walk = QhysicsUiBuilder.ChipButton(face.transform, "WalkSpeed", WalkText(), new Vector2(520f, 72f), CycleWalkSpeed);
-            _walkLabel = walk.GetComponentInChildren<TextMeshProUGUI>(true);
-            var walkDir = QhysicsUiBuilder.ChipButton(face.transform, "WalkDirection", WalkDirText(), new Vector2(520f, 72f), ToggleWalkDirection);
-            _walkDirLabel = walkDir.GetComponentInChildren<TextMeshProUGUI>(true);
+            var gridRt = new GameObject("Grid", typeof(RectTransform)).GetComponent<RectTransform>();
+            gridRt.SetParent(face.transform, false);
+            gridRt.sizeDelta = new Vector2(700f, gridH);
+            var grid = gridRt.gameObject.AddComponent<UnityEngine.UI.GridLayoutGroup>();
+            grid.cellSize = new Vector2(GridCellW, GridCellH);
+            grid.spacing = new Vector2(GridGapX, GridGapY);
+            grid.constraint = UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = 2;
+            grid.startAxis = UnityEngine.UI.GridLayoutGroup.Axis.Horizontal;
+            grid.childAlignment = TextAnchor.UpperCenter;
+            Transform g = gridRt;
+
+            GridChip(g, "VolDown", "Volume -", () => NudgeVolume(-0.1f));
+            GridChip(g, "VolUp", "Volume +", () => NudgeVolume(0.1f));
+            GridChip(g, "Speed", "Cycle sim speed", CycleSpeed);
+            GridChip(g, "Gravity", "Cycle gravity", CycleGravity);
+            GridChip(g, "Opacity", "UI opacity cycle", CycleOpacity);
+            _vignetteLabel = GridChip(g, "Vignette", VignetteText(), CycleVignette);
+            _blinkLabel = GridChip(g, "Blink", BlinkText(), ToggleBlink);
+            _snapLabel = GridChip(g, "SnapTurn", SnapText(), CycleSnapTurn);
+            _seatedLabel = GridChip(g, "Seated", SeatedText(), CycleSeated);
+            _foveationLabel = GridChip(g, "Foveation", FoveationText(), CycleFoveation);
+            _walkLabel = GridChip(g, "WalkSpeed", WalkText(), CycleWalkSpeed);
+            _walkDirLabel = GridChip(g, "WalkDirection", WalkDirText(), ToggleWalkDirection);
             QhysicsUiBuilder.ChipButton(face.transform, "Close", "Close", new Vector2(520f, 72f), () => SetOpen(false));
 
             // Boot path: apply PlayerPrefs master to mixer MasterVolume (dB). AudioListener stays at 1 when mixer is present.
@@ -109,6 +126,21 @@ namespace RealityEngine.UI
             MatchGravityIndex();
             RefreshStatus();
             SetOpen(false);
+        }
+
+        /// <summary>One half-width settings chip in the grid; returns its label so cycling chips can rename themselves.</summary>
+        static TextMeshProUGUI GridChip(Transform grid, string name, string label, UnityEngine.Events.UnityAction onClick)
+        {
+            var chip = QhysicsUiBuilder.ChipButton(grid, name, label, new Vector2(GridCellW, GridCellH), onClick);
+            var tmp = chip.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (tmp != null)
+            {
+                // Long values ("Walk direction: Left hand") shrink a little instead of being cut off with "...".
+                tmp.enableAutoSizing = true;
+                tmp.fontSizeMax = QhysicsUiStyle.FontChip;
+                tmp.fontSizeMin = 17f;
+            }
+            return tmp;
         }
 
         void LateUpdate()
