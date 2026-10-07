@@ -37,6 +37,14 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: UI haptics (headset menus)
+
+**What:** In the headset, sliding a controller ray onto a button, chip, toggle or slider gives a faint tick in that hand, and pulling the trigger on it gives a short firm click. A greyed-out control (for example **Continue** before you have a star) gives only a soft bump, so you can tell it did nothing. Sweeping fast down a long list is throttled so it does not buzz on every row. Nothing about the UI or input changes; desktop and the Device Simulator are unchanged.
+
+**Test VR (Ctrl+P, Link):** On the boot menu, move the right ray slowly across Continue / Chapter 1 / Sandbox / Settings: one tick per button. Trigger on Sandbox: firm click. Open the toolbelt (Menu / B / Y) and sweep across the tabs with the left ray: ticks come in the left hand. Console shows `XrUiHaptics: ready (N XR rays; ...)` once.
+
+**Report:** too strong, too weak, or ticks in the wrong hand (amplitudes are one-line tweaks in `Assets/Universe/XR/XrUiHaptics.cs`).
+
 ## 2026-10-07 build: Comfort vignette (headset locomotion)
 
 **What:** While you stick-walk, smooth-turn or fall, the edges of your view darken into a soft tunnel and fade back out about half a second after you stop. It only reacts to the rig moving (not your real head or body), and ignores teleport, arena/Giza travel and 45 deg snap turns. Default **Mild**; **Settings > Comfort vignette** cycles Mild / Strong / Off (saved between Plays). XR only; desktop and the Device Simulator are unchanged. Zero cost while standing still (the mesh is hidden).
