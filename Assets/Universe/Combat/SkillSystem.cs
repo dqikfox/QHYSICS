@@ -20,7 +20,7 @@ namespace RealityEngine.Combat
     }
 
     /// <summary>
-    /// XP (kill 40, challenge 50 + 10/star, parry 5), levels (+1 point each) and a small skill tree.
+    /// XP (kill 40, challenge 50 + 10/star, parry 5), levels (+1 point each) and a skill tree (MELEE / MAGIC / MIND / POWERS).
     /// Saved to persistentDataPath/QHYSICS/skills.json. Exposes multipliers used by combat code.
     /// </summary>
     public static class SkillSystem
@@ -39,6 +39,11 @@ namespace RealityEngine.Combat
             new SkillDef { id = "deep_focus", name = "Deep Focus", branch = "MIND", maxRank = 3, desc = "+25% focus duration" },
             new SkillDef { id = "throwing_arm", name = "Throwing Arm", branch = "MIND", maxRank = 2, desc = "+12% throw speed" },
             new SkillDef { id = "light_grip", name = "Light Grip", branch = "MIND", maxRank = 2, desc = "Damage from slower swings" },
+            new SkillDef { id = "force_mastery", name = "Force Mastery", branch = "POWERS", maxRank = 3, desc = "+15% force push / fling power" },
+            new SkillDef { id = "long_reach", name = "Long Reach", branch = "POWERS", maxRank = 3, desc = "+2 m telekinesis reach" },
+            new SkillDef { id = "ground_slam", name = "Ground Slam", branch = "POWERS", maxRank = 3, desc = "Unlock: punch both fists down (desktop F11). +radius/dmg per rank" },
+            new SkillDef { id = "blade_recall", name = "Blade Recall", branch = "POWERS", maxRank = 2, desc = "Unlock: hold empty grip 0.5 s (desktop F12). Rank 2: +range" },
+            new SkillDef { id = "storm_chain", name = "Storm Chain", branch = "POWERS", maxRank = 2, desc = "+1 lightning chain jump", requires = "overcharge", requiresRank = 1 },
         };
 
         [Serializable]
@@ -88,6 +93,10 @@ namespace RealityEngine.Combat
         public static float ThrowMult => 1f + 0.12f * Rank("throwing_arm");
         public static float SwingThresholdMult => 1f - 0.12f * Rank("light_grip");
         public static float EnemyBlockChanceMult => 1f;
+        public static float ForcePowerMult => 1f + 0.15f * Rank("force_mastery");
+        public static float TkRangeBonus => 2f * Rank("long_reach");
+        public static int ChainExtra => Rank("storm_chain");
+
 
         static bool _hooked;
 
@@ -232,9 +241,9 @@ namespace RealityEngine.Combat
             _hud.ScreenAnchor = new Vector2(0.5f, 0.5f);
             _hud.ScreenOffset = Vector2.zero;
             _hud.WorldOffset = new Vector3(0f, 0f, 1.3f);
-            _hud.WorldSize = new Vector2(1180f, 660f);
-            _hud.Root.sizeDelta = new Vector2(1140f, 620f);
-            var face = QhysicsUiBuilder.BorderPanel(_hud.Root, "Panel", new Vector2(1140f, 620f));
+            _hud.WorldSize = new Vector2(1540f, 660f);
+            _hud.Root.sizeDelta = new Vector2(1500f, 620f);
+            var face = QhysicsUiBuilder.BorderPanel(_hud.Root, "Panel", new Vector2(1500f, 620f));
 
             _header = QhysicsUiBuilder.Label(face.transform, "Header", "SKILLS", QhysicsUiStyle.FontBody, QhysicsUiStyle.AccentInfo, TextAlignmentOptions.MidlineLeft);
             _header.fontStyle = FontStyles.Bold;
@@ -242,12 +251,12 @@ namespace RealityEngine.Combat
             _header.rectTransform.sizeDelta = new Vector2(800f, 44f);
 
             var close = QhysicsUiBuilder.ChipButton(face.transform, "Close", "Close (K)", new Vector2(176f, 48f), () => SetOpen(false));
-            close.GetComponent<RectTransform>().anchoredPosition = new Vector2(466f, 270f);
+            close.GetComponent<RectTransform>().anchoredPosition = new Vector2(646f, 270f);
 
-            string[] branches = { "MELEE", "MAGIC", "MIND" };
+            string[] branches = { "MELEE", "MAGIC", "MIND", "POWERS" };
             for (int b = 0; b < branches.Length; b++)
             {
-                float x = -368f + b * 368f;
+                float x = -555f + b * 370f;
                 var bl = QhysicsUiBuilder.Label(face.transform, "Branch" + b, branches[b], QhysicsUiStyle.FontSmall, QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
                 bl.rectTransform.anchoredPosition = new Vector2(x, 214f);
                 bl.rectTransform.sizeDelta = new Vector2(340f, 32f);
@@ -268,7 +277,7 @@ namespace RealityEngine.Combat
             var foot = QhysicsUiBuilder.Label(face.transform, "Foot", "XP: enemy 40  |  challenge 50 + 10 per star  |  parry 5.   Up/Down + Enter, or click.",
                 QhysicsUiStyle.FontSmall, QhysicsUiStyle.TextMuted, TextAlignmentOptions.Center);
             foot.rectTransform.anchoredPosition = new Vector2(0f, -280f);
-            foot.rectTransform.sizeDelta = new Vector2(1080f, 32f);
+            foot.rectTransform.sizeDelta = new Vector2(1440f, 32f);
             _hud.SetActive(false);
         }
 
