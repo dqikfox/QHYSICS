@@ -104,10 +104,10 @@ namespace RealityEngine.Combat
     }
 
     /// <summary>
-    /// Spells: Fire (projectile + burn), Lightning (chain), Force (tap = pull a loose weapon to your hand,
-    /// charge = push wave). Desktop: hold V to charge, release to cast; Z next spell; B imbue held weapon;
-    /// G focus. XR: hold trigger on an empty hand (combat mode), release to cast; left stick click next spell, hold it for focus;
-    /// charge next to the blade in your other hand to imbue it.
+    /// Spells: Fire (projectile + burn), Lightning (chain), Force (tap = pull a loose weapon to your hand;
+    /// hold charge = telekinesis lock + drag, release flings; if nothing locked = push wave). Desktop: hold V to charge,
+    /// release to cast; Z next spell; B imbue held weapon; G focus. XR: hold trigger on an empty hand (combat mode),
+    /// release to cast; left stick click next spell, hold it for focus; charge next to the blade in your other hand to imbue it.
     /// </summary>
     [DefaultExecutionOrder(152)]
     public sealed class SpellSystem : MonoBehaviour
@@ -184,6 +184,7 @@ namespace RealityEngine.Combat
             }
             Charging = false;
             Charge01 = 0f;
+            ForceTelekinesis.Cancel();
         }
 
         void UpdateDesktop()
@@ -204,12 +205,19 @@ namespace RealityEngine.Combat
                 _desk.t += Time.unscaledDeltaTime;
                 Charge01 = Mathf.Clamp01(_desk.t / 0.6f);
                 ShowOrb(_desk, origin, Charge01);
+                if (Current == SpellId.Force)
+                    ForceTelekinesis.TickWhileCharging(origin, cam.transform.rotation, cam.transform.forward, Charge01, XRNode.RightHand);
             }
             else if (_desk.charging)
             {
                 _desk.charging = false;
                 HideOrb(_desk);
-                Cast(Current, origin, cam.transform.forward, Mathf.Clamp01(_desk.t / 0.6f), _desk.t < 0.25f, XRNode.RightHand);
+                float c = Mathf.Clamp01(_desk.t / 0.6f);
+                bool tap = _desk.t < 0.25f;
+                if (Current == SpellId.Force && ForceTelekinesis.IsHolding)
+                    ForceTelekinesis.Release(cam.transform.forward * 8f + Vector3.up * 1.5f, true);
+                else
+                    Cast(Current, origin, cam.transform.forward, c, tap, XRNode.RightHand);
                 Charge01 = 0f;
             }
 #endif
@@ -272,6 +280,8 @@ namespace RealityEngine.Combat
                 float c = Mathf.Clamp01(h.t / 0.6f);
                 ShowOrb(h, pos + rot * Vector3.forward * 0.08f, c);
                 if (c < 1f) CombatHaptics.Pulse(h.node, 0.05f + 0.15f * c, 0.02f);
+                if (Current == SpellId.Force)
+                    ForceTelekinesis.TickWhileCharging(pos, rot, rot * Vector3.forward, c, h.node);
                 // Imbue: fully charged fire/lightning held against the blade in the other hand.
                 var w = ph != null ? ph.HeldIn(other.node) : null;
                 if (c >= 1f && w != null && Current != SpellId.Force)
@@ -289,7 +299,12 @@ namespace RealityEngine.Combat
             {
                 h.charging = false;
                 HideOrb(h);
-                Cast(Current, pos + rot * Vector3.forward * 0.1f, rot * Vector3.forward, Mathf.Clamp01(h.t / 0.6f), h.t < 0.25f, h.node);
+                float c = Mathf.Clamp01(h.t / 0.6f);
+                bool tap = h.t < 0.25f;
+                if (Current == SpellId.Force && ForceTelekinesis.IsHolding)
+                    ForceTelekinesis.Release(rot * Vector3.forward * 6f, true);
+                else
+                    Cast(Current, pos + rot * Vector3.forward * 0.1f, rot * Vector3.forward, c, tap, h.node);
             }
         }
 
@@ -345,6 +360,7 @@ namespace RealityEngine.Combat
                     CastLightning(origin, dir, (8f + 16f * charge) * power);
                     break;
                 case SpellId.Force:
+                    // Telekinesis hold/fling is handled by ForceTelekinesis while charging; Cast only for tap-pull / push-wave.
                     if (tap) { if (ManaPool.TrySpend(8f)) ForcePull(origin, dir, node); }
                     else if (ManaPool.TrySpend(18f)) ForcePush(origin, dir, charge * power);
                     break;

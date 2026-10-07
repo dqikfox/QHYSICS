@@ -563,6 +563,13 @@ namespace RealityEngine.Combat
             hurt.Hurt(swingDamage, point, Type == EnemyType.Brute ? "Brute" : "Raider");
         }
 
+        /// <summary>Force telekinesis grabbed a body part: go limp so the limb can be yanked (B&amp;S lift).</summary>
+        public void OnForceLifted()
+        {
+            if (_state == State.Dead) return;
+            Knockdown(Type == EnemyType.Brute ? 1.6f : 1.3f);
+        }
+
         public void OnWeaponBlocked(bool parry, Vector3 point)
         {
             if (_state == State.Dead) return;

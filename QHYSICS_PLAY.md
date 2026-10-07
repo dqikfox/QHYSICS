@@ -21,7 +21,7 @@
 7. **Sword on the dummy:** grip a sword on the table and swing at a dummy. Numbers, DPS and haptics should appear, and the sword should not go through walls. Put your second hand on the grip for two-handed. Thrust fast with the tip to stick it, then pull back to free it.
 8. **Enemy:** stand in the middle of the arena for 4 s to spawn one (or COMBAT > Enemy). Put your blade in its swing to block. Swing into its blade to parry: it staggers and you get a gold spark. It is an active ragdoll: hits shove its limbs, hard hits or a parry make it go limp and get back up. Kill it: it goes fully limp, drops its sword, and gives +40 XP. COMBAT > **Brute** spawns the heavy mace type.
 9. **Spells** (in the arena, near enemies, or while holding a weapon): with an empty hand, hold the **trigger** to charge and release to cast.
-   - **Left stick click** = next spell (Fire, Lightning, Force). Force tapped at a loose weapon pulls it to you.
+   - **Left stick click** = next spell (Fire, Lightning, Force). Force tapped at a loose weapon pulls it to you. **Hold** Force charge to lock telekinesis (purple tether) on a weapon/prop/enemy limb, move it, release to fling; if nothing locks you get the push wave.
    - A fully charged spell held next to the blade in your other hand imbues it.
 10. **Focus:** hold the **left stick click** for 0.5 s for slow-mo. Hold it again, or wait for the meter, to end it.
 11. **Skills:** pause (Menu) > **Skills**, or COMBAT > Skills. Point and trigger a skill to buy it. Stop Play, Play again, and check the rank is kept.
@@ -35,6 +35,15 @@
 - **Floor too high or low:** say by how much. Press the recalibrate key or re-enter Sandbox.
 - **Weapon flies off, jitters, or feels too weak or too heavy:** name the weapon and describe it. The strength and damage numbers are easy to tune.
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
+
+
+## 2026-10-07 build: Force telekinesis (B&S drag + fling)
+
+**What:** Holding Force charge now locks onto a loose weapon, free rigidbody, or enemy body part and drags it with a laggy physics drive (heavier = more lag). A purple tether shows the hold. Release flings with hand/camera velocity. Short tap still yanks a weapon to your hand; a long charge with no lock still fires the push wave. Lifting an enemy limb knocks them limp briefly. Mana: 10 to lock, then ~7/s.
+
+**Test VR:** Arena > Force spell (left stick click until Force) > empty hand hold trigger aimed at a sword on the table until the purple tether appears > move your hand > release to throw it. Then aim at an enemy torso/limb, lock, yank, release. Tap-pull and push-wave still work when you do not lock.
+
+**Test desktop:** Z to Force, hold V aimed at a spawned weapon (F3), drag with look, release to fling. F8 enemy: lock a limb and yank.
 
 
 ## 2026-09-30 build: Chapter 1 flow, wrist HUD, active ragdoll, Brute, tutorial, Giza travel
@@ -190,7 +199,8 @@ All runtime code is in `Assets/Universe/Combat/` (bootstrapped by `CombatBootstr
 | Fire | charge and release | 15 | bolt with splash damage; burns for 3 s |
 | Lightning | charge and release | 20 | hits the target and chains to 2 more within 4 m |
 | Force | tap | 8 | pulls a loose weapon into your hand |
-| Force | charge | 18 | push wave |
+| Force | hold charge (lock) | 10 + 7/s | telekinesis: purple tether, drag with lag, release flings (weapons / props / enemy limbs) |
+| Force | charge release (no lock) | 18 | push wave |
 
 - **Imbue:** puts Fire or Lightning on the held blade for 20 s (25 mana).
 - **Mana:** 100, regenerating at 12/s.
