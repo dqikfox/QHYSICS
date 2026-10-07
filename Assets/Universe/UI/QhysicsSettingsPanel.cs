@@ -6,7 +6,7 @@ using RealityEngine.XR;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// World-space settings with REAL wired toggles only (volume, sim speed, gravity, UI opacity, comfort vignette, teleport blink).
+    /// World-space settings with REAL wired toggles only (volume, sim speed, gravity, UI opacity, comfort vignette, teleport blink, snap turn angle).
     /// Volume chips drive QhysicsMixer Master (dB) via <see cref="AudioRouter"/> — not AudioListener.volume.
     /// Honesty: Master bus gain only; not per-SFX routing and not a full EQ.
     /// </summary>
@@ -29,6 +29,7 @@ namespace RealityEngine.UI
         float _masterVolume = 1f;
         TextMeshProUGUI _vignetteLabel;
         TextMeshProUGUI _blinkLabel;
+        TextMeshProUGUI _snapLabel;
 
         public static QhysicsSettingsPanel Ensure(Transform parent)
         {
@@ -65,9 +66,9 @@ namespace RealityEngine.UI
                 else DestroyImmediate(c.gameObject);
             }
 
-            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(780f, 790f));
+            _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(780f, 872f));
             QhysicsUiBuilder.WireEventCamera(_canvas);
-            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(740f, 750f));
+            var face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(740f, 832f));
             QhysicsUiBuilder.LayoutVertical(face.rectTransform, 10f);
 
             QhysicsUiBuilder.Label(face.transform, "Title", "SETTINGS", QhysicsUiStyle.FontTitle,
@@ -86,6 +87,8 @@ namespace RealityEngine.UI
             _vignetteLabel = vig.GetComponentInChildren<TextMeshProUGUI>(true);
             var blink = QhysicsUiBuilder.ChipButton(face.transform, "Blink", BlinkText(), new Vector2(520f, 72f), ToggleBlink);
             _blinkLabel = blink.GetComponentInChildren<TextMeshProUGUI>(true);
+            var snap = QhysicsUiBuilder.ChipButton(face.transform, "SnapTurn", SnapText(), new Vector2(520f, 72f), CycleSnapTurn);
+            _snapLabel = snap.GetComponentInChildren<TextMeshProUGUI>(true);
             QhysicsUiBuilder.ChipButton(face.transform, "Close", "Close", new Vector2(520f, 72f), () => SetOpen(false));
 
             // Boot path: apply PlayerPrefs master to mixer MasterVolume (dB). AudioListener stays at 1 when mixer is present.
@@ -205,6 +208,17 @@ namespace RealityEngine.UI
             RefreshStatus();
         }
 
+        static string SnapText() => "Snap turn: " + SnapTurnSettings.Label;
+
+        void CycleSnapTurn()
+        {
+            // Headset comfort: how far one right-stick flick turns you (30 / 45 / 90 degrees). Applies immediately.
+            SnapTurnSettings.Cycle();
+            if (_snapLabel != null)
+                _snapLabel.text = SnapText();
+            RefreshStatus();
+        }
+
         void MatchGravityIndex()
         {
             float g = Mathf.Abs(UnityEngine.Physics.gravity.y);
@@ -230,7 +244,8 @@ namespace RealityEngine.UI
                 + " | " + GravityNames[_gravIndex]
                 + " | ui a " + _uiOpacity.ToString("0.00")
                 + " | vignette " + ComfortVignette.ModeLabel(ComfortVignette.CurrentMode)
-                + " | blink " + TeleportBlink.StateLabel;
+                + " | blink " + TeleportBlink.StateLabel
+                + " | snap " + SnapTurnSettings.Label;
         }
     }
 }

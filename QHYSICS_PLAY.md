@@ -37,6 +37,14 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Snap turn angle (headset comfort)
+
+**What:** A new **Settings > Snap turn** chip picks how far one right-stick flick turns you: **30 deg**, **45 deg** (default, same as before) or **90 deg**. It applies the moment you click it and is saved between Plays. Flicking the stick down for a 180 turn-around is unchanged, and snap turn still pauses while the toolbelt or a scrolling list is using the right stick. XR only; desktop and the Device Simulator are unchanged.
+
+**Test VR (Ctrl+P, Link):** Flick the right stick left/right a few times: 45 deg steps. Open Settings, click **Snap turn** until it reads **30 deg**, close, flick again: smaller steps. Cycle to **90 deg**: quarter turns. Stop Play, Play again: it remembers the last choice. Console shows `SnapTurnSettings: snap turn 30 deg (N provider(s) updated).` (N should be 1 or more; 0 means no snap-turn provider was found on the rig, please report it).
+
+**Report:** if the turn step does not change after clicking, or the Settings panel's bottom **Close** chip is cut off (the panel grew one row taller).
+
 ## 2026-10-07 build: Teleport blink (headset comfort)
 
 **What:** Whenever the rig jumps more than 1 m in one frame (teleport arc, toolbelt Arena / Giza / station travel, Chapter start, respawn) the view goes black for that frame and fades back in over about a quarter of a second, so the world never pops. Stick walking, falling and snap turns never blink. It uses unscaled time, so it still works in Focus slow-mo. Default **On**; **Settings > Teleport blink** toggles On / Off (saved between Plays). XR only; desktop and the Device Simulator are unchanged. Zero cost when not blinking (the quad is hidden).
