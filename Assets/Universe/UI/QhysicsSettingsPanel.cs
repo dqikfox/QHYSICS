@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 using RealityEngine.Audio;
 using RealityEngine.XR;
@@ -6,7 +6,7 @@ using RealityEngine.XR;
 namespace RealityEngine.UI
 {
     /// <summary>
-    /// World-space settings (two-column chip grid) with REAL wired toggles only (volume, sim speed, gravity, UI opacity, comfort vignette, teleport blink, snap turn angle, seated boost, foveation, walk speed, walk direction).
+    /// World-space settings (two-column chip grid) with REAL wired toggles only (volume, sim speed, gravity, UI opacity, comfort vignette, teleport blink, snap turn angle, seated boost, foveation, render scale, walk speed, walk direction).
     /// Volume chips drive QhysicsMixer Master (dB) via <see cref="AudioRouter"/> — not AudioListener.volume.
     /// Honesty: Master bus gain only; not per-SFX routing and not a full EQ.
     /// </summary>
@@ -20,8 +20,8 @@ namespace RealityEngine.UI
         static readonly string[] GravityNames = { "Earth g", "Moon g", "Mars g" };
         static readonly float[] Speeds = { 0.5f, 1f, 2f };
 
-        // Two-column chip grid (12 setting chips => 6 rows); Close stays full width underneath.
-        const int GridChips = 12;
+        // Two-column chip grid (13 setting chips => 7 rows, last one left column); Close stays full width underneath.
+        const int GridChips = 13;
         const int GridRows = (GridChips + 1) / 2;
         const float GridCellW = 340f, GridCellH = 64f, GridGapX = 16f, GridGapY = 10f;
         const float StatusH = 96f;
@@ -40,6 +40,7 @@ namespace RealityEngine.UI
         TextMeshProUGUI _foveationLabel;
         TextMeshProUGUI _walkLabel;
         TextMeshProUGUI _walkDirLabel;
+        TextMeshProUGUI _renderScaleLabel;
 
         public static QhysicsSettingsPanel Ensure(Transform parent)
         {
@@ -118,6 +119,7 @@ namespace RealityEngine.UI
             _foveationLabel = GridChip(g, "Foveation", FoveationText(), CycleFoveation);
             _walkLabel = GridChip(g, "WalkSpeed", WalkText(), CycleWalkSpeed);
             _walkDirLabel = GridChip(g, "WalkDirection", WalkDirText(), ToggleWalkDirection);
+            _renderScaleLabel = GridChip(g, "RenderScale", RenderScaleText(), CycleRenderScale);
             QhysicsUiBuilder.ChipButton(face.transform, "Close", "Close", new Vector2(520f, 72f), () => SetOpen(false));
 
             // Boot path: apply PlayerPrefs master to mixer MasterVolume (dB). AudioListener stays at 1 when mixer is present.
@@ -307,6 +309,17 @@ namespace RealityEngine.UI
             RefreshStatus();
         }
 
+        static string RenderScaleText() => "Render scale: " + RenderScaleSettings.Label;
+
+        void CycleRenderScale()
+        {
+            // Quest performance / sharpness: eye resolution 0.8 / 0.9 / 1.0 (native) / 1.2. Lower = steadier frame rate, higher = crisper text.
+            RenderScaleSettings.Cycle();
+            if (_renderScaleLabel != null)
+                _renderScaleLabel.text = RenderScaleText();
+            RefreshStatus();
+        }
+
         void MatchGravityIndex()
         {
             float g = Mathf.Abs(UnityEngine.Physics.gravity.y);
@@ -336,6 +349,7 @@ namespace RealityEngine.UI
                 + " | snap " + SnapTurnSettings.Label
                 + " | seated " + SeatedMode.Label
                 + " | foveation " + FoveationSettings.Label
+                + " | render " + RenderScaleSettings.Label
                 + " | walk " + WalkSpeedSettings.Label
                 + " | walk dir " + WalkDirectionSettings.Label;
         }
