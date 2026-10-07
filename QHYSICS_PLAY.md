@@ -37,6 +37,13 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Sim freezes behind the system menu
+
+**What:** When the headset loses focus, the sim now stops instead of carrying on behind your back. That happens when you press the Meta button for the system menu, when the Link dashboard or a system prompt pops up, or (over Link) when you take the headset off. Before, enemies kept swinging, gadgets kept running and timers kept counting while you could not touch anything. Now, a quarter of a second after focus goes, time freezes and the game audio pauses. When you come back, the sim carries on at the speed it had (0.1x stays 0.1x). If you had already paused, it stays paused. If you changed things while away (pause menu, sim speed), your change wins. Focus slow-mo is ended first, so you do not come back stuck in slow motion. It only runs while the OpenXR headset display is running, so desktop Play and the XR Device Simulator behave exactly as before. Nothing is saved.
+
+**Test (Ctrl+P, Quest Link):** Once in the headset, the Console shows `XrFocusPause: headset session focused; ...`. Start something moving (a swinging pendulum, a spinning coil, or a training dummy fight) with sound playing. Press the Meta button on the right controller. The scene behind the menu stops moving and goes quiet, and the Console shows `XrFocusPause: headset lost input focus ... sim frozen and audio paused (was 1x).` Close the menu: everything carries on from where it stopped and the Console shows `sim resumed at 1x.` Try it again with the sim at 0.1x, and once with the pause menu open. Desktop Play without a headset: no XrFocusPause lines at all and nothing changes.
+
+**Report:** whether the freeze and resume lines appear, anything that keeps moving or making sound behind the menu, and any time you come back with the sim stuck paused or at the wrong speed.
 ## 2026-10-07 build: Lost items come back
 
 **What:** If you drop or throw a grabbable (gadget, magnet, coil, sword, prop) and it slips through the floor, tunnels through a bench or flies off the edge of the map, it now comes back instead of being gone for the session. Each grabbable remembers the last place it sat still (not in your hand). If it keeps falling for 3 seconds with nothing underneath it, or drops below 500 m under the world, it reappears at that resting spot with no speed. If it falls out again within 6 seconds of coming back, it goes to where it was first seen instead. Things that land on real ground (thrown off a pyramid, dropped down a slope) stay where they land. Objects in your hand, in a socket or locked in place are never moved. Slow-mo and pause do not set it off early. Nothing is saved to the scene or prefabs.
