@@ -11,7 +11,7 @@ namespace RealityEngine.Combat
     /// <summary>
     /// Runtime bootstrap for the combat layer (no scene edits): physics hands, spells, skills, HUD,
     /// hurtbox, enemy director and the arena near the plaza. Debug/spawn keys: F2 dagger, F3 sword,
-    /// F4 spear, F6 mace, F7 shield, F8 enemy (Shift+F8 brute), F10 dummy, L arena teleport.
+    /// F4 spear, F6 mace, F7 shield, F8 enemy (Shift+F8 brute), F10 dummy, L arena teleport, F11 ground slam, F12 blade recall (once unlocked in Skills).
     /// </summary>
     [DefaultExecutionOrder(151)]
     public sealed class CombatBootstrap : MonoBehaviour
@@ -31,6 +31,8 @@ namespace RealityEngine.Combat
             Instance = this;
             PhysicsHands.Ensure();
             SpellSystem.Ensure();
+            CombatAbilities.Ensure();
+            CombatSfxDirector.Ensure();
             PlayerHurtbox.Ensure();
             EnemyDirector.Ensure();
             SkillSystem.Hook();

@@ -1192,3 +1192,26 @@ Ideal isochoric Gay-Lussac / Amontons rigid-vessel prop - P/T = k at fixed V; pr
 4. **N / P** (near gadget) cycles temperature COLD/ROOM/WARM/HOT (250/293/350/400 K; activate / LMB also steps T)
 5. XR: grip grab, trigger/activate cycles temperature
 6. Honesty: ideal-gas isochoric P~T (fixed V) - NOT Boyle (isothermal), NOT Charles (isobaric), not real gas, not phase change, not burst vessel
+
+## Combat sound pass (CombatSfxDirector + new procedural clips)
+
+All sounds are synthesized at runtime by `QhysicsSfx` (no imported audio, no packages added).
+
+1. Ctrl+P with Link, go to the Arena (toolbelt COMBAT > Arena, or L on desktop), spawn a Dummy and an Enemy, grab a Sword.
+2. Swing slowly, then fast, in the air: a fast swing gives a swoosh (lower and heavier for Mace / Spear), slow waving stays quiet.
+3. Hit the enemy softly, then hard: a soft hit is a quiet high thud; a hard hit (above about 7 m/s) adds a bone crunch. Kills add a low crunch.
+4. Stab and stick, then pull out: stick / unstick sounds as before. Repeated hits vary slightly in pitch so they don't sound like copies.
+5. Click any menu button (toolbelt, Settings, Skills): a short quiet click. Tell me if any button clicks twice or never clicks.
+
+## Skill tree POWERS branch + Ground Slam + Blade Recall
+
+Skills panel (toolbelt COMBAT > Skills, K on desktop) now has 4 columns: MELEE / MAGIC / MIND / POWERS. XP still comes from kills (40), challenges (50 + 10 per star) and parries (5); 1 point per level; saved to persistentDataPath/QHYSICS/skills.json.
+
+POWERS: Force Mastery (+15% push / fling per rank), Long Reach (+2 m telekinesis reach, and wider force push), Ground Slam (unlock + bigger per rank), Blade Recall (unlock, rank 2 = 30 m), Storm Chain (+1 lightning chain jump, needs Overcharge 1).
+
+1. Open Skills and check all 4 columns fit and the Close chip at the top right is reachable with the ray.
+2. With 0 points, try a slam gesture: you get a denied buzz and a "locked" toast.
+3. Earn a point (kill an enemy / finish a challenge), buy Ground Slam. In the Arena, punch both fists down hard together below chest height: cyan ring, deep boom, both controllers rumble, nearby enemies and props are thrown out and up. 30 mana, 4 s cooldown. Desktop: F11.
+4. Buy Blade Recall. Throw your sword away, then squeeze grip on the empty hand (trigger released) and keep holding: after 0.5 s the sword whooshes back and is caught with a clang + buzz. Let go early and it just drops near you. Desktop: F12 (lands in hand).
+5. Buy Long Reach and check telekinesis grabs from further away; buy Storm Chain and check lightning jumps to one more enemy.
+6. Stop Play and press Play again: points and ranks are kept.

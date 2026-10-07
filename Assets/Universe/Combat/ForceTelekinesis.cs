@@ -18,7 +18,8 @@ namespace RealityEngine.Combat
 
         public static bool IsHolding => Instance != null && Instance._rb != null;
 
-        const float AcquireRange = 9f;
+        const float AcquireRangeBase = 9f;
+        static float AcquireRange => AcquireRangeBase + SkillSystem.TkRangeBonus;
         const float AcquireAngle = 28f;
         const float HoldDistance = 0.85f;
         const float ManaPerSecond = 7f;
@@ -229,7 +230,7 @@ namespace RealityEngine.Combat
             if (fling)
             {
                 Vector3 v = handVel.sqrMagnitude > 0.01f ? handVel : _handVel;
-                float boost = Mathf.Lerp(1.4f, 0.7f, Mathf.InverseLerp(0.3f, 8f, rb.mass)) * SkillSystem.ThrowMult;
+                float boost = Mathf.Lerp(1.4f, 0.7f, Mathf.InverseLerp(0.3f, 8f, rb.mass)) * SkillSystem.ThrowMult * SkillSystem.ForcePowerMult;
                 rb.linearVelocity = Vector3.ClampMagnitude(v * boost, 28f);
                 rb.angularVelocity += Random.insideUnitSphere * 2f;
                 QhysicsSfx.PlayAt(SfxId.ForcePush, rb.worldCenterOfMass, 0.7f, 0.85f);

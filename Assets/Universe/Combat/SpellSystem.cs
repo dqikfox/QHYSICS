@@ -362,7 +362,7 @@ namespace RealityEngine.Combat
                 case SpellId.Force:
                     // Telekinesis hold/fling is handled by ForceTelekinesis while charging; Cast only for tap-pull / push-wave.
                     if (tap) { if (ManaPool.TrySpend(8f)) ForcePull(origin, dir, node); }
-                    else if (ManaPool.TrySpend(18f)) ForcePush(origin, dir, charge * power);
+                    else if (ManaPool.TrySpend(18f)) ForcePush(origin, dir, charge * power * SkillSystem.ForcePowerMult);
                     break;
             }
             CombatHaptics.Pulse(node, 0.6f, 0.08f);
@@ -415,7 +415,7 @@ namespace RealityEngine.Combat
             // Chain to up to 2 more enemies within 4 m.
             Vector3 from = end;
             var done = new HashSet<ICombatTarget> { first };
-            for (int k = 0; k < 2; k++)
+            for (int k = 0; k < 2 + SkillSystem.ChainExtra; k++)
             {
                 CombatEnemy next = null;
                 float bd = 4f;
@@ -438,7 +438,7 @@ namespace RealityEngine.Combat
 
         static void ForcePush(Vector3 origin, Vector3 dir, float power)
         {
-            float range = 8f;
+            float range = 8f + SkillSystem.TkRangeBonus * 0.5f;
             QhysicsSfx.PlayAt(SfxId.ForcePush, origin, 0.9f);
             ForceWaveVfx.Spawn(origin, dir);
             var cols = UnityEngine.Physics.OverlapSphere(origin + dir * range * 0.5f, range * 0.6f, ~0, QueryTriggerInteraction.Ignore);

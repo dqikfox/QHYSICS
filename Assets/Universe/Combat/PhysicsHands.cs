@@ -89,6 +89,18 @@ namespace RealityEngine.Combat
             return node == XRNode.LeftHand ? _l.held : _r.held;
         }
 
+        /// <summary>Blade Recall: grab whatever weapon is now at this XR hand if its grip is still squeezed and the hand is empty.</summary>
+        public bool TryGrabArrived(XRNode node)
+        {
+            if (!CombatInputGate.IsXr) return false;
+            var h = node == XRNode.LeftHand ? _l : _r;
+            if (!h.valid || !h.gripDown || h.held != null) return false;
+            TryXrGrab(h, h == _l ? _r : _l);
+            return h.held != null;
+        }
+
+        public bool GripDown(XRNode node) => CombatInputGate.IsXr && (node == XRNode.LeftHand ? _l.gripDown : _r.gripDown);
+
         public PhysicsWeapon AnyHeld => _desk.held != null ? _desk.held : (_r.held != null ? _r.held : _l.held);
 
         // ------------------------------------------------------------------ Update (poses + input)
