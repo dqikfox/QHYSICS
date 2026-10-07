@@ -37,6 +37,13 @@
 - **Console exceptions:** copy the first one with its stack (`Logs/Editor.log`).
 
 
+## 2026-10-07 build: Walk speed + stick deadzone (headset comfort)
+
+**What:** A new **Settings > Walk speed** chip sets how fast the left stick walks you: **Slow (1.2 m/s)** for new or motion-sensitive players and careful bench work, **Normal (2.0 m/s)** (default, same as before) and **Fast (3.0 m/s)** for crossing the Giza plaza and the arena. It applies the moment you click it and is saved between Plays. Stick walking also gets a small deadzone now, so a slightly drifting Quest stick no longer slowly creeps you across the floor when you are not touching it; past the deadzone, walking still ramps up smoothly from zero. XR only; desktop WASD and the Device Simulator are unchanged.
+
+**Test VR (Ctrl+P, Link):** Open Settings and check the chip reads **Walk speed: Normal (2.0 m/s)** and the status line ends `| walk Normal (2.0 m/s)`. Walk forward with the left stick, then click the chip to **Fast** and walk again (clearly quicker), then **Slow** (clearly gentler), then back to **Normal**. Console shows `WalkSpeedSettings: walk speed Fast (3.0 m/s) (1 move provider(s) updated).` each click. Let go of the left stick and stand still for 20 s: you should not drift at all. Push the stick just a little: you start walking slowly, not with a jump. Stop Play, Play again: it remembers the last speed.
+
+**Report:** if you still drift with the stick released (say which direction), if small pushes feel dead (the deadzone is 0.15 and easy to tune), or if the Settings panel's bottom **Close** chip is cut off (the panel grew one row taller again).
 ## 2026-10-07 build: Foveation (Quest performance)
 
 **What:** A new **Settings > Foveation** chip turns on fixed foveated rendering: the headset draws the soft outer edges of each lens at lower resolution so the GPU has more headroom for a steady frame rate on the Quest 3S. It cycles **Off** / **Low** / **Medium** (default) / **High**, applies the moment you click it and is saved between Plays. The OpenXR Foveated Rendering feature was already enabled for Android but nothing ever set a level, so until now it was effectively off. The Quest 3S has no eye tracking, so this is fixed (lens-centred) foveation only. Desktop and the Device Simulator are unchanged.

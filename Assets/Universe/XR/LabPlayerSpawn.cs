@@ -32,7 +32,7 @@ namespace RealityEngine.XR
         const float BadOriginY = -10f;
         /// <summary>Desktop eye height on Camera Offset (XR Floor keeps offset at 0).</summary>
         public const float DesktopEyeHeightM = 1.65f;
-        const float XrContinuousMoveSpeed = 2.0f;
+        // Stick-walk speed: Settings > Walk speed (Slow / Normal / Fast), see WalkSpeedSettings.
         // Snap-turn angle: Settings > Snap turn (30 / 45 / 90), see SnapTurnSettings.
 
         static int _appliedFrame = -1;
@@ -526,11 +526,8 @@ namespace RealityEngine.XR
             _move = originXf.GetComponent<SmoothMovementController>();
             if (_move != null)
             {
-                // Comfort-safe continuous move on plaza (not desktop WASD).
-                if (_move.speed < 1.2f || _move.speed > 2.8f)
-                    _move.speed = XrContinuousMoveSpeed;
-                else
-                    _move.speed = Mathf.Clamp(_move.speed, 1.5f, 2.5f);
+                // Comfort-safe continuous move on plaza (not desktop WASD): the player's saved walk speed.
+                _move.speed = WalkSpeedSettings.Speed;
                 if (_move.tableCollider == null)
                 {
                     Transform tableXf = FindNamedContains("circuittable");
