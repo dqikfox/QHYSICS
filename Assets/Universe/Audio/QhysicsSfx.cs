@@ -37,7 +37,23 @@ namespace RealityEngine.Audio
         Catch = 28,
         UiClick = 29,
         SwooshHeavy = 30,
-        SlamCharge = 31
+        SlamCharge = 31,
+        EnemyTell = 32,
+        PerfectParry = 33,
+        Disarm = 34,
+        GuardBreak = 35,
+        OrbCharge = 36,
+        OrbFire = 37,
+        OrbDeflect = 38,
+        OrbBurst = 39,
+        WoodBreak = 40,
+        Explosion = 41,
+        GongHit = 42,
+        WaveStart = 43,
+        WaveClear = 44,
+        Pickup = 45,
+        SpawnIn = 46,
+        Ignite = 47
     }
 
     /// <summary>
@@ -165,6 +181,22 @@ namespace RealityEngine.Audio
                 case SfxId.SwooshHeavy: return Sweep("sfx_swoosh_heavy", 0.36f, 250f, 1400f, 0.6f);
                 case SfxId.SlamCharge: return Tone("sfx_slamcharge", 0.3f, 110f, 330f, 0.4f, 4f);
                 case SfxId.Denied: return Tone("sfx_denied", 0.18f, 180f, 140f, 0.4f, 12f);
+                case SfxId.EnemyTell: return Tone("sfx_tell", 0.22f, 520f, 940f, 0.32f, 5f);
+                case SfxId.PerfectParry: return Metal("sfx_perfect", 0.95f, new[] { 1240f, 1861f, 2790f, 3721f, 4652f });
+                case SfxId.Disarm: return Metal("sfx_disarm", 0.45f, new[] { 520f, 877f, 1391f });
+                case SfxId.GuardBreak: return Impact("sfx_guardbreak", 0.42f, 68f, 0.8f, 1700f);
+                case SfxId.OrbCharge: return Tone("sfx_orbcharge", 0.85f, 180f, 560f, 0.32f, 1.2f);
+                case SfxId.OrbFire: return Sweep("sfx_orbfire", 0.3f, 1900f, 420f, 0.5f);
+                case SfxId.OrbDeflect: return Metal("sfx_orbdeflect", 0.38f, new[] { 980f, 1471f, 2207f });
+                case SfxId.OrbBurst: return Impact("sfx_orbburst", 0.34f, 140f, 0.6f, 2600f);
+                case SfxId.WoodBreak: return Splinter("sfx_woodbreak", 0.42f);
+                case SfxId.Explosion: return Impact("sfx_explosion", 1.1f, 42f, 1f, 1300f);
+                case SfxId.GongHit: return Gong("sfx_gong", 2.4f, new[] { 98f, 163f, 229f, 296f, 407f, 538f });
+                case SfxId.WaveStart: return Arp("sfx_wavestart", new[] { 220f, 329.63f, 440f }, 0.14f, 0.5f);
+                case SfxId.WaveClear: return Arp("sfx_waveclear", new[] { 523.25f, 659.25f, 783.99f, 1046.5f, 1318.5f }, 0.1f, 0.55f);
+                case SfxId.Pickup: return Arp("sfx_pickup", new[] { 880f, 1318.5f, 1760f }, 0.05f, 0.35f);
+                case SfxId.SpawnIn: return Sweep("sfx_spawnin", 0.5f, 200f, 2200f, 0.5f);
+                case SfxId.Ignite: return Sweep("sfx_ignite", 0.4f, 300f, 2400f, 0.55f);
             }
             return Tone("sfx_default", 0.1f, 440f, 0f, 0.4f, 20f);
         }
@@ -291,6 +323,47 @@ namespace RealityEngine.Audio
                 burst *= 0.9985f;
                 float noise = (float)(rng.NextDouble() * 2.0 - 1.0);
                 d[i] = noise * (0.25f + burst) * Mathf.Exp(-5f * t);
+            }
+            Normalize(d, 0.85f);
+            return Make(name, d);
+        }
+
+        /// <summary>Slow-decaying inharmonic partials with a soft mallet attack (arena gong).</summary>
+        static AudioClip Gong(string name, float dur, float[] partials)
+        {
+            int n = Mathf.CeilToInt(dur * SampleRate);
+            var d = new float[n];
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)SampleRate;
+                float s = 0f;
+                for (int k = 0; k < partials.Length; k++)
+                {
+                    float wob = 1f + 0.004f * Mathf.Sin(2f * Mathf.PI * (0.7f + k * 0.3f) * t);
+                    s += Mathf.Sin(2f * Mathf.PI * partials[k] * wob * t) * Mathf.Exp(-(1.1f + 0.9f * k) * t) / (1f + k * 0.45f);
+                }
+                d[i] = s * Mathf.Clamp01(t * 300f);
+            }
+            Normalize(d, 0.8f);
+            return Make(name, d);
+        }
+
+        /// <summary>Wood breaking: a low knock plus a run of short splinter cracks.</summary>
+        static AudioClip Splinter(string name, float dur)
+        {
+            int n = Mathf.CeilToInt(dur * SampleRate);
+            var d = new float[n];
+            var rng = new System.Random(name.GetHashCode());
+            float burst = 1f, lp = 0f;
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)SampleRate;
+                if (rng.NextDouble() < 0.0016) burst = 0.5f + (float)rng.NextDouble() * 0.5f;
+                burst *= 0.9975f;
+                float noise = (float)(rng.NextDouble() * 2.0 - 1.0);
+                lp += 0.35f * (noise - lp);
+                float knock = Mathf.Sin(2f * Mathf.PI * 120f * (1f + Mathf.Exp(-25f * t)) * t) * Mathf.Exp(-18f * t);
+                d[i] = (lp * burst * 1.2f + knock * 0.8f) * Mathf.Exp(-4f * t);
             }
             Normalize(d, 0.85f);
             return Make(name, d);

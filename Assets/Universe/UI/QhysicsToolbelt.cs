@@ -34,7 +34,7 @@ namespace RealityEngine.UI
             new[] { "Teleport", "Scale", "Sky", "Reset Pose", "Controls", "Stations", "Sphinx", "Khufu", "Khafre", "Menkaure", "Plaza", "Tutorial", "Bio", "Chem", "Thermo", "Survey", "Experiment" },
             new[] { "Challenges", "Induction", "New Run", "Save", "Load" },
             new string[0], // CARRY: filled live from PlayerCarryInventory (the old separate tools row)
-            new[] { "Dagger", "Sword", "Spear", "Mace", "Shield", "Enemy", "Brute", "Dummy", "Skills", "Arena" }
+            new[] { "Dagger", "Sword", "Spear", "Mace", "Shield", "Enemy", "Brute", "Dummy", "Skills", "Arena", "Axe", "Saber", "Staff", "Tower" }
         };
 
         [SerializeField] bool visible;
@@ -390,6 +390,10 @@ namespace RealityEngine.UI
                 case "spear": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Spear); return true;
                 case "mace": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Mace); return true;
                 case "shield": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Shield); return true;
+                case "axe": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Axe); return true;
+                case "saber": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Saber); return true;
+                case "staff": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.Staff); return true;
+                case "tower": RealityEngine.Combat.CombatBootstrap.SpawnWeapon(RealityEngine.Combat.WeaponKind.TowerShield); return true;
                 case "enemy": RealityEngine.Combat.CombatBootstrap.SpawnEnemy(); return true;
                 case "brute":
                     RealityEngine.Combat.CombatEnemy.NextSpawnOverride = RealityEngine.Combat.EnemyType.Brute;

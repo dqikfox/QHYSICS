@@ -34,6 +34,12 @@ namespace RealityEngine.Combat
             return true;
         }
 
+        /// <summary>Instant refill (perfect parry reward, arena mana orbs).</summary>
+        public static void Add(float amount)
+        {
+            if (amount > 0f) Current = Mathf.Min(Max, Current + amount);
+        }
+
         public static void Tick(float unscaledDt)
         {
             if (Time.unscaledTime - _lastSpend > 1f)
@@ -488,7 +494,7 @@ namespace RealityEngine.Combat
 
         public static void TryImbue(PhysicsWeapon w)
         {
-            if (w == null || w.kind == WeaponKind.Shield) { QhysicsSfx.Play2D(SfxId.Denied, 0.4f); return; }
+            if (w == null || w.IsShield) { QhysicsSfx.Play2D(SfxId.Denied, 0.4f); return; }
             if (Current == SpellId.Force) { QhysicsSfx.Play2D(SfxId.Denied, 0.4f); return; }
             if (!ManaPool.TrySpend(25f)) return;
             w.ApplyImbue(Current == SpellId.Fire ? Element.Fire : Element.Lightning, 20f * SkillSystem.ImbueDurationMult);

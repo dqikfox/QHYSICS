@@ -6,7 +6,7 @@ using RealityEngine.Player;
 
 namespace RealityEngine.Combat
 {
-    public enum WeaponKind { Dagger = 0, Sword = 1, Spear = 2, Mace = 3, Shield = 4, EnemySword = 5 }
+    public enum WeaponKind { Dagger = 0, Sword = 1, Spear = 2, Mace = 3, Shield = 4, EnemySword = 5, Axe = 6, Saber = 7, Staff = 8, TowerShield = 9 }
 
     public enum WeaponPartType { Handle = 0, Edge = 1, Tip = 2, Head = 3, Guard = 4, ShieldFace = 5 }
 
@@ -41,6 +41,11 @@ namespace RealityEngine.Combat
         public CombatTeam ownerTeam = CombatTeam.Neutral;
         /// <summary>Set by the enemy that owns this weapon; used for block/parry.</summary>
         public CombatEnemy enemyOwner;
+        /// <summary>Enemy-carried shield: blocks (guard meter) but only hurts the player during a shield bash.</summary>
+        public bool enemyGuardOnly;
+
+        /// <summary>Round shield or tower shield (held face-forward, no swooshes, no imbue).</summary>
+        public bool IsShield => kind == WeaponKind.Shield || kind == WeaponKind.TowerShield;
 
         public Rigidbody Body { get; private set; }
         public int HeldCount { get; set; }
