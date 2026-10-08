@@ -536,11 +536,23 @@ namespace RealityEngine.Combat
         }
     }
 
-    /// <summary>Trigger pad: a player hand / body or player weapon touching it cycles the arena tier.</summary>
+    /// <summary>Trigger pad: a player hand (XR), body or player weapon touching it cycles the arena tier.</summary>
     public sealed class ArenaTierPad : MonoBehaviour
     {
         public ArenaWaves waves;
         float _last = -9f;
+        bool _handWasNear;
+
+        void Update()
+        {
+            bool near = ArenaDecor.HandNear(transform.position, 0.2f);
+            if (near && !_handWasNear && waves != null && Time.time - _last >= 0.7f)
+            {
+                _last = Time.time;
+                waves.CycleTier();
+            }
+            _handWasNear = near;
+        }
 
         void OnTriggerEnter(Collider other)
         {

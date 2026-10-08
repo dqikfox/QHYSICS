@@ -1287,3 +1287,35 @@ The arena now has a **wave mode**. On the left side, next to the spawn area, the
 4. Let yourself die once mid-run. The run should end, its enemies should disappear, and the board should go back to "RING THE GONG TO BEGIN".
 5. Clear Recruit fully. The board should show BEST RECRUIT.
 6. Tell me if the spawn pace feels too slow or too fast, or if the gong is hard to hit.
+
+## Arena props and decorations (2026-10-09)
+
+The arena is now dressed in dark stone with cyan accents. Everything is built in code when the arena is created, so the scene file is unchanged. Everything is made from simple shapes sharing the same materials. The only new real-time lights are the 2 braziers (no shadows); the explosion flash is a short temporary light.
+
+- **Entrance arch:** two stone pillars with a lintel and a glowing keystone over the gap in the wall, framing the existing COMBAT ARENA sign.
+- **Two weapon racks** stand on the left wall past the weapon table:
+  - Rack A: axe, saber, sword, staff, plus a round shield.
+  - Rack B: dagger, mace, spear, axe, plus a tower shield.
+
+  Every weapon is a real physics weapon held in place by a breakable joint, so you can just grab it. A hard knock, Blade Recall or telekinesis also frees it. A weapon knocked loose but still at its spot gets hung back up. A slot refills 25 s after its weapon is taken. The old weapon stays where you left it and is tidied by the loot clean-up once it's been untouched for a while. Enemies never take weapons off the racks.
+- **Breakable props:** there are two clusters by the right-hand walls, each with crates, barrels and one **volatile barrel** (rust-red with glowing orange bands).
+  - Hit them with weapons, spells or thrown objects. A hard impact (above about 7 m/s), such as a thrown crate or a ragdoll landing on it, also counts.
+  - Crates take 25 damage and barrels 35. They burst into planks or staves that fade after about 5 s, with a splintering sound.
+  - Crates sometimes drop a floating **green heal orb** (+20 HP) or a **blue mana orb** (+30 mana). Walk over an orb, touch it, or poke it with a weapon tip to collect it (you hear a chime).
+  - **Volatile barrels** explode after a short fuse. The blast does up to 45 fire damage plus a burn to enemies within 3.2 m, knocks nearby enemies down, and throws props around. It **also hurts you** within 2.5 m (up to about 28 HP), and other volatile barrels nearby go off too.
+  - Broken props come back after 40 s, and every one comes back at the start of each arena wave.
+- **Braziers:** two flaming braziers flank the inside of the entrance, each with one flickering orange light. Hold a blade's edge or tip in the flames to **ignite it** (fire imbue, no mana cost), with a whoosh and sparks. Shields can't be ignited.
+- **Crystal torches:** 6 slowly turning cyan crystals sit on the wall tops (glow only, no lights).
+- **Banners:** dark cloth banners with cyan stripes hang on the 4 corner pillars and sway gently.
+- **Outside the walls:** there are columns (one broken, with a fallen drum) and a tall obelisk with glowing runes behind the spawn side. These are skipped automatically if they would overlap existing level geometry.
+- **Floor:** a cyan rune ring is inlaid in the floor.
+- **Heavy bag:** a hanging bag on the right side swings on a joint. It shows HIT and COMBO, has a huge HP pool that resets when you stop hitting it, and shows damage numbers.
+
+1. Ctrl+P with Link, then go to the arena (COMBAT > Arena). Walk under the arch and check the braziers light up the entrance.
+2. Grab the axe from rack A and the tower shield from rack B. Each should come free cleanly, and after about 25 s a new one should appear on the rack.
+3. Hold a sword in a brazier flame. It should ignite (fire VFX and a whoosh) without using mana.
+4. Smash a crate with the mace. You should get planks and the splinter sound, and sometimes an orb. Collect the orb by walking over it or touching it.
+5. From a few metres away, hit a volatile barrel (or throw something at it, or cast fire). You should see an orange flash and hear a boom, and props and any nearby enemies should go flying. Try luring an enemy next to one first. Stand close once to check it hurts you.
+6. Punch or slash the heavy bag a few times quickly to see the combo counter.
+7. Start an arena wave (gong) after breaking some props. They should all reappear with a small cyan flash.
+8. Tell me if anything floats, clips into walls, blocks the walkways, or looks too bright or too dark on the headset.

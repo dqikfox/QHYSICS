@@ -305,6 +305,7 @@ namespace RealityEngine.Combat
             TrainingDummy.Spawn(transform.TransformPoint(new Vector3(4.4f, 0.06f, -1.2f)), transform.rotation * Quaternion.Euler(0f, 210f, 0f));
 
             ArenaWaves.Ensure(this); // gong, tier plate, wave board + loot janitor
+            ArenaDecor.Build(this);  // arch, racks, breakables, braziers, torches, banners, columns, rune ring, heavy bag
         }
 
         void Restock(bool force)
