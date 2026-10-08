@@ -1215,3 +1215,18 @@ POWERS: Force Mastery (+15% push / fling per rank), Long Reach (+2 m telekinesis
 4. Buy Blade Recall. Throw your sword away, then squeeze grip on the empty hand (trigger released) and keep holding: after 0.5 s the sword whooshes back and is caught with a clang + buzz. Let go early and it just drops near you. Desktop: F12 (lands in hand).
 5. Buy Long Reach and check telekinesis grabs from further away; buy Storm Chain and check lightning jumps to one more enemy.
 6. Stop Play and press Play again: points and ranks are kept.
+
+## New weapons: Axe, Saber, Quarterstaff, Tower Shield (2026-10-09)
+
+Four more physics weapons, built from primitives like the rest (no imported models). Toolbelt **COMBAT** (page 3): **Axe**, **Saber**, **Staff**, **Tower**. Desktop: open the toolbelt with M / Tab and click the chip; the weapon goes straight into your hand.
+
+- **Axe** (1.9 kg): one-handed, bearded blade on one side. Chops hard when the head moves sideways, not when you drag it along the haft. Heavy swoosh.
+- **Saber** (1.0 kg): light and fast, long thin blade, can stab and stick.
+- **Quarterstaff** (1.8 kg): two-handed blunt pole, both ends hit. Grab it with both hands to steer it.
+- **Tower Shield** (4 kg): tall rectangular shield, held face forward like the round shield. Blocks, no swooshes, can't be imbued.
+
+1. Ctrl+P with Link, go to the Arena (toolbelt COMBAT > Arena), spawn each new weapon from page 3 and grab it.
+2. Swing the axe at a training dummy with the blade leading, then with the haft leading: the blade hits harder.
+3. Grab the staff with both hands and check the second hand steers it.
+4. Hold the tower shield up and let an enemy swing into it: it should clang and stop the blade.
+5. Sounds are all generated in code (16 new procedural clips are added in this pass for later features too). Nothing imported, no packages added.

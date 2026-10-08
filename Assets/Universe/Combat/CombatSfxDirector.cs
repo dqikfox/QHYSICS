@@ -50,7 +50,7 @@ namespace RealityEngine.Combat
 
         static void OnHit(ICombatTarget t, DamageInfo d)
         {
-            if (t == null || t.Team == CombatTeam.Player || d.sourceTeam != CombatTeam.Player) return;
+            if (t == null || t.Team != CombatTeam.Enemy || d.sourceTeam != CombatTeam.Player) return;
             if (d.type != DamageType.Blunt && d.type != DamageType.Slash && d.type != DamageType.Pierce && d.type != DamageType.Force) return;
             float s = Mathf.Max(0f, d.relativeSpeed);
             float k = Mathf.Clamp01(s / 12f);
@@ -62,7 +62,7 @@ namespace RealityEngine.Combat
 
         static void OnKilled(ICombatTarget t, DamageInfo d)
         {
-            if (t == null || t.Team == CombatTeam.Player) return;
+            if (t == null || t.Team != CombatTeam.Enemy) return;
             QhysicsSfx.PlayAt(SfxId.BoneCrunch, d.point, 0.9f, 0.75f);
         }
 
@@ -73,7 +73,7 @@ namespace RealityEngine.Combat
             for (int i = 0; i < PhysicsWeapon.All.Count; i++)
             {
                 var w = PhysicsWeapon.All[i];
-                if (w == null || !w.IsHeld || !w.HeldByPlayer || w.kind == WeaponKind.Shield) { if (w != null) _lastTip.Remove(w); continue; }
+                if (w == null || !w.IsHeld || !w.HeldByPlayer || w.IsShield) { if (w != null) _lastTip.Remove(w); continue; }
                 Vector3 tip = w.TipWorld;
                 if (!_lastTip.TryGetValue(w, out Vector3 prev)) { _lastTip[w] = tip; continue; }
                 _lastTip[w] = tip;
@@ -83,7 +83,7 @@ namespace RealityEngine.Combat
                 if (speed < SwooshSpeed || was >= SwooshSpeed) continue;
                 if (_lastSwoosh.TryGetValue(w, out float last) && now - last < SwooshGap) continue;
                 _lastSwoosh[w] = now;
-                bool heavy = w.kind == WeaponKind.Mace || w.kind == WeaponKind.Spear;
+                bool heavy = w.kind == WeaponKind.Mace || w.kind == WeaponKind.Spear || w.kind == WeaponKind.Axe || w.kind == WeaponKind.Staff;
                 float k = Mathf.Clamp01((speed - SwooshSpeed) / 8f);
                 QhysicsSfx.PlayAt(heavy ? SfxId.SwooshHeavy : SfxId.Whoosh, tip, 0.25f + 0.5f * k, Mathf.Lerp(0.9f, 1.3f, k));
             }

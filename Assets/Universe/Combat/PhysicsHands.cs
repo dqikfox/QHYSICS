@@ -202,7 +202,7 @@ namespace RealityEngine.Combat
             h.farTime = 0f;
             // Keep a reverse grip if the blade already points back along the hand.
             Vector3 handFwd = handRot * Vector3.forward;
-            h.relRot = Vector3.Dot(w.Axis, handFwd) >= 0f || w.kind == WeaponKind.Shield ? CanonRel : ReverseRel;
+            h.relRot = Vector3.Dot(w.Axis, handFwd) >= 0f || w.IsShield ? CanonRel : ReverseRel;
             w.HeldCount = 1;
             w.HeldByPlayer = true;
             w.MarkPlayerHold();
@@ -310,7 +310,7 @@ namespace RealityEngine.Combat
                 {
                     if (mouse.leftButton.wasPressedThisFrame)
                         StartMove(DeskMove.Slash, Mathf.Lerp(0.26f, 0.42f, Mathf.InverseLerp(0.4f, 3f, _desk.held.Body.mass)));
-                    else if (mouse.rightButton.wasPressedThisFrame && _desk.held.kind != WeaponKind.Shield)
+                    else if (mouse.rightButton.wasPressedThisFrame && !_desk.held.IsShield)
                         StartMove(DeskMove.Thrust, 0.22f);
                 }
                 if (kb.fKey.wasPressedThisFrame)
@@ -382,7 +382,7 @@ namespace RealityEngine.Combat
 
         void DesktopPose(Transform cam, out Vector3 pos, out Quaternion rot)
         {
-            bool shield = _desk.held != null && _desk.held.kind == WeaponKind.Shield;
+            bool shield = _desk.held != null && _desk.held.IsShield;
             Vector3 lp;
             Quaternion lr;
             if (_block)

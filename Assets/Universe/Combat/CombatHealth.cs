@@ -16,6 +16,8 @@ namespace RealityEngine.Combat
         public bool resetsWhenIdle;
         public float resetDelay = 3f;
         public bool showNumbers = true;
+        /// <summary>Multiplier on incoming damage (1 = normal). Enemies raise it briefly when their guard or poise breaks.</summary>
+        public float incomingMult = 1f;
 
         public float Hp { get; private set; }
         public float Hp01 => maxHp > 0f ? Mathf.Clamp01(Hp / maxHp) : 0f;
@@ -59,6 +61,8 @@ namespace RealityEngine.Combat
         {
             if (Hp <= 0f || hit.amount <= 0f)
                 return;
+            if (incomingMult > 0f && !Mathf.Approximately(incomingMult, 1f))
+                hit.amount *= incomingMult;
             Hp = Mathf.Max(0f, Hp - hit.amount);
             LastHitTime = Time.time;
             if (showNumbers)
