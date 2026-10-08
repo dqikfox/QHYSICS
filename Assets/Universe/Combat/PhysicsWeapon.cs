@@ -310,25 +310,43 @@ namespace RealityEngine.Combat
                 return;
             _lastClang = Time.time;
 
-            // Player weapon meets an enemy weapon mid-swing: block (slow) or parry (fast).
-            if (ActiveTeam == CombatTeam.Player && other.enemyOwner != null && other.enemyOwner.IsSwinging)
+            if (ActiveTeam == CombatTeam.Player && other.enemyOwner != null)
             {
-                bool parry = speed >= CombatTuning.ParryMinSpeed * SkillSystem.ParryThresholdMult;
-                other.enemyOwner.OnWeaponBlocked(parry, p);
-                if (parry)
+                var foe = other.enemyOwner;
+                // Enemy shield (Warden): fills its guard meter instead of parrying.
+                if (other.enemyGuardOnly)
                 {
-                    QhysicsSfx.PlayAt(SfxId.Parry, p, 1f);
-                    CombatEvents.RaiseParried(p);
-                    CombatHaptics.Pulse(PrimaryNode, 0.9f, 0.12f);
-                    SparkBurst.Spawn(p, new Color(1f, 0.85f, 0.4f), 18);
+                    foe.OnGuardStruck(this, speed, p);
+                    return;
                 }
-                else
+                // Player weapon meets an enemy weapon mid-swing (or at the very end of the windup): block (slow),
+                // parry (fast), perfect parry (fast inside the window, the tell glow is white).
+                if (foe.IsSwinging || foe.InParryWindow)
                 {
-                    QhysicsSfx.PlayAt(SfxId.Block, p, 0.8f);
-                    CombatHaptics.Pulse(PrimaryNode, 0.5f, 0.08f);
-                    SparkBurst.Spawn(p, new Color(1f, 0.9f, 0.7f), 8);
+                    bool parry = speed >= CombatTuning.ParryMinSpeed * SkillSystem.ParryThresholdMult;
+                    bool perfect = parry && foe.InParryWindow;
+                    foe.OnWeaponBlocked(parry, perfect, p, this);
+                    if (parry)
+                    {
+                        CombatEvents.RaiseParried(p);
+                        if (!perfect) // the enemy plays the perfect-parry ring, sparks and haptics itself
+                        {
+                            QhysicsSfx.PlayAt(SfxId.Parry, p, 1f);
+                            CombatHaptics.Pulse(PrimaryNode, 0.9f, 0.12f);
+                            SparkBurst.Spawn(p, new Color(1f, 0.85f, 0.4f), 18);
+                        }
+                    }
+                    else
+                    {
+                        QhysicsSfx.PlayAt(SfxId.Block, p, 0.8f);
+                        CombatHaptics.Pulse(PrimaryNode, 0.5f, 0.08f);
+                        SparkBurst.Spawn(p, new Color(1f, 0.9f, 0.7f), 8);
+                    }
+                    return;
                 }
-                return;
+                // Not attacking: duelist counter-parry / heavy-hit disarm.
+                if (foe.OnWeaponStruck(this, speed, p))
+                    return;
             }
             if (speed > 2.5f)
             {
@@ -442,6 +460,8 @@ namespace RealityEngine.Combat
         {
             // Enemy weapons hurt the player through the player's hurtbox trigger.
             if (ownerTeam != CombatTeam.Enemy || enemyOwner == null || !enemyOwner.IsSwinging)
+                return;
+            if (enemyGuardOnly && !enemyOwner.IsBashing)
                 return;
             var hurt = other.GetComponent<PlayerHurtbox>();
             if (hurt == null)
