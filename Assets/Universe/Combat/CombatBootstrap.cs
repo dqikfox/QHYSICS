@@ -11,7 +11,8 @@ namespace RealityEngine.Combat
     /// <summary>
     /// Runtime bootstrap for the combat layer (no scene edits): physics hands, spells, skills, HUD,
     /// hurtbox, enemy director and the arena near the plaza. Debug/spawn keys: F2 dagger, F3 sword,
-    /// F4 spear, F6 mace, F7 shield, F8 enemy (Shift+F8 brute), F10 dummy, L arena teleport, F11 ground slam, F12 blade recall (once unlocked in Skills).
+    /// F4 spear, F6 mace, F7 shield, F8 enemy (Shift+F8 brute, Ctrl+F8 cycles Duelist / Caster / Warden), F10 dummy,
+    /// L arena teleport, F11 ground slam, F12 blade recall (once unlocked in Skills).
     /// </summary>
     [DefaultExecutionOrder(151)]
     public sealed class CombatBootstrap : MonoBehaviour
@@ -65,6 +66,11 @@ namespace RealityEngine.Combat
             {
                 if (kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed)
                     CombatEnemy.NextSpawnOverride = EnemyType.Brute;
+                else if (kb.leftCtrlKey.isPressed || kb.rightCtrlKey.isPressed)
+                {
+                    _ctrlCycle = (_ctrlCycle + 1) % 3;
+                    CombatEnemy.NextSpawnOverride = _ctrlCycle == 0 ? EnemyType.Duelist : _ctrlCycle == 1 ? EnemyType.Caster : EnemyType.Warden;
+                }
                 if (!EnemyDirector.Ensure().SpawnInFrontOfPlayer())
                     CombatEnemy.NextSpawnOverride = null;
             }
@@ -89,6 +95,16 @@ namespace RealityEngine.Combat
         }
 
         public static void SpawnEnemy() => EnemyDirector.Ensure().SpawnInFrontOfPlayer();
+
+        static int _ctrlCycle = -1;
+
+        /// <summary>Toolbelt Duelist / Caster / Warden chips (same 3-alive cap as Enemy).</summary>
+        public static void SpawnEnemyOfType(EnemyType type)
+        {
+            CombatEnemy.NextSpawnOverride = type;
+            if (!EnemyDirector.Ensure().SpawnInFrontOfPlayer())
+                CombatEnemy.NextSpawnOverride = null;
+        }
 
         public static void SpawnDummy()
         {

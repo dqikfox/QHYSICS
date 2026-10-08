@@ -34,7 +34,7 @@ namespace RealityEngine.UI
             new[] { "Teleport", "Scale", "Sky", "Reset Pose", "Controls", "Stations", "Sphinx", "Khufu", "Khafre", "Menkaure", "Plaza", "Tutorial", "Bio", "Chem", "Thermo", "Survey", "Experiment" },
             new[] { "Challenges", "Induction", "New Run", "Save", "Load" },
             new string[0], // CARRY: filled live from PlayerCarryInventory (the old separate tools row)
-            new[] { "Dagger", "Sword", "Spear", "Mace", "Shield", "Enemy", "Brute", "Dummy", "Skills", "Arena", "Axe", "Saber", "Staff", "Tower" }
+            new[] { "Dagger", "Sword", "Spear", "Mace", "Shield", "Enemy", "Brute", "Dummy", "Skills", "Arena", "Axe", "Saber", "Staff", "Tower", "Duelist", "Caster", "Warden" }
         };
 
         [SerializeField] bool visible;
@@ -400,6 +400,9 @@ namespace RealityEngine.UI
                     if (!RealityEngine.Combat.EnemyDirector.Ensure().SpawnInFrontOfPlayer())
                         RealityEngine.Combat.CombatEnemy.NextSpawnOverride = null;
                     return true;
+                case "duelist": RealityEngine.Combat.CombatBootstrap.SpawnEnemyOfType(RealityEngine.Combat.EnemyType.Duelist); return true;
+                case "caster": RealityEngine.Combat.CombatBootstrap.SpawnEnemyOfType(RealityEngine.Combat.EnemyType.Caster); return true;
+                case "warden": RealityEngine.Combat.CombatBootstrap.SpawnEnemyOfType(RealityEngine.Combat.EnemyType.Warden); return true;
                 case "dummy": RealityEngine.Combat.CombatBootstrap.SpawnDummy(); return true;
                 case "skills": RealityEngine.Combat.SkillsPanel.Open(); return true;
                 case "arena": RealityEngine.Combat.CombatBootstrap.ToggleArena(); return true;

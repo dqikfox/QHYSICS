@@ -1230,3 +1230,25 @@ Four more physics weapons, built from primitives like the rest (no imported mode
 3. Grab the staff with both hands and check the second hand steers it.
 4. Hold the tower shield up and let an enemy swing into it: it should clang and stop the blade.
 5. Sounds are all generated in code (16 new procedural clips are added in this pass for later features too). Nothing imported, no packages added.
+
+## New enemies (Duelist, Caster, Warden) + parry windows, poise, disarms (2026-10-09)
+
+Three new enemy types on the same active ragdolls as the Raider and Brute, so they wobble, stumble and go limp from physics hits. Toolbelt **COMBAT** page 4: **Duelist**, **Caster**, **Warden** (same 3-alive cap as Enemy). Desktop: **Ctrl+F8** cycles Duelist > Caster > Warden; F8 / Shift+F8 as before. The plain **Enemy** chip now rotates Raider, Duelist, Raider, Warden, Caster, Brute.
+
+- **Duelist** (gold visor, red sash, saber): fast, strafes around you, swings in 2-3 hit combos alternating sides. When you swing at it, it often puts its blade in your blade's path. Hit its blocking blade lightly and it **counter-parries**: your weapon gets knocked aside (strong buzz) and it ripostes straight away. Hit the block very hard (above about 9 m/s) or with a heavy weapon (mace, shield) and its guard folds into a stagger.
+- **Caster** (purple hood and robe, staff): keeps 4-9 m away, backs off if you close in, and throws slow purple orbs that home on your head for about a second. **Bat an orb with any weapon or shield** to deflect it: it turns cyan, flies back at the Caster (or the nearest enemy in front) and knocks them down for 1.8x damage. If you get right up close it swings the staff. Disarmed casters keep casting from the hand.
+- **Warden** (steel armour, red crest, tower shield + sword): blocks frontal hits with the shield, raises it when you swing, attacks with sword thrusts and shield bashes. Hits on the shield fill a hidden guard meter (faster with heavy weapons and fast swings). Full = **guard break**: long stagger, takes +25% damage, and 35% of the time the shield flies off. Fire bolts and orbs hit the shield physically too, so flank it or batter it.
+
+Combat depth for every enemy (Raider and Brute included):
+- **Attack tell:** an orange glow grows at the weapon tip during the windup (with a rising "tell" sound). It flashes **white** for the last 0.14 s of the windup and the first 0.14 s of the swing: that is the **perfect parry window**.
+- **Perfect parry:** meet the weapon fast inside the white window: bright ring sound, cyan sparks, full buzz, +15 mana, a big stagger or knockdown, and a chance to **disarm** (Raider 60%, Caster 70%, Warden 45%, Duelist 35%, Brute 20%). A normal parry works as before.
+- **Disarm:** the weapon flies out and becomes loot you can grab. The enemy runs for the nearest loose weapon within 8 m (not racked ones) and picks it up, or fights with fists if there is none. A very hard hit with a heavy weapon on an enemy's idle weapon can also knock it loose.
+- **Poise:** every hit wears down a poise meter (blunt hits more). Empty it and the enemy staggers for 1.1 s and takes +30% damage ("Staggered - strike now!"). Poise recovers after 1.5 s without hits.
+- **Hit reactions:** the torso leans away from each hit, the head snaps back on head hits, and the enemy stumbles back a little. No dismemberment.
+
+1. Ctrl+P with Link, Arena (toolbelt COMBAT > Arena), grab a sword, spawn a **Raider**. Watch the tip glow orange during its windup. Swing into its sword just as the glow flashes white: you should hear the bright ring, get +15 mana, and it should go down, often dropping its sword. Back off and watch it run to pick a weapon up. Grab its dropped sword first and it fights with fists.
+2. Spawn a **Duelist**. Swing at it: it should block with its saber. Tap the block lightly: your blade is knocked aside and it ripostes. Then swing hard with a mace: its guard should fold.
+3. Spawn a **Caster**, step back, and swat the purple orb with your sword or shield as it arrives: it should turn cyan and knock the Caster down. Let one hit you to check it hurts (about 13 HP).
+4. Spawn a **Warden**. Hit its shield 2-4 times hard with a mace or axe until "Guard broken!", then hit the body. Light taps on the shield should only clang. Watch for its shield bash when you stand close.
+5. Hit any enemy rapidly with blunt hits to see "Staggered - strike now!".
+6. Tell me if any enemy's parts look wrong (hood clipping, shield floating away from the arm, staff pose), if orbs are too fast or too slow to hit back, or if the duelist feels unfair.
