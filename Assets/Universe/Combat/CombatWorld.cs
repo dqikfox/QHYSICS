@@ -103,7 +103,7 @@ namespace RealityEngine.Combat
         }
     }
 
-    /// <summary>Keeps at most 3 enemies alive; auto-spawns one while the player is in the arena.</summary>
+    /// <summary>Keeps at most 3 enemies alive; auto-spawns one while the player is in the arena (paused while <see cref="ArenaWaves"/> runs).</summary>
     public sealed class EnemyDirector : MonoBehaviour
     {
         public const int MaxEnemies = 3;
@@ -150,7 +150,7 @@ namespace RealityEngine.Combat
         void Update()
         {
             var arena = CombatArena.Instance;
-            if (!AutoArena || arena == null || !arena.PlayerInside())
+            if (!AutoArena || ArenaWaves.Active || arena == null || !arena.PlayerInside())
             {
                 _emptySince = Time.time;
                 return;
@@ -303,6 +303,8 @@ namespace RealityEngine.Combat
 
             TrainingDummy.Spawn(transform.TransformPoint(new Vector3(3.2f, 0.06f, -3.2f)), transform.rotation * Quaternion.Euler(0f, 180f, 0f));
             TrainingDummy.Spawn(transform.TransformPoint(new Vector3(4.4f, 0.06f, -1.2f)), transform.rotation * Quaternion.Euler(0f, 210f, 0f));
+
+            ArenaWaves.Ensure(this); // gong, tier plate, wave board + loot janitor
         }
 
         void Restock(bool force)

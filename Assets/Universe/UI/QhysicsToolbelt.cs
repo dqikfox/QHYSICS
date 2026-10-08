@@ -34,7 +34,7 @@ namespace RealityEngine.UI
             new[] { "Teleport", "Scale", "Sky", "Reset Pose", "Controls", "Stations", "Sphinx", "Khufu", "Khafre", "Menkaure", "Plaza", "Tutorial", "Bio", "Chem", "Thermo", "Survey", "Experiment" },
             new[] { "Challenges", "Induction", "New Run", "Save", "Load" },
             new string[0], // CARRY: filled live from PlayerCarryInventory (the old separate tools row)
-            new[] { "Dagger", "Sword", "Spear", "Mace", "Shield", "Enemy", "Brute", "Dummy", "Skills", "Arena", "Axe", "Saber", "Staff", "Tower", "Duelist", "Caster", "Warden" }
+            new[] { "Dagger", "Sword", "Spear", "Mace", "Shield", "Enemy", "Brute", "Dummy", "Skills", "Arena", "Axe", "Saber", "Staff", "Tower", "Duelist", "Caster", "Warden", "Waves", "Tier" }
         };
 
         [SerializeField] bool visible;
@@ -406,6 +406,8 @@ namespace RealityEngine.UI
                 case "dummy": RealityEngine.Combat.CombatBootstrap.SpawnDummy(); return true;
                 case "skills": RealityEngine.Combat.SkillsPanel.Open(); return true;
                 case "arena": RealityEngine.Combat.CombatBootstrap.ToggleArena(); return true;
+                case "waves": RealityEngine.Combat.CombatBootstrap.ToggleWaves(); return true;
+                case "tier": RealityEngine.Combat.CombatBootstrap.CycleArenaTier(); return true;
             }
             return false;
         }
