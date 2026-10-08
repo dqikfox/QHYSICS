@@ -12,7 +12,7 @@ namespace RealityEngine.Combat
     /// Runtime bootstrap for the combat layer (no scene edits): physics hands, spells, skills, HUD,
     /// hurtbox, enemy director and the arena near the plaza. Debug/spawn keys: F2 dagger, F3 sword,
     /// F4 spear, F6 mace, F7 shield, F8 enemy (Shift+F8 brute, Ctrl+F8 cycles Duelist / Caster / Warden), F10 dummy,
-    /// L arena teleport, F11 ground slam, F12 blade recall (once unlocked in Skills).
+    /// L arena teleport (Shift+L start/stop waves, Alt+L cycle wave tier), F11 ground slam, F12 blade recall (once unlocked in Skills).
     /// </summary>
     [DefaultExecutionOrder(151)]
     public sealed class CombatBootstrap : MonoBehaviour
@@ -75,7 +75,12 @@ namespace RealityEngine.Combat
                     CombatEnemy.NextSpawnOverride = null;
             }
             if (kb.f10Key.wasPressedThisFrame) SpawnDummy();
-            if (kb.lKey.wasPressedThisFrame) ToggleArena();
+            if (kb.lKey.wasPressedThisFrame)
+            {
+                if (kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed) ToggleWaves();
+                else if (kb.leftAltKey.isPressed || kb.rightAltKey.isPressed) CycleArenaTier();
+                else ToggleArena();
+            }
 #endif
         }
 
@@ -116,6 +121,35 @@ namespace RealityEngine.Combat
             Vector3 p = cam.transform.position + fwd * 2.2f;
             if (!CombatArena.GroundAt(p, out Vector3 g)) g = new Vector3(p.x, cam.transform.position.y - 1.6f, p.z);
             TrainingDummy.Spawn(g + Vector3.up * 0.02f, Quaternion.LookRotation(-fwd));
+        }
+
+        static CombatArena EnsureArena()
+        {
+            if (CombatArena.Instance == null)
+            {
+                var origin = GameObject.Find("XR Origin");
+                CombatArena.Build(origin != null ? origin.transform.position : Vector3.zero);
+            }
+            return CombatArena.Instance;
+        }
+
+        /// <summary>Toolbelt "Waves" / Shift+L: start (teleporting into the arena if needed) or stop arena waves.</summary>
+        public static void ToggleWaves()
+        {
+            var arena = EnsureArena();
+            if (arena == null) return;
+            var waves = ArenaWaves.Ensure(arena);
+            if (waves == null) return;
+            if (!ArenaWaves.Active && !arena.PlayerInside())
+                arena.TogglePlayerTeleport();
+            waves.Toggle();
+        }
+
+        /// <summary>Toolbelt "Tier" / Alt+L: cycle Recruit / Veteran / Champion / Legend.</summary>
+        public static void CycleArenaTier()
+        {
+            var waves = ArenaWaves.Ensure(EnsureArena());
+            if (waves != null) waves.CycleTier();
         }
 
         public static void ToggleArena()

@@ -1252,3 +1252,38 @@ Combat depth for every enemy (Raider and Brute included):
 4. Spawn a **Warden**. Hit its shield 2-4 times hard with a mace or axe until "Guard broken!", then hit the body. Light taps on the shield should only clang. Watch for its shield bash when you stand close.
 5. Hit any enemy rapidly with blunt hits to see "Staggered - strike now!".
 6. Tell me if any enemy's parts look wrong (hood clipping, shield floating away from the arm, staff pose), if orbs are too fast or too slow to hit back, or if the duelist feels unfair.
+
+## Arena waves with difficulty tiers (2026-10-09)
+
+The arena now has a **wave mode**. On the left side, next to the spawn area, there is a bronze **gong** on a stone frame with a status board above it, and a short **tier pedestal** with a glowing pad beside it.
+
+- **Pick a tier:** touch the pad with your hand or a weapon. You can also use toolbelt **COMBAT > Tier** (page 4), or **Alt+L** on desktop. The pad colour and the board show the tier. You can't change tier during a run.
+
+  | Tier | Waves | Max enemies alive | Enemy HP | Enemy damage | Attack pace |
+  |---|---|---|---|---|---|
+  | Recruit | 5 | 2 | ×0.8 | ×0.7 | slower |
+  | Veteran | 6 | 3 | ×1 | ×1 | normal |
+  | Champion | 7 | 3 | ×1.35 | ×1.25 | faster |
+  | Legend | 8 | 4 | ×1.8 | ×1.5 | much faster |
+
+- **Start:** hit the gong with any weapon (or something you throw) faster than about 2.5 m/s. A softer tap just rings it. You can also use toolbelt **COMBAT > Waves**, which takes you into the arena first if you're outside, or **Shift+L**. Using either again stops the run.
+- **Waves get bigger and add enemy types as you go:**
+  - Raiders first.
+  - Duelists from wave 2.
+  - Wardens and Casters from wave 3.
+  - Champion and Legend can send a Brute from wave 4.
+  - The **final wave has a Brute boss** with 1.5× HP.
+
+  Enemies arrive one at a time through a cyan spawn column with a rising sound, keeping within the tier's limit on how many are alive at once.
+- **Between waves:** you get 6 s with a 3-2-1 countdown, and you heal 25%. Hit the gong to skip the wait.
+- **Clearing every wave:** you hear a fanfare and the gong, you're fully healed, and you get XP (80 per tier step plus 15 per wave, plus 10 per wave as you go). Your best cleared tier is saved and shown on the board as BEST.
+- **Losing:** dying ends the run and removes that run's enemies. Leaving the arena pauses new spawns. After 10 s outside you get a warning, and after 30 s outside the run ends.
+- While waves are running, the arena's normal one-at-a-time auto-spawn is switched off. Starting a run also clears any stray enemies inside the arena.
+- **Loot clean-up:** dropped enemy weapons are tidied. Once there are more than 8 lying around, the oldest ones that have sat untouched for over 20 s are removed. Any left untouched for 150 s are removed. Weapons you're holding, or that are stuck in something, are never removed.
+
+1. Ctrl+P with Link, then go to the arena (COMBAT > Arena). Find the gong on your left past the weapon table and touch the pad next to it. The tier should change, and the pad and board colour should change with it. Set it to **Recruit**.
+2. Grab a sword or mace and hit the gong hard. You should hear a deep bronze ring, see sparks and the gong swinging, see "Arena: RECRUIT - 5 waves", and get a short countdown before wave 1.
+3. Clear a wave. Check you see "+25% HP", the countdown, and the board showing WAVE x/5. Hit the gong during the break to skip it.
+4. Let yourself die once mid-run. The run should end, its enemies should disappear, and the board should go back to "RING THE GONG TO BEGIN".
+5. Clear Recruit fully. The board should show BEST RECRUIT.
+6. Tell me if the spawn pace feels too slow or too fast, or if the gong is hard to hit.
