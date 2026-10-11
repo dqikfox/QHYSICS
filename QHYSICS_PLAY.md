@@ -1319,3 +1319,75 @@ The arena is now dressed in dark stone with cyan accents. Everything is built in
 6. Punch or slash the heavy bag a few times quickly to see the combo counter.
 7. Start an arena wave (gong) after breaking some props. They should all reappear with a small cyan flash.
 8. Tell me if anything floats, clips into walls, blocks the walkways, or looks too bright or too dark on the headset.
+
+## Crystal Lab: crystal physics with in-game guides (2026-10-12)
+
+The Crystal Lab is a new area next to the plaza. It has 7 benches. Everything is built in code about 4 s after Play starts, so the scene file is unchanged.
+
+The lab goes on the first clear, level spot around the plaza, trying the left (west) side first. It never goes on top of the combat arena. All the parts are simple shapes, the crystals use one shared transparent URP Lit material, and there are only 2 always-on lights (the lab light and the cluster glow). The burner flame and the heat lamp each add one light, but only while they are on.
+
+**Getting there:**
+- Toolbelt **WORLD > Crystal Lab** takes you to the entrance.
+- Toolbelt **CRYSTAL** tab (the new 8th tab): Crystal Lab, Piezo, Pyro, Resonator, Calcite, Tribo, Hot Ice, or Ferro takes you straight to that bench.
+- The rest of the CRYSTAL chips spawn gadgets: Quartz, Tourmaline, LiTaO3, Calcite Rhomb, Polarizer, Igniter, Hammer, Wintergreen, Sugar Cube, Seed Crystal.
+- On desktop, **PageDown** goes to the next bench.
+
+**Every bench** has:
+- **A guide card** above it with tabs:
+  - **WHAT:** a plain-language explanation.
+  - **MATH:** the equations, the real constants and their sources.
+  - **TRY THIS:** step-by-step things to do.
+  - **LATTICE:** what the ions are doing. This tab also highlights the unit-cell model next to the card.
+  - **CHALLENGE:** starts that bench's starred challenge.
+- **A live readout line** and up to 12 control chips you can click with the ray or the mouse.
+- **A unit-cell model** on the right that moves with the experiment.
+
+Hovering or holding a crystal item fills the INSPECT strip.
+
+The challenges are in the new **Crystal Lab** chapter (EXPERIMENTS > Challenges > Crystal Lab tab). They are all unlocked from the start.
+
+Every model's simplifications are written in small grey text on its WHAT page.
+
+1. **Get to the lab.** Press Ctrl+P with Link and wait about 5 s. Open the toolbelt and choose WORLD > **Crystal Lab**.
+   - You should land at the entrance facing the welcome board, with the CRYSTAL LAB sign behind you. Benches should be on three sides, with a glowing quartz cluster in the middle.
+   - Press PageDown on desktop, or tap the CRYSTAL tab chips, to visit each bench.
+2. **Piezo (bench 1).**
+   - Grab the cyan handwheel on the press and roll your wrist clockwise (desktop: E on the wheel, or the Press + chip). The electrometer should climb about 0.8 V per newton. Reaching 1 kV completes the "Squeeze 1 kV" challenge if it is running.
+   - Hold the press still: the voltage should drain away. Now release: it should go **negative**.
+   - Open the press (Release chip). Grab the hammer and hit the crystal hard. You should get a spark at the gap, a snap, and a buzz in the hand holding the hammer.
+   - Turn the red valve to gas ON, then strike again: the burner should light (blue flame with a whoosh).
+   - Switch **Material: PZT**: a light tap now sparks.
+   - Cycle **Drive** through to Reson.: you should hear the divided-down resonance, and the readout should show dL in pm.
+   - Spawn CRYSTAL > **Igniter**. Turn the gas back on, hold the igniter tip at the nozzle, and pull the trigger.
+3. **Pyro (bench 2).**
+   - Lamp ON. Within a few seconds the paper bits should jump up and dance under the plate, ticking, and the electroscope leaves should spread.
+   - Leave the lamp on. Once the temperature levels off, the charge should fade and the bits should fall.
+   - Lamp OFF and Cold ON. The bits should dance again, and the top face should now read **+**.
+   - Try the tourmaline. It is held closer (8 mm), charges more slowly, and still lifts the bits.
+4. **Resonator (bench 3).**
+   - You should hear a hum plus a 256 Hz reference, beating slowly. The tine and the green divider LEDs should ripple, and the second hand should tick.
+   - Trim -100 / -10 / -1 / -0.1 ng until the error is within +/-10 ppm. The readout should turn green, you should hear a ring, and the challenge should tick.
+   - Turn the OVEN knob: the fork error should be a parabola.
+   - Switch **Cut: AT 10MHz**: the temperature curve should be much flatter.
+5. **Calcite (bench 4).**
+   - Look down at the tilted light box: the dot should show twice.
+   - Turn the teal ring: one image should orbit the other.
+   - Turn the violet ring, or use the Polar. chips: one image should vanish, then 90 degrees later the other.
+   - Exaggerate x3 widens the gap.
+   - Spawn CRYSTAL > **Polarizer** and hold it flat over the crystal. The readout should say "(your sheet)".
+   - Polarizer 2 ON plus crossed polarizers should make both images go dark.
+6. **Tribo (bench 5).**
+   - Grab a white mint from the tray and smash it on the anvil inside the dark hood. You should get a blue flash, a crackle, 3 fragments, and the spectrum bars should peak at 450.
+   - Press **DROP PESTLE** on the mint that's already on the anvil.
+   - A sugar cube should give a fainter flash, with the bars in the UV.
+   - Bang the two quartz pebbles together for an orange glow.
+   - On desktop: hold a candy and left-click to crunch it.
+7. **Hot ice (bench 6).**
+   - Grab the seed rod from its rack and dip the white tip into the clear beaker. Needles should race outward from that point, and the thermometer should go from 22 to about 54 C. The solid-by-mass figure should read about 38% fast, then climb as it cools (time-lapse).
+   - Re-melt, then Fresh batch, to repeat.
+8. **Ferro (bench 7).**
+   - The green P-E loop should trace on the scope, and the domain tiles should flip red and blue.
+   - Amp 0.8 kV/mm (below Ec) should give no switching.
+   - **T 140 C** should collapse the loop to an S-line, and the readout should switch to PARAELECTRIC with epsR. Do this with the "Curie Point" challenge running to finish it.
+9. **Challenges.** EXPERIMENTS > Challenges should now show 3 tabs: "Ch 1 Faraday", "Crystal Lab", "Sandbox / Extra". Start "Piezo Igniter" from the bench card's CHALLENGE tab and complete it. The objective overlay should show "Light the burner with a piezo spark", then stars.
+10. **Tell me** if any card text is too small or too big in the headset, if a bench clips into Giza geometry, if the lab spawned somewhere odd (the Console logs "CrystalLab: built 7 stations at ..."), or if any bench feels confusing.
