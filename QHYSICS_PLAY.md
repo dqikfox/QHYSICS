@@ -1391,3 +1391,27 @@ Every model's simplifications are written in small grey text on its WHAT page.
    - **T 140 C** should collapse the loop to an S-line, and the readout should switch to PARAELECTRIC with epsR. Do this with the "Curie Point" challenge running to finish it.
 9. **Challenges.** EXPERIMENTS > Challenges should now show 3 tabs: "Ch 1 Faraday", "Crystal Lab", "Sandbox / Extra". Start "Piezo Igniter" from the bench card's CHALLENGE tab and complete it. The objective overlay should show "Light the burner with a piezo spark", then stars.
 10. **Tell me** if any card text is too small or too big in the headset, if a bench clips into Giza geometry, if the lab spawned somewhere odd (the Console logs "CrystalLab: built 7 stations at ..."), or if any bench feels confusing.
+
+
+## Crystal Lab benches 8-9 (LCD, Bragg) + Piezo Strike skill (2026-10-12)
+
+What's new: two more Crystal Lab benches in the middle row either side of the quartz cluster (bench 8 Liquid Crystal Display, bench 9 Bragg Diffraction), a new "Pixel Physics" and "Bragg's Law" challenge in the Crystal Lab chapter, and a Piezo Strike skill (Skills > MAGIC) that puts a PZT igniter element in your blunt weapons. Runtime only; Faraday.unity is not edited.
+
+Ctrl+P (with Link for the headset), wait ~5 s for the lab to build. Console: "CrystalLab: built 9 stations at ...".
+
+1. **Reach the new benches.** Toolbelt CRYSTAL tab > **LCD** or **Bragg** (page 2 of the chips), or WORLD > Crystal Lab and walk to the middle row. Desktop: PageDown cycles all 9 benches.
+2. **LCD (bench 8).**
+   - Look through the purple analyser ring at the backlit cell: it should be white. Tap **V +0.05** repeatedly (or twist the cyan knob). Nothing until ~0.85 V, then it darkens quickly; by 3 V it is nearly black. The live line shows Vth 0.85 V, tau_off ~27 ms, leak ~5%.
+   - The two-digit display on the right counts seconds; driven segments are the dark ones. Below ~0.85 V the digits disappear.
+   - **Analyser 90/0**: the picture inverts (black background, bright digits).
+   - **Lamp: ON**, V 0: after ~10-20 s the cell passes 35.3 C, the readout says ISOTROPIC and the whole cell goes black. Lamp off and it returns.
+   - **Drive: DC** with a few volts: an amber "ion damage" figure climbs and contrast fades. **Fresh cell** resets it.
+   - **Gap** chip: 2.65 um gives ~0% leak (Gooch-Tarry first minimum), 1.5 um leaks ~33% (grey "white").
+   - Unit-cell model (right of the bench): rods twist 90 deg across 5 layers; with voltage the middle layers stand up; when hot they jiggle randomly.
+3. **Bragg (bench 9).**
+   - Opal (left): twist the green knob or **Tilt +5**. The reflected beam swings up toward you and shifts from green (550 nm) to blue. **Opal: 300 nm** starts red (660 nm). **Pores: water** makes the colour almost vanish (strength ~7%).
+   - X-ray goniometer (right): **Scan 5-60** sweeps theta at 2 deg/s; the crystal turns at theta and the Geiger arm at 2theta, the purple plot fills in, and the counter crackles at peaks. NaCl peaks: theta 15.85 (200), 33.1 (400), 55.0 (600) with K-beta twins at 14.3 / 29.6 / 47.8. **Ni filter: ON** removes the twins.
+   - Stop on a peak with **th +/-0.1**: the live line shows a = lambda / sin theta ~ 564 pm for NaCl (200). **Crystal: LiF / KCl** moves the peaks (LiF 22.5, KCl 14.2).
+4. **Challenges.** CHALLENGE tab on each card. "Pixel Physics": threshold within 0.06 V, black at <= 3 V, black at 0 V by heating. "Bragg's Law": park on NaCl (200) K-alpha, park on a K-beta peak with the filter off, opal red (>= 620 nm). EXPERIMENTS > Challenges > Crystal Lab should now list 10.
+5. **Piezo Strike.** Earn a point (or use one you have), K / toolbelt COMBAT > Skills > MAGIC > **Piezo Strike**. Maces and quarterstaffs grow a small cyan crystal stud at the head within ~1 s. In the Arena, hit an enemy with a mace or staff end (or a shield face / pommel) at a decent swing: a blue spark arcs into it with a snap and a haptic tick, a small blue Lightning number appears, and a toast like "PIEZO 7.45 kV 0.13 uC 0.49 mJ arc 2.5 mm". Hitting a Duelist / Raider during its glowing windup should break the attack into a short stagger ("Piezo shock - attack broken!"); rank 3 also breaks swings. Soft taps only click (under 3 kV). Console logs "PiezoStrike: first spark ..." once.
+6. **Tell me** if bench 8 or 9 overlaps the quartz cluster, a side bench or the welcome board, if the scan plot or LCD lamp hides the card's bottom chip row, if the opal colour or LCD contrast reads badly in the headset, and whether the piezo bonus feels too strong or too weak.
