@@ -78,6 +78,44 @@ namespace RealityEngine.Crystals
         public const double BaTiO3CurieC = 125.0;
         /// <summary>BaTiO3 spontaneous polarisation at room temperature ~0.26 C/m^2.</summary>
         public const double BaTiO3Ps = 0.26;
+
+        // ── Liquid crystal 5CB (4-cyano-4'-pentylbiphenyl), ~25 C ──
+        /// <summary>5CB birefringence dn = ne - no ~ 0.18 at 589 nm (ne ~1.71, no ~1.53; Li, Gauza & Wu, J. Appl. Phys. 96 (2004)).</summary>
+        public const double Lc5cbDn = 0.18;
+        /// <summary>5CB dielectric anisotropy d_eps = eps_par - eps_perp ~ +11.5 at 1 kHz (reported +11 to +13).</summary>
+        public const double Lc5cbDeps = 11.5;
+        /// <summary>5CB Frank constants splay / twist / bend (pN), Bradshaw et al., J. Physique 46, 1513 (1985); values vary ~15% between sources.</summary>
+        public const double Lc5cbK11 = 6.4e-12;
+        public const double Lc5cbK22 = 3.0e-12;
+        public const double Lc5cbK33 = 10.0e-12;
+        /// <summary>5CB nematic-isotropic (clearing) point 35.3 C (Gray, Harrison & Nash, Electron. Lett. 9, 130 (1973)).</summary>
+        public const double Lc5cbTniC = 35.3;
+        /// <summary>5CB rotational viscosity gamma1 ~ 0.08 Pa s at 25 C (order of magnitude; literature 0.07-0.10).</summary>
+        public const double Lc5cbGamma1 = 0.08;
+        /// <summary>Haller order-parameter exponent S = S0 (1 - T/T*)^beta, beta ~ 0.2 (Haller, Prog. Solid State Chem. 10, 103 (1975)).</summary>
+        public const double HallerBeta = 0.2;
+
+        // ── Bragg diffraction ──
+        /// <summary>Rock-salt lattice constants at room temperature (Intl. Tables for Crystallography / standard XRD reference data).</summary>
+        public const double NaClA = 564.02e-12;
+        public const double LiFA = 402.7e-12;
+        public const double KClA = 629.3e-12;
+        /// <summary>Cu K-alpha1 154.06 pm and K-beta 139.22 pm (Intl. Tables Vol. C); unfiltered K-beta / K-alpha intensity ~0.18.</summary>
+        public const double CuKa1 = 154.06e-12;
+        public const double CuKb = 139.22e-12;
+        public const double CuKbRatio = 0.18;
+        /// <summary>Opal: amorphous silica spheres n ~ 1.45, fcc packing fraction 0.74 (Sanders, Nature 204, 1151 (1964)).</summary>
+        public const double SilicaN = 1.45;
+        public const double OpalFill = 0.74;
+        public const double WaterN = 1.333;
+        public const double EthanolN = 1.361;
+
+        // ── PZT igniter element (Piezo Strike) ──
+        /// <summary>Model element: a 3 mm diameter x 6 mm long PZT-5A cylinder, as in push-button / gas igniters.</summary>
+        public const double PztIgniterDia = 3.0e-3;
+        public const double PztIgniterLen = 6.0e-3;
+        /// <summary>Stress cap ~50 MPa: soft PZT starts to depole under higher dynamic compression (order of magnitude from datasheets).</summary>
+        public const double PztMaxStress = 50e6;
     }
 
     /// <summary>Crystal objects can feed the INSPECT strip with live physics lines.</summary>
