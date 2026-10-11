@@ -13,7 +13,7 @@ namespace RealityEngine.Crystals
     /// </summary>
     public sealed class CrystalUnitCell : MonoBehaviour
     {
-        public enum Mode { QuartzPiezo, PyroLiTaO3, Resonator, Calcite, Tribo, HotIce, Perovskite }
+        public enum Mode { QuartzPiezo, PyroLiTaO3, Resonator, Calcite, Tribo, HotIce, Perovskite, Nematic, Bragg }
 
         public Mode CellMode;
         /// <summary>Main drive: stress / polarisation / phase / angle (station-defined, -1..1).</summary>
@@ -140,6 +140,19 @@ namespace RealityEngine.Crystals
                         AddIon(faces[i] * 0.1f, -1, 0.028f);
                     AddIon(Vector3.zero, +1, 0.035f);
                     break;
+                case Mode.Nematic:
+                    // 5 layers x 2 rod molecules x 3 beads (index = layer * 6 + rod * 3 + bead).
+                    for (int layer = 0; layer < 5; layer++)
+                        for (int rod = 0; rod < 2; rod++)
+                            for (int k = 0; k < 3; k++)
+                                AddIon(new Vector3(rod == 0 ? -0.06f : 0.06f, -0.1f + layer * 0.05f, 0f), 0, k == 1 ? 0.026f : 0.02f);
+                    break;
+                case Mode.Bragg:
+                    // Three (200)-type planes of a rock-salt crystal: alternating Na+ / Cl- along each plane.
+                    for (int layer = 0; layer < 3; layer++)
+                        for (int i = 0; i < 5; i++)
+                            AddIon(new Vector3(-0.12f + i * 0.06f, 0.06f - layer * 0.07f, 0f), (i + layer) % 2 == 0 ? +1 : -1, (i + layer) % 2 == 0 ? 0.022f : 0.034f);
+                    break;
             }
             var title = CrystalFx.Text(transform, "Title", _title, 2.2f, new Color(0f, 0.9f, 1f, 1f), new Vector3(0f, 0.21f, 0f), new Vector2(4.2f, 0.6f));
             title.transform.localScale = Vector3.one * 0.1f;
@@ -246,6 +259,22 @@ namespace RealityEngine.Crystals
                         else if (q < 0)
                             p -= new Vector3(0f, 0.008f * s, 0f);
                         break;
+                    case Mode.Nematic:
+                    {
+                        // Drive = field tilt 0..1 (max mid-cell, walls anchored), Aux = disorder 0..1 (temperature).
+                        int layer = i / 6, rodIdx = (i % 6) / 3, k = i % 3 - 1;
+                        Vector3 jit = _jitter[layer * 6 + rodIdx * 3];
+                        float twist = layer / 4f * 90f + Mathf.Sin(t * 2.3f + jit.x) * 70f * Aux;
+                        float tilt = Mathf.Clamp01(s) * 80f * Mathf.Sin(Mathf.PI * layer / 4f) + Mathf.Sin(t * 1.9f + jit.y) * 60f * Aux;
+                        float tw = twist * Mathf.Deg2Rad, tl = tilt * Mathf.Deg2Rad;
+                        Vector3 dir = new Vector3(Mathf.Cos(tl) * Mathf.Cos(tw), Mathf.Sin(tl), Mathf.Cos(tl) * Mathf.Sin(tw));
+                        p = _base[i] + dir * (0.032f * k);
+                        q = 0;
+                        break;
+                    }
+                    case Mode.Bragg:
+                        p += new Vector3(Mathf.Sin(t * 9f + _jitter[i].x), Mathf.Sin(t * 8f + _jitter[i].y), 0f) * 0.002f;
+                        break;
                 }
                 _ions[i].localPosition = p;
                 if (q > 0 && q < 2) { plusC += p; np++; }
@@ -273,12 +302,20 @@ namespace RealityEngine.Crystals
                 case Mode.Tribo:
                     SetArrow(new Vector3(-0.02f - Aux * 0.05f, 0.14f, 0f), new Vector3(0.02f + Aux * 0.05f, 0.14f, 0f));
                     break;
+                case Mode.Bragg:
+                {
+                    // Incoming ray at glancing angle theta (Drive = theta / 90 deg) onto the top plane.
+                    float th = Mathf.Clamp01(s) * Mathf.PI * 0.5f;
+                    Vector3 hit = new Vector3(0f, 0.06f, 0f);
+                    SetArrow(hit + new Vector3(-Mathf.Cos(th), Mathf.Sin(th), 0f) * 0.14f, hit + new Vector3(-Mathf.Cos(th), Mathf.Sin(th), 0f) * 0.02f);
+                    break;
+                }
                 default:
                     SetArrow(Vector3.zero, Vector3.zero);
                     break;
             }
             if (_frameR != null)
-                _frameR.enabled = Highlight > 0.5f || CellMode == Mode.Perovskite || CellMode == Mode.PyroLiTaO3;
+                _frameR.enabled = Highlight > 0.5f || CellMode == Mode.Perovskite || CellMode == Mode.PyroLiTaO3 || CellMode == Mode.Nematic;
         }
 
         public void SetCaption(string text)
