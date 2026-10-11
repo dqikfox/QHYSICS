@@ -195,7 +195,7 @@ namespace RealityEngine.Challenges
                 return;
             }
             _instance = this;
-            Campaign = BuildStarterCampaign();
+            Campaign = RealityEngine.Crystals.CrystalChallenges.Append(BuildStarterCampaign());
             ChapterCatalog.Build(Campaign);
             _progress = ChallengeProgress.Load();
             ApplyUnlockState();
@@ -1973,6 +1973,7 @@ namespace RealityEngine.Challenges
             _pollTimer = 0f;
             _peakInducedEmf = 0f;
             _peakMutualEmf = 0f;
+            RealityEngine.Crystals.CrystalGoals.Clear();
             _refsValid = false; // force refresh on first poll
             if (def.id == "induction")
                 EnsureInductionBound();
@@ -2007,6 +2008,7 @@ namespace RealityEngine.Challenges
             _pollTimer = 0f;
             _peakInducedEmf = 0f;
             _peakMutualEmf = 0f;
+            RealityEngine.Crystals.CrystalGoals.Clear();
             _refsValid = false;
         }
 
@@ -2128,6 +2130,9 @@ namespace RealityEngine.Challenges
 
                 case ObjectiveType.MutualEmfThreshold:
                     return _peakMutualEmf >= (obj.targetValue > 0f ? obj.targetValue : 1e-4f);
+
+                case ObjectiveType.CrystalGoal:
+                    return RealityEngine.Crystals.CrystalGoals.IsMet(obj.targetTag, obj.targetValue);
 
                 default:
                     return false;
@@ -2533,6 +2538,8 @@ namespace RealityEngine.Challenges
                     float need = obj.targetValue > 0f ? obj.targetValue : 1e-4f;
                     return "pk " + (_peakMutualEmf * 1000f).ToString("0.000") + "/" + (need * 1000f).ToString("0.000") + " mV";
                 }
+                case ObjectiveType.CrystalGoal:
+                    return RealityEngine.Crystals.CrystalGoals.Readout(obj.targetTag, obj.targetValue);
                 default:
                     return string.Empty;
             }

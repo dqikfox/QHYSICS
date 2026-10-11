@@ -33,7 +33,9 @@ namespace RealityEngine.Challenges
         /// <summary>A LoadCrankGeneratorGadget is cranking with nearby peak |EMF| >= targetValue volts, held for targetCount seconds (sustained).</summary>
         CrankEmfThreshold = 11,
         /// <summary>A coupled LoadMutualCouplerGadget latched peak secondary |EMF| >= targetValue volts.</summary>
-        MutualEmfThreshold = 12
+        MutualEmfThreshold = 12,
+        /// <summary>Crystal Lab goal (RealityEngine.Crystals.CrystalGoals): targetTag = goal id; targetValue > 0 = best reported value >= targetValue, 0 = latched event.</summary>
+        CrystalGoal = 13
     }
 
     /// <summary>

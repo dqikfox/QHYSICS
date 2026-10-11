@@ -239,6 +239,9 @@ namespace RealityEngine.UI
         {
             if (t == null)
                 return "-";
+            var crystal = t.GetComponentInParent<RealityEngine.Crystals.ICrystalInspectable>();
+            if (crystal != null)
+                return crystal.InspectStats(selected);
 
             var circuit = t.GetComponentInParent<InductionCircuit>();
             if (circuit == null)
@@ -324,6 +327,9 @@ namespace RealityEngine.UI
         {
             if (t == null)
                 return "";
+            var crystal = t.GetComponentInParent<RealityEngine.Crystals.ICrystalInspectable>();
+            if (crystal != null)
+                return crystal.InspectDetail();
             var circuit = t.GetComponentInParent<InductionCircuit>();
             if (circuit == null)
                 circuit = UnityEngine.Object.FindFirstObjectByType<InductionCircuit>(FindObjectsInactive.Exclude);
@@ -344,6 +350,9 @@ namespace RealityEngine.UI
 
         static string FormatHints(Transform t, bool selected)
         {
+            var crystal = t != null ? t.GetComponentInParent<RealityEngine.Crystals.ICrystalInspectable>() : null;
+            if (crystal != null)
+                return crystal.InspectHint(selected);
             if (t.GetComponentInParent<FieldProbe>() != null)
                 return selected ? "Move tip near magnet poles" : "Grab probe | sample B(r)";
             if (t.GetComponentInParent<MultimeterProbe>() != null)

@@ -48,6 +48,11 @@ namespace RealityEngine.Player
             if (key == "delete" || key == "empty")
                 return null;
 
+            // Crystal Lab gadgets (quartz, pyro crystals, polarizer, igniter, hammer, candy, seed crystal).
+            GameObject crystalGadget = RealityEngine.Crystals.CrystalLab.TrySpawnGadget(key, worldPos);
+            if (crystalGadget != null)
+                return crystalGadget;
+
             // Physics / measure gadgets (not CircuitLab Dispenser tags)
             if (key == "thin lens" || key == "thinlens" || key == "lens" || key == "optics" || key == "focus" || key == "optics bench" || key == "opticsbench")
                 return SpawnThinLens(worldPos);
