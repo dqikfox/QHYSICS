@@ -304,8 +304,11 @@ namespace RealityEngine.Combat
             TrainingDummy.Spawn(transform.TransformPoint(new Vector3(3.2f, 0.06f, -3.2f)), transform.rotation * Quaternion.Euler(0f, 180f, 0f));
             TrainingDummy.Spawn(transform.TransformPoint(new Vector3(4.4f, 0.06f, -1.2f)), transform.rotation * Quaternion.Euler(0f, 210f, 0f));
 
-            ArenaWaves.Ensure(this); // gong, tier plate, wave board + loot janitor
-            ArenaDecor.Build(this);  // arch, racks, breakables, braziers, torches, banners, columns, rune ring, heavy bag
+            // Isolated so a bug in one add-on never stops the other (or the caller's arena/enemy setup).
+            try { ArenaWaves.Ensure(this); } // gong, tier plate, wave board + loot janitor
+            catch (System.Exception e) { Debug.LogError("Combat: arena waves failed to build: " + e); }
+            try { ArenaDecor.Build(this); }  // arch, racks, breakables, braziers, torches, banners, columns, rune ring, heavy bag
+            catch (System.Exception e) { Debug.LogError("Combat: arena decor failed to build: " + e); }
         }
 
         void Restock(bool force)
