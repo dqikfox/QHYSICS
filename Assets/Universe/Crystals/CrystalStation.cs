@@ -33,7 +33,7 @@ namespace RealityEngine.Crystals
         {
             BuildBench();
             BuildStation();
-            Card = CrystalGuideCard.Create(transform, new Vector3(0f, 1.72f, 0.52f), Quaternion.Euler(-6f, 0f, 0f), GetContent());
+            Card = CrystalGuideCard.Create(transform, new Vector3(0f, 1.80f, 0.56f), Quaternion.Euler(-6f, 0f, 0f), GetContent());
             AddControls(Card);
             Card.SetLive(LiveLine);
             Cell = CrystalUnitCell.Create(transform, new Vector3(1.13f, 1.36f, 0.2f), CellMode, CellTitle);
