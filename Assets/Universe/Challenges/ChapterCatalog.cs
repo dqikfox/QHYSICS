@@ -40,6 +40,10 @@ namespace RealityEngine.Challenges
     {
         public const string Chapter1Id = "ch1_faradays_bench";
         public const string ExtraId = "extra_sandbox";
+        public const string CrystalId = "crystal_lab";
+
+        /// <summary>Crystal Lab chapter (non-sequential: every station challenge is open from the start).</summary>
+        public static readonly string[] CrystalIds = RealityEngine.Crystals.CrystalChallenges.Ids;
 
         static ChapterDefinition[] _chapters;
 
@@ -91,6 +95,8 @@ namespace RealityEngine.Challenges
                         continue;
                     if (Array.IndexOf(Chapter1Ids, d.id) >= 0)
                         continue;
+                    if (Array.IndexOf(CrystalIds, d.id) >= 0)
+                        continue;
                     extra.Add(d.id);
                 }
             }
@@ -104,7 +110,16 @@ namespace RealityEngine.Challenges
                 challengeIds = extra.ToArray(),
                 sequentialUnlock = false
             };
-            _chapters = new[] { ch1, ex };
+            var crystal = new ChapterDefinition
+            {
+                id = CrystalId,
+                order = 2,
+                title = "Crystal Lab",
+                subtitle = "Piezo, pyro, quartz clocks, calcite, glowing candy, hot ice, ferroelectrics",
+                challengeIds = CrystalIds,
+                sequentialUnlock = false
+            };
+            _chapters = new[] { ch1, crystal, ex };
         }
 
         public static ChapterDefinition Get(string chapterId)

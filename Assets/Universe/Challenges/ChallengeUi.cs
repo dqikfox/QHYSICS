@@ -208,8 +208,10 @@ namespace RealityEngine.Challenges
             for (int i = 0; i < chapters.Length; i++)
             {
                 int idx = i;
-                string label = chapters[i].order == 1 ? "Ch 1: Faraday's Bench" : chapters[i].title;
-                var tab = QhysicsUiBuilder.ChipButton(tabs, "Tab_" + chapters[i].id, label, new Vector2(i == 0 ? 400f : 360f, 50f),
+                bool compact = chapters.Length > 2;
+                string label = chapters[i].order == 1 ? (compact ? "Ch 1 Faraday" : "Ch 1: Faraday's Bench") : chapters[i].title;
+                float tabW = compact ? Mathf.Floor((ListWidth - 40f - 8f * (chapters.Length - 1)) / chapters.Length) : (i == 0 ? 400f : 360f);
+                var tab = QhysicsUiBuilder.ChipButton(tabs, "Tab_" + chapters[i].id, label, new Vector2(tabW, 50f),
                     () => SelectChapter(idx));
                 _chapterTabs.Add(tab);
             }
