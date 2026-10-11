@@ -21,6 +21,7 @@ namespace RealityEngine.Combat
 
     /// <summary>
     /// XP (kill 40, challenge 50 + 10/star, parry 5), levels (+1 point each) and a skill tree (MELEE / MAGIC / MIND / POWERS).
+    /// MAGIC also holds Piezo Strike (see PiezoStrike.cs: PZT igniter element in blunt weapons).
     /// Saved to persistentDataPath/QHYSICS/skills.json. Exposes multipliers used by combat code.
     /// </summary>
     public static class SkillSystem
@@ -36,6 +37,7 @@ namespace RealityEngine.Combat
             new SkillDef { id = "flow", name = "Flow", branch = "MAGIC", maxRank = 3, desc = "+20% mana regen" },
             new SkillDef { id = "overcharge", name = "Overcharge", branch = "MAGIC", maxRank = 3, desc = "+12% spell damage", requires = "mana_well", requiresRank = 1 },
             new SkillDef { id = "lasting_imbue", name = "Lasting Imbue", branch = "MAGIC", maxRank = 2, desc = "+50% imbue time", requires = "flow", requiresRank = 1 },
+            new SkillDef { id = "piezo_strike", name = "Piezo Strike", branch = "MAGIC", maxRank = 3, desc = "Blunt hits fire a PZT spark: shock dmg, breaks windups (r3: swings)" },
             new SkillDef { id = "deep_focus", name = "Deep Focus", branch = "MIND", maxRank = 3, desc = "+25% focus duration" },
             new SkillDef { id = "throwing_arm", name = "Throwing Arm", branch = "MIND", maxRank = 2, desc = "+12% throw speed" },
             new SkillDef { id = "light_grip", name = "Light Grip", branch = "MIND", maxRank = 2, desc = "Damage from slower swings" },
