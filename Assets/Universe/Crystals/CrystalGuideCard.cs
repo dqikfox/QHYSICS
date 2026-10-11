@@ -33,6 +33,8 @@ namespace RealityEngine.Crystals
 
         static readonly string[] Pages = { "WHAT", "MATH", "TRY THIS", "LATTICE", "CHALLENGE" };
         const float W = 940f, H = 700f;
+        /// <summary>Card is ~1.3 m wide (1.35 x the shared 1 mm/unit canvas scale) so 15-22 pt body text stays readable from the stand point ~1.6 m away in the headset.</summary>
+        const float VrScale = 1.35f;
 
         Canvas _canvas;
         TextMeshProUGUI _title, _status, _body, _live;
@@ -62,6 +64,7 @@ namespace RealityEngine.Crystals
         {
             _canvas = QhysicsUiBuilder.CreateWorldCanvas("Canvas", transform, new Vector2(W + 20f, H + 20f));
             _canvas.sortingOrder = 40;
+            _canvas.transform.localScale = Vector3.one * (QhysicsUiStyle.CanvasScale * VrScale);
             QhysicsUiBuilder.WireEventCamera(_canvas);
             Image face = QhysicsUiBuilder.BorderPanel(_canvas.transform, "Panel", new Vector2(W, H));
 
