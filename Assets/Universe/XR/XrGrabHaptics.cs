@@ -138,7 +138,7 @@ namespace RealityEngine.XR
             return rb != null ? rb : t.GetComponentInParent<Rigidbody>();
         }
 
-        static XRNode? NodeFor(XRBaseInteractor i)
+        internal static XRNode? NodeFor(XRBaseInteractor i)
         {
             if (i == null)
                 return null;

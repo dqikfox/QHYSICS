@@ -53,7 +53,14 @@ namespace RealityEngine.Audio
         WaveClear = 44,
         Pickup = 45,
         SpawnIn = 46,
-        Ignite = 47
+        Ignite = 47,
+        CrystalClick = 48,
+        SparkSnap = 49,
+        CrystalRing = 50,
+        TriboCrackle = 51,
+        PyroTick = 52,
+        GasWhoosh = 53,
+        FreezeFront = 54
     }
 
     /// <summary>
@@ -197,6 +204,14 @@ namespace RealityEngine.Audio
                 case SfxId.Pickup: return Arp("sfx_pickup", new[] { 880f, 1318.5f, 1760f }, 0.05f, 0.35f);
                 case SfxId.SpawnIn: return Sweep("sfx_spawnin", 0.5f, 200f, 2200f, 0.5f);
                 case SfxId.Ignite: return Sweep("sfx_ignite", 0.4f, 300f, 2400f, 0.55f);
+                // Crystal Lab
+                case SfxId.CrystalClick: return Metal("sfx_crystal_click", 0.12f, new[] { 2900f, 4310f, 6120f });
+                case SfxId.SparkSnap: return Impact("sfx_spark_snap", 0.09f, 900f, 0.5f, 9000f);
+                case SfxId.CrystalRing: return Gong("sfx_crystal_ring", 1.6f, new[] { 1318.5f, 2644.9f, 3961.2f, 5264.2f });
+                case SfxId.TriboCrackle: return Crack("sfx_tribo_crackle", 0.22f);
+                case SfxId.PyroTick: return Tone("sfx_pyro_tick", 0.03f, 3400f, 2600f, 0.3f, 120f);
+                case SfxId.GasWhoosh: return Sweep("sfx_gas_whoosh", 0.6f, 180f, 1200f, 0.6f);
+                case SfxId.FreezeFront: return Sweep("sfx_freeze_front", 0.8f, 4000f, 900f, 0.4f);
             }
             return Tone("sfx_default", 0.1f, 440f, 0f, 0.4f, 20f);
         }
