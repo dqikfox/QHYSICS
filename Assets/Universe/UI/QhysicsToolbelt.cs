@@ -35,7 +35,7 @@ namespace RealityEngine.UI
             new[] { "Challenges", "Induction", "New Run", "Save", "Load" },
             new string[0], // CARRY: filled live from PlayerCarryInventory (the old separate tools row)
             new[] { "Dagger", "Sword", "Spear", "Mace", "Shield", "Enemy", "Brute", "Dummy", "Skills", "Arena", "Axe", "Saber", "Staff", "Tower", "Duelist", "Caster", "Warden", "Waves", "Tier" },
-            new[] { "Crystal Lab", "Piezo", "Pyro", "Resonator", "Calcite", "Tribo", "Hot Ice", "Ferro", "Quartz", "Tourmaline", "LiTaO3", "Calcite Rhomb", "Polarizer", "Igniter", "Hammer", "Wintergreen", "Sugar Cube", "Seed Crystal" }
+            new[] { "Crystal Lab", "Piezo", "Pyro", "Resonator", "Calcite", "Tribo", "Hot Ice", "Ferro", "LCD", "Bragg", "Quartz", "Tourmaline", "LiTaO3", "Calcite Rhomb", "Polarizer", "Igniter", "Hammer", "Wintergreen", "Sugar Cube", "Seed Crystal" }
         };
 
         [SerializeField] bool visible;

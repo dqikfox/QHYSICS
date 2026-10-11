@@ -15,8 +15,9 @@ using UnityEngine.InputSystem;
 namespace RealityEngine.Crystals
 {
     /// <summary>
-    /// The Crystal Lab: a runtime-built area near the plaza (no scene edits) with seven benches - piezo, pyro,
-    /// quartz resonator, calcite birefringence, triboluminescence, hot-ice growth and ferroelectric hysteresis.
+    /// The Crystal Lab: a runtime-built area near the plaza (no scene edits) with nine benches - piezo, pyro,
+    /// quartz resonator, calcite birefringence, triboluminescence, hot-ice growth, ferroelectric hysteresis, and in the
+    /// middle row the twisted-nematic liquid-crystal display and Bragg diffraction (opal + X-ray goniometer).
     /// Reach it from toolbelt WORLD > Crystal Lab or the CRYSTAL tab (station chips travel straight to a bench);
     /// desktop PageDown cycles the benches. Built 4 s after load, one bench per frame (no hitch), at the first
     /// clear, level site around the plaza that is not the combat arena.
@@ -36,7 +37,9 @@ namespace RealityEngine.Crystals
             new[] { "calcite", "birefringence" },
             new[] { "tribo", "triboluminescence" },
             new[] { "hot ice", "growth", "crystal growth" },
-            new[] { "ferro", "ferroelectric", "curie" }
+            new[] { "ferro", "ferroelectric", "curie" },
+            new[] { "lcd", "liquid crystal", "liquid crystals", "lcd station" },
+            new[] { "bragg", "bragg diffraction", "x-ray", "xray", "opal" }
         };
 
         readonly List<CrystalStation> _stations = new List<CrystalStation>();
@@ -97,9 +100,11 @@ namespace RealityEngine.Crystals
                 g => g.AddComponent<BirefringenceStation>(),
                 g => g.AddComponent<TriboStation>(),
                 g => g.AddComponent<GrowthStation>(),
-                g => g.AddComponent<FerroStation>()
+                g => g.AddComponent<FerroStation>(),
+                g => g.AddComponent<LiquidCrystalStation>(),
+                g => g.AddComponent<BraggStation>()
             };
-            // Back row (3), right side (2), left side (2). Local -Z faces the plaza / entrance.
+            // Back row (3), right side (2), left side (2), middle row (2, either side of the quartz cluster). Local -Z faces the plaza / entrance.
             var poses = new (Vector3 p, float yaw)[]
             {
                 (new Vector3(-4.2f, 0f, 3.2f), 0f),
@@ -108,7 +113,9 @@ namespace RealityEngine.Crystals
                 (new Vector3(5.4f, 0f, 0.4f), 90f),
                 (new Vector3(5.4f, 0f, -2.6f), 90f),
                 (new Vector3(-5.4f, 0f, -2.6f), -90f),
-                (new Vector3(-5.4f, 0f, 0.4f), -90f)
+                (new Vector3(-5.4f, 0f, 0.4f), -90f),
+                (new Vector3(-2.4f, 0f, -0.5f), 0f),
+                (new Vector3(2.4f, 0f, -0.5f), 0f)
             };
             for (int i = 0; i < types.Length; i++)
             {
@@ -244,11 +251,11 @@ namespace RealityEngine.Crystals
             title.fontStyle = TMPro.FontStyles.Bold;
             var back = CrystalFx.Text(shell, "SignTextIn", "CRYSTAL LAB", 3.2f, new Color(0f, 0.9f, 1f), new Vector3(0f, 2.78f, -HalfZ + 0.04f), new Vector2(3.8f, 0.45f));
             back.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
-            CrystalFx.Text(shell, "SignSub", "piezo  pyro  quartz  calcite  tribo  hot ice  ferro", 1.3f, new Color(0.7f, 0.9f, 1f), new Vector3(0f, 2.42f, -HalfZ - 0.04f), new Vector2(3.8f, 0.2f));
+            CrystalFx.Text(shell, "SignSub", "piezo  pyro  quartz  calcite  tribo  hot ice  ferro  lcd  bragg", 1.3f, new Color(0.7f, 0.9f, 1f), new Vector3(0f, 2.42f, -HalfZ - 0.04f), new Vector2(3.8f, 0.2f));
 
             // Welcome board just inside the entrance.
             var welcome = CrystalFx.Text(shell, "Welcome",
-                "<b>WELCOME TO THE CRYSTAL LAB</b>\nSeven benches. Each has a guide card: WHAT / MATH / TRY THIS / LATTICE / CHALLENGE.\n"
+                "<b>WELCOME TO THE CRYSTAL LAB</b>\nNine benches. Each has a guide card: WHAT / MATH / TRY THIS / LATTICE / CHALLENGE.\n"
                 + "Toolbelt CRYSTAL tab: jump to a bench or spawn crystals.  Desktop: PageDown = next bench.\n"
                 + "Point at anything and read the INSPECT strip.", 1.1f, new Color(0.8f, 0.95f, 1f),
                 new Vector3(0f, 1.55f, -HalfZ + 1.4f), new Vector2(3.4f, 0.6f));
@@ -602,7 +609,8 @@ namespace RealityEngine.Crystals
         public static readonly string[] Ids =
         {
             "crystal_piezo_1kv", "crystal_piezo_burner", "crystal_pyro", "crystal_watch",
-            "crystal_calcite", "crystal_tribo", "crystal_hotice", "crystal_ferro"
+            "crystal_calcite", "crystal_tribo", "crystal_hotice", "crystal_ferro",
+            "crystal_lcd", "crystal_bragg"
         };
 
         static ChallengeObjective Goal(string id, string text, float target = 0f)
@@ -651,7 +659,15 @@ namespace RealityEngine.Crystals
                     90f, 45f, Goal("hot_ice", "Crystallise it, above 50 C")),
                 Def("crystal_ferro", "Curie Point", "See a full ferroelectric hysteresis loop, then heat BaTiO3 past its Curie point until the loop collapses.",
                     "Keep the drive amplitude above Ec (~1 kV/mm at 25 C) for one loop, then use T 140 C.",
-                    120f, 60f, Goal("ferro_loop", "Draw a hysteresis loop below Tc"), Goal("ferro_curie", "Collapse the loop above Tc (125 C)"))
+                    120f, 60f, Goal("ferro_loop", "Draw a hysteresis loop below Tc"), Goal("ferro_curie", "Collapse the loop above Tc (125 C)")),
+                Def("crystal_lcd", "Pixel Physics", "Find a liquid-crystal pixel's threshold, switch it black with voltage, then melt its order with heat.",
+                    "Analyser at 90 deg. Step V by 0.05: the knee is ~0.85 V. 3 V turns it black. Then V 0, Lamp ON and wait for 35.3 C.",
+                    150f, 70f, Goal("lcd_threshold", "Set V within 0.06 V of the threshold"), Goal("lcd_switch", "Turn the pixel black (< 10%) with <= 3 V"),
+                    Goal("lcd_melt", "Black at 0 V by heating past 35.3 C")),
+                Def("crystal_bragg", "Bragg's Law", "Find the NaCl X-ray peak, park on a K-beta line, and make the opal flash red.",
+                    "Scan 5-60, then stop on the tall spike near theta 15.9 deg. K-beta twins sit ~1.6 deg lower (Ni filter OFF). Opal: 300 nm, small tilt.",
+                    150f, 70f, Goal("bragg_nacl", "Park on the NaCl (200) K-alpha peak"), Goal("bragg_kbeta", "Park on a K-beta peak (filter off)"),
+                    Goal("opal_red", "Make the opal reflect red (>= 620 nm)"))
             };
         }
 
