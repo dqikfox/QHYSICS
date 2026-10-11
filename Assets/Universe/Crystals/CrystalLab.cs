@@ -153,6 +153,7 @@ namespace RealityEngine.Crystals
             rot = Quaternion.identity;
             clear = false;
             bool haveFallback = false;
+            int bestBlockers = int.MaxValue;
             Vector3 fb = center;
             Quaternion fbRot = rot;
             Vector3 arena = CombatArena.Instance != null ? CombatArena.Instance.Center : new Vector3(float.MaxValue, 0f, float.MaxValue);
@@ -170,43 +171,55 @@ namespace RealityEngine.Crystals
                 if (toPlaza.sqrMagnitude < 0.01f)
                     toPlaza = Vector3.back;
                 Quaternion r = Quaternion.LookRotation(-toPlaza.normalized);
-                if (!haveFallback)
+                int blockers = SiteBlockers(g, r);
+                if (blockers == 0)
                 {
+                    center = g;
+                    rot = r;
+                    clear = true;
+                    return;
+                }
+                // No clear site yet: remember the least obstructed grounded one (not just the first one found).
+                if (blockers < bestBlockers)
+                {
+                    bestBlockers = blockers;
                     haveFallback = true;
                     fb = g;
                     fbRot = r;
                 }
-                if (!SiteClear(g, r))
-                    continue;
-                center = g;
-                rot = r;
-                clear = true;
-                return;
             }
             if (haveFallback)
             {
                 center = fb;
                 rot = fbRot;
+                Debug.LogWarning("CrystalLab: no fully clear site near the plaza; using the least obstructed one (" + bestBlockers + " blocker score).");
+            }
+            else
+            {
+                Debug.LogWarning("CrystalLab: no ground found around the plaza; building at plaza height (the lab floor has its own collider).");
             }
         }
 
-        static bool SiteClear(Vector3 g, Quaternion r)
+        /// <summary>0 = clear and level. Otherwise the number of non-player colliders in the lab volume, +100 per corner that is
+        /// unlevel (> 0.6 m) or has no ground, so a fallback prefers a crowded-but-level site over a cliff edge.</summary>
+        static int SiteBlockers(Vector3 g, Quaternion r)
         {
+            int n = 0;
             var cols = UnityEngine.Physics.OverlapBox(g + Vector3.up * 1.45f, new Vector3(HalfX, 1.3f, HalfZ), r, ~0, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < cols.Length; i++)
             {
                 if (cols[i] == null || CombatInputGate.IsPlayerCollider(cols[i]))
                     continue;
-                return false;
+                n++;
             }
             // Also require roughly level ground at the four corners.
             Vector3[] corners = { new Vector3(HalfX, 0f, HalfZ), new Vector3(-HalfX, 0f, HalfZ), new Vector3(HalfX, 0f, -HalfZ), new Vector3(-HalfX, 0f, -HalfZ) };
             for (int i = 0; i < corners.Length; i++)
             {
                 if (!CombatArena.GroundAt(g + r * corners[i], out Vector3 c) || Mathf.Abs(c.y - g.y) > 0.6f)
-                    return false;
+                    n += 100;
             }
-            return true;
+            return n;
         }
 
         void BuildShell()
