@@ -456,7 +456,7 @@ namespace RealityEngine.Crystals
         LineRenderer[] _lines;
         float[] _lineUntil;
         int _next, _nextLine;
-        readonly MaterialPropertyBlock _mpb = new MaterialPropertyBlock();
+        MaterialPropertyBlock _mpb; // created in Build(): Unity forbids MaterialPropertyBlock in MonoBehaviour field initializers
 
         public static CrystalFlashPool Ensure()
         {
@@ -470,6 +470,7 @@ namespace RealityEngine.Crystals
 
         void Build()
         {
+            _mpb = new MaterialPropertyBlock();
             _lights = new Light[2];
             _beads = new Transform[2];
             _beadR = new Renderer[2];
