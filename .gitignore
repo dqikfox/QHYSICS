@@ -68,3 +68,6 @@ Assets/Real Materials/Textures/plaster common normal.png.meta
 /[Uu]ser[Ss]ettings/
 /.agents/
 /.claude/
+
+# local logs
+debug.log
